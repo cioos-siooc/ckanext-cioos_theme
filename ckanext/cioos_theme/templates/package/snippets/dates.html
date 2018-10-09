@@ -50,7 +50,25 @@
                 {{value}}
               </td>
             </tr>
+
+          {% elif 'temporal-extent-begin' == key %}
+            <tr rel="dc:relation" resource="_:extra{{ i }}">
+              <th scope="row" class="dataset-label" property="rdfs:label">Temporal Extent Begin</th>
+              <td class="dataset-details" property="rdf:value">
+                {{value}}
+              </td>
+            </tr>
+
+            {% elif 'temporal-extent-end' == key %}
+              <tr rel="dc:relation" resource="_:extra{{ i }}">
+                <th scope="row" class="dataset-label" property="rdfs:label">Temporal Extent End</th>
+                <td class="dataset-details" property="rdf:value">
+                  {{value}}
+                </td>
+              </tr>
+
           {% endif %}
+
         {% endfor %}
 
       {% endblock %}
