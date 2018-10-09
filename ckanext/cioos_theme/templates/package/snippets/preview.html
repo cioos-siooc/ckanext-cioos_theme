@@ -1,0 +1,19 @@
+<section class="preview">
+  {% block package_img_preview %}
+    {% for extra in h.sorted_extras(pkg_dict.extras) %}
+      {% set key, value = extra %}
+      {% if 'graphic-preview-file' == key %}
+        <h3>{{ _('Graphic Preview') }}</h3>
+        <table class="table table-striped table-bordered table-condensed">
+          <tbody>
+            <tr>
+              <td>
+                <img src="{{ value }}" style="max-width: 786px;"/>
+      	      </td>
+            </tr>
+          </tbody>
+        </table>
+      {% endif %}
+    {% endfor %}
+  {% endblock %}
+</section>

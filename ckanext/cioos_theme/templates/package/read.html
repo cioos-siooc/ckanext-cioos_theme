@@ -37,6 +37,14 @@
     {% snippet "package/snippets/resources_list.html", pkg=pkg, resources=pkg.resources %}
   {% endblock %}
 
+  {% block package_dates %}
+    {% snippet "package/snippets/dates.html", pkg_dict=pkg %}
+  {% endblock %}
+
+  {% block package_img_preview %}
+    {% snippet "package/snippets/preview.html", pkg_dict=pkg %}
+  {% endblock %}
+
   {% block package_tags %}
     {% snippet "package/snippets/tags.html", tags=pkg.tags %}
   {% endblock %}
