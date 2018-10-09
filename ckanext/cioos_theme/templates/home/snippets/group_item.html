@@ -1,0 +1,14 @@
+{% block group_item %}
+  <li class="media-item">
+    {% block item_inner %}
+      {% block image %}
+        <a class="media-image" href="{{ h.url_for(controller='group', action='read', id=group.name) }}">
+          <img src="{{ group.image_display_url or h.url_for_static('/base/images/placeholder-group.png') }}" alt="{{ group.name }}" class="media-image img-responsive">
+        </a>
+      {% endblock %}
+      {% block title %}
+        <h4 class="media-heading">{{ group.display_name }}</h4>
+      {% endblock %}
+    {% endblock %}
+  </li>
+{% endblock %}

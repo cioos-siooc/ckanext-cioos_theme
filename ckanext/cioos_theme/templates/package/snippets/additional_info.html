@@ -1,0 +1,162 @@
+<section class="additional-info">
+  <h3>{{ _('Additional Info') }}</h3>
+  <table class="table table-striped table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th scope="col">{{ _('Field') }}</th>
+        <th scope="col">{{ _('Value') }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% block package_additional_info %}
+
+
+        {% if pkg_dict.url %}
+          <tr>
+            <th scope="row" class="dataset-label">{{ _('Source') }}</th>
+            {% if h.is_url(pkg_dict.url) %}
+              <td class="dataset-details" property="foaf:homepage">{{ h.link_to(pkg_dict.url, pkg_dict.url, rel='foaf:homepage', target='_blank') }}</td>
+            {% else %}
+              <td class="dataset-details" property="foaf:homepage">{{ pkg_dict.url }}</td>
+            {% endif %}
+          </tr>
+        {% endif %}
+
+        {% if pkg_dict.author_email %}
+          <tr>
+            <th scope="row" class="dataset-label">{{ _("Author") }}</th>
+            <td class="dataset-details" property="dc:creator">{{ h.mail_to(email_address=pkg_dict.author_email, name=pkg_dict.author) }}</td>
+          </tr>
+        {% elif pkg_dict.author %}
+          <tr>
+            <th scope="row" class="dataset-label">{{ _("Author") }}</th>
+            <td class="dataset-details" property="dc:creator">{{ pkg_dict.author }}</td>
+          </tr>
+        {% endif %}
+
+        {% if pkg_dict.maintainer_email %}
+          <tr>
+            <th scope="row" class="dataset-label">{{ _('Maintainer') }}</th>
+            <td class="dataset-details" property="dc:contributor">{{ h.mail_to(email_address=pkg_dict.maintainer_email, name=pkg_dict.maintainer) }}</td>
+          </tr>
+        {% elif pkg_dict.maintainer %}
+          <tr>
+            <th scope="row" class="dataset-label">{{ _('Maintainer') }}</th>
+            <td class="dataset-details" property="dc:contributor">{{ pkg_dict.maintainer }}</td>
+          </tr>
+        {% endif %}
+
+        {% if pkg_dict.version %}
+          <tr>
+            <th scope="row" class="dataset-label">{{ _("Version") }}</th>
+            <td class="dataset-details">{{ pkg_dict.version }}</td>
+          </tr>
+        {% endif %}
+
+        {% if h.check_access('package_update',{'id':pkg_dict.id}) %}
+          <tr>
+            <th scope="row" class="dataset-label">{{ _("State") }}</th>
+            <td class="dataset-details">{{ _(pkg_dict.state) }}</td>
+          </tr>
+        {% endif %}
+        {% if pkg_dict.metadata_modified %}
+          <tr>
+            <th scope="row" class="dataset-label">{{ _("Last Updated") }}</th>
+            <td class="dataset-details">
+                {% snippet 'snippets/local_friendly_datetime.html', datetime_obj=pkg_dict.metadata_modified %}
+            </td>
+          </tr>
+        {% endif %}
+        {% if pkg_dict.metadata_created %}
+          <tr>
+            <th scope="row" class="dataset-label">{{ _("Created") }}</th>
+
+            <td class="dataset-details">
+                {% snippet 'snippets/local_friendly_datetime.html', datetime_obj=pkg_dict.metadata_created %}
+            </td>
+          </tr>
+        {% endif %}
+
+
+      {% block extras scoped %}
+
+
+	{% set items_to_skip = ['graphic-preview-description', 'coupled-resource', 'graphic-preview-type', 'spatial_harvester'] %}
+
+        {% for extra in h.sorted_extras(pkg_dict.extras) %}
+          {% set key, value = extra %}
+
+	  {% if key in items_to_skip %}
+	    {# do nothing #}
+
+	  {% elif 'dataset-reference-date' == key %}
+           {% for d in h.cioos_load_json(value) %}
+            <tr rel="dc:relation" resource="_:extra{{ i }}">
+              <th scope="row" class="dataset-label" property="rdfs:label">{{d['type'].title()}}</th>
+              <td class="dataset-details" property="rdf:value">
+		  {{d['value']}}</br>
+              </td>
+            </tr>
+	    {% endfor %}
+	  {% elif 'responsible-party' == key %}
+            <tr rel="dc:relation" resource="_:extra{{ i }}">
+              <th scope="row" class="dataset-label" property="rdfs:label">{{ key.replace("-", " ").title() }}</th>
+              <td class="dataset-details" property="rdf:value">
+                {% for d in h.cioos_load_json(value) %}
+		  {{ d.name }} - {{','.join(d.roles)}}</br>
+		{% endfor %}
+	      </td>
+            </tr>
+	  {% elif 'access_constraints' == key %}
+            <tr rel="dc:relation" resource="_:extra{{ i }}">
+              <th scope="row" class="dataset-label" property="rdfs:label">{{ key.replace("_", " ").title() }}</th>
+              <td class="dataset-details" property="rdf:value">
+                {{ '\n'.join(h.cioos_load_json(value)) }}
+	      </td>
+            </tr>
+	  {% elif 'licence' == key %}
+            <tr rel="dc:relation" resource="_:extra{{ i }}">
+              <th scope="row" class="dataset-label" property="rdfs:label">{{ key }}</th>
+              <td class="dataset-details" property="rdf:value">
+                {{ '\n'.join(h.cioos_load_json(value)) }}
+	      </td>
+            </tr>
+	  {% elif 'spatial' == key %}
+            <tr rel="dc:relation" resource="_:extra{{ i }}">
+              <th scope="row" class="dataset-label" property="rdfs:label">{{ key }}</th>
+              <td class="dataset-details" property="rdf:value">
+		{% set minx, miny, maxx, maxy = h.cioos_geojson_to_bbox(h.cioos_load_json(value)) %}
+                SW: ({{ miny }} lat, {{ minx }} long)</br>
+                NE: ({{ maxy }} lat, {{ maxx }} long)
+	      </td>
+            </tr>
+	  {% elif 'graphic-preview-file' == key %}
+            <tr rel="dc:relation" resource="_:extra{{ i }}">
+              <th scope="row" class="dataset-label" property="rdfs:label">Preview</th>
+              <td class="dataset-details" property="rdf:value">
+                <img src="{{ value }}" style="max-width: 380px;"/>
+	      </td>
+            </tr>
+	  {% elif 'contact-email' == key %}
+            <tr rel="dc:relation" resource="_:extra{{ i }}">
+              <th scope="row" class="dataset-label" property="rdfs:label">{{ key.replace("-", " ").title() }}</th>
+              <td class="dataset-details" property="rdf:value">
+                <a href="mailto:{{ value }}">{{ value }}</a>
+	      </td>
+            </tr>
+
+          {% else %}
+            <tr rel="dc:relation" resource="_:extra{{ i }}">
+              <th scope="row" class="dataset-label" property="rdfs:label">{{ key }}</th>
+              <td class="dataset-details" property="rdf:value">{{ value }}</td>
+            </tr>
+	  {% endif %}
+
+        {% endfor %}
+      {% endblock %}
+
+
+      {% endblock %}
+    </tbody>
+  </table>
+</section>

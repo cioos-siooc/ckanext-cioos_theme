@@ -1,0 +1,65 @@
+<div role="main" class="hero">
+  <div class="container">
+    <div class="row row1">
+      <div class="col-md-12 col1">
+        {% block search %}
+          {% snippet 'home/snippets/search.html' %}
+        {% endblock %}
+
+{#	<div class="box">
+	  {% snippet "spatial/snippets/spatial_query.html" , default_extent="[[48.0, -130.0], [60.0, -110.0]]" %}
+	</div>
+#}
+      </div>
+      <div class="col-md-12 col1" style="margin-top:20px">
+	<div class="box" style="padding:5px">
+
+       {% set groups = h.cioos_groups() %}
+       {% block group_list %}
+         <h3 class="heading" style="margin-left:15px; margin-top:10px; font-size:24px; color:rgb(68, 68, 68)">Search By Group</h3>
+         <ul class="media-grid" data-module="media-grid">
+          {% for group in groups %}
+	      <li class="media-item">
+	            <a class="media-image" href="{{ h.url_for(controller='group', action='read', id=group.name) }}">
+	              <img src="{{ group.image_display_url or h.url_for_static('/base/images/placeholder-group.png') }}" alt="{{ group.name }}" class="media-image img-responsive">
+	            </a>
+	            <span class="media-heading">{{ group.display_name }}</span>
+	      </li>
+          {% endfor %}
+        </ul>
+      {% endblock %}
+	</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+<div role="main">
+  <div class="container">
+    <div class="row row2">
+      <div class="col-md-6 col1">
+	<div class="box"> 
+	<div class="inner"> 
+	  <p>Welcome to the data discovery site for the Pacific Node of the CIOOS project.</p>
+	  <p>This site aims to provide open access to a wide range of resources related to the canadian oceans.</p>
+	  <p>As most of this work is on-going, new resources will gradually be uploaded. We also welcome suggestions from external visitors on relevant datasets that could be linked to the platform at: someone (at) cioos.org.</p>
+	</div>
+	</div>
+      </div>
+      <div class="col-md-6 col2">
+        {% block stats %}
+          {% snippet 'home/snippets/stats.html' %}
+        {% endblock %}
+      </div>
+
+      <div class="col-md-6 col2" style="margin-top:20px">
+	<div class="box">
+	  <div class="inner">
+            <p>{{"some snappy text or useful links here"}}</p>
+	 </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
