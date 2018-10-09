@@ -10,7 +10,6 @@
     <tbody>
       {% block package_additional_info %}
 
-
         {% if pkg_dict.url %}
           <tr>
             <th scope="row" class="dataset-label">{{ _('Source') }}</th>
@@ -77,86 +76,84 @@
           </tr>
         {% endif %}
 
+        {% block extras scoped %}
 
-      {% block extras scoped %}
+          {% set items_to_skip = ['graphic-preview-description', 'coupled-resource', 'graphic-preview-type', 'spatial_harvester',
+              'bbox-east-long', 'bbox-north-lat', 'bbox-south-lat', 'bbox-west-long', 'spatial', 'temporal-extent-begin' ,'temporal-extent-end'
+              'metadata-date', 'dataset-reference-date', 'frequency-of-update', 'graphic-preview-file'] %}
 
+          {% for extra in h.sorted_extras(pkg_dict.extras) %}
+            {% set key, value = extra %}
 
-	{% set items_to_skip = ['graphic-preview-description', 'coupled-resource', 'graphic-preview-type', 'spatial_harvester',
-      'bbox-east-long', 'bbox-north-lat', 'bbox-south-lat', 'bbox-west-long', 'spatial', 'temporal-extent-begin' ,'temporal-extent-end'
-      'metadata-date', 'dataset-reference-date', 'frequency-of-update'] %}
+            {% if key in items_to_skip %}
+              {# do nothing #}
 
-        {% for extra in h.sorted_extras(pkg_dict.extras) %}
-          {% set key, value = extra %}
+            {% elif 'dataset-reference-date' == key %}
+                   {% for d in h.cioos_load_json(value) %}
+                    <tr rel="dc:relation" resource="_:extra{{ i }}">
+                      <th scope="row" class="dataset-label" property="rdfs:label">{{d['type'].title()}}</th>
+                      <td class="dataset-details" property="rdf:value">
+          	  {{d['value']}}</br>
+                      </td>
+                    </tr>
+              {% endfor %}
+            {% elif 'responsible-party' == key %}
+                    <tr rel="dc:relation" resource="_:extra{{ i }}">
+                      <th scope="row" class="dataset-label" property="rdfs:label">{{ key.replace("-", " ").title() }}</th>
+                      <td class="dataset-details" property="rdf:value">
+                        {% for d in h.cioos_load_json(value) %}
+          	  {{ d.name }} - {{','.join(d.roles)}}</br>
+          	{% endfor %}
+                </td>
+                    </tr>
+            {% elif 'access_constraints' == key %}
+                    <tr rel="dc:relation" resource="_:extra{{ i }}">
+                      <th scope="row" class="dataset-label" property="rdfs:label">{{ key.replace("_", " ").title() }}</th>
+                      <td class="dataset-details" property="rdf:value">
+                        {{ '\n'.join(h.cioos_load_json(value)) }}
+                </td>
+                    </tr>
+            {% elif 'licence' == key %}
+                    <tr rel="dc:relation" resource="_:extra{{ i }}">
+                      <th scope="row" class="dataset-label" property="rdfs:label">{{ key }}</th>
+                      <td class="dataset-details" property="rdf:value">
+                        {{ '\n'.join(h.cioos_load_json(value)) }}
+                </td>
+                    </tr>
+            {% elif 'spatial' == key %}
+                    <tr rel="dc:relation" resource="_:extra{{ i }}">
+                      <th scope="row" class="dataset-label" property="rdfs:label">{{ key }}</th>
+                      <td class="dataset-details" property="rdf:value">
+          	{% set minx, miny, maxx, maxy = h.cioos_geojson_to_bbox(h.cioos_load_json(value)) %}
+                        SW: ({{ miny }} lat, {{ minx }} long)</br>
+                        NE: ({{ maxy }} lat, {{ maxx }} long)
+                </td>
+                    </tr>
+            {% elif 'graphic-preview-file' == key %}
+                    <tr rel="dc:relation" resource="_:extra{{ i }}">
+                      <th scope="row" class="dataset-label" property="rdfs:label">Preview</th>
+                      <td class="dataset-details" property="rdf:value">
+                        <img src="{{ value }}" style="max-width: 380px;"/>
+                </td>
+                    </tr>
+            {% elif 'contact-email' == key %}
+                    <tr rel="dc:relation" resource="_:extra{{ i }}">
+                      <th scope="row" class="dataset-label" property="rdfs:label">{{ key.replace("-", " ").title() }}</th>
+                      <td class="dataset-details" property="rdf:value">
+                        <a href="mailto:{{ value }}">{{ value }}</a>
+                </td>
+                    </tr>
 
-	  {% if key in items_to_skip %}
-	    {# do nothing #}
+            {% elif value != '' %}
+              <tr rel="dc:relation" resource="_:extra{{ i }}">
+                <th scope="row" class="dataset-label" property="rdfs:label">{{ key }}</th>
+                <td class="dataset-details" property="rdf:value">{{ value }}</td>
+              </tr>
+            {% endif %}
 
-	  {% elif 'dataset-reference-date' == key %}
-           {% for d in h.cioos_load_json(value) %}
-            <tr rel="dc:relation" resource="_:extra{{ i }}">
-              <th scope="row" class="dataset-label" property="rdfs:label">{{d['type'].title()}}</th>
-              <td class="dataset-details" property="rdf:value">
-		  {{d['value']}}</br>
-              </td>
-            </tr>
-	    {% endfor %}
-	  {% elif 'responsible-party' == key %}
-            <tr rel="dc:relation" resource="_:extra{{ i }}">
-              <th scope="row" class="dataset-label" property="rdfs:label">{{ key.replace("-", " ").title() }}</th>
-              <td class="dataset-details" property="rdf:value">
-                {% for d in h.cioos_load_json(value) %}
-		  {{ d.name }} - {{','.join(d.roles)}}</br>
-		{% endfor %}
-	      </td>
-            </tr>
-	  {% elif 'access_constraints' == key %}
-            <tr rel="dc:relation" resource="_:extra{{ i }}">
-              <th scope="row" class="dataset-label" property="rdfs:label">{{ key.replace("_", " ").title() }}</th>
-              <td class="dataset-details" property="rdf:value">
-                {{ '\n'.join(h.cioos_load_json(value)) }}
-	      </td>
-            </tr>
-	  {% elif 'licence' == key %}
-            <tr rel="dc:relation" resource="_:extra{{ i }}">
-              <th scope="row" class="dataset-label" property="rdfs:label">{{ key }}</th>
-              <td class="dataset-details" property="rdf:value">
-                {{ '\n'.join(h.cioos_load_json(value)) }}
-	      </td>
-            </tr>
-	  {% elif 'spatial' == key %}
-            <tr rel="dc:relation" resource="_:extra{{ i }}">
-              <th scope="row" class="dataset-label" property="rdfs:label">{{ key }}</th>
-              <td class="dataset-details" property="rdf:value">
-		{% set minx, miny, maxx, maxy = h.cioos_geojson_to_bbox(h.cioos_load_json(value)) %}
-                SW: ({{ miny }} lat, {{ minx }} long)</br>
-                NE: ({{ maxy }} lat, {{ maxx }} long)
-	      </td>
-            </tr>
-	  {% elif 'graphic-preview-file' == key %}
-            <tr rel="dc:relation" resource="_:extra{{ i }}">
-              <th scope="row" class="dataset-label" property="rdfs:label">Preview</th>
-              <td class="dataset-details" property="rdf:value">
-                <img src="{{ value }}" style="max-width: 380px;"/>
-	      </td>
-            </tr>
-	  {% elif 'contact-email' == key %}
-            <tr rel="dc:relation" resource="_:extra{{ i }}">
-              <th scope="row" class="dataset-label" property="rdfs:label">{{ key.replace("-", " ").title() }}</th>
-              <td class="dataset-details" property="rdf:value">
-                <a href="mailto:{{ value }}">{{ value }}</a>
-	      </td>
-            </tr>
-
-          {% else %}
-            <tr rel="dc:relation" resource="_:extra{{ i }}">
-              <th scope="row" class="dataset-label" property="rdfs:label">{{ key }}</th>
-              <td class="dataset-details" property="rdf:value">{{ value }}</td>
-            </tr>
-	  {% endif %}
-
-        {% endfor %}
-      {% endblock %}
-
+          {% endfor %}
+          
+        {% endblock %}
 
       {% endblock %}
     </tbody>
