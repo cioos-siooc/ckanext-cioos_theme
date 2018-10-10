@@ -1,0 +1,22 @@
+<section class="metadata_source">
+  <h3>{{ _('Metadata Spurce') }}</h3>
+  <table class="table table-bordered">
+    <tbody>
+      {% block package_metadata_source %}
+          <tr>
+            <td><img src='{{ pkg_dict.organization.image_url }}' /></td>
+            <td>
+              <span> <strong>{{  pkg_dict.organization.title }} </strong> </span>
+              {% if pkg_dict.url %}
+                  {% if h.is_url(pkg_dict.url) %}
+                    <span property="foaf:homepage"> <a href="{{ pkg_dict.url }}">{{ _('Source') }}</a> </span>
+                  {% else %}
+                    <span property="foaf:homepage"> {{ pkg_dict.url }} </span>
+                  {% endif %}
+              {% endif %}            
+            </td>
+          </tr>
+      {% endblock %}
+    </tbody>
+  </table>
+</section>

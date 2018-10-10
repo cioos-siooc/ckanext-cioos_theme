@@ -45,6 +45,10 @@
     {% snippet "package/snippets/dates.html", pkg_dict=pkg %}
   {% endblock %}
 
+  {% block package_metadata_source %}
+    {% snippet "package/snippets/metadata_source.html", pkg_dict=pkg %}
+  {% endblock %}
+
   {% block package_img_preview %}
     {% snippet "package/snippets/preview.html", pkg_dict=pkg %}
   {% endblock %}
