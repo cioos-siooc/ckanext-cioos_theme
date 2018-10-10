@@ -58,7 +58,7 @@
             <td class="dataset-details">{{ _(pkg_dict.state) }}</td>
           </tr>
         {% endif %}
-        
+
         {#
           {% if pkg_dict.metadata_modified %}
             <tr>
@@ -83,7 +83,7 @@
 
           {% set items_to_skip = ['graphic-preview-description', 'coupled-resource', 'graphic-preview-type', 'spatial_harvester',
               'bbox-east-long', 'bbox-north-lat', 'bbox-south-lat', 'bbox-west-long', 'spatial', 'temporal-extent-begin' ,'temporal-extent-end'
-              'metadata-date', 'dataset-reference-date', 'frequency-of-update', 'graphic-preview-file'] %}
+              'metadata-date', 'dataset-reference-date', 'frequency-of-update', 'graphic-preview-file', 'licence', 'access_constraints'] %}
 
           {% for extra in h.sorted_extras(pkg_dict.extras) %}
             {% set key, value = extra %}
@@ -109,6 +109,7 @@
           	{% endfor %}
                 </td>
                     </tr>
+            {#
             {% elif 'access_constraints' == key %}
                     <tr rel="dc:relation" resource="_:extra{{ i }}">
                       <th scope="row" class="dataset-label" property="rdfs:label">{{ key.replace("_", " ").title() }}</th>
@@ -116,13 +117,15 @@
                         {{ '\n'.join(h.cioos_load_json(value)) }}
                 </td>
                     </tr>
-            {% elif 'licence' == key %}
+            #}
+            {# {% elif 'licence' == key %}
                     <tr rel="dc:relation" resource="_:extra{{ i }}">
                       <th scope="row" class="dataset-label" property="rdfs:label">{{ key }}</th>
                       <td class="dataset-details" property="rdf:value">
                         {{ '\n'.join(h.cioos_load_json(value)) }}
                 </td>
                     </tr>
+            #}
             {% elif 'spatial' == key %}
                     <tr rel="dc:relation" resource="_:extra{{ i }}">
                       <th scope="row" class="dataset-label" property="rdfs:label">{{ key }}</th>
@@ -162,3 +165,4 @@
     </tbody>
   </table>
 </section>
+

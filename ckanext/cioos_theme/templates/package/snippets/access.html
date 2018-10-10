@@ -1,17 +1,24 @@
 <section class="access">
   <h3>{{ _('Access and Use') }}</h3>
-  <table class="table table-striped table-bordered table-condensed">
+  <table class="table table-bordered">
     <tbody>
       {% block package_access %}
-
-
           <tr>
-            <td class="dataset-details">
-                {% pkg_dict %}
+            <td>
+                {%  for extra in pkg_dict %}
+		  {% if 'licence' == extra.key %}
+		    <span> <strong>Licence:</strong> {{ '\n'.join(h.cioos_load_json(extra.value)) | default('Not Specified', true) }} </span>
+		  {% endif %}
+		{% endfor %}
+		<span>
+                {%  for extra in pkg_dict %}
+		  {% if 'access_constraints' == extra.key %}
+		    {{ '\n'.join(h.cioos_load_json(extra.value)) }}
+		  {% endif %}
+		{% endfor %}
+		</span>
             </td>
           </tr>
-
-
       {% endblock %}
     </tbody>
   </table>
