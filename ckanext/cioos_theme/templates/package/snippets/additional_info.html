@@ -58,23 +58,26 @@
             <td class="dataset-details">{{ _(pkg_dict.state) }}</td>
           </tr>
         {% endif %}
-        {% if pkg_dict.metadata_modified %}
-          <tr>
-            <th scope="row" class="dataset-label">{{ _("Last Updated") }}</th>
-            <td class="dataset-details">
-                {% snippet 'snippets/local_friendly_datetime.html', datetime_obj=pkg_dict.metadata_modified %}
-            </td>
-          </tr>
-        {% endif %}
-        {% if pkg_dict.metadata_created %}
-          <tr>
-            <th scope="row" class="dataset-label">{{ _("Created") }}</th>
+        
+        {#
+          {% if pkg_dict.metadata_modified %}
+            <tr>
+              <th scope="row" class="dataset-label">{{ _("Last Updated") }}</th>
+              <td class="dataset-details">
+                  {% snippet 'snippets/local_friendly_datetime.html', datetime_obj=pkg_dict.metadata_modified %}
+              </td>
+            </tr>
+          {% endif %}
+          {% if pkg_dict.metadata_created %}
+            <tr>
+              <th scope="row" class="dataset-label">{{ _("Created") }}</th>
 
-            <td class="dataset-details">
-                {% snippet 'snippets/local_friendly_datetime.html', datetime_obj=pkg_dict.metadata_created %}
-            </td>
-          </tr>
-        {% endif %}
+              <td class="dataset-details">
+                  {% snippet 'snippets/local_friendly_datetime.html', datetime_obj=pkg_dict.metadata_created %}
+              </td>
+            </tr>
+          {% endif %}
+        #}
 
         {% block extras scoped %}
 
@@ -152,7 +155,7 @@
             {% endif %}
 
           {% endfor %}
-          
+
         {% endblock %}
 
       {% endblock %}
