@@ -82,7 +82,7 @@
         {% block extras scoped %}
 
           {% set items_to_skip = ['graphic-preview-description', 'coupled-resource', 'graphic-preview-type', 'spatial_harvester',
-              'bbox-east-long', 'bbox-north-lat', 'bbox-south-lat', 'bbox-west-long', 'spatial', 'temporal-extent-begin' ,'temporal-extent-end'
+              'bbox-east-long', 'bbox-north-lat', 'bbox-south-lat', 'bbox-west-long', 'spatial', 'temporal-extent-begin' ,'temporal-extent-end',
               'metadata-date', 'dataset-reference-date', 'frequency-of-update', 'graphic-preview-file', 'licence', 'access_constraints'] %}
 
           {% for extra in h.sorted_extras(pkg_dict.extras) %}
@@ -165,4 +165,3 @@
     </tbody>
   </table>
 </section>
-

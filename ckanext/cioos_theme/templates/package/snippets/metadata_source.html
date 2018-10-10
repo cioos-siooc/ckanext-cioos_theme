@@ -4,16 +4,28 @@
     <tbody>
       {% block package_metadata_source %}
           <tr>
-            <td><img src='{{ pkg_dict.organization.image_url }}' /></td>
+            <td><img src='/base/images/{{ pkg_dict.organization.image_url }}' style="max-height:50px;"/></td>
             <td>
               <span> <strong>{{  pkg_dict.organization.title }} </strong> </span>
-              {% if pkg_dict.url %}
-                  {% if h.is_url(pkg_dict.url) %}
-                    <span property="foaf:homepage"> <a href="{{ pkg_dict.url }}">{{ _('Source') }}</a> </span>
+              {% for extra in pkg_dict %}
+                {% set key, value = extra %}
+                {% if key == "harvest_url" set url = value %}
+                {% if key == "guid" set guid = value %}
+                {% if key == "harvest_title" set title = value %}
+                {% if key == "harvest_job_id" set job = value %}
+              {% endfor %}
+
+              {% if url %}
+                  {% if h.is_url(url) %}
+                    <span property="foaf:homepage"> <a href="{{ url }}{{guid}}">{{ _('Source') }} from {{ title }}</a> </span>
                   {% else %}
-                    <span property="foaf:homepage"> {{ pkg_dict.url }} </span>
+                    <span property="foaf:homepage"> {{ url }}{{ guid }} </span>
                   {% endif %}
-              {% endif %}            
+              {% endif %}
+              {% if job %}
+                {% set job_url = h.url_for('harvest_object', id=job) %}
+                <span> <a href="{{ job_url }}">Download Metadata</a></span>
+              {% endif %}
             </td>
           </tr>
       {% endblock %}
