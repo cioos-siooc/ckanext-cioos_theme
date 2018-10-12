@@ -1,0 +1,32 @@
+<section class="metadata_source">
+  <h3>{{ _('Metadata Spurce') }}</h3>
+  <table class="table table-bordered">
+    <tbody>
+      {% block package_metadata_source %}
+          <tr>
+            <td><img src='/base/images/{{ pkg_dict.organization.image_url }}' style="max-height:50px;"/></td>
+            <td>
+	      {% set url = pkg_dict.extras | selectattr("key","equalto","harvest_url") | map(attribute="value") | join('') %}
+	      {% set guid = pkg_dict.extras | selectattr("key","equalto","guid") | map(attribute="value") | join('') %}
+	      {% set title = pkg_dict.extras | selectattr("key","equalto","harvest_title") | map(attribute="value") | join('') %}
+	      {% set job = pkg_dict.extras | selectattr("key","equalto","harvest_job_id") | map(attribute="value") | join('') %}
+
+              <span> <strong>{{  title }} </strong> </span> </br>
+
+              {% if url %}
+                  {% if h.is_url(url) %}
+                    <span property="foaf:homepage"> <a href="{{ url }}{{guid}}">{{ _('View Source') }}</a> </span>
+                  {% else %}
+                    <span property="foaf:homepage"> {{ url }}{{ guid }} </span>
+                  {% endif %}
+              {% endif %}
+              {% if job %}
+		{% set job_url = h.url_for(controller="packages", action="display_xml_original", id=job) %}
+                .<span> <a href="{{ job_url }}">Download Metadata</a></span>
+              {% endif %}
+            </td>
+          </tr>
+      {% endblock %}
+    </tbody>
+  </table>
+</section>

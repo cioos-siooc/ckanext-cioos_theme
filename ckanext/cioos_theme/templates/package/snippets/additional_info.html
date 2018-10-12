@@ -83,7 +83,8 @@
 
           {% set items_to_skip = ['graphic-preview-description', 'coupled-resource', 'graphic-preview-type', 'spatial_harvester',
               'bbox-east-long', 'bbox-north-lat', 'bbox-south-lat', 'bbox-west-long', 'spatial', 'temporal-extent-begin' ,'temporal-extent-end',
-              'metadata-date', 'dataset-reference-date', 'frequency-of-update', 'graphic-preview-file', 'licence', 'access_constraints'] %}
+              'metadata-date', 'dataset-reference-date', 'frequency-of-update', 'graphic-preview-file', 'licence', 'access_constraints',
+		'guid','h_job_id','h_object_id','h_source_id','h_source_title','h_source_url','gn_localized_url','gn_view_metadata_url'] %}
 
           {% for extra in h.sorted_extras(pkg_dict.extras) %}
             {% set key, value = extra %}
@@ -104,10 +105,8 @@
                     <tr rel="dc:relation" resource="_:extra{{ i }}">
                       <th scope="row" class="dataset-label" property="rdfs:label">{{ key.replace("-", " ").title() }}</th>
                       <td class="dataset-details" property="rdf:value">
-                        {% for d in h.cioos_load_json(value) %}
-          	  {{ d.name }} - {{','.join(d.roles)}}</br>
-          	{% endfor %}
-                </td>
+			{{ h.get_responsible_party(value) }}
+                      </td>
                     </tr>
             {#
             {% elif 'access_constraints' == key %}
