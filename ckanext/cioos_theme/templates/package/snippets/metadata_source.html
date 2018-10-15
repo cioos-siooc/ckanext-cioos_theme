@@ -4,7 +4,7 @@
     <tbody>
       {% block package_metadata_source %}
           <tr>
-            <td style="width:75px;"><img src='../uploads/group/{{ pkg_dict.organization.image_url }}' style="max-height:50px;"/></td>
+            <td style="width:76px;"><img src='../uploads/group/{{ pkg_dict.organization.image_url }}' style="max-height:50px; max-width: 50px;"/></td>
             <td>
 	      {% set url = pkg_dict.extras | selectattr("key","equalto","h_source_url") | map(attribute="value") | join('') %}
 	      {% set source_guid = pkg_dict.extras | selectattr("key","equalto","guid") | map(attribute="value") | join('') %}
