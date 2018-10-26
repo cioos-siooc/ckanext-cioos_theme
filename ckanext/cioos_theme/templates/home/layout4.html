@@ -38,13 +38,13 @@
   <div class="container">
     <div class="row row2">
       <div class="col-md-6 col1">
-	<div class="box">
-	<div class="inner">
-	  <p>Welcome to the data discovery site for the Pacific Node of the CIOOS project.</p>
-	  <p>This site aims to provide open access to a wide range of resources related to the canadian oceans.</p>
-	  <p>As most of this work is on-going, new resources will gradually be uploaded. We also welcome suggestions from external visitors on relevant datasets that could be linked to the platform at: someone (at) cioos.org.</p>
-	</div>
-	</div>
+<!--	<div class="box">
+	<div class="inner"> -->
+      {% block promoted %}
+        {% snippet 'home/snippets/promoted.html' %}
+      {% endblock %}
+<!--	</div>
+</div> -->
       </div>
       <div class="col-md-6 col2">
         {% block stats %}
@@ -55,7 +55,9 @@
       <div class="col-md-6 col2" style="margin-top:20px">
 	<div class="box">
 	  <div class="inner">
-            <p>{{"some snappy text or useful links here"}}</p>
+      <p>{{"some snappy text or useful links here"}}</p>
+      </br>
+      </br>
 	 </div>
         </div>
       </div>
