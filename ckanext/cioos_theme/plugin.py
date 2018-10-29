@@ -1,5 +1,6 @@
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
+from ckan.lib.plugins import DefaultTranslation
 import json
 from shapely.geometry import shape
 
@@ -74,7 +75,8 @@ def recent_packages_html():
 
 
 
-class Cioos_ThemePlugin(plugins.SingletonPlugin):
+class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
+    plugins.implements(plugins.ITranslation)
     plugins.implements(plugins.IConfigurer)
     plugins.implements(plugins.ITemplateHelpers)
     # IConfigurer
