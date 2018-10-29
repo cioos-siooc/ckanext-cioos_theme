@@ -92,7 +92,7 @@
             {% if key in items_to_skip %}
               {# do nothing #}
 
-            {% elif 'dataset-reference-date' == key %}
+            {% elif _('dataset-reference-date') == key %}
                    {% for d in h.cioos_load_json(value) %}
                     <tr rel="dc:relation" resource="_:extra{{ i }}">
                       <th scope="row" class="dataset-label" property="rdfs:label">{{d['type'].title()}}</th>
@@ -101,49 +101,49 @@
                       </td>
                     </tr>
               {% endfor %}
-            {% elif 'responsible-party' == key %}
+            {% elif _('responsible-party') == key %}
                     <tr rel="dc:relation" resource="_:extra{{ i }}">
-                      <th scope="row" class="dataset-label" property="rdfs:label">{{ key.replace("-", " ").title() }}</th>
+                      <th scope="row" class="dataset-label" property="rdfs:label">{{ _(key.replace("-", " ").title()) }}</th>
                       <td class="dataset-details" property="rdf:value">
 			{{ h.get_responsible_party(value) }}
                       </td>
                     </tr>
             {#
-            {% elif 'access_constraints' == key %}
+            {% elif _('access_constraints') == key %}
                     <tr rel="dc:relation" resource="_:extra{{ i }}">
-                      <th scope="row" class="dataset-label" property="rdfs:label">{{ key.replace("_", " ").title() }}</th>
+                      <th scope="row" class="dataset-label" property="rdfs:label">{{ _(key.replace("_", " ").title()) }}</th>
                       <td class="dataset-details" property="rdf:value">
                         {{ '\n'.join(h.cioos_load_json(value)) }}
                 </td>
                     </tr>
             #}
-            {# {% elif 'licence' == key %}
+            {# {% elif _('licence') == key %}
                     <tr rel="dc:relation" resource="_:extra{{ i }}">
-                      <th scope="row" class="dataset-label" property="rdfs:label">{{ key }}</th>
+                      <th scope="row" class="dataset-label" property="rdfs:label">{{ _(key) }}</th>
                       <td class="dataset-details" property="rdf:value">
                         {{ '\n'.join(h.cioos_load_json(value)) }}
                 </td>
                     </tr>
             #}
-            {% elif 'spatial' == key %}
+            {% elif _('spatial') == key %}
                     <tr rel="dc:relation" resource="_:extra{{ i }}">
-                      <th scope="row" class="dataset-label" property="rdfs:label">{{ key }}</th>
+                      <th scope="row" class="dataset-label" property="rdfs:label">{{ _(key) }}</th>
                       <td class="dataset-details" property="rdf:value">
           	{% set minx, miny, maxx, maxy = h.cioos_geojson_to_bbox(h.cioos_load_json(value)) %}
                         SW: ({{ miny }} lat, {{ minx }} long)</br>
                         NE: ({{ maxy }} lat, {{ maxx }} long)
                 </td>
                     </tr>
-            {% elif 'graphic-preview-file' == key %}
+            {% elif _('graphic-preview-file') == key %}
                     <tr rel="dc:relation" resource="_:extra{{ i }}">
-                      <th scope="row" class="dataset-label" property="rdfs:label">Preview</th>
+                      <th scope="row" class="dataset-label" property="rdfs:label">{{ _("Preview") }}</th>
                       <td class="dataset-details" property="rdf:value">
                         <img src="{{ value }}" style="max-width: 380px;"/>
                 </td>
                     </tr>
-            {% elif 'contact-email' == key %}
+            {% elif _('contact-email') == key %}
                     <tr rel="dc:relation" resource="_:extra{{ i }}">
-                      <th scope="row" class="dataset-label" property="rdfs:label">{{ key.replace("-", " ").title() }}</th>
+                      <th scope="row" class="dataset-label" property="rdfs:label">{{ _( key.replace("-", " ").title() ) }}</th>
                       <td class="dataset-details" property="rdf:value">
                         <a href="mailto:{{ value }}">{{ value }}</a>
                 </td>
@@ -151,7 +151,7 @@
 
             {% elif value != '' %}
               <tr rel="dc:relation" resource="_:extra{{ i }}">
-                <th scope="row" class="dataset-label" property="rdfs:label">{{ key }}</th>
+                <th scope="row" class="dataset-label" property="rdfs:label">{{ _(key) }}</th>
                 <td class="dataset-details" property="rdf:value">{{ value }}</td>
               </tr>
             {% endif %}
