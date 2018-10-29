@@ -1,0 +1,197 @@
+# French translations for ckanext-cioos_theme.
+# Copyright (C) 2018 ORGANIZATION
+# This file is distributed under the same license as the ckanext-cioos_theme
+# project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2018.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: ckanext-cioos_theme 0.0.1\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2018-10-29 18:34+0000\n"
+"PO-Revision-Date: 2018-10-29 18:39+0000\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: fr\n"
+"Language-Team: fr <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n > 1)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.3.4\n"
+
+#: ckanext/cioos_theme/templates/group/read.html:13
+#: ckanext/cioos_theme/templates/package/search.html:29
+msgid "Relevance"
+msgstr "Pertinence"
+
+#: ckanext/cioos_theme/templates/group/read.html:14
+#: ckanext/cioos_theme/templates/package/search.html:30
+msgid "Name Ascending"
+msgstr "Nom croissant"
+
+#: ckanext/cioos_theme/templates/group/read.html:15
+#: ckanext/cioos_theme/templates/package/search.html:31
+msgid "Name Descending"
+msgstr "Nom décroissant"
+
+#: ckanext/cioos_theme/templates/group/read.html:16
+#: ckanext/cioos_theme/templates/package/search.html:32
+msgid "Last Modified"
+msgstr "Dernière modification"
+
+#: ckanext/cioos_theme/templates/group/read.html:17
+#: ckanext/cioos_theme/templates/package/search.html:33
+msgid "Popular"
+msgstr "Populaire"
+
+#: ckanext/cioos_theme/templates/group/read.html:19
+msgid "Search datasets..."
+msgstr "Rechercher des jeux de donnée..."
+
+#: ckanext/cioos_theme/templates/home/snippets/promoted.html:8
+msgid "Welcome to CKAN"
+msgstr "Bienvenue chez CKAN"
+
+#: ckanext/cioos_theme/templates/home/snippets/promoted.html:10
+#, fuzzy
+msgid ""
+"This is a nice introductory paragraph about CKAN or the site in general. "
+"We don't have any copy to go here yet but soon we will "
+msgstr ""
+"Il s’agit d’un paragraphe d’introduction intéressant sur CKAN ou le site "
+"en général. Nous n'avons pas encore de copie pour y aller mais bientôt"
+
+#: ckanext/cioos_theme/templates/package/search.html:4
+#, fuzzy
+#| msgid "Search datasets..."
+msgid "Datasets"
+msgstr "Rechercher des jeux de donnée..."
+
+#: ckanext/cioos_theme/templates/package/search.html:56
+#, python-format
+msgid ""
+" You can also access this registry using the %(api_link)s (see "
+"%(api_doc_link)s) or download a %(dump_link)s. "
+msgstr ""
+" Vous pouvez également accéder à ce registre en utilisant le %(api_link)s"
+" (voir %(api_doc_link)s) ou télécharger un %(dump_link)s. "
+
+#: ckanext/cioos_theme/templates/package/search.html:60
+#, python-format
+msgid ""
+" You can also access this registry using the %(api_link)s (see "
+"%(api_doc_link)s). "
+msgstr ""
+" Vous pouvez également accéder à ce registre en utilisant le %(api_link)s"
+" (voir %(api_doc_link)s). "
+
+#: ckanext/cioos_theme/templates/package/snippets/access.html:2
+msgid "Access and Use"
+msgstr "Accès et utilisation"
+
+#: ckanext/cioos_theme/templates/package/snippets/additional_info.html:2
+msgid "Additional Info"
+msgstr "Info additionnelle"
+
+#: ckanext/cioos_theme/templates/package/snippets/additional_info.html:6
+msgid "Field"
+msgstr "Champ"
+
+#: ckanext/cioos_theme/templates/package/snippets/additional_info.html:7
+msgid "Value"
+msgstr "Valeur"
+
+#: ckanext/cioos_theme/templates/package/snippets/additional_info.html:15
+msgid "Source"
+msgstr "La source"
+
+#: ckanext/cioos_theme/templates/package/snippets/additional_info.html:26
+#: ckanext/cioos_theme/templates/package/snippets/additional_info.html:31
+msgid "Author"
+msgstr "Auteur"
+
+#: ckanext/cioos_theme/templates/package/snippets/additional_info.html:38
+#: ckanext/cioos_theme/templates/package/snippets/additional_info.html:43
+msgid "Maintainer"
+msgstr "Mainteneur"
+
+#: ckanext/cioos_theme/templates/package/snippets/additional_info.html:50
+msgid "Version"
+msgstr "Version"
+
+#: ckanext/cioos_theme/templates/package/snippets/additional_info.html:57
+msgid "State"
+msgstr "État"
+
+#: ckanext/cioos_theme/templates/package/snippets/additional_info.html:95
+msgid "dataset-reference-date"
+msgstr "date-de-référence-du-jeu-de-données"
+
+#: ckanext/cioos_theme/templates/package/snippets/additional_info.html:104
+msgid "responsible-party"
+msgstr "partie-responsable"
+
+#: ckanext/cioos_theme/templates/package/snippets/additional_info.html:128
+msgid "spatial"
+msgstr "spatial"
+
+#: ckanext/cioos_theme/templates/package/snippets/additional_info.html:137
+msgid "graphic-preview-file"
+msgstr "fichier-de-prévisualisation-graphique"
+
+#: ckanext/cioos_theme/templates/package/snippets/additional_info.html:144
+msgid "contact-email"
+msgstr "email-du-contact"
+
+#: ckanext/cioos_theme/templates/package/snippets/dates.html:2
+msgid "Dates"
+msgstr "Dates"
+
+#: ckanext/cioos_theme/templates/package/snippets/dates.html:9
+msgid "Metadata Created"
+msgstr "Métadonnées créées"
+
+#: ckanext/cioos_theme/templates/package/snippets/dates.html:18
+msgid "Metadata Updated"
+msgstr "Métadonnées mises à jour"
+
+#: ckanext/cioos_theme/templates/package/snippets/dates.html:30
+msgid "Reference Date(s)"
+msgstr "Date(s) de référence"
+
+#: ckanext/cioos_theme/templates/package/snippets/dates.html:40
+msgid "Metadata Date"
+msgstr "Métadonnées Date"
+
+#: ckanext/cioos_theme/templates/package/snippets/dates.html:48
+msgid "Frequency of Update"
+msgstr "Fréquence de mise à jour"
+
+#: ckanext/cioos_theme/templates/package/snippets/dates.html:56
+msgid "Temporal Extent Begin"
+msgstr "L'étendue temporelle commence"
+
+#: ckanext/cioos_theme/templates/package/snippets/dates.html:64
+msgid "Temporal Extent End"
+msgstr "Fin de l'étendue temporelle"
+
+#: ckanext/cioos_theme/templates/package/snippets/metadata_source.html:2
+msgid "Metadata Source"
+msgstr "Source de métadonnées"
+
+#: ckanext/cioos_theme/templates/package/snippets/preview.html:6
+msgid "Graphic Preview"
+msgstr "Aperçu graphique"
+
+#: ckanext/cioos_theme/templates/package/snippets/metadata_source.html:2
+msgid "View Full Metadata"
+msgstr "Afficher les métadonnées complètes"
+
+#: ckanext/cioos_theme/templates/package/snippets/metadata_source.html:2
+msgid "Harvested from"
+msgstr "Récolté à partir de"
+
+#: ckanext/cioos_theme/templates/package/snippets/metadata_source.html:2
+msgid "Other records from"
+msgstr "Autres disques de"
+

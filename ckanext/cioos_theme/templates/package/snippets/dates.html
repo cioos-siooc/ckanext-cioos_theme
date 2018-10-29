@@ -27,17 +27,17 @@
 
   	      {% if 'dataset-reference-date' == key %}
             <tr rel="dc:relation" resource="_:extra{{ i }}">
-              <th scope="row" class="dataset-label" property="rdfs:label">Reference Date(s)</th>
+              <th scope="row" class="dataset-label" property="rdfs:label">{{ _("Reference Date(s)") }}</th>
               <td class="dataset-details" property="rdf:value">
                 {% for d in h.cioos_load_json(value) %}
-                  {{d['value']}} ({{d['type'].title()}})</br>
+                  {{d['value']}} ({{_(d['type'].title())}})</br>
                 {% endfor %}
               </td>
             </tr>
 
           {% elif 'metadata-date' == key %}
             <tr rel="dc:relation" resource="_:extra{{ i }}">
-              <th scope="row" class="dataset-label" property="rdfs:label">Metadata Date</th>
+              <th scope="row" class="dataset-label" property="rdfs:label">{{ _("Metadata Date") }}</th>
               <td class="dataset-details" property="rdf:value">
                 {% snippet 'snippets/local_friendly_datetime.html', datetime_obj=value %}
               </td>
@@ -45,7 +45,7 @@
 
           {% elif 'frequency-of-update' == key %}
             <tr rel="dc:relation" resource="_:extra{{ i }}">
-              <th scope="row" class="dataset-label" property="rdfs:label">Frequency of Update</th>
+              <th scope="row" class="dataset-label" property="rdfs:label">{{ _("Frequency of Update") }}</th>
               <td class="dataset-details" property="rdf:value">
                 {{value}}
               </td>
@@ -53,7 +53,7 @@
 
           {% elif 'temporal-extent-begin' == key %}
             <tr rel="dc:relation" resource="_:extra{{ i }}">
-              <th scope="row" class="dataset-label" property="rdfs:label">Temporal Extent Begin</th>
+              <th scope="row" class="dataset-label" property="rdfs:label">{{ _("Temporal Extent Begin") }}</th>
               <td class="dataset-details" property="rdf:value">
                 {% snippet 'snippets/local_friendly_datetime.html', datetime_obj=value %}
               </td>
@@ -61,7 +61,7 @@
 
             {% elif 'temporal-extent-end' == key %}
               <tr rel="dc:relation" resource="_:extra{{ i }}">
-                <th scope="row" class="dataset-label" property="rdfs:label">Temporal Extent End</th>
+                <th scope="row" class="dataset-label" property="rdfs:label">{{ _("Temporal Extent End") }}</th>
                 <td class="dataset-details" property="rdf:value">
                   {% snippet 'snippets/local_friendly_datetime.html', datetime_obj=value %}
                 </td>

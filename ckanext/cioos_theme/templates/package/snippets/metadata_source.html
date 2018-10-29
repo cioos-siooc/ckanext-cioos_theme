@@ -16,21 +16,21 @@
 	      {# {% set gn_view_metadata_url = pkg_dict.extras | selectattr("key","equalto","gn_view_metadata_url") | map(attribute="value") | join('') %} #}
 
 	      {% if harvest_object %}
-	        <span style="font-weight:bold;">View Full Metadata: <a href="{{ h.url_for('harvest_object_show', id = harvest_object ) }}">xml</a> - <a href="{{ h.url_for('harvest_object_show', id = harvest_object ) }}/html">html</a> </span><br>
+	        <span style="font-weight:bold;">{{_("View Full Metadata")}}: <a href="{{ h.url_for('harvest_object_show', id = harvest_object ) }}">xml</a> - <a href="{{ h.url_for('harvest_object_show', id = harvest_object ) }}/html">html</a> </span><br>
 	      {% else %}
 	        <span">Source information unavailable</span><br>
 	      {% endif %}
 
               {% if url and source_guid %}
                   {% if h.is_url(url) %}
-                    <span style="margin-left:20px;"> Harvested from </span><a href="{{ gn_view_metadata_url if gn_view_metadata_url else url.strip('/') }}/{{source_guid}}{{source_guid_suffix}}">{{ title }}</a>
+                    <span style="margin-left:20px;"> {{_("Harvested from")}} </span><a href="{{ gn_view_metadata_url if gn_view_metadata_url else url.strip('/') }}/{{source_guid}}{{source_guid_suffix}}">{{ title }}</a>
                   {% else %}
                     <span> {{ url }}{{ guid }} </span>
                   {% endif %}
 		 </br>
               {% endif %}
               {% if source_id %}
-                <span style="margin-left:20px;"> Other records from </span><a href="{{h.url_for('harvest_read', id = source_id)}}">{{ title }}</a> </br>
+                <span style="margin-left:20px;"> {{_("Other records from")}} </span><a href="{{h.url_for('harvest_read', id = source_id)}}">{{ title }}</a> </br>
               {% endif %}
 
 
