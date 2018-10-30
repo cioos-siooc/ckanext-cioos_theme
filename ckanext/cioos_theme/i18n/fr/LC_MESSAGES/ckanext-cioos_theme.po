@@ -131,6 +131,11 @@ msgstr "date-de-référence-du-jeu-de-données"
 msgid "responsible-party"
 msgstr "partie-responsable"
 
+
+#: ckanext/cioos_theme/templates/package/snippets/additional_info.html:104
+msgid "Responsible Party"
+msgstr "Partie Responsable"
+
 #: ckanext/cioos_theme/templates/package/snippets/additional_info.html:128
 msgid "spatial"
 msgstr "spatial"
@@ -195,3 +200,11 @@ msgstr "Récolté à partir de"
 msgid "Other records from"
 msgstr "Autres disques de"
 
+msgid "Creation"
+msgstr "Création"
+
+msgid "Principal Investigator"
+msgstr "Chercheur principal"
+
+msgid "Not Specified"
+msgstr "Non précisé"

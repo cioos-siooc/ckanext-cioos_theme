@@ -5,11 +5,14 @@
       {% block package_access %}
           <tr>
             <td>
-                {%  for extra in pkg_dict %}
-		  {% if 'licence' == extra.key %}
-		    <span> <strong>Licence:</strong> {{ '\n'.join(h.cioos_load_json(extra.value)) | default('Not Specified', true) }} </span>
-		  {% endif %}
-		{% endfor %}
+              {% set licence_extras = [] %}
+              {%  for extra in pkg_dict.extras %}
+                {% if 'licence' == extra.key %}
+                  {% set _ = licence_extras.append( '\n'.join(h.cioos_load_json(extra.value)) ) %}
+                {% endif %}
+              {% endfor %}
+              {% set licence = pkg_dict.license_title or pkg_dict.license_id or licence_extras[-1] or 'Not Specified' %}
+    <span> <strong>Licence:</strong> {{ licence }} </span>
 		<span>
                 {%  for extra in pkg_dict %}
 		  {% if 'access_constraints' == extra.key %}
