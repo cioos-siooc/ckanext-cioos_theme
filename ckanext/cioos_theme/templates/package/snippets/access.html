@@ -11,15 +11,21 @@
                   {% set _ = licence_extras.append( '\n'.join(h.cioos_load_json(extra.value)) ) %}
                 {% endif %}
               {% endfor %}
-              {% set licence = pkg_dict.license_title or pkg_dict.license_id or licence_extras[-1] or 'Not Specified' %}
-    <span> <strong>Licence:</strong> {{ licence }} </span>
-		<span>
+              {% set licence = pkg_dict.license_title or pkg_dict.license_id or 'Not Specified'%}
+              <span>
+                <strong>Licence:</strong> {{ licence }}
+              </span>
+              <br/>
+              <span>
+                {{ licence_extras[-1] }}
+              </span>
+          		<span>
                 {%  for extra in pkg_dict %}
-		  {% if 'access_constraints' == extra.key %}
-		    {{ '\n'.join(h.cioos_load_json(extra.value)) }}
-		  {% endif %}
-		{% endfor %}
-		</span>
+            		  {% if 'access_constraints' == extra.key %}
+            		    {{ '\n'.join(h.cioos_load_json(extra.value)) }}
+            		  {% endif %}
+            		{% endfor %}
+          		</span>
             </td>
           </tr>
       {% endblock %}
