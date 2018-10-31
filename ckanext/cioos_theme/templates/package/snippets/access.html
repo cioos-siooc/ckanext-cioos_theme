@@ -13,7 +13,12 @@
               {% endfor %}
               {% set licence = pkg_dict.license_title or pkg_dict.license_id or 'Not Specified'%}
               <span>
-                <strong>Licence:</strong> {{ licence }}
+                <strong>Licence:</strong>
+                {% if pkg_dict.license_url%}
+                  <a href="{{pkg_dict.license_url}}">{{ licence }}</a>
+                {% else %}
+                  {{ licence }}
+                {% endif %}
               </span>
               <br/>
               <span>
