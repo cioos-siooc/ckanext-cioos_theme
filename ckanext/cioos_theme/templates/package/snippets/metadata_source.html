@@ -1,4 +1,5 @@
 <section class="metadata_source">
+  {% if harvest_object %}
   <h3>{{ _('Metadata Source') }}</h3>
   <table class="table table-bordered">
     <tbody>
@@ -39,4 +40,5 @@
       {% endblock %}
     </tbody>
   </table>
+  {% endif %}
 </section>
