@@ -32,10 +32,7 @@
 ckanext-cioos_theme
 =============
 
-.. Put a description of your extension here:
-   What does it do? What features does it have?
-   Consider including some screenshots or embedding a video!
-
+This is a proof of concept theme for the CIOOS-SIOOC project. It almost defenitly will not be used in production. Please refer to the national node for actuall ckan themes and templates.
 
 ------------
 Requirements
