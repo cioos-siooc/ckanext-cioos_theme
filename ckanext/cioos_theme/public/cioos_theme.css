@@ -12,18 +12,28 @@
     border-radius: 3px;
 }
 
+[role=main], .main {
+    padding-top: 10px;
+    background: none;
+    background-color: #ffffff;
+}
 
+.box {
+  background-color: #f8f8f8;
+  box-shadow: none;
+}
 /* =====================================================
    The "account masthead" bar across the top of the site
    ===================================================== */
 
 .account-masthead {
-    background-color: #f9f9f9;
+    background-color: #3c7394;
     color: white;
 }
+
 /* The "bubble" containing the number of new notifications. */
 .account-masthead .account .notifications a span {
-  background-color: #f9f9f9;
+  background-color: #3c7394;
 }
 /* The text and icons in the user account info. */
 .account-masthead .account ul li a {
@@ -33,7 +43,7 @@
    over them. */
 .account-masthead .account ul li a:hover {
   color: rgba(0, 0, 0, 0.7);
-  background-color: #f9f9f9;
+  background-color: #3c7394;
 }
 
 
@@ -41,7 +51,7 @@
    The main masthead bar that contains the site logo, nav links, and search
    ======================================================================== */
 .masthead {
-  background-color: #335075;
+  background-color: #52a7d7;
   color: #284162;
 }
 
@@ -49,7 +59,7 @@
    Organizations, etc) when the user's pointer hovers over them. */
 .masthead .navigation .nav-pills li a:hover {
   background-color: #3e628f;
-  color: #f9f9f9;
+  color: #3c7394;
 }
 
 /* The "active" navigation pill (for example, when you're on the /dataset page
@@ -60,7 +70,7 @@
 }
 
 .masthead .navigation .nav-pills li a {
-  background-color: #335075;
+  background-color: #52a7d7;
   color: white;
 }
 
@@ -72,20 +82,31 @@
 /* Change the colors of the "Search Your Data" box. */
 .homepage .module-search .module-content {
   color: rgb(68, 68, 68);
-  background-color: #f9f9f9;
+  background-color: #f8f8f8;
 }
+
+/* Change the colors of the "Search Your Data" box. */
+.homepage .module-search .module-content {
+  color: rgb(68, 68, 68);
+  background-color: #f8f8f8;
+}
+
 /* Change the background color of the "Popular Tags" box. */
 .homepage .module-search .tags {
-  background-color: #335075;
+  background-color: #52a7d7;
 }
 
 /* ====================================
    The footer at the bottom of the site
    ==================================== */
-.site-footer,
-body {
-  background-color: #e1e4e7;
+.site-footer{
+  background-color: #3c7394;
 }
+
+body {
+  background-color: #ffffff;
+}
+
 /* The text in the footer. */
 .site-footer,
 .site-footer label,
