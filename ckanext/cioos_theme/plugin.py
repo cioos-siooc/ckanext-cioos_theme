@@ -1,5 +1,6 @@
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
+import ckanext.cioos_theme.helpers as OGSLhelpers #OGSL helpers
 from ckan.lib.plugins import DefaultTranslation
 import json
 from shapely.geometry import shape
@@ -79,6 +80,9 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
     plugins.implements(plugins.ITranslation)
     plugins.implements(plugins.IConfigurer)
     plugins.implements(plugins.ITemplateHelpers)
+    plugins.implements(plugins.IFacets) #OSGL
+    plugins.implements(plugins.IPackageController, inherit=True) #OSGL
+
     # IConfigurer
 
     def update_config(self, config_):
@@ -95,12 +99,108 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         # extension they belong to, to avoid clashing with functions from
         # other extensions.
         return {
-	  'cioos_load_json': load_json, 
+	  'cioos_load_json': load_json,
 	  'cioos_geojson_to_bbox': geojson_to_bbox,
 	  'cioos_most_popular_groups': most_popular_groups,
 	  'cioos_groups': groups,
 	  'cioos_most_popular_datasets': most_popular_datasets,
 	  'cioos_most_popular_resources': most_popular_resources,
-	  'cioos_recent_packages_html': recent_packages_html
+	  'cioos_recent_packages_html': recent_packages_html,
+      'get_organization_list': OGSLhelpers.get_organization_list,
+      'get_organization_dict': OGSLhelpers.get_organization_dict,
+      'get_organization_dict_extra': OGSLhelpers.get_organization_dict_extra
 	}
 
+    # IFacets
+
+    def dataset_facets(self, facets_dict, package_type):
+        u"""Modify and return the facets_dict for the dataset search page.
+
+        :param facets_dict: the search facets as currently specified
+        :type facets_dict: OrderedDict
+
+        :param package_type: the package type that these facets apply to
+        :type package_type: string
+
+        :returns: the updated facets_dict
+        :rtype: OrderedDict
+
+        """
+        self._update_facets(facets_dict)
+        return facets_dict
+
+    def group_facets(self, facets_dict, group_type, package_type):
+        u"""Modify and return the facets_dict for a group's page.
+
+        :param facets_dict: the search facets as currently specified
+        :type facets_dict: OrderedDict
+
+        :param group_type: the group type that these facets apply to
+        :type group_type: string
+
+        :param package_type: the package type that these facets apply to
+        :type package_type: string
+
+        :returns: the updated facets_dict
+        :rtype: OrderedDict
+
+        """
+        self._update_facets(facets_dict)
+        return facets_dict
+
+    def organization_facets(self, facets_dict, organization_type, package_type):
+        u"""Modify and return the facets_dict for an organization's page.
+
+        :param facets_dict: the search facets as currently specified
+        :type facets_dict: OrderedDict
+
+        :param organization_type: the organization type that these facets apply
+        :type organization_type: string
+
+        :param package_type: the package type that these facets apply to
+        :type package_type: string
+
+        :returns: the updated facets_dict
+        :rtype: OrderedDict
+        """
+        self._update_facets(facets_dict)
+        return facets_dict
+
+    def _update_facets(self, facets_dict):
+        u"""
+            Add facet themes
+        :param facets_dict:
+        :return:
+        """
+        if 'themes' not in facets_dict:
+            # Horrible hack
+            # Insert facet themes at first position of the OrderedDict facets_dict.
+            ordered_dict = facets_dict.copy()
+            facets_dict.clear()
+            facets_dict['themes'] = toolkit._('Theme')
+
+            for key, value in ordered_dict.items():
+                # Make translation 'on the fly' of facet tags.
+                # Should check for all translated fields.
+                # Should check translation exists.
+                if key == 'tags':
+                    facets_dict[key + '_' + self.lang()] = value
+                else:
+                    facets_dict[key] = value
+
+    # IPackageController
+
+    def before_index(self, data_dict):
+        tags_dict = json.loads(data_dict.get('extras_tags_translated', '{}'))
+        data_dict['tags_en'] = tags_dict.get('en', [])
+        data_dict['tags_fr'] = tags_dict.get('fr', [])
+
+        if data_dict.get('extras_themes', None):
+            data_dict['themes'] = json.loads(data_dict.get('extras_themes', '[]'))
+        return data_dict
+
+    # Custom section
+
+    def lang(self):
+        from ckantoolkit import h
+        return h.lang()
