@@ -1,6 +1,7 @@
-{% extends "package/read_base.html" %}
+{% ckan_extends %}
 
 {% set pkg = c.pkg_dict %}
+{%- set schema = h.scheming_get_dataset_schema(dataset_type) -%}
 
 {% block primary_content_inner %}
   {{ super() }}
@@ -22,15 +23,21 @@
         {% endif %}
       {% endblock %}
     </h1>
+
     {% block package_notes %}
-      {% if pkg.notes %}
+      {%- if not dataset_type -%}
+        <p>
+        dataset_type not passed to template. your version of CKAN
+        might not be compatible with ckanext-scheming
+        </p>
+      {%- endif -%}
+      {# % if h.scheming_field_by_name(schema.dataset_fields, 'notes') and pkg['notes'] % #}
         <div class="notes embedded-content">
           {{ h.render_markdown(h.get_translated(pkg, 'notes')) }}
         </div>
-      {% endif %}
+      {# % endif % #}
     {% endblock %}
-    {# FIXME why is this here? seems wrong #}
-    <span class="insert-comment-thread"></span>
+
   {% endblock %}
 
   {% block package_access %}
@@ -69,7 +76,7 @@
   {% endif %}
 
   {% block package_additional_info %}
-    {% snippet "package/snippets/additional_info.html", pkg_dict=pkg %}
+    {% snippet "scheming/package/snippets/additional_info.html", pkg_dict=pkg, dataset_type=dataset_type, schema=schema %}
   {% endblock %}
 
 {% endblock %}
