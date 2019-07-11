@@ -4,7 +4,6 @@
 {%- set schema = h.scheming_get_dataset_schema(dataset_type) -%}
 
 {% block primary_content_inner %}
-  {{ super() }}
   {% block package_description %}
     {% if pkg.private %}
       <span class="dataset-private label label-inverse pull-right">
@@ -31,12 +30,17 @@
         might not be compatible with ckanext-scheming
         </p>
       {%- endif -%}
-      {# % if h.scheming_field_by_name(schema.dataset_fields, 'notes') and pkg['notes'] % #}
+      {% if ( h.scheming_field_by_name(schema.dataset_fields, 'notes') or h.scheming_field_by_name(schema.dataset_fields, 'notes_translated') ) and get_translated(pkg, 'notes') %}
         <div class="notes embedded-content">
           {{ h.render_markdown(h.get_translated(pkg, 'notes')) }}
         </div>
-      {# % endif % #}
+      {% endif %}
     {% endblock %}
+
+    <a href="{{ h.url_for('package_export', package_id=pkg.name, file_format='datacite', extension='xml')}}" class="btn"><i class="fa fa-icon fa-file-text"></i>{{ _(' EnviDat DataCite ')}}</a>
+    <a href="{{ h.url_for('package_export', package_id=pkg.name, file_format='iso19139', extension='xml')}}" class="btn"><i class="fa fa-icon fa-file-text"></i>{{ _(' EnviDat ISO 19139 ')}}</a>
+    <a href="{{ h.url_for('package_export', package_id=pkg.name, file_format='cioos', extension='xml')}}" class="btn"><i class="fa fa-icon fa-file-text"></i>{{ _(' CIOOS ISO 19139 ')}}</a>
+    <a href="{{ h.url_for('package_export', package_id=pkg.name, file_format='gcmd_dif', extension='xml')}}" class="btn"><i class="fa fa-icon fa-file-text"></i>{{ _(' EnviDat GCMD DIF ')}}</a>
 
   {% endblock %}
 
@@ -70,7 +74,7 @@
     {% snippet "package/snippets/tags.html", tags=pkg.tags %}
   {% endblock %}
 
-  {% set dataset_extent = h.get_pkg_dict_extra(c.pkg_dict, 'spatial', '') %}
+  {% set dataset_extent = h.get_pkg_dict_extra(c.pkg_dict, 'spatial') or c.pkg_dict.get('spatial') %}
   {% if dataset_extent %}
     {% snippet "spatial/snippets/dataset_map.html", extent=dataset_extent %}
   {% endif %}
