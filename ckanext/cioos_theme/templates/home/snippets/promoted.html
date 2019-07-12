@@ -1,11 +1,10 @@
 {% set intro = g.site_intro_text %}
 
 <div class="module-content box">
-  {% if intro %}
-    <h3 class="page-heading">{{ _("ABOUT THE DATA CATALOGUE") }}</h3>
+  <h3 class="heading">{{ _("ABOUT THE DATA CATALOGUE") }}</h3>
+  {% if intro %}  
     {{ h.render_markdown(intro) }}
   {% else %}
-    <h1 class="page-heading">{{ _("Welcome to CKAN") }}</h1>
     <p>
       {% trans %}This is a nice introductory paragraph about CKAN or the site
       in general. We don't have any copy to go here yet but soon we will
