@@ -201,6 +201,9 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
 
     # Custom section
 
+    def read_template(self):
+        return 'package/read.html'
+    
     def lang(self):
         from ckantoolkit import h
         return h.lang()
