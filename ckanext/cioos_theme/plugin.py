@@ -80,7 +80,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
     plugins.implements(plugins.ITranslation)
     plugins.implements(plugins.IConfigurer)
     plugins.implements(plugins.ITemplateHelpers)
-    plugins.implements(plugins.IFacets) #OSGL
+    #plugins.implements(plugins.IFacets) #OSGL
     plugins.implements(plugins.IPackageController, inherit=True) #OSGL
 
     # IConfigurer

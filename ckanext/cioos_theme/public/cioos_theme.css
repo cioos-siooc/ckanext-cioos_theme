@@ -80,27 +80,33 @@
   color: white;
 }
 
+/* ===========================================
+   homepage content
+   =========================================== */
+.homepage .module-content {
+  margin-bottom: 30px;
+}
 
 /* ===========================================
    The content in the middle of the front page
    =========================================== */
 
 /* Change the colors of the "Search Your Data" box. */
-.homepage .module-search .module-content {
+/* .homepage .module-search .module-content {
   color: rgb(68, 68, 68);
   background-color: #f8f8f8;
-}
+} */
 
 /* Change the colors of the "Search Your Data" box. */
-.homepage .module-search .module-content {
+/* .homepage .module-search .module-content {
   color: rgb(68, 68, 68);
   background-color: #f8f8f8;
-}
+} */
 
 /* Change the background color of the "Popular Tags" box. */
-.homepage .module-search .tags {
+/* .homepage .module-search .tags {
   background-color: #52a7d7;
-}
+} */
 
 /* ====================================
    The footer at the bottom of the site
