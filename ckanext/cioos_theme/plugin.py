@@ -197,7 +197,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
 
         # if data_dict.get('extras_themes', None):
         #     data_dict['themes'] = json.loads(data_dict.get('extras_themes', '[]'))
-        # return data_dict
+        return data_dict
 
     # Custom section
 
