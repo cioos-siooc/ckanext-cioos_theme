@@ -1,0 +1,223 @@
+# Translations template for ckanext-cioos_theme.
+# Copyright (C) 2018 ORGANIZATION
+# This file is distributed under the same license as the ckanext-cioos_theme
+# project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2018.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: ckanext-cioos_theme 0.0.1\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2018-10-29 18:34+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.3.4\n"
+
+#: ckanext/cioos_theme/templates/group/read.html:13
+#: ckanext/cioos_theme/templates/package/search.html:29
+msgid "Relevance"
+msgstr ""
+
+#: ckanext/cioos_theme/templates/group/read.html:14
+#: ckanext/cioos_theme/templates/package/search.html:30
+msgid "Name Ascending"
+msgstr ""
+
+#: ckanext/cioos_theme/templates/group/read.html:15
+#: ckanext/cioos_theme/templates/package/search.html:31
+msgid "Name Descending"
+msgstr ""
+
+#: ckanext/cioos_theme/templates/group/read.html:16
+#: ckanext/cioos_theme/templates/package/search.html:32
+msgid "Last Modified"
+msgstr ""
+
+#: ckanext/cioos_theme/templates/group/read.html:17
+#: ckanext/cioos_theme/templates/package/search.html:33
+msgid "Popular"
+msgstr ""
+
+#: ckanext/cioos_theme/templates/group/read.html:19
+msgid "Search datasets..."
+msgstr ""
+
+#: ckanext/cioos_theme/templates/home/snippets/promoted.html:8
+msgid "Welcome to CKAN"
+msgstr ""
+
+#: ckanext/cioos_theme/templates/home/snippets/promoted.html:10
+msgid ""
+"This is a nice introductory paragraph about CKAN or the site in general. We "
+"don't have any copy to go here yet but soon we will "
+msgstr ""
+
+#: ckanext/cioos_theme/templates/package/read.html:11
+msgid "Private"
+msgstr ""
+
+#: ckanext/cioos_theme/templates/package/read.html:18
+msgid "Draft"
+msgstr ""
+
+#: ckanext/cioos_theme/templates/package/read.html:21
+msgid "Deleted"
+msgstr ""
+
+#: ckanext/cioos_theme/templates/package/read_base.html:14
+msgid "Manage"
+msgstr ""
+
+#: ckanext/cioos_theme/templates/package/read_base.html:19
+msgid "Dataset"
+msgstr ""
+
+#: ckanext/cioos_theme/templates/package/read_base.html:20
+msgid "Groups"
+msgstr ""
+
+#: ckanext/cioos_theme/templates/package/read_base.html:21
+msgid "Activity Stream"
+msgstr ""
+
+#: ckanext/cioos_theme/templates/package/read_base.html:32
+#, python-format
+msgid ""
+"This is an old revision of this dataset, as edited at %(timestamp)s. It may "
+"differ significantly from the <a href=\"%(url)s\">current revision</a>."
+msgstr ""
+
+#: ckanext/cioos_theme/templates/package/search.html:4
+msgid "Datasets"
+msgstr ""
+
+#: ckanext/cioos_theme/templates/package/search.html:52
+msgid "API"
+msgstr ""
+
+#: ckanext/cioos_theme/templates/package/search.html:53
+msgid "API Docs"
+msgstr ""
+
+#: ckanext/cioos_theme/templates/package/search.html:55
+msgid "full {format} dump"
+msgstr ""
+
+#: ckanext/cioos_theme/templates/package/search.html:56
+#, python-format
+msgid ""
+" You can also access this registry using the %(api_link)s (see "
+"%(api_doc_link)s) or download a %(dump_link)s. "
+msgstr ""
+
+#: ckanext/cioos_theme/templates/package/search.html:60
+#, python-format
+msgid ""
+" You can also access this registry using the %(api_link)s (see "
+"%(api_doc_link)s). "
+msgstr ""
+
+#: ckanext/cioos_theme/templates/package/snippets/access.html:2
+msgid "Access and Use"
+msgstr ""
+
+#: ckanext/cioos_theme/templates/package/snippets/additional_info.html:2
+msgid "Additional Info"
+msgstr ""
+
+#: ckanext/cioos_theme/templates/package/snippets/additional_info.html:6
+msgid "Field"
+msgstr ""
+
+#: ckanext/cioos_theme/templates/package/snippets/additional_info.html:7
+msgid "Value"
+msgstr ""
+
+#: ckanext/cioos_theme/templates/package/snippets/additional_info.html:15
+msgid "Source"
+msgstr ""
+
+#: ckanext/cioos_theme/templates/package/snippets/additional_info.html:26
+#: ckanext/cioos_theme/templates/package/snippets/additional_info.html:31
+msgid "Author"
+msgstr ""
+
+#: ckanext/cioos_theme/templates/package/snippets/additional_info.html:38
+#: ckanext/cioos_theme/templates/package/snippets/additional_info.html:43
+msgid "Maintainer"
+msgstr ""
+
+#: ckanext/cioos_theme/templates/package/snippets/additional_info.html:50
+msgid "Version"
+msgstr ""
+
+#: ckanext/cioos_theme/templates/package/snippets/additional_info.html:57
+msgid "State"
+msgstr ""
+
+#: ckanext/cioos_theme/templates/package/snippets/additional_info.html:95
+msgid "dataset-reference-date"
+msgstr ""
+
+#: ckanext/cioos_theme/templates/package/snippets/additional_info.html:104
+msgid "responsible-party"
+msgstr ""
+
+#: ckanext/cioos_theme/templates/package/snippets/additional_info.html:128
+msgid "spatial"
+msgstr ""
+
+#: ckanext/cioos_theme/templates/package/snippets/additional_info.html:137
+msgid "graphic-preview-file"
+msgstr ""
+
+#: ckanext/cioos_theme/templates/package/snippets/additional_info.html:144
+msgid "contact-email"
+msgstr ""
+
+#: ckanext/cioos_theme/templates/package/snippets/dates.html:2
+msgid "Dates"
+msgstr ""
+
+#: ckanext/cioos_theme/templates/package/snippets/dates.html:9
+#, python-format
+msgid "Metadata Created{% endtrans"
+msgstr ""
+
+#: ckanext/cioos_theme/templates/package/snippets/dates.html:18
+msgid "Metadata Updated"
+msgstr ""
+
+#: ckanext/cioos_theme/templates/package/snippets/dates.html:30
+msgid "Reference Date(s)"
+msgstr ""
+
+#: ckanext/cioos_theme/templates/package/snippets/dates.html:40
+msgid "Metadata Date"
+msgstr ""
+
+#: ckanext/cioos_theme/templates/package/snippets/dates.html:48
+msgid "Frequency of Update"
+msgstr ""
+
+#: ckanext/cioos_theme/templates/package/snippets/dates.html:56
+msgid "Temporal Extent Begin"
+msgstr ""
+
+#: ckanext/cioos_theme/templates/package/snippets/dates.html:64
+msgid "Temporal Extent End"
+msgstr ""
+
+#: ckanext/cioos_theme/templates/package/snippets/metadata_source.html:2
+msgid "Metadata Source"
+msgstr ""
+
+#: ckanext/cioos_theme/templates/package/snippets/preview.html:6
+msgid "Graphic Preview"
+msgstr ""
+

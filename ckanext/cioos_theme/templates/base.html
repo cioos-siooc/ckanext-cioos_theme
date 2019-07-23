@@ -1,0 +1,6 @@
+{% ckan_extends %}
+
+{% block styles %}
+  {{ super() }}
+  <link rel="stylesheet" href="{{h.url_for_static('/cioos_theme.css')}}" />
+{% endblock %}

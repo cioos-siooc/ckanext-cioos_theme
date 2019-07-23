@@ -1,0 +1,77 @@
+<section class="dates">
+  <h3>{{ _('Dates') }}</h3>
+  <table class="table table-bordered table-condensed">
+    <tbody>
+      {% block package_dates %}
+
+        {% if pkg_dict.metadata_created %}
+          <tr>
+            <th scope="row" class="dataset-label">{{ _("Metadata Created") }}</th>
+
+            <td class="dataset-details">
+                {% snippet 'snippets/local_friendly_datetime.html', datetime_obj=pkg_dict.metadata_created %}
+            </td>
+          </tr>
+        {% endif %}
+        {% if pkg_dict.metadata_modified %}
+          <tr>
+            <th scope="row" class="dataset-label">{{ _("Metadata Updated") }}</th>
+            <td class="dataset-details">
+                {% snippet 'snippets/local_friendly_datetime.html', datetime_obj=pkg_dict.metadata_modified %}
+            </td>
+          </tr>
+        {% endif %}
+
+        {% for extra in h.sorted_extras(pkg_dict.extras) %}
+          {% set key, value = extra %}
+
+  	      {% if 'dataset-reference-date' == key %}
+            <tr rel="dc:relation" resource="_:extra{{ i }}">
+              <th scope="row" class="dataset-label" property="rdfs:label">{{ _("Reference Date(s)") }}</th>
+              <td class="dataset-details" property="rdf:value">
+                {% for d in h.cioos_load_json(value) %}
+                  {{d['value']}} ({{_(d['type'].title())}})</br>
+                {% endfor %}
+              </td>
+            </tr>
+
+          {% elif 'metadata-date' == key %}
+            <tr rel="dc:relation" resource="_:extra{{ i }}">
+              <th scope="row" class="dataset-label" property="rdfs:label">{{ _("Metadata Date") }}</th>
+              <td class="dataset-details" property="rdf:value">
+                {% snippet 'snippets/local_friendly_datetime.html', datetime_obj=value %}
+              </td>
+            </tr>
+
+          {% elif 'frequency-of-update' == key %}
+            <tr rel="dc:relation" resource="_:extra{{ i }}">
+              <th scope="row" class="dataset-label" property="rdfs:label">{{ _("Frequency of Update") }}</th>
+              <td class="dataset-details" property="rdf:value">
+                {{value}}
+              </td>
+            </tr>
+
+          {% elif 'temporal-extent-begin' == key %}
+            <tr rel="dc:relation" resource="_:extra{{ i }}">
+              <th scope="row" class="dataset-label" property="rdfs:label">{{ _("Temporal Extent Begin") }}</th>
+              <td class="dataset-details" property="rdf:value">
+                {% snippet 'snippets/local_friendly_datetime.html', datetime_obj=value %}
+              </td>
+            </tr>
+
+            {% elif 'temporal-extent-end' == key %}
+              <tr rel="dc:relation" resource="_:extra{{ i }}">
+                <th scope="row" class="dataset-label" property="rdfs:label">{{ _("Temporal Extent End") }}</th>
+                <td class="dataset-details" property="rdf:value">
+                  {% snippet 'snippets/local_friendly_datetime.html', datetime_obj=value %}
+                </td>
+              </tr>
+
+          {% endif %}
+
+        {% endfor %}
+
+      {% endblock %}
+    </tbody>
+  </table>
+</section>

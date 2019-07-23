@@ -1,0 +1,39 @@
+<section class="access">
+  <h3>{{ _('Access and Use') }}</h3>
+  <table class="table table-bordered">
+    <tbody>
+      {% block package_access %}
+          <tr>
+            <td>
+              {% set licence_extras = [] %}
+              {%  for extra in pkg_dict.extras %}
+                {% if 'licence' == extra.key %}
+                  {% set _ = licence_extras.append( '\n'.join(h.cioos_load_json(extra.value)) ) %}
+                {% endif %}
+              {% endfor %}
+              {% set licence = pkg_dict.license_title or pkg_dict.license_id or 'Not Specified'%}
+              <span>
+                <strong>Licence:</strong>
+                {% if pkg_dict.license_url%}
+                  <a href="{{pkg_dict.license_url}}">{{ licence }}</a>
+                {% else %}
+                  {{ licence }}
+                {% endif %}
+              </span>
+              <br/>
+              <span>
+                {{ licence_extras[-1] }}
+              </span>
+          		<span>
+                {%  for extra in pkg_dict %}
+            		  {% if 'access_constraints' == extra.key %}
+            		    {{ '\n'.join(h.cioos_load_json(extra.value)) }}
+            		  {% endif %}
+            		{% endfor %}
+          		</span>
+            </td>
+          </tr>
+      {% endblock %}
+    </tbody>
+  </table>
+</section>
