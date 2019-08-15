@@ -12,33 +12,37 @@
           {% snippet 'home/snippets/search.html' %}
         {% endblock %}
       </div>
+
       <div class="col-md-12 col1">
         <div class="module-content box">
-       {% set groups = h.cioos_groups() %}
-       {% block group_list %}
+       {% block eov_list %}
          <h3 class="heading">SEARCH BY OCEAN VARIABLE</h3>
-         <ul class="media-grid" data-module="media-grid">
-          {% for group in groups %}
-              <li class="media-item">
-                    <a class="media-image" href="{{ h.url_for(controller='group', action='read', id=group.name) }}">
-                      <img src="{{ group.image_display_url or h.url_for_static('/base/images/placeholder-group.png') }}" alt="{{ group.name }}" class="media-image img-responsive">
+            {% set facets = h.cioos_get_facets() %}
+            {% set eov = h.get_facet_items_dict('eov', limit=None, exclude_active=False) %}
+            {% for grouper, list in eov|groupby('category') %}
+              <h4>{{grouper}}</h4>
+              <ul class="media-grid" data-module="media-grid">
+              {% for item in list %}
+                {% set href = h.url_for(controller='package', action='search', eov=item.name) %}
+                {% set label = label_function(item) if label_function else item.display_name %}
+                {% set label_truncated = h.truncate(label, 22) if not label_function else label %}
+                {% set count = count_label(item['count']) if count_label else ('%d' % item['count']) %}
+                {# set img_url = item.image_display_url or h.url_for_static('/base/images/' + item.name + '.png') #}
+                {% set img_url = item.image_display_url or h.url_for_static('/base/images/placeholder-group.png') %}
+                  <li class="media-item">
+                    <a class="media-image" href="{{ href }}" title="{{ label if label != label_truncated else '' }}">
+                      <img src="{{ img_url }}" alt="{{ item.name }}" class="media-image img-responsive">
                     </a>
-                    <span class="media-heading">{{ group.display_name }}</span>
-              </li>
-          {% endfor %}
-        </ul>
-      {% endblock %}
+                    <span class="media-heading">{{ label_truncated }}</span>
+                    <span class="hidden separator"> - </span>
+                    <span class="item-count badge">{{ count }}</span>
+                  </li>
+              {% endfor %}
+              </ul>
+            {% endfor %}
+        {% endblock %}
         </div>
       </div>
-
-      <div class="col-md-12 col1">
-        <div class="module-content box">
-          <h3 class="heading">SEARCH BY SPATIAL EXTENT</h3>
-      	  {% snippet "spatial/snippets/spatial_query.html" , default_extent="[[48.0, -130.0], [60.0, -110.0]]" %}
-      	</div>
-      </div>
-
-
 
     </div>
   </div>
