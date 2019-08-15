@@ -141,6 +141,30 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
     plugins.implements(plugins.IFacets)
     plugins.implements(plugins.IPackageController, inherit=True)
     plugins.implements(plugins.IValidators)
+    plugins.implements(plugins.IAuthenticator)
+
+    # IAuthenticator
+
+    def identify(self):
+        #log.info('Request from remote_addr:%s, user:%s, %s:%s', toolkit.request.remote_addr, toolkit.request.remote_user, toolkit.request.method, toolkit.request.url)
+        #log.info('{"method":"%s", "remote_addr":"%s", "user":"%s", "url":"%s"}', toolkit.request.method, toolkit.request.remote_addr, toolkit.request.remote_user, toolkit.request.url)
+        log.info('Request by %s for %s from %s', toolkit.request.remote_user, toolkit.request.url, toolkit.request.remote_addr,)
+        c.user = None
+        c.userobj = None
+        return
+
+    def login(self, error=None):
+        log.info('Login attempt from %s', toolkit.request.remote_addr)
+        return
+
+    def logout(self):
+        log.info('Logout by %s from %s', toolkit.request.remote_user, toolkit.request.remote_addr)
+        return
+
+    def abort(self, status_code, detail, headers, comment):
+        '''Handle an abort.'''
+        log.info('Blocked request to %s with status %s becouse "%s" from %s', toolkit.request.url, status_code, detail, toolkit.request.remote_addr)
+        return (status_code, detail, headers, comment)
 
     # IConfigurer
 
