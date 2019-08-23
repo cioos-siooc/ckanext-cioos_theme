@@ -7,7 +7,7 @@ import json
 from shapely.geometry import shape
 import logging
 import ckan.lib.navl.dictization_functions as df
-from ckan.common import c, request
+from ckan.common import c
 
 
 StopOnError = df.StopOnError
@@ -100,7 +100,7 @@ def geojson_to_bbox(o):
 def clean_and_populate_eovs(field, schema):
 
     def validator(key, data, errors, context):
-        log.debug('eov_from_keywords_validator errors:%r', errors[key])
+        # log.debug('data:%r',data)
         if errors[key] and (u'Select at least one' not in errors[key] or 'Select at least one' not in errors[key]):
             return
 
@@ -118,7 +118,10 @@ def clean_and_populate_eovs(field, schema):
 
         d = json.loads(data.get(key, '[]'))
         for x in eov_data:
-            val = eov_list.get(x.lower(), '')
+            if isinstance(x, basestring):
+                val = eov_list.get(x.lower(), '')
+            else:
+                val = eov_list.get(x, '')
             if val and val not in d:
                 d.append(val)
 
@@ -128,11 +131,9 @@ def clean_and_populate_eovs(field, schema):
             errors[key].remove('Select at least one')
 
         data[key] = json.dumps(d)
-        # log.debug('validate eov:%r', data.get(key))
         return data
 
     return validator
-
 
 class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
     plugins.implements(plugins.ITranslation)
@@ -281,7 +282,13 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
 
     # modfiey tags, keywords, and eov fields so that they properly index
     def before_index(self, data_dict):
-        tags_dict = json.loads(data_dict.get('keywords', '{}'))
+        try:
+            tags_dict = json.loads(data_dict.get('keywords', '{}'))
+        except Exception as err:
+            log.error(type(err))
+            log.error("error:%s, keywords:%r", err, data_dict.get('keywords', '{}'))
+            tags_dict = {"en": [], "fr": []}
+
         data_dict['tags_en'] = tags_dict.get('en', [])
         data_dict['tags_fr'] = tags_dict.get('fr', [])
 
