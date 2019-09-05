@@ -100,7 +100,7 @@ def geojson_to_bbox(o):
 def clean_and_populate_eovs(field, schema):
 
     def validator(key, data, errors, context):
-        # log.debug('data:%r',data)
+        #log.debug('EOV VALIDATOR data:%r',data)
         if errors[key] and (u'Select at least one' not in errors[key] or 'Select at least one' not in errors[key]):
             return
 
@@ -149,22 +149,44 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
     def identify(self):
         #log.info('Request from remote_addr:%s, user:%s, %s:%s', toolkit.request.remote_addr, toolkit.request.remote_user, toolkit.request.method, toolkit.request.url)
         #log.info('{"method":"%s", "remote_addr":"%s", "user":"%s", "url":"%s"}', toolkit.request.method, toolkit.request.remote_addr, toolkit.request.remote_user, toolkit.request.url)
-        log.info('Request by %s for %s from %s', toolkit.request.remote_user, toolkit.request.url, toolkit.request.remote_addr,)
+        try:
+            remote_addr = toolkit.request.headers['X-Forwarded-For']
+            # log.debug('X-Forwarded-For:%r',toolkit.request.headers['X-Forwarded-For'])
+            # log.debug('X-Forwarded-Host:%r',toolkit.request.headers['X-Forwarded-Host'])
+            # log.debug('X-Forwarded-Server:%r',toolkit.request.headers['X-Forwarded-Server'])
+            # log.debug('remote_addr:%r',remote_addr)
+        except KeyError:
+            remote_addr = toolkit.request.remote_addr
+            # log.debug('remote_addr:%r',remote_addr)
+
+        log.info('Request by %s for %s from %s', toolkit.request.remote_user, toolkit.request.url, remote_addr)
         c.user = None
         c.userobj = None
         return
 
     def login(self, error=None):
-        log.info('Login attempt from %s', toolkit.request.remote_addr)
+        try:
+            remote_addr = toolkit.request.headers['X-Forwarded-For']
+        except KeyError:
+            remote_addr = toolkit.request.remote_addr
+        log.info('Login attempt from %s', remote_addr)
         return
 
     def logout(self):
-        log.info('Logout by %s from %s', toolkit.request.remote_user, toolkit.request.remote_addr)
+        try:
+            remote_addr = toolkit.request.headers['X-Forwarded-For']
+        except KeyError:
+            remote_addr = toolkit.request.remote_addr
+        log.info('Logout by %s from %s', toolkit.request.remote_user, remote_addr)
         return
 
     def abort(self, status_code, detail, headers, comment):
         '''Handle an abort.'''
-        log.info('Blocked request to %s with status %s becouse "%s" from %s', toolkit.request.url, status_code, detail, toolkit.request.remote_addr)
+        try:
+            remote_addr = toolkit.request.headers['X-Forwarded-For']
+        except KeyError:
+            remote_addr = toolkit.request.remote_addr
+        log.info('Blocked request to %s with status %s becouse "%s" from %s', toolkit.request.url, status_code, detail, remote_addr)
         return (status_code, detail, headers, comment)
 
     # IConfigurer
@@ -280,11 +302,13 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
 
     # IPackageController
 
+
     # modfiey tags, keywords, and eov fields so that they properly index
     def before_index(self, data_dict):
         try:
             tags_dict = json.loads(data_dict.get('keywords', '{}'))
         except Exception as err:
+            log.error(data_dict.get('id','NO ID'))
             log.error(type(err))
             log.error("error:%s, keywords:%r", err, data_dict.get('keywords', '{}'))
             tags_dict = {"en": [], "fr": []}
