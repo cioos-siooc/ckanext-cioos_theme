@@ -1,5 +1,10 @@
 {% block header_wrapper %}
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+<link rel="stylesheet" href="css/bootstrap4-growth.min.css">
+<link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,700|Quicksand:300,400,700&display=swap" rel="stylesheet">
 <header class="navbar navbar-static-top masthead">
+  <div class="topbarsocial"><i class="fab fa-facebook-square"></i> <i class="fab fa-twitter"></i></div>
+
   {% block header_debug %} {% if g.debug and not g.debug_supress_header %}
   <div class="debug">Controller : {{ c.controller }}<br/>Action : {{ c.action }}</div>
   {% endif %} {% endblock %}
