@@ -323,6 +323,9 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         data_dict['tags_en'] = tags_dict.get('en', [])
         data_dict['tags_fr'] = tags_dict.get('fr', [])
 
+        #data_dict['notes'] = data_dict.get('notes_translated', data_dict['notes'])
+        #data_dict['title'] = data_dict.get('title_translated', data_dict['title'])
+
         # eov is multi select so it is a json list rather then a python list
         if(data_dict.get('eov')):
             data_dict['eov'] = load_json(data_dict['eov'])
@@ -346,6 +349,12 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                         item['category'] = c.get('catagory', u'')
                 new_eovs.append(item)
             search_results['search_facets']['eov']['items'] = new_eovs
+
+        for result in search_results.get('results', []):
+            result['title'] = load_json(result.get('title', ''))
+            result['notes'] = load_json(result.get('notes', ''))
+            result['keywords'] = load_json(result.get('keywords', {}))
+
         return search_results
 
     # Custom section
