@@ -1,50 +1,54 @@
 .media-heading {
-    font-size: 16px;
+  font-size: 16px;
 }
 
 .media-item {
-    position: relative;
-    float: left;
-    width: 150px;
-    padding: 15px;
-    margin: 0 0 10px 10px;
-    background-color: white;
-    border-radius: 3px;
+  position: relative;
+  float: left;
+  width: 150px;
+  padding: 15px;
+  margin: 0 0 10px 10px;
+  background-color: white;
+  border-radius: 3px;
 }
 
 .media-grid {
-    background: none;
-    background-color: #f8f8f8;
-    border: 1px solid #52a7d7;
+  background: none;
+  background-color: #f8f8f8;
+  border: 1px solid #52a7d7;
 }
 
-[role=main], .main {
-    padding-top: 10px;
-    background: none;
-    background-color: #ffffff;
+[role=main],
+.main {
+  padding-top: 10px;
+  background: none;
+  background-color: #ffffff;
 }
 
 .box {
   background-color: #f8f8f8;
   box-shadow: none;
 }
+
 /* =====================================================
    The "account masthead" bar across the top of the site
    ===================================================== */
 
 .account-masthead {
-    background-color: #3c7394;
-    color: white;
+  background-color: #3c7394;
+  color: white;
 }
 
 /* The "bubble" containing the number of new notifications. */
 .account-masthead .account .notifications a span {
   background-color: #3c7394;
 }
+
 /* The text and icons in the user account info. */
 .account-masthead .account ul li a {
   color: rgba(0, 0, 0, 0.6);
 }
+
 /* The user account info text and icons, when the user's pointer is hovering
    over them. */
 .account-masthead .account ul li a:hover {
@@ -111,7 +115,7 @@
 /* ====================================
    The footer at the bottom of the site
    ==================================== */
-.site-footer{
+.site-footer {
   background-color: #3c7394;
 }
 
@@ -125,43 +129,63 @@ body {
 .site-footer small {
   color: rgba(0, 0, 0, 0.6);
 }
+
 /* The link texts in the footer. */
 .site-footer a {
   color: rgba(0, 0, 0, 0.6);
 }
 
-#topmenu{
-  background:#52A79B;
-  color:#fff;
+#topmenu {
+  background: #52A79B;
+  color: #fff;
   overflow: hidden;
+}
+
+#topmenu nav {
+  width: 50%;
+  float: right;
+  padding: 0 2em 0 0;
 }
 
 #topmenu li {
-    float: right;
-    display: block;
-    margin: .25em;
-  }
-
-#topmenu a{
-  color:#fff;
+  float: right;
+  display: block;
+  margin: .25em;
 }
 
-#mainmenu{
-  border:1px solid #52A79B;
-  border-width:0 0 1px 0;
+
+#topmenu a {
+  color: #fff;
 }
+
+#mainmenu {
+  border: 1px solid #52A79B;
+  border-width: 0 0 1px 0;
+}
+
 #mainmenu img {
-  padding: .75em 0 .25em 0;
+  padding: .75em 0 .25em 2em;
 }
-#mainmenu nav{  
+
+#mainmenu nav {
   width: 50%;
   float: right;
+  padding: .75em 2em .25em 0;
 }
-#mainmenu ul{
+
+#mainmenu ul {
   overflow: hidden;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  justify-content: space-between;
 }
-#mainmenu li{
-    float: right;
-    display: block;
-    margin: .25em;
+
+#mainmenu li {
+  float: right;
+  display: block;
+  margin: 3em 0 0 0;
+  font-family: 'Quicksand', sans-serif;
+  font-weight: bold;
+  text-transform: uppercase;
 }
