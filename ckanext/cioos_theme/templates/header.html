@@ -62,23 +62,27 @@
 {% endblock %}
 <!-- TOP MENU STARTS HERE -->
 <header id="topmenu">
-  <nav>
-    <ul>
-      <li><a href="http://cioos-pacific-wordpress-theme/fr/accueil/" tabindex="0" aria-label="French/English">FR</a></li>
-      <li><a href="http://facebook.com/cioos.siooc/" tabindex="0" aria-label="Facebook">Faceboook</a></li>
-      <li><a href="http://twitter.com/cioos_siooc" tabindex="0" aria-label="Twitter">Twitter</a></li>
-    </ul>
-  </nav>
+  <div class="container">
+    <nav>
+      <ul>
+        <li><a href="http://cioos-pacific-wordpress-theme/fr/accueil/" tabindex="0" aria-label="French/English">FR</a></li>
+        <li><a href="http://facebook.com/cioos.siooc/" tabindex="0" aria-label="Facebook">Faceboook</a></li>
+        <li><a href="http://twitter.com/cioos_siooc" tabindex="0" aria-label="Twitter">Twitter</a></li>
+      </ul>
+    </nav>
+  </div>
 </header>
 <header id="mainmenu">
-  <a class="logo" href="{{ h.url_for('home.index') }}"><img src="/base/images/logoEN.svg"></a>
-  {% block header_site_navigation %}
-  <nav>
-    <ul>
-      {% block header_site_navigation_tabs %} {{ h.build_nav_main( ('search', _('Datasets')), ('organizations_index', _('Organizations')),
-      ('group_index', _('Groups')), ('home.about', _('About')) ) }} {% endblock %}
-    </ul>
-  </nav>
-  {% endblock %}
+  <div class="container">
+    <a class="logo" href="{{ h.url_for('home.index') }}"><img src="/base/images/logoEN.svg"></a>
+    {% block header_site_navigation %}
+    <nav>
+      <ul>
+        {% block header_site_navigation_tabs %} {{ h.build_nav_main( ('search', _('Datasets')), ('organizations_index', _('Organizations')),
+        ('group_index', _('Groups')), ('home.about', _('About')) ) }} {% endblock %}
+      </ul>
+    </nav>
+    {% endblock %}
+  </div>
 </header>
 {% endblock %}
