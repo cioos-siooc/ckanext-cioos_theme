@@ -1,0 +1,18 @@
+{
+  "name": "Bulleit",
+  "version": "0.2.0",
+  "devDependencies": {
+    "grunt": "^1.0.4",
+    "grunt-autoprefixer": "*",
+    "grunt-browser-sync": "*",
+    "grunt-contrib-concat": "*",
+    "grunt-contrib-imagemin": "*",
+    "grunt-contrib-sass": "*",
+    "grunt-contrib-uglify": "*",
+    "grunt-contrib-watch": "^1.1.0",
+    "grunt-notify": "*"
+  },
+  "dependencies": {
+    "grunt-sass-globbing": "^1.5.1"
+  }
+}
