@@ -1,4 +1,37 @@
+$bodyfont: "adobe-garamond-pro","Georgia",serif; //bodyfont
+$headlinefont: "nimbus-sans","Arial",sans-serif; //headlines, captions and infoboxes
+$headerfont: "fira-sans","Arial",sans-serif; //Site header slogan
 
+$darkestblack: rgba(73, 73, 72, 1); //the darkest black used for font color and body copy
+$maincolor: rgba(30, 93, 111, 1); //Header color - behind the logo - #205f71;
+$lighttextcolor: lighten($darkestblack, 95%); //white text #ffffff
+$specialseries: rgba(190, 228, 234, 1);
+$navbg: rgba(27, 70, 82, 1); //Dark blue, behind nav area, behind share logos #1c4552
+$navbghover: $maincolor; //Used in pagination hover
+$hakaigrey: rgba(149, 149, 145, 1); //Used in Author color, share button BG, single page #BBB
+$hakaigreylight: rgba(243, 241, 237, 1); //Used in correction backgrounds and audio edition BG
+$body_link_color: rgba(79, 170, 189, 1); //Colour of text links in body copy
+$body_link_hover_color: $maincolor; //Colour of text link 
+$rotatingheaderselectbg: rgba(0, 0, 0, 1);
+$captionlink: lighten($navbg, 50%);
+$captionlinkcolor: lighten($navbghover, 40%);
+
+
+//Layout
+$number_of_columns:4;
+$master_margin_width: 30px;
+$singlepagecontainer: 600px;
+
+//Fullscreen
+$papawidth: 1160px;
+
+//tablets landscape and small screens
+$mamabreak: 1200px;
+$mamawidth: 960px;
+
+//tablets portrait all the way down to the smallest phones.
+$teenbreak: 980px;
+$teenwidth: 100%;
 
 /* #Reset & Basics (Inspired by E. Meyers)
 ================================================== */
@@ -29,6 +62,164 @@
   }
 
 
+/* #Basic Styles
+================================================== */
+  body {
+    background: $lighttextcolor;
+    font: 1em/2em Arial, sans-serif;
+    color: $darkestblack;
+    -webkit-font-smoothing: antialiased; /* Fix for webkit rendering */
+    -webkit-text-size-adjust: 100%;
+     }
+
+
+
+/* #Typography
+================================================== */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: $headlinefont;
+    font-weight: normal; 
+    margin: 0.7em 0 0.5em 0; 
+    line-height: 1em;}
+  h1 a, h2 a, h3 a, h4 a, h5 a, h6 a { font-weight: inherit;  }
+  h1 { font-size: 1.8em;}
+  h2 { font-size: 1.4em;}
+  h3 { font-size: 1.2em;}
+  h4 { font-size: 1em;}
+  h5, h6 { margin: 1.5em 0 .5em 0; font-style: italic; }
+  .subheader { color: $hakaigrey; }
+
+  p { 
+    margin: .25em 0 1em 0; 
+    line-height: 1.6em;
+    letter-spacing: 0.03em;
+  }
+  p img { margin: 0; }
+  p.lead { font-size: 1.2em; line-height: 2em; color: $hakaigrey;  }
+
+  em { font-style: italic; }
+  strong { font-weight: bold; }
+  small { font-size: 80%; }
+
+/*  Tables 
+================================================== */
+  table { margin: 1em 0; border: 1px solid $hakaigrey; border-width: 0 0 1px 0; width: 100% }
+  tr { border: solid $hakaigrey; border-width: 1px 0 0 1px; }
+  th, td { padding: 0.5em; vertical-align: top; border: solid $hakaigrey; border-width: 0 1px 0 0; }
+  th { font-weight: bold; background: $hakaigrey; }
+  td { text-align: center; }
+  th[scope="col"], thead th, thead td { border-bottom: 1px solid $hakaigreylight; text-align: left; }
+  th[scope="row"] { border-right: 1px solid $hakaigreylight; text-align: right; }
+  tfoot th, tfoot td { border-top: 1px solid $hakaigrey; border-width: 0 1px 0 0; background: #EEE; }
+
+/*  Blockquotes 
+================================================== */
+  blockquote { margin: 20px 0 0 0; padding: 0 0 0 25px; font-style: italic; color: $hakaigrey; background: url(images/quote.png) no-repeat; }
+  blockquote cite { display: block; color: $hakaigrey; }
+  blockquote cite:before { content: "\2014 \0020"; }
+  blockquote cite a, blockquote cite a:visited, blockquote cite a:visited { color: $hakaigrey; }
+
+  hr { border: solid $hakaigrey; border-width: 1px 0 0; clear: both; margin: 10px 0 20px; height: 0; }
+
+
+/* #Links
+================================================== */
+  a, a:visited { color: $body_link_color; text-decoration: underline; outline: 0; }
+  a:hover, a:focus { color: $body_link_hover_color; }
+  p a, p a:visited { line-height: inherit; }
+
+
+/* #Lists
+================================================== */
+  ul, ol { margin-bottom: 1em; margin-left: 2em;}
+  ul { list-style: circle outside; }
+  ol { list-style: decimal;}
+  ul ul, ul ol,
+  ol ol, ol ul { margin: 1em 2em;}
+  ul ul li, ul ol li,
+  ol ol li, ol ul li { margin-bottom: 1em; }
+  li {padding: 0 0 1em 1em; }
+
+
+/* #Images
+================================================== */
+  img.scale-with-grid {
+    max-width: 100%;
+    height: auto; }
+
+/* #Forms
+================================================== */
+  fieldset { border: 1px solid $hakaigrey; margin-top: 1em; }
+  legend { background: $lighttextcolor none repeat scroll 0%; margin: 0 .4em; padding: 0 .1em }
+  label { font-size: 1em;}
+  input, select { box-sizing: border-box; font-size: 1em; padding: .2em; font-family: $headlinefont; width:100% }
+  textarea { box-sizing: border-box; font-size: 1em; padding: .2em; font-family: $headlinefont; width:100%  }
+  select, button { cursor: pointer; padding: 0.1em; }
+  button,
+  input[type="button"],
+  input[type="submit"],
+  input[type="reset" ]{
+    box-sizing: border-box;
+    background-color: $body_link_color;
+    border: 1px solid $body_link_color;
+      color: $lighttextcolor;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-weight: bold;
+      width: 100%;
+      font-family: $headlinefont;
+      font-size:1em;
+      padding: 0.2em .2em .3em .2em;}
+/* #Misc
+================================================== */
+.remove-bottom { margin-bottom: 0 !important; }
+.half-bottom { margin-bottom: 10px !important; }
+.add-bottom { margin-bottom: 20px !important; }
+tt,code,samp,kbd {
+  background: $hakaigreylight;
+  font-family: "Courier New", Courier, mono;
+}
+pre {
+  border: 1px solid #bbb;
+  padding: 0 0.5em;
+  margin: .5em 0 1em 0;
+  font: 1em/1.6em Monaco, "Courier New", "DejaVu Sans Mono", "Bitstream Vera Sans Mono", monospace;
+  background: $hakaigreylight;
+  background-image: -webkit-linear-gradient($hakaigrey 50%, $hakaigreylight 50%);
+  background-image: -moz-linear-gradient($hakaigrey 50%, $hakaigreylight 50%);
+  background-image: -o-linear-gradient($hakaigrey 50%, $hakaigreylight 50%);
+  background-image: linear-gradient($hakaigrey 50%, $hakaigreylight 50%);
+  background-size: 1em 3.2em;
+  word-break: break-all;
+  word-wrap: break-word;
+}
+pre code{
+  padding: 0 0.5em;
+  margin: .5em 0 1em 0;
+  background: none;
+  border: none;
+  font: 1em/1.6em Monaco, "Courier New", "DejaVu Sans Mono", "Bitstream Vera Sans Mono", monospace;
+  word-break: break-all;
+  word-wrap: break-word;
+}
+sup {vertical-align: super;
+  font-size: smaller;}
+
+i, cite, em, var, address, dfn {
+  font-style: italic;
+}
+
+abbr, acronym {
+  border-width: 0 0 1px 0;
+  border-style: dashed;
+  border-color: $darkestblack; 
+  cursor:help;}
+
+  sub {
+    vertical-align: sub;
+    font-size: smaller;
+  }
 .media-heading {
   font-size: 16px;
 }
@@ -231,4 +422,18 @@ body {
     min-height: 300px;
 }
 
-.test{background:red;}
+@media (min-width: 1000px) {
+  .container {
+    width: 900px;
+  }
+}
+@media (min-width: 1192px) {
+  .container {
+    width: 1170px;
+  }
+}
+@media (min-width: 1400px) {
+  .container {
+    width: 1390px;
+  }
+}
