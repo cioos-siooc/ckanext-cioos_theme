@@ -437,3 +437,275 @@ body {
     width: 1390px;
   }
 }
+
+/* Main navigation
+================================================== */
+
+header nav,
+.header nav,
+.nav nav  {
+  background: $navbg;
+  float: left;
+  ul#menu-primary{ 
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    li {
+      display: table-cell;
+      padding: 0;
+      a{ 
+        color: $lighttextcolor;
+        text-decoration: none;
+        font-family: $headlinefont;
+      }
+    }
+  }
+}
+
+.skip-link{
+  position: absolute; left:100000px}
+.main-nav-check,
+.mobile-nav ,
+.toggle-menu {
+  display: none;
+}
+
+
+/* Mobile navigation
+================================================================================================ */
+@media only screen and (max-width: $teenbreak) {
+  nav .container {
+    width: 100%;
+  }
+
+  .main-nav,
+  .navarea {
+    display: none;
+  }
+  .mobile-nav{
+    display: block;
+    z-index: 100;
+    position: relative;
+    top: 0px;
+    width: 100%;
+    margin: 0;
+    height:auto;
+    background: $navbg;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    margin: 0;
+    ul.menu  {
+      margin:0; 
+      overflow:hidden; 
+      list-style: none;
+    
+      li {
+        padding: 0;
+        float:left; 
+        margin:0; 
+        width:100%; 
+        list-style: none;
+         a{
+          font-family: $headlinefont;
+          text-align:left; 
+          float:left;  
+          display:block; 
+          overflow:hidden; 
+          text-decoration:none; 
+          width:98%;
+          padding: 0 0 0 5%;
+          display: block;
+          font-size: inherit; 
+          color: #fff;
+          border: 1px solid darken($navbg, 5%);
+        }
+      }
+      li.menu-item-has-children a{
+        width:69%;
+        float:left;
+      }
+      li.menu-item-has-children ul li a {
+        width: 100%;
+        border-width: 0 0 1px 0;
+      }
+      li.menu-item-has-children a.navdrop,
+      li.menu-item-has-children a.navdropover{
+        width: 25%;
+        text-indent: 0px;
+        float:right;
+        font-family:'FontAwesome';
+        background:lighten($navbg, 10%);
+        text-align: center;
+        padding:0;
+        border: 0 solid $navbg;
+        span{display:none;}
+        &:after{ content: "More";font-family: $headlinefont; margin:0 0 0 .5em}
+        &:before{content: "\f055";}
+      }
+      li.menu-item-has-children a.navdropover{
+        &:after{ content: "More";font-family: $headlinefont; margin:0 0 0 .5em}
+        &:before{content: "\f056";}
+      }
+      li.menu-item-has-children li.menu-item-has-children a.navdrop,
+      li.menu-item-has-children li.menu-item-has-children a.navdropover{
+        background:lighten($navbg, 20%);
+        border: 0 solid lighten($navbg, 10%);
+        text-indent: 0px;
+        &:before{content: "";}
+      }
+      li.menu-item-has-children li.menu-item-has-children  li.menu-item-has-children a.navdrop,
+      li.menu-item-has-children li.menu-item-has-children  li.menu-item-has-children a.navdropover{
+        background:lighten($navbg, 30%);
+        border: 0 solid lighten($navbg, 20%);
+        text-indent: 0px;
+        &:before{content: "";}
+      }
+      ul.sub-menu{ 
+        margin:0; 
+        position: relative; 
+        z-index: 100;  
+        font-size: inherit; 
+        border:none; 
+        width:100%; 
+        list-style: none;    
+        li{ 
+          margin: 0; 
+          width: 100%; 
+          background:lighten($navbg, 10%);
+          a{
+          color:$lighttextcolor;  
+          padding:0 0 0 5%;
+          border: 0 solid lighten($navbg, 15%);
+          &:before{content: "";}
+          }
+        } 
+        ul.sub-menu{
+          margin:  0;
+          position: relative;
+          li {
+            background:lighten($navbg, 20%);
+            a{ 
+            border: 0 solid lighten($navbg, 25%);
+            text-indent: 20px;
+            &:before{content: "-- ";}
+            }
+          }
+          ul.sub-menu{ 
+            margin:  0; 
+            position: relative; 
+            li {
+              background:lighten($navbg, 30%);
+              a{ 
+              border: 0 solid lighten($navbg, 35%);
+              text-indent: 30px;
+              &:before{content: "--- ";}
+              }
+            }
+          }
+        }  
+      }
+    }
+  }
+  /* Mobile topbar
+  ======================= */
+  .topbar {
+    margin-top:30px;
+    }
+  .toggle-menu { 
+    display:block;
+    label{
+      display: block;
+      background: $navbg;
+      overflow: hidden;
+      padding: 2% 5%;
+      color:#fff;
+      font-family: $headlinefont;
+      top: 0;
+      z-index:1000;
+      box-shadow: 0px 6px 19px rgba(0,0,0,0.2);
+      cursor: pointer;
+      text-align: right;
+      &:before {
+      margin-right: .3333em;
+      content: "\f055";
+      font-family: 'FontAwesome';
+      transition: all 0.3s ease;
+      }
+    }
+  }
+  .main-nav-check {
+    display: none;
+  }
+  .close-menu {
+    display: none;
+  }
+
+  /* Mobile navigation Animations
+  ================================== */
+
+  #main-nav-check:checked ~ .toggle-menu label:before {
+    content: "\f056";
+  }
+  #main-nav-check ~ .mobile-nav ul.menu li a,
+  #main-nav-check:checked ~ .mobile-nav ul.menu ul.subhide li a,
+  #main-nav-check:checked ~ .mobile-nav ul.menu ul.subshow ul.subhide li a,
+  #main-nav-check:checked ~ .mobile-nav ul.menu ul.subhide ul.subshow li a,
+  #main-nav-check:checked ~ .mobile-nav ul.menu ul.subhide li a.navdrop,
+  #main-nav-check:checked ~ .mobile-nav ul.menu ul.subhide li a.navdropover,
+  #main-nav-check:checked ~ .mobile-nav ul.menu ul.subshow ul.subhide li a.navdrop,
+  #main-nav-check:checked ~ .mobile-nav ul.menu ul.subshow ul.subhide li a.navdropover, 
+  #main-nav-check:checked ~ .mobile-nav ul.menu ul.subhide ul.subshow li a.navdrop,
+  #main-nav-check:checked ~ .mobile-nav ul.menu ul.subhide ul.subshow li a.navdropover 
+  {
+    border-width:0;
+    line-height:0;
+    transition: all 0.2s ease;
+    height: 0;
+  }
+  #main-nav-check:checked ~ .mobile-nav ul.menu li a.navdrop,
+  #main-nav-check:checked ~ .mobile-nav ul.menu li a.navdropover,
+  #main-nav-check:checked ~ .mobile-nav ul.menu ul.subshow li a.navdrop,
+  #main-nav-check:checked ~ .mobile-nav ul.menu ul.subshow li a.navdropover{
+    border-width:1px 0 0 0;
+    line-height: 2.75em;
+    transition: all 0.2s ease;
+    border-bottom:1px solid transparent;
+  }
+  #main-nav-check:checked ~ .mobile-nav ul.menu li a{
+    line-height: 2.5em;
+    border-width:1px 0 0 0;
+    transition: all 0.2s ease;
+    height: auto;
+  }
+  #main-nav-check:checked ~ .mobile-nav ul.menu ul.subshow li a {
+    line-height: 2.5em;
+    border-width: 0 0 1px 0;
+    transition: all 0.2s ease;
+    height: auto;
+  }
+  #main-nav-check ~ .mobile-nav ul.menu li a.icons,
+  #main-nav-check ~ .mobile-nav form{
+    height: 0;
+    display: none;
+  }
+  #main-nav-check:checked ~ .mobile-nav ul.menu li a.icons,
+  #main-nav-check:checked ~ .mobile-nav form{
+    line-height: 1em;
+    display: block;
+    height: auto;
+    border:none;
+    border-width:0;
+    transition: all 0.2s ease;
+  }
+  #main-nav-check ~ .mobile-nav.headericons {
+    border-top: 0px;
+    padding: 0;
+    transition: all 0.2s ease;
+  }
+  #main-nav-check:checked ~ .mobile-nav.headericons {
+    border-top: 1px solid darken($navbg, 5%);
+    padding: 1em 0 0 0;
+    transition: all 0.2s ease;
+  }
+}
+

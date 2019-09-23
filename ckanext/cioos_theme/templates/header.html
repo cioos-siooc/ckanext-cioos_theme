@@ -61,6 +61,24 @@
 </header>
 {% endblock %}
 <!-- TOP MENU STARTS HERE -->
+<input type="checkbox" class="main-nav-check" id="main-nav-check" />
+<div class="mobileheader toggle-menu">
+  <label for="main-nav-check">Menu</label>
+</div>
+<nav class="menubar mobile-nav" id="mobile-nav">
+  <h4 class="invis">Mobile Navigation</h4>
+  <div id="menu-mobile" class="menu">
+    {% block header_mobilesite_navigation2 %}
+    <nav>
+      <ul>
+        {% block header_mobilesite_navigation_tabs %} {{ h.build_nav_main( ('search', _('Datasets')), ('organizations_index', _('Organizations')),
+        ('group_index', _('Groups')), ('home.about', _('About')) ) }} {% endblock %}
+      </ul>
+    </nav>
+    {% endblock %}
+  </div>
+</nav>
+
 <header id="topmenu">
   <div class="container">
     <nav>
@@ -72,7 +90,8 @@
     </nav>
   </div>
 </header>
-<header id="mainmenu">
+
+<header id="mainmenu" class="nav main-nav row">
   <div class="container">
     <a class="logo" href="{{ h.url_for('home.index') }}"><img src="/base/images/logoEN.svg"></a>
     {% block header_site_navigation %}
