@@ -302,6 +302,13 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
 
     # IPackageController
 
+    def after_create(self, context, pkg_dict):
+        # dosn't work to update name in validator as id is populated by database. better to use a validator and populate usig uuid
+        # import uuid
+        # str(uuid.uuid4())
+        name = pkg_dict.get('name', '')
+        if not name:
+            pkg_dict['name'] = pkg_dict.get('id', name)
 
     # modfiey tags, keywords, and eov fields so that they properly index
     def before_index(self, data_dict):
@@ -315,6 +322,25 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
 
         data_dict['tags_en'] = tags_dict.get('en', [])
         data_dict['tags_fr'] = tags_dict.get('fr', [])
+
+        temporal_extent = json.loads(data_dict.get('temporal-extent', '{}'))
+        temporal_extent_begin = temporal_extent.get('begin')
+        temporal_extent_end = temporal_extent.get('end')
+
+        if(temporal_extent_begin):
+            data_dict['temporal-extent-begin'] = temporal_extent_begin
+        if(temporal_extent_end):
+            data_dict['temporal-extent-end'] = temporal_extent_end
+        if(temporal_extent_begin and temporal_extent_end):
+            data_dict['temporal-extent-range'] = '[' + temporal_extent_begin + ' TO ' + temporal_extent_end + ']'
+
+        vertical_extent = json.loads(data_dict.get('vertical-extent', '{}'))
+        vertical_extent_min = vertical_extent.get('min')
+        vertical_extent_max = vertical_extent.get('max')
+        if(vertical_extent_min):
+            data_dict['vertical-extent-min'] = vertical_extent_min
+        if(vertical_extent_max):
+            data_dict['vertical-extent-max'] = vertical_extent_max
 
         # eov is multi select so it is a json list rather then a python list
         if(data_dict.get('eov')):
@@ -339,6 +365,21 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                         item['category'] = c.get('catagory', u'')
                 new_eovs.append(item)
             search_results['search_facets']['eov']['items'] = new_eovs
+
+        # for result in search_results.get('results', []):
+        #     log.debug('result: %r', result)
+        #     title = result.get('title')
+        #     if(title):
+        #         result['title'] = load_json(title)
+        #
+        #     notes = result.get('notes')
+        #     if(notes):
+        #         result['notes'] = load_json(notes)
+        #
+        #     keywords = result.get('keywords')
+        #     if(keywords):
+        #         result['keywords'] = load_json(keywords)
+
         return search_results
 
     # Custom section
