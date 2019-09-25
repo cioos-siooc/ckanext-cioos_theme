@@ -348,6 +348,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         return data_dict
 
     # update eov search facets with keys from choices list in the scheming extension schema
+    # format search results for consistant json output
     def after_search(self, search_results, search_params):
         search_facets = search_results.get('search_facets', {})
         eov = search_facets.get('eov', {})
@@ -366,19 +367,23 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                 new_eovs.append(item)
             search_results['search_facets']['eov']['items'] = new_eovs
 
-        # for result in search_results.get('results', []):
-        #     log.debug('result: %r', result)
-        #     title = result.get('title')
-        #     if(title):
-        #         result['title'] = load_json(title)
-        #
-        #     notes = result.get('notes')
-        #     if(notes):
-        #         result['notes'] = load_json(notes)
-        #
-        #     keywords = result.get('keywords')
-        #     if(keywords):
-        #         result['keywords'] = load_json(keywords)
+        # convert string encoded json to json objects for translated fields
+        # package_search with filters uses solr index values which are strings
+        # this is inconsistant with package data which is returned as json objects
+        # by the package_show and package_search end points whout filters applied
+        for result in search_results.get('results', []):
+            log.debug('result: %r', result)
+            title = result.get('title_translated')
+            if(title):
+                result['title_translated'] = load_json(title)
+
+            notes = result.get('notes_translated')
+            if(notes):
+                result['notes_translated'] = load_json(notes)
+
+            keywords = result.get('keywords')
+            if(keywords):
+                result['keywords'] = load_json(keywords)
 
         return search_results
 
