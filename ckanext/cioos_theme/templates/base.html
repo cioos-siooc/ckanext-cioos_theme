@@ -49,7 +49,7 @@
   {%- endif %}
   {% endblock %}
   <link href="https://fonts.googleapis.com/css?family=Quicksand&display=swap" rel="stylesheet">
-  <link rel="stylesheet" type="text/css" href="/cioos_theme.css" />
+  <link rel="stylesheet" type="text/css" href="{{h.url_for_static('/cioos_theme.css')}}" />
 </head>
 <body {% block bodytag %} data-site-root="{{ h.url_for('/', locale='default', qualified=true) }}" data-locale-root="{{ h.url_for('/', qualified=true) }}" {% endblock %}>
 
