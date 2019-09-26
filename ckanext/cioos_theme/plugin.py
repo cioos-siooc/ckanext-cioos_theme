@@ -372,15 +372,12 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         # this is inconsistant with package data which is returned as json objects
         # by the package_show and package_search end points whout filters applied
         for result in search_results.get('results', []):
-            log.debug('result: %r', result)
             title = result.get('title_translated')
             if(title):
                 result['title_translated'] = load_json(title)
-
             notes = result.get('notes_translated')
             if(notes):
                 result['notes_translated'] = load_json(notes)
-
             keywords = result.get('keywords')
             if(keywords):
                 result['keywords'] = load_json(keywords)

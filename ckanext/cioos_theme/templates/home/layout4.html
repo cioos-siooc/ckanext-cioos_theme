@@ -2,15 +2,15 @@
   <div class="container">
     <div class="row row1">
       <div class="col-md-12 col1 mapbg">
-        <img src="/base/images/map.svg">
+        <img src="{{h.url_for_static('/base/images/map.svg')}}">
       </div>
       <div class="col-md-12 col1">
         <div class="module-content box rabox">
-          <img src="/base/images/westcoast.svg">
-          <img src="/base/images/stlawrence.svg">
-          <img src="/base/images/eastcoast.svg">
-        </div>  
-      </div>      
+          <img src="{{h.url_for_static('/base/images/westcoast.svg')}}">
+          <img src="{{h.url_for_static('/base/images/stlawrence.svg')}}">
+          <img src="{{h.url_for_static('/base/images/eastcoast.svg')}}">
+        </div>
+      </div>
       <div class="col-md-12 col1">
         {% block promoted %}
           {% snippet 'home/snippets/promoted.html' %}
