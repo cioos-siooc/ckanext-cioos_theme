@@ -33,193 +33,7 @@ $mamawidth: 960px;
 $teenbreak: 980px;
 $teenwidth: 100%;
 
-/* #Reset & Basics (Inspired by E. Meyers)
-================================================== */
-  html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video {
-    margin: 0;
-    padding: 0;
-    border: 0;
-    font-size: 100%;
-    font: inherit;
-    vertical-align: baseline; }
-  article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {
-    display: block; }
-  body {
-    line-height: inherit; }
-  ol, ul {
-    list-style: none; }
-  blockquote, q {
-    quotes: none; }
-  blockquote:before, blockquote:after,
-  q:before, q:after {
-    content: '';
-    content: none; }
-  table {
-    border-collapse: collapse;
-    border-spacing: 0; }
-  body > header, body > main, body > footer{
-    position: relative;
-  }
 
-
-/* #Basic Styles
-================================================== */
-  body {
-    background: $lighttextcolor;
-    font: 1em/2em Arial, sans-serif;
-    color: $darkestblack;
-    -webkit-font-smoothing: antialiased; /* Fix for webkit rendering */
-    -webkit-text-size-adjust: 100%;
-     }
-
-
-
-/* #Typography
-================================================== */
-  h1, h2, h3, h4, h5, h6 {
-    font-family: $headlinefont;
-    font-weight: normal; 
-    margin: 0.7em 0 0.5em 0; 
-    line-height: 1em;}
-  h1 a, h2 a, h3 a, h4 a, h5 a, h6 a { font-weight: inherit;  }
-  h1 { font-size: 1.8em;}
-  h2 { font-size: 1.4em;}
-  h3 { font-size: 1.2em;}
-  h4 { font-size: 1em;}
-  h5, h6 { margin: 1.5em 0 .5em 0; font-style: italic; }
-  .subheader { color: $hakaigrey; }
-
-  p { 
-    margin: .25em 0 1em 0; 
-    line-height: 1.6em;
-    letter-spacing: 0.03em;
-  }
-  p img { margin: 0; }
-  p.lead { font-size: 1.2em; line-height: 2em; color: $hakaigrey;  }
-
-  em { font-style: italic; }
-  strong { font-weight: bold; }
-  small { font-size: 80%; }
-
-/*  Tables 
-================================================== */
-  table { margin: 1em 0; border: 1px solid $hakaigrey; border-width: 0 0 1px 0; width: 100% }
-  tr { border: solid $hakaigrey; border-width: 1px 0 0 1px; }
-  th, td { padding: 0.5em; vertical-align: top; border: solid $hakaigrey; border-width: 0 1px 0 0; }
-  th { font-weight: bold; background: $hakaigrey; }
-  td { text-align: center; }
-  th[scope="col"], thead th, thead td { border-bottom: 1px solid $hakaigreylight; text-align: left; }
-  th[scope="row"] { border-right: 1px solid $hakaigreylight; text-align: right; }
-  tfoot th, tfoot td { border-top: 1px solid $hakaigrey; border-width: 0 1px 0 0; background: #EEE; }
-
-/*  Blockquotes 
-================================================== */
-  blockquote { margin: 20px 0 0 0; padding: 0 0 0 25px; font-style: italic; color: $hakaigrey; background: url(images/quote.png) no-repeat; }
-  blockquote cite { display: block; color: $hakaigrey; }
-  blockquote cite:before { content: "\2014 \0020"; }
-  blockquote cite a, blockquote cite a:visited, blockquote cite a:visited { color: $hakaigrey; }
-
-  hr { border: solid $hakaigrey; border-width: 1px 0 0; clear: both; margin: 10px 0 20px; height: 0; }
-
-
-/* #Links
-================================================== */
-  a, a:visited { color: $body_link_color; text-decoration: underline; outline: 0; }
-  a:hover, a:focus { color: $body_link_hover_color; }
-  p a, p a:visited { line-height: inherit; }
-
-
-/* #Lists
-================================================== */
-  ul, ol { margin-bottom: 1em; margin-left: 2em;}
-  ul { list-style: circle outside; }
-  ol { list-style: decimal;}
-  ul ul, ul ol,
-  ol ol, ol ul { margin: 1em 2em;}
-  ul ul li, ul ol li,
-  ol ol li, ol ul li { margin-bottom: 1em; }
-  li {padding: 0 0 1em 1em; }
-
-
-/* #Images
-================================================== */
-  img.scale-with-grid {
-    max-width: 100%;
-    height: auto; }
-
-/* #Forms
-================================================== */
-  fieldset { border: 1px solid $hakaigrey; margin-top: 1em; }
-  legend { background: $lighttextcolor none repeat scroll 0%; margin: 0 .4em; padding: 0 .1em }
-  label { font-size: 1em;}
-  input, select { box-sizing: border-box; font-size: 1em; padding: .2em; font-family: $headlinefont; width:100% }
-  textarea { box-sizing: border-box; font-size: 1em; padding: .2em; font-family: $headlinefont; width:100%  }
-  select, button { cursor: pointer; padding: 0.1em; }
-  button,
-  input[type="button"],
-  input[type="submit"],
-  input[type="reset" ]{
-    box-sizing: border-box;
-    background-color: $body_link_color;
-    border: 1px solid $body_link_color;
-      color: $lighttextcolor;
-      text-align: center;
-      text-decoration: none;
-      display: inline-block;
-      font-weight: bold;
-      width: 100%;
-      font-family: $headlinefont;
-      font-size:1em;
-      padding: 0.2em .2em .3em .2em;}
-/* #Misc
-================================================== */
-.remove-bottom { margin-bottom: 0 !important; }
-.half-bottom { margin-bottom: 10px !important; }
-.add-bottom { margin-bottom: 20px !important; }
-tt,code,samp,kbd {
-  background: $hakaigreylight;
-  font-family: "Courier New", Courier, mono;
-}
-pre {
-  border: 1px solid #bbb;
-  padding: 0 0.5em;
-  margin: .5em 0 1em 0;
-  font: 1em/1.6em Monaco, "Courier New", "DejaVu Sans Mono", "Bitstream Vera Sans Mono", monospace;
-  background: $hakaigreylight;
-  background-image: -webkit-linear-gradient($hakaigrey 50%, $hakaigreylight 50%);
-  background-image: -moz-linear-gradient($hakaigrey 50%, $hakaigreylight 50%);
-  background-image: -o-linear-gradient($hakaigrey 50%, $hakaigreylight 50%);
-  background-image: linear-gradient($hakaigrey 50%, $hakaigreylight 50%);
-  background-size: 1em 3.2em;
-  word-break: break-all;
-  word-wrap: break-word;
-}
-pre code{
-  padding: 0 0.5em;
-  margin: .5em 0 1em 0;
-  background: none;
-  border: none;
-  font: 1em/1.6em Monaco, "Courier New", "DejaVu Sans Mono", "Bitstream Vera Sans Mono", monospace;
-  word-break: break-all;
-  word-wrap: break-word;
-}
-sup {vertical-align: super;
-  font-size: smaller;}
-
-i, cite, em, var, address, dfn {
-  font-style: italic;
-}
-
-abbr, acronym {
-  border-width: 0 0 1px 0;
-  border-style: dashed;
-  border-color: $darkestblack; 
-  cursor:help;}
-
-  sub {
-    vertical-align: sub;
-    font-size: smaller;
-  }
 .media-heading {
   font-size: 16px;
 }
@@ -306,12 +120,6 @@ abbr, acronym {
   color: white;
 }
 
-/* ===========================================
-   homepage content
-   =========================================== */
-.homepage .module-content {
-  margin-bottom: 30px;
-}
 
 /* ===========================================
    The content in the middle of the front page
@@ -421,7 +229,6 @@ body {
     border-radius: 0;
     box-shadow: none;
     position: relative;
-    min-height: 300px;
 }
 
 @media (min-width: 1000px) {
@@ -706,7 +513,61 @@ header nav,
   }
 }
 
-.mapbg{text-align:center;}
+.mapbg{
+  text-align:center;
+  margin:0 0 1em 0;
+}
 
 .rabox {  display: flex;
   justify-content: space-between;}
+
+.home-intro-text{
+  @media (min-width: 1000px) {padding:0 0px}
+  @media (min-width: 1192px) {padding:0 180px}
+  @media (min-width: 1400px) {padding:0 280px}
+}
+
+.btn-primary {
+    color: #404041;
+    background-color: #C6E3DF;
+    border-color: #C6E3DF;
+    padding: 0 30px 10px !important;
+    margin:0 30px;
+}
+.btn {
+    display: inline-block;
+    text-transform:uppercase;
+    margin-bottom: 0;
+    font-family:Quicksand;
+    font-weight: normal;
+    text-align: center;
+    vertical-align: middle;
+    touch-action: manipulation;
+    cursor: pointer;
+    background-image: none;
+    border: 1px solid transparent;
+    white-space: nowrap;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    border-radius: 20px;}
+
+
+/* ===========================================
+   homepage content
+   =========================================== */
+.homepage .module-content-end {
+  margin-bottom: 30px;
+}
+.homepage .module-content-end:before {
+content: "";
+position: absolute;
+width: 200%;
+height: 200%;
+top: -50%;
+left: -50%;
+z-index: -1;
+background: url(background.png) 0 0 repeat;
+-webkit-transform: rotate(30deg);
+transform: rotate(30deg);
+}
