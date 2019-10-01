@@ -567,3 +567,51 @@ header nav,
   background-repeat: no-repeat;
   background-position: 111%;
 }
+
+/* ===========================================
+   News widget
+   =========================================== */
+
+  .newsitem {
+    position: relative;
+    display: inline-block;
+    padding: 5px 20px;
+    overflow: hidden;
+    z-index: 1;
+  } 
+  .newsitem header {
+    border:1px solid #ddd;
+    background: #fff;
+    text-align: center;
+  } 
+  .newsitem p {
+    position: absolute;
+    display: inline-block;
+    left: 0px;
+    top: 22px;
+    background: #52A79B;
+    width: 150px;
+    padding: 3px 10px;
+  } 
+  .newsitem .newsday {
+    font-size:3em;
+    width: 50%;
+    display: inline-block;
+    color:#fff
+  } 
+  .newsitem .newsmonth {
+    width: 50%;
+    display: inline-block; 
+    color:#fff 
+  } 
+  .newsitem p:before {
+    content: "";
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    bottom: -20px;
+    left: -20px;
+    z-index: -2;
+    border: 20px solid;
+    border-color: transparent #437a7a transparent transparent;
+  }
