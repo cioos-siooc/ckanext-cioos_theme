@@ -8,8 +8,8 @@
         <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer gravida sed magna eget pellentesque. Duis pulvinar leo at nunc convallis, at molestie dui suscipit. In sit amet lorem dictum, tristique metus sit amet, egestas neque. Integer eros ante, luctus ac lectus quis, vulputate lobortis orci. Vestibulum scelerisque commodo lectus. Phasellus id velit vestibulum, interdum magna id, consequat sem. Suspendisse ornare arcu nec placerat accumsan. In eget eleifend nunc. Duis condimentum diam non tellus bibendum, et eleifend mi malesuada. Mauris urna purus, tristique nec aliquet ac, facilisis a enim. </p>
         <p class="mapbg "><a class="btn btn-primary" href="#" role="button">Explore Data</a><a class="btn btn-primary" href="#" role="button">Contribute to Cioos</a></p>
       </div>
-      <div class="col-md-12 col1">
-        <div class="module-content box">
+      <div class="col-md-12 col1 module-content-end">
+        <div class="module-content box ">
           <h3 class="heading">Regional Associations</h3>
         </div>
         <div class="module-content box rabox">
@@ -17,47 +17,16 @@
           <img src="{{h.url_for_static('/base/images/stlawrence.svg')}}">
           <img src="{{h.url_for_static('/base/images/eastcoast.svg')}}">
         </div>
-      </div>      
-      <div class="col-md-12 col1">
-        {% block promoted %}
-          {% snippet 'home/snippets/promoted.html' %}
-        {% endblock %}
       </div>
-      <div class="col-md-12 col1">
-        {% block search %}
-          {% snippet 'home/snippets/search.html' %}
-        {% endblock %}
-      </div>
-      <div class="col-md-12 col1">
+      <div class="col-md-12 col1 module-content-end">
         <div class="module-content box">
-       {% block eov_list %}
-         <h3 class="heading">SEARCH BY OCEAN VARIABLE</h3>
-            {% set facets = h.cioos_get_facets() %}
-            {% set eov = h.get_facet_items_dict('eov', limit=None, exclude_active=False) %}
-            {% for grouper, list in eov|groupby('category') %}
-              <h4>{{grouper}}</h4>
-              <ul class="media-grid" data-module="media-grid">
-              {% for item in list %}
-                {% set href = h.url_for(controller='package', action='search', eov=item.name) %}
-                {% set label = label_function(item) if label_function else item.display_name %}
-                {% set label_truncated = h.truncate(label, 22) if not label_function else label %}
-                {% set count = count_label(item['count']) if count_label else ('%d' % item['count']) %}
-                {# set img_url = item.image_display_url or h.url_for_static('/base/images/' + item.name + '.png') #}
-                {% set img_url = item.image_display_url or h.url_for_static('/base/images/placeholder-group.png') %}
-                  <li class="media-item">
-                    <a class="media-image" href="{{ href }}" title="{{ label if label != label_truncated else '' }}">
-                      <img src="{{ img_url }}" alt="{{ item.name }}" class="media-image img-responsive">
-                    </a>
-                    <span class="media-heading">{{ label_truncated }}</span>
-                    <span class="hidden separator"> - </span>
-                    <span class="item-count badge">{{ count }}</span>
-                  </li>
-              {% endfor %}
-              </ul>
-            {% endfor %}
-        {% endblock %}
+          <h3 class="heading">Latest News</h3>
+        </div>
+        <div class="module-content box rabox">
+          news item
         </div>
       </div>
+
 
     </div>
   </div>

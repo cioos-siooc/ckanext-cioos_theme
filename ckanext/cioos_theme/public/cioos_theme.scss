@@ -557,19 +557,13 @@ header nav,
    homepage content
    =========================================== */
 .homepage .module-content-end {
-  margin-bottom: 30px;
-}
-.homepage .module-content-end:before {
-content: "";
-position: absolute;
-width: 200%;
-height: 200%;
-top: -50%;
-left: -50%;
-z-index: -1;
-background: url(background.png) 0 0 repeat;
--webkit-transform: rotate(30deg);
-transform: rotate(30deg);
+  margin-bottom: 100px;
 }
 
-#footer {background:#52A79B}
+#footer {
+  background-color:#52A79B;
+  background-image: url(/base/images/footerlogo.svg);
+  min-height: 300px;
+  background-repeat: no-repeat;
+  background-position: 111%;
+}

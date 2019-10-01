@@ -54,11 +54,11 @@
 <body {% block bodytag %} data-site-root="{{ h.url_for('/', locale='default', qualified=true) }}" data-locale-root="{{ h.url_for('/', qualified=true) }}" {% endblock %}>
 
 
-  {%- block page %}{% endblock -%} page
+  {%- block page %}{% endblock -%}
 
 
-  {%- block scripts %}{% endblock -%} scpiprs
-  {% block body_extras -%} extrs
+  {%- block scripts %}{% endblock -%}
+  {% block body_extras -%}
   {# defined in the config.ini under "ckan.template_footer_end" #}
   {{ g.template_footer_end | safe }}
   {%- endblock %}
