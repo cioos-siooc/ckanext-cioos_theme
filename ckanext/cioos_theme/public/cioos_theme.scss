@@ -23,15 +23,19 @@ $master_margin_width: 30px;
 $singlepagecontainer: 600px;
 
 //Fullscreen
-$papawidth: 1160px;
+$papabreak: 1400px;
+$papawidth: 1390px;
 
 //tablets landscape and small screens
-$mamabreak: 1200px;
-$mamawidth: 960px;
+$mamabreak: 1192px;
+$mamawidth: 1170px;
 
 //tablets portrait all the way down to the smallest phones.
-$teenbreak: 980px;
-$teenwidth: 100%;
+$teenbreak: 1000px;
+$teenwidth: 900px;
+
+
+
 
 
 .media-heading {
@@ -151,6 +155,7 @@ $teenwidth: 100%;
 
 body {
   background: #ffffff;
+  font-family: 'Montserrat', sans-serif;
 }
 
 /* The text in the footer. */
@@ -232,19 +237,19 @@ body {
     position: relative;
 }
 
-@media (min-width: 1000px) {
+@media (min-width: $teenbreak) {
   .container {
-    width: 900px;
+    width: $teenwidth;
   }
 }
-@media (min-width: 1192px) {
+@media (min-width: $mamabreak) {
   .container {
-    width: 1170px;
+    width: $mamawidth;
   }
 }
-@media (min-width: 1400px) {
+@media (min-width: $papabreak) {
   .container {
-    width: 1390px;
+    width: $papawidth;
   }
 }
 
@@ -519,8 +524,10 @@ header nav,
   margin:0 0 1em 0;
 }
 
-.rabox {  display: flex;
-  justify-content: space-between;}
+.flexbox {  
+  display: flex;
+  justify-content: space-between;
+}
 
 .home-intro-text{
   @media (min-width: 1000px) {padding:0 0px}
@@ -615,4 +622,48 @@ header nav,
     z-index: -2;
     border: 20px solid;
     border-color: transparent #437a7a transparent transparent;
+  }
+  .rabox img {
+      max-width: 30%;
+  }
+
+  .form-control {
+      border-radius: 30px;
+      border-color:#FA7268;
+  }
+
+  .search-form .search-input.search-giant button {
+    top: 15px;
+    right: 16px;
+    background: #fa7268;
+    border-radius: 27px;
+    width: 53px;
+    height: 53px;
+  }
+  .search-form .search-input button i {
+    color:#fff;
+  }
+
+  .centertext{
+    text-align:center;
+  }
+  .title h1 {
+    font-size:70px; 
+    font-weight:600;
+    color:#707070;
+  }
+  .title h1 span {
+    font-weight:300;
+  }
+  .title h2 {
+    font-size:50px; 
+    font-weight:300;
+    color:#707070;
+  }
+  .title h2 span {
+    color:#FA7268;
+  }
+
+  .search-form {
+    border-bottom: none; 
   }
