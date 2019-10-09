@@ -549,34 +549,6 @@ header nav,
     font-size: 14px;
     line-height: 1.42857143;
     border-radius: 20px;}
-
-
-/* ===========================================
-   homepage content
-   =========================================== */
-.homepage .module-content-end {
-  margin-bottom: 100px;
-}
-
-#footer {
-  background-color:#52A79B;
-  background-repeat: no-repeat;
-  background-position: 111%;
-  color:#fff;
-  padding:10px;
-}
-
-/* The text in the footer. */
-.site-footer,
-.site-footer label,
-.site-footer small {
-  color: rgba(0, 0, 0, 0.6);
-}
-
-/* The link texts in the footer. */
-.site-footer a {
-  color: rgba(0, 0, 0, 0.6);
-}
 /* ===========================================
    News widget
    =========================================== */
@@ -670,3 +642,30 @@ header nav,
   }
 
   .rightalign {text-align:right;}
+
+/* ===========================================
+   homepage content
+   =========================================== */
+.homepage .module-content-end {
+  margin-bottom: 100px;
+}
+
+#footer {
+  background-color:#52A79B;
+  background-repeat: no-repeat;
+  background-position: 111%;
+  color:#fff;
+  padding:10px;
+}
+
+/* The text in the footer. */
+.site-footer,
+.site-footer label,
+.site-footer small {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+/* The link texts in the footer. */
+.site-footer a {
+  color: rgba(0, 0, 0, 0.6);
+}
