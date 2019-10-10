@@ -4,7 +4,6 @@
       <div class="col-md-12 col1 centertext title module-content-end">
         <h1><span>CIOOS</span> Data Catalogue</h1>
         <h2>Search, find, download — all of our <span>[TOTAL]</span> datasets.</h2>
-
         <!-- old block -->
         {# block promoted #}
         {# snippet 'home/snippets/promoted.html' #}
@@ -16,189 +15,270 @@
         {% endblock %}
       </div>
       <div class="col-md-12 col1 module-content-end">
+        <h3 class="heading">SEARCH BY OCEAN VARIABLE</h3>
         <div class="module-content box">
-          <h3 class="heading">SEARCH BY OCEAN VARIABLE</h3>
           <h4>Category A</h4>
-          <ul class="media-grid" data-module="media-grid" style="position: relative; height: 229.65px;">
-            <li class="media-item" style="position: absolute; left: 0px; top: 15px;">
+          <ul class="media-grid" data-module="media-grid">
+            <li class="media-item">
               <a class="media-image" href="/dataset?eov=name" title="">
-                <img src="image_display_url" alt="name" class="media-image img-responsive">
+                <img src="{{h.url_for_static('/base/images/icon_temp.png')}}" alt="name" class="media-image img-responsive">
               </a>
-              <span class="media-heading">display_name</span>
+              <span class="media-heading">Temperature</span>
               <span class="hidden separator"> - </span>
               <span class="item-count badge">123</span>
             </li>
-            <li class="media-item" style="position: absolute; left: 160px; top: 15px;">
+            <li class="media-item">
               <a class="media-image" href="/dataset?eov=name" title="">
-                <img src="image_display_url" alt="name" class="media-image img-responsive">
+                <img src="{{h.url_for_static('/base/images/icon_current.png')}}" alt="name" class="media-image img-responsive">
               </a>
-              <span class="media-heading">display_name</span>
+              <span class="media-heading">Sea Surface</span>
               <span class="hidden separator"> - </span>
               <span class="item-count badge">123</span>
             </li>
-            <li class="media-item" style="position: absolute; left: 320px; top: 15px;">
+            <li class="media-item">
               <a class="media-image" href="/dataset?eov=name" title="">
-                <img src="image_display_url" alt="name" class="media-image img-responsive">
+                <img src="{{h.url_for_static('/base/images/icon_salt.png')}}" alt="name" class="media-image img-responsive">
               </a>
-              <span class="media-heading">display_name</span>
+              <span class="media-heading">Salinity</span>
               <span class="hidden separator"> - </span>
               <span class="item-count badge">123</span>
             </li>
-            <li class="media-item" style="position: absolute; left: 480px; top: 15px;">
+            <li class="media-item">
               <a class="media-image" href="/dataset?eov=name" title="">
-                <img src="image_display_url" alt="name" class="media-image img-responsive">
+                <img src="{{h.url_for_static('/base/images/icon_ice.png')}}" alt="name" class="media-image img-responsive">
               </a>
-              <span class="media-heading">display_name</span>
+              <span class="media-heading">Ice</span>
               <span class="hidden separator"> - </span>
               <span class="item-count badge">123</span>
             </li>
-            <li class="media-item" style="position: absolute; left: 640px; top: 15px;">
+                       <li class="media-item">
               <a class="media-image" href="/dataset?eov=name" title="">
-                <img src="image_display_url" alt="name" class="media-image img-responsive">
+                <img src="{{h.url_for_static('/base/images/icon_temp.png')}}" alt="name" class="media-image img-responsive">
               </a>
-              <span class="media-heading">display_name</span>
+              <span class="media-heading">Temperature</span>
               <span class="hidden separator"> - </span>
               <span class="item-count badge">123</span>
             </li>
-            <li class="media-item" style="position: absolute; left: 800px; top: 15px;">
+            <li class="media-item">
               <a class="media-image" href="/dataset?eov=name" title="">
-                <img src="image_display_url" alt="name" class="media-image img-responsive">
+                <img src="{{h.url_for_static('/base/images/icon_current.png')}}" alt="name" class="media-image img-responsive">
               </a>
-              <span class="media-heading">display_name</span>
+              <span class="media-heading">Sea Surface</span>
               <span class="hidden separator"> - </span>
               <span class="item-count badge">123</span>
             </li>
-            <li class="media-item" style="position: absolute; left: 960px; top: 15px;">
+            <li class="media-item">
               <a class="media-image" href="/dataset?eov=name" title="">
-                <img src="image_display_url" alt="name" class="media-image img-responsive">
+                <img src="{{h.url_for_static('/base/images/icon_salt.png')}}" alt="name" class="media-image img-responsive">
               </a>
-              <span class="media-heading">display_name</span>
+              <span class="media-heading">Salinity</span>
               <span class="hidden separator"> - </span>
               <span class="item-count badge">123</span>
             </li>
-            <li class="media-item" style="position: absolute; left: 1120px; top: 15px;">
+            <li class="media-item">
               <a class="media-image" href="/dataset?eov=name" title="">
-                <img src="image_display_url" alt="name" class="media-image img-responsive">
+                <img src="{{h.url_for_static('/base/images/icon_ice.png')}}" alt="name" class="media-image img-responsive">
               </a>
-              <span class="media-heading">display_name</span>
+              <span class="media-heading">Ice</span>
               <span class="hidden separator"> - </span>
               <span class="item-count badge">123</span>
             </li>
-            <li class="media-item" style="position: absolute; left: 0px; top: 121px;">
+                        <li class="media-item">
               <a class="media-image" href="/dataset?eov=name" title="">
-                <img src="image_display_url" alt="name" class="media-image img-responsive">
+                <img src="{{h.url_for_static('/base/images/icon_temp.png')}}" alt="name" class="media-image img-responsive">
               </a>
-              <span class="media-heading">display_name</span>
+              <span class="media-heading">Temperature</span>
               <span class="hidden separator"> - </span>
               <span class="item-count badge">123</span>
             </li>
-            <li class="media-item" style="position: absolute; left: 160px; top: 121px;">
+            <li class="media-item">
               <a class="media-image" href="/dataset?eov=name" title="">
-                <img src="image_display_url" alt="name" class="media-image img-responsive">
+                <img src="{{h.url_for_static('/base/images/icon_current.png')}}" alt="name" class="media-image img-responsive">
               </a>
-              <span class="media-heading">display_name</span>
+              <span class="media-heading">Sea Surface</span>
               <span class="hidden separator"> - </span>
               <span class="item-count badge">123</span>
             </li>
-            <li class="media-item" style="position: absolute; left: 320px; top: 121px;">
+            <li class="media-item">
               <a class="media-image" href="/dataset?eov=name" title="">
-                <img src="image_display_url" alt="name" class="media-image img-responsive">
+                <img src="{{h.url_for_static('/base/images/icon_salt.png')}}" alt="name" class="media-image img-responsive">
               </a>
-              <span class="media-heading">display_name</span>
+              <span class="media-heading">Salinity</span>
+              <span class="hidden separator"> - </span>
+              <span class="item-count badge">123</span>
+            </li>
+            <li class="media-item">
+              <a class="media-image" href="/dataset?eov=name" title="">
+                <img src="{{h.url_for_static('/base/images/icon_ice.png')}}" alt="name" class="media-image img-responsive">
+              </a>
+              <span class="media-heading">Ice</span>
               <span class="hidden separator"> - </span>
               <span class="item-count badge">123</span>
             </li>
           </ul>
           <h4>Other Category</h4>
-          <ul class="media-grid" data-module="media-grid" style="position: relative; height: 229.65px;">
-            <li class="media-item" style="position: absolute; left: 0px; top: 15px;">
+          <ul class="media-grid" data-module="media-grid">
+                        <li class="media-item">
               <a class="media-image" href="/dataset?eov=name" title="">
-                <img src="image_display_url" alt="name" class="media-image img-responsive">
+                <img src="{{h.url_for_static('/base/images/icon_temp.png')}}" alt="name" class="media-image img-responsive">
               </a>
-              <span class="media-heading">display_name</span>
+              <span class="media-heading">Temperature</span>
               <span class="hidden separator"> - </span>
               <span class="item-count badge">123</span>
             </li>
-            <li class="media-item" style="position: absolute; left: 160px; top: 15px;">
+            <li class="media-item">
               <a class="media-image" href="/dataset?eov=name" title="">
-                <img src="image_display_url" alt="name" class="media-image img-responsive">
+                <img src="{{h.url_for_static('/base/images/icon_current.png')}}" alt="name" class="media-image img-responsive">
               </a>
-              <span class="media-heading">display_name</span>
+              <span class="media-heading">Sea Surface</span>
               <span class="hidden separator"> - </span>
               <span class="item-count badge">123</span>
             </li>
-            <li class="media-item" style="position: absolute; left: 320px; top: 15px;">
+            <li class="media-item">
               <a class="media-image" href="/dataset?eov=name" title="">
-                <img src="image_display_url" alt="name" class="media-image img-responsive">
+                <img src="{{h.url_for_static('/base/images/icon_salt.png')}}" alt="name" class="media-image img-responsive">
               </a>
-              <span class="media-heading">display_name</span>
+              <span class="media-heading">Salinity</span>
               <span class="hidden separator"> - </span>
               <span class="item-count badge">123</span>
             </li>
-            <li class="media-item" style="position: absolute; left: 480px; top: 15px;">
+            <li class="media-item">
               <a class="media-image" href="/dataset?eov=name" title="">
-                <img src="image_display_url" alt="name" class="media-image img-responsive">
+                <img src="{{h.url_for_static('/base/images/icon_ice.png')}}" alt="name" class="media-image img-responsive">
               </a>
-              <span class="media-heading">display_name</span>
+              <span class="media-heading">Ice</span>
               <span class="hidden separator"> - </span>
               <span class="item-count badge">123</span>
             </li>
-            <li class="media-item" style="position: absolute; left: 640px; top: 15px;">
+                        <li class="media-item">
               <a class="media-image" href="/dataset?eov=name" title="">
-                <img src="image_display_url" alt="name" class="media-image img-responsive">
+                <img src="{{h.url_for_static('/base/images/icon_temp.png')}}" alt="name" class="media-image img-responsive">
               </a>
-              <span class="media-heading">display_name</span>
+              <span class="media-heading">Temperature</span>
               <span class="hidden separator"> - </span>
               <span class="item-count badge">123</span>
             </li>
-            <li class="media-item" style="position: absolute; left: 800px; top: 15px;">
+            <li class="media-item">
               <a class="media-image" href="/dataset?eov=name" title="">
-                <img src="image_display_url" alt="name" class="media-image img-responsive">
+                <img src="{{h.url_for_static('/base/images/icon_current.png')}}" alt="name" class="media-image img-responsive">
               </a>
-              <span class="media-heading">display_name</span>
+              <span class="media-heading">Sea Surface</span>
               <span class="hidden separator"> - </span>
               <span class="item-count badge">123</span>
             </li>
-            <li class="media-item" style="position: absolute; left: 960px; top: 15px;">
+            <li class="media-item">
               <a class="media-image" href="/dataset?eov=name" title="">
-                <img src="image_display_url" alt="name" class="media-image img-responsive">
+                <img src="{{h.url_for_static('/base/images/icon_salt.png')}}" alt="name" class="media-image img-responsive">
               </a>
-              <span class="media-heading">display_name</span>
+              <span class="media-heading">Salinity</span>
               <span class="hidden separator"> - </span>
               <span class="item-count badge">123</span>
             </li>
-            <li class="media-item" style="position: absolute; left: 1120px; top: 15px;">
+            <li class="media-item">
               <a class="media-image" href="/dataset?eov=name" title="">
-                <img src="image_display_url" alt="name" class="media-image img-responsive">
+                <img src="{{h.url_for_static('/base/images/icon_ice.png')}}" alt="name" class="media-image img-responsive">
               </a>
-              <span class="media-heading">display_name</span>
+              <span class="media-heading">Ice</span>
               <span class="hidden separator"> - </span>
               <span class="item-count badge">123</span>
             </li>
-            <li class="media-item" style="position: absolute; left: 0px; top: 121px;">
+                        <li class="media-item">
               <a class="media-image" href="/dataset?eov=name" title="">
-                <img src="image_display_url" alt="name" class="media-image img-responsive">
+                <img src="{{h.url_for_static('/base/images/icon_temp.png')}}" alt="name" class="media-image img-responsive">
               </a>
-              <span class="media-heading">display_name</span>
+              <span class="media-heading">Temperature</span>
               <span class="hidden separator"> - </span>
               <span class="item-count badge">123</span>
             </li>
-            <li class="media-item" style="position: absolute; left: 160px; top: 121px;">
+            <li class="media-item">
               <a class="media-image" href="/dataset?eov=name" title="">
-                <img src="image_display_url" alt="name" class="media-image img-responsive">
+                <img src="{{h.url_for_static('/base/images/icon_current.png')}}" alt="name" class="media-image img-responsive">
               </a>
-              <span class="media-heading">display_name</span>
+              <span class="media-heading">Sea Surface</span>
               <span class="hidden separator"> - </span>
               <span class="item-count badge">123</span>
             </li>
-            <li class="media-item" style="position: absolute; left: 320px; top: 121px;">
+            <li class="media-item">
               <a class="media-image" href="/dataset?eov=name" title="">
-                <img src="image_display_url" alt="name" class="media-image img-responsive">
+                <img src="{{h.url_for_static('/base/images/icon_salt.png')}}" alt="name" class="media-image img-responsive">
               </a>
-              <span class="media-heading">display_name</span>
+              <span class="media-heading">Salinity</span>
               <span class="hidden separator"> - </span>
               <span class="item-count badge">123</span>
             </li>
+            <li class="media-item">
+              <a class="media-image" href="/dataset?eov=name" title="">
+                <img src="{{h.url_for_static('/base/images/icon_ice.png')}}" alt="name" class="media-image img-responsive">
+              </a>
+              <span class="media-heading">Ice</span>
+              <span class="hidden separator"> - </span>
+              <span class="item-count badge">123</span>
+            </li>
+                        <li class="media-item">
+              <a class="media-image" href="/dataset?eov=name" title="">
+                <img src="{{h.url_for_static('/base/images/icon_temp.png')}}" alt="name" class="media-image img-responsive">
+              </a>
+              <span class="media-heading">Temperature</span>
+              <span class="hidden separator"> - </span>
+              <span class="item-count badge">123</span>
+            </li>
+            <li class="media-item">
+              <a class="media-image" href="/dataset?eov=name" title="">
+                <img src="{{h.url_for_static('/base/images/icon_current.png')}}" alt="name" class="media-image img-responsive">
+              </a>
+              <span class="media-heading">Sea Surface</span>
+              <span class="hidden separator"> - </span>
+              <span class="item-count badge">123</span>
+            </li>
+            <li class="media-item">
+              <a class="media-image" href="/dataset?eov=name" title="">
+                <img src="{{h.url_for_static('/base/images/icon_salt.png')}}" alt="name" class="media-image img-responsive">
+              </a>
+              <span class="media-heading">Salinity</span>
+              <span class="hidden separator"> - </span>
+              <span class="item-count badge">123</span>
+            </li>
+            <li class="media-item">
+              <a class="media-image" href="/dataset?eov=name" title="">
+                <img src="{{h.url_for_static('/base/images/icon_ice.png')}}" alt="name" class="media-image img-responsive">
+              </a>
+              <span class="media-heading">Ice</span>
+              <span class="hidden separator"> - </span>
+              <span class="item-count badge">123</span>
+            </li>
+                        <li class="media-item">
+              <a class="media-image" href="/dataset?eov=name" title="">
+                <img src="{{h.url_for_static('/base/images/icon_temp.png')}}" alt="name" class="media-image img-responsive">
+              </a>
+              <span class="media-heading">Temperature</span>
+              <span class="hidden separator"> - </span>
+              <span class="item-count badge">123</span>
+            </li>
+            <li class="media-item">
+              <a class="media-image" href="/dataset?eov=name" title="">
+                <img src="{{h.url_for_static('/base/images/icon_current.png')}}" alt="name" class="media-image img-responsive">
+              </a>
+              <span class="media-heading">Sea Surface</span>
+              <span class="hidden separator"> - </span>
+              <span class="item-count badge">123</span>
+            </li>
+            <li class="media-item">
+              <a class="media-image" href="/dataset?eov=name" title="">
+                <img src="{{h.url_for_static('/base/images/icon_salt.png')}}" alt="name" class="media-image img-responsive">
+              </a>
+              <span class="media-heading">Salinity</span>
+              <span class="hidden separator"> - </span>
+              <span class="item-count badge">123</span>
+            </li>
+            <li class="media-item">
+              <a class="media-image" href="/dataset?eov=name" title="">
+                <img src="{{h.url_for_static('/base/images/icon_ice.png')}}" alt="name" class="media-image img-responsive">
+              </a>
+              <span class="media-heading">Ice</span>
+              <span class="hidden separator"> - </span>
+              <span class="item-count badge">123</span>
+            </li>
+            
           </ul>
         </div>
       </div>
@@ -232,7 +312,8 @@
           {% endfor %}
           {% endblock %}
         </div>
-      </div> -->
+      </div> 
+      -->
     </div>
   </div>
 </div>
