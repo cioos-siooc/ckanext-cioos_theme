@@ -1,8 +1,8 @@
 {% set tags = h.get_facet_items_dict('tags', limit=3) %}
 {% set placeholder = _('E.g. environment') %}
 
+<h3 class="heading">{{ _("SEARCH BY KEYWORD") }}</h3>
 <div class="module-content box">
-  <h3 class="heading">{{ _("SEARCH BY KEYWORD") }}</h3>
   <form class="search-form" method="get" action="{% url_for controller='package', action='search' %}">
     <div class="col-md-3 col1"></div>
     <div class="col-md-6 col2 search-input form-group search-giant">
