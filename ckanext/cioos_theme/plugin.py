@@ -302,13 +302,13 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
 
     # IPackageController
 
-    def after_create(self, context, pkg_dict):
-        # dosn't work to update name in validator as id is populated by database. better to use a validator and populate usig uuid
-        # import uuid
-        # str(uuid.uuid4())
-        name = pkg_dict.get('name', '')
-        if not name:
-            pkg_dict['name'] = pkg_dict.get('id', name)
+    # def after_create(self, context, pkg_dict):
+    #     # dosn't work to update name in validator as id is populated by database. better to use a validator and populate usig uuid
+    #     # import uuid
+    #     # str(uuid.uuid4())
+    #     name = pkg_dict.get('name', '')
+    #     if not name:
+    #         pkg_dict['name'] = pkg_dict.get('id', name)
 
     # modfiey tags, keywords, and eov fields so that they properly index
     def before_index(self, data_dict):
