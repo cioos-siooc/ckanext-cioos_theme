@@ -100,7 +100,6 @@ def geojson_to_bbox(o):
 def clean_and_populate_eovs(field, schema):
 
     def validator(key, data, errors, context):
-        #log.debug('EOV VALIDATOR data:%r',data)
         if errors[key] and (u'Select at least one' not in errors[key] or 'Select at least one' not in errors[key]):
             return
 
@@ -147,17 +146,10 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
     # IAuthenticator
 
     def identify(self):
-        #log.info('Request from remote_addr:%s, user:%s, %s:%s', toolkit.request.remote_addr, toolkit.request.remote_user, toolkit.request.method, toolkit.request.url)
-        #log.info('{"method":"%s", "remote_addr":"%s", "user":"%s", "url":"%s"}', toolkit.request.method, toolkit.request.remote_addr, toolkit.request.remote_user, toolkit.request.url)
         try:
             remote_addr = toolkit.request.headers['X-Forwarded-For']
-            # log.debug('X-Forwarded-For:%r',toolkit.request.headers['X-Forwarded-For'])
-            # log.debug('X-Forwarded-Host:%r',toolkit.request.headers['X-Forwarded-Host'])
-            # log.debug('X-Forwarded-Server:%r',toolkit.request.headers['X-Forwarded-Server'])
-            # log.debug('remote_addr:%r',remote_addr)
         except KeyError:
             remote_addr = toolkit.request.remote_addr
-            # log.debug('remote_addr:%r',remote_addr)
 
         log.info('Request by %s for %s from %s', toolkit.request.remote_user, toolkit.request.url, remote_addr)
         c.user = None
@@ -315,32 +307,36 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         try:
             tags_dict = json.loads(data_dict.get('keywords', '{}'))
         except Exception as err:
-            log.error(data_dict.get('id','NO ID'))
+            log.error(data_dict.get('id', 'NO ID'))
             log.error(type(err))
             log.error("error:%s, keywords:%r", err, data_dict.get('keywords', '{}'))
             tags_dict = {"en": [], "fr": []}
 
         data_dict['tags_en'] = tags_dict.get('en', [])
         data_dict['tags_fr'] = tags_dict.get('fr', [])
+        data_dict['tags'] = data_dict['tags_en'] + data_dict['tags_fr']
 
-        temporal_extent = json.loads(data_dict.get('temporal-extent', '{}'))
-        temporal_extent_begin = temporal_extent.get('begin')
-        temporal_extent_end = temporal_extent.get('end')
+        te = data_dict.get('temporal-extent', '{}')
+        if te:
+            temporal_extent = load_json(te)
+            temporal_extent_begin = temporal_extent.get('begin')
+            temporal_extent_end = temporal_extent.get('end')
+            if(temporal_extent_begin):
+                data_dict['temporal-extent-begin'] = temporal_extent_begin
+            if(temporal_extent_end):
+                data_dict['temporal-extent-end'] = temporal_extent_end
+            if(temporal_extent_begin and temporal_extent_end):
+                data_dict['temporal-extent-range'] = '[' + temporal_extent_begin + ' TO ' + temporal_extent_end + ']'
 
-        if(temporal_extent_begin):
-            data_dict['temporal-extent-begin'] = temporal_extent_begin
-        if(temporal_extent_end):
-            data_dict['temporal-extent-end'] = temporal_extent_end
-        if(temporal_extent_begin and temporal_extent_end):
-            data_dict['temporal-extent-range'] = '[' + temporal_extent_begin + ' TO ' + temporal_extent_end + ']'
-
-        vertical_extent = json.loads(data_dict.get('vertical-extent', '{}'))
-        vertical_extent_min = vertical_extent.get('min')
-        vertical_extent_max = vertical_extent.get('max')
-        if(vertical_extent_min):
-            data_dict['vertical-extent-min'] = vertical_extent_min
-        if(vertical_extent_max):
-            data_dict['vertical-extent-max'] = vertical_extent_max
+        ve = data_dict.get('vertical-extent', '{}')
+        if ve:
+            vertical_extent = load_json(ve)
+            vertical_extent_min = vertical_extent.get('min')
+            vertical_extent_max = vertical_extent.get('max')
+            if(vertical_extent_min):
+                data_dict['vertical-extent-min'] = vertical_extent_min
+            if(vertical_extent_max):
+                data_dict['vertical-extent-max'] = vertical_extent_max
 
         # eov is multi select so it is a json list rather then a python list
         if(data_dict.get('eov')):
