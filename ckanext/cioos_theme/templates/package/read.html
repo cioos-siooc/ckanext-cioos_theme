@@ -38,7 +38,7 @@
       {% endif %}
     {% endblock %}
 
-    <a href="{{ h.url_for('package_export', package_id=pkg.name, file_format='cioos', extension='xml')}}" class="btn"><i class="fa fa-icon fa-file-text"></i>{{ _(' CIOOS ISO 19139 ')}}</a>
+    <!-- <a href="{{ h.url_for('package_export', package_id=pkg.name, file_format='cioos', extension='xml')}}" class="btn"><i class="fa fa-icon fa-file-text"></i>{{ _(' CIOOS ISO 19139 ')}}</a> -->
     <a href="{{ h.url_for(controller='package', action='read', id=pkg.id) }}" class="btn"><i class="fa fa-icon fa-link"></i>{{ _(' Show Permalink ')}}</a>
 
   {% endblock %}
