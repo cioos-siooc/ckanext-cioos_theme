@@ -48,7 +48,7 @@
 
   {% block secondary_help_content %}{% endblock %}
 
- 
+
   {% block package_info %}
     {% snippet 'package/snippets/info.html', pkg=pkg %}
   {% endblock %}
@@ -63,11 +63,11 @@
   {% endblock %}
 
 
-<!--
+{#
   {% block package_social %}
     {% snippet "snippets/social.html" %}
   {% endblock %}
--->
+#}
 
   {% block package_license %}
     {% snippet "snippets/license.html", pkg_dict=pkg, has_context_title=true %}
