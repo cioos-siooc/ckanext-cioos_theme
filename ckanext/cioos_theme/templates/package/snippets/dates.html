@@ -9,7 +9,12 @@
             <th scope="row" class="dataset-label">{{ _("Metadata Created") }}</th>
 
             <td class="dataset-details">
-                {% snippet 'snippets/local_friendly_datetime.html', datetime_obj=pkg_dict.metadata_created %}
+                {% if pkg_dict.metadata_created  | length == 10 %}
+                  {{ h.render_datetime(pkg_dict.metadata_created , '%B %d, %Y') }}
+                {% else %}
+                  {% snippet 'snippets/local_friendly_datetime.html', datetime_obj=pkg_dict.metadata_created %}
+                {% endif %}
+
             </td>
           </tr>
         {% endif %}
@@ -17,7 +22,54 @@
           <tr>
             <th scope="row" class="dataset-label">{{ _("Metadata Updated") }}</th>
             <td class="dataset-details">
-                {% snippet 'snippets/local_friendly_datetime.html', datetime_obj=pkg_dict.metadata_modified %}
+                {% if pkg_dict.metadata_modified | length == 10 %}
+                  {{ h.render_datetime(pkg_dict.metadata_modified, '%B %d, %Y') }}
+                {% else %}
+                  {% snippet 'snippets/local_friendly_datetime.html', datetime_obj=pkg_dict.metadata_modified %}
+                {% endif %}
+
+            </td>
+          </tr>
+        {% endif %}
+
+        {% if pkg_dict['temporal-extent'] %}
+          {% set te = h.cioos_load_json(pkg_dict['temporal-extent']) %}
+          {% if te.begin %}
+            <tr>
+              <th scope="row" class="dataset-label">{{ _("Temporal Extent Begin") }}</th>
+              <td class="dataset-details">
+                {% if te.begin | length == 10 %}
+                  {{ h.render_datetime(te.begin, '%B %d, %Y') }}
+                {% else %}
+                  {% snippet 'snippets/local_friendly_datetime.html', datetime_obj=te.begin %}
+                {% endif %}
+              </td>
+            </tr>
+          {% endif %}
+
+          {% if te.end%}
+            <tr>
+              <th scope="row" class="dataset-label">{{ _("Temporal Extent End") }}</th>
+              <td class="dataset-details">
+                {% if te.end | length == 10 %}
+                  {{ h.render_datetime(te.end, '%B %d, %Y') }}
+                {% else %}
+                  {% snippet 'snippets/local_friendly_datetime.html', datetime_obj=te.end %}
+                {% endif %}
+              </td>
+            </tr>
+          {% endif %}
+        {% endif %}
+
+        {% if pkg_dict['dataset-reference-date'] %}
+          <tr>
+            <th scope="row" class="dataset-label">{{ _("Reference Date(s)") }}</th>
+            <td class="dataset-details">
+              {% for d in h.cioos_load_json(pkg_dict['dataset-reference-date']) %}
+                {% if d['value'] %}
+                  {% snippet 'snippets/local_friendly_datetime.html', datetime_obj=d['value']|replace("Z", "") %} ({{_(d['type'].title())}})</br>
+                {% endif %}
+              {% endfor %}
             </td>
           </tr>
         {% endif %}
@@ -39,7 +91,11 @@
             <tr rel="dc:relation" resource="_:extra{{ i }}">
               <th scope="row" class="dataset-label" property="rdfs:label">{{ _("Metadata Date") }}</th>
               <td class="dataset-details" property="rdf:value">
-                {% snippet 'snippets/local_friendly_datetime.html', datetime_obj=value %}
+                {% if value | length == 10 %}
+                  {{ h.render_datetime(value, '%B %d, %Y') }}
+                {% else %}
+                  {% snippet 'snippets/local_friendly_datetime.html', datetime_obj=value %}
+                {% endif %}
               </td>
             </tr>
 
@@ -50,22 +106,6 @@
                 {{value}}
               </td>
             </tr>
-
-          {% elif 'temporal-extent-begin' == key %}
-            <tr rel="dc:relation" resource="_:extra{{ i }}">
-              <th scope="row" class="dataset-label" property="rdfs:label">{{ _("Temporal Extent Begin") }}</th>
-              <td class="dataset-details" property="rdf:value">
-                {% snippet 'snippets/local_friendly_datetime.html', datetime_obj=value %}
-              </td>
-            </tr>
-
-            {% elif 'temporal-extent-end' == key %}
-              <tr rel="dc:relation" resource="_:extra{{ i }}">
-                <th scope="row" class="dataset-label" property="rdfs:label">{{ _("Temporal Extent End") }}</th>
-                <td class="dataset-details" property="rdf:value">
-                  {% snippet 'snippets/local_friendly_datetime.html', datetime_obj=value %}
-                </td>
-              </tr>
 
           {% endif %}
 
