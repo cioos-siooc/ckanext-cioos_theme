@@ -66,8 +66,10 @@
             <th scope="row" class="dataset-label">{{ _("Reference Date(s)") }}</th>
             <td class="dataset-details">
               {% for d in h.cioos_load_json(pkg_dict['dataset-reference-date']) %}
-                {% if d['value'] %}
-                  {% snippet 'snippets/local_friendly_datetime.html', datetime_obj=d['value']|replace("Z", "") %} ({{_(d['type'].title())}})</br>
+                {% if d['value']| length == 10 %}
+                  {{ h.render_datetime(d['value'], '%B %d, %Y') }} ({{_(d['type'].title())}})</br>
+                {% else %}
+                  {% snippet 'snippets/local_friendly_datetime.html', datetime_obj=d['value'] %} ({{_(d['type'].title())}})</br>
                 {% endif %}
               {% endfor %}
             </td>
@@ -87,7 +89,7 @@
               </td>
             </tr>
 
-          {% elif 'metadata-date' == key %}
+          {# {% elif 'metadata-date' == key %}
             <tr rel="dc:relation" resource="_:extra{{ i }}">
               <th scope="row" class="dataset-label" property="rdfs:label">{{ _("Metadata Date") }}</th>
               <td class="dataset-details" property="rdf:value">
@@ -98,7 +100,7 @@
                 {% endif %}
               </td>
             </tr>
-
+          #}
           {% elif 'frequency-of-update' == key %}
             <tr rel="dc:relation" resource="_:extra{{ i }}">
               <th scope="row" class="dataset-label" property="rdfs:label">{{ _("Frequency of Update") }}</th>
