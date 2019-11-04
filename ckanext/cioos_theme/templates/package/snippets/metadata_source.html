@@ -8,8 +8,8 @@
               <td style="width:76px;"><img src='../uploads/group/{{ pkg_dict.organization.image_url }}' style="max-height:50px; max-width: 50px;"/></td>
             {% endif %}
             <td>
-        {% set waf_location = pkg_dict.extras | selectattr("key","equalto","waf_location_url") | map(attribute="value") | join('')%}
-        {% set waf_modified_date = pkg_dict.extras | selectattr("key","equalto","waf_modified_date") | map(attribute="value") | join('')%}
+        {% set xml_location = pkg_dict.extras | selectattr("key","equalto","xml_location_url") | map(attribute="value") | join('')%}
+        {% set xml_modified_date = pkg_dict.extras | selectattr("key","equalto","xml_modified_date") | map(attribute="value") | join('')%}
 	      {% set h_source_url = pkg_dict.extras | selectattr("key","equalto","h_source_url") | map(attribute="value") | join('') %}
 	      {% set source_guid = pkg_dict.extras | selectattr("key","equalto","guid") | map(attribute="value") | join('') %}
 	      {% set source_guid_suffix = pkg_dict.extras | selectattr("key","equalto","guid_suffix") | map(attribute="value") | join('') %}
@@ -18,7 +18,7 @@
 	      {% set job = pkg_dict.extras | selectattr("key","equalto","h_job_id") | map(attribute="value") | join('') %}
 	      {% set harvest_object = pkg_dict.extras | selectattr("key","equalto","h_object_id") | map(attribute="value") | join('') %}
 	      {# {% set gn_view_metadata_url = pkg_dict.extras | selectattr("key","equalto","gn_view_metadata_url") | map(attribute="value") | join('') %} #}
-        {% set url = waf_location or gn_view_metadata_url or h_source_url %}
+        {% set url = xml_location or gn_view_metadata_url or h_source_url %}
 
 	      {% if harvest_object %}
 	        <span style="font-weight:bold;">{{_("View Full Metadata")}}: <a href="{{ h.url_for('harvest_object_show', id = harvest_object ) }}">XML</a></span><br>
@@ -35,8 +35,8 @@
                   {% endif %}
                 </p>
 
-              {% if waf_modified_date %}
-                <p style="margin-left:50px;font-size:small;line-height: 1;margin-bottom: 2.5px;"><span>{{_("Source last modified")}} </span> {% snippet 'snippets/local_friendly_datetime.html', datetime_obj=waf_modified_date %}</p>
+              {% if xml_modified_date %}
+                <p style="margin-left:50px;font-size:small;line-height: 1;margin-bottom: 2.5px;"><span>{{_("Source last modified")}} </span> {% snippet 'snippets/local_friendly_datetime.html', datetime_obj=xml_modified_date %}</p>
               {% else %}
               {% endif %}
 
