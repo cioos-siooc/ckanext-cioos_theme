@@ -8,7 +8,7 @@
               <td style="width:76px;"><img src='../uploads/group/{{ pkg_dict.organization.image_url }}' style="max-height:50px; max-width: 50px;"/></td>
             {% endif %}
             <td>
-        {% set xml_location = pkg_dict.extras | selectattr("key","equalto","xml_location_url") | map(attribute="value") | join('')%}
+        {% set xml_location_extras = pkg_dict.extras | selectattr("key","equalto","xml_location_url") | map(attribute="value") | join('')%}
         {% set xml_modified_date = pkg_dict.extras | selectattr("key","equalto","xml_modified_date") | map(attribute="value") | join('')%}
 	      {% set h_source_url = pkg_dict.extras | selectattr("key","equalto","h_source_url") | map(attribute="value") | join('') %}
 	      {% set source_guid = pkg_dict.extras | selectattr("key","equalto","guid") | map(attribute="value") | join('') %}
@@ -18,7 +18,7 @@
 	      {% set job = pkg_dict.extras | selectattr("key","equalto","h_job_id") | map(attribute="value") | join('') %}
 	      {% set harvest_object = pkg_dict.extras | selectattr("key","equalto","h_object_id") | map(attribute="value") | join('') %}
 	      {# {% set gn_view_metadata_url = pkg_dict.extras | selectattr("key","equalto","gn_view_metadata_url") | map(attribute="value") | join('') %} #}
-        {% set url = xml_location or gn_view_metadata_url or h_source_url %}
+        {% set url = pkg_dict.xml_location_url or xml_location_extras or gn_view_metadata_url or h_source_url %}
 
 	      {% if harvest_object %}
 	        <span style="font-weight:bold;">{{_("View Full Metadata")}}: <a href="{{ h.url_for('harvest_object_show', id = harvest_object ) }}">XML</a></span><br>
@@ -29,7 +29,7 @@
               {% if url %}
               <p style="margin-left:20px;margin-bottom: 0px;">
                   {% if h.is_url(url) %}
-                    <span> {{_("Harvest source from")}} </span><a href="{{url}}">{{ title }}</a>
+                    <span> {{_("Harvested from ")}} </span><a href="{{url}}">{{ title }}</a>
                   {% else %}
                     <span> {{ url }}{{ guid }} </span>
                   {% endif %}
@@ -43,7 +43,7 @@
               {% endif %}
               {% if source_id %}
                 <p style="margin-left:20px;margin-bottom: 0px;">
-                <span > {{_("Other records from")}} </span><a href="{{h.url_for('harvest_read', id = source_id)}}">{{ title }}</a>
+                <span > {{_("Other records harvested from ")}} </span><a href="{{h.url_for('harvest_read', id = source_id)}}">{{ title }}</a>
                 </p>
               {% endif %}
 
