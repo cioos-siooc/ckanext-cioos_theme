@@ -3,8 +3,16 @@
 <!-- TOP MENU STARTS HERE -->
 <input type="checkbox" class="main-nav-check" id="main-nav-check" />
 <div class="mobileheader toggle-menu">
-  <a class="logo" href="{{ h.url_for('home.index') }}"><img src="{{h.url_for_static('/base/images/logoEN.svg')}}"></a>
-
+  {% if g.site_logo %}
+    <a class="logo" href="{{ h.url_for('home.index') }}"><img src="{{ h.url_for_static_or_external(g.site_logo) }}" alt="{{ g.site_title }}" title="{{ g.site_title }}" /></a>
+  {% else %}
+    <h1>
+      <a href="{{ h.url_for('home.index') }}">{{ g.site_title }}</a>
+    </h1>
+    {% if g.site_description %}
+      <h2>{{ g.site_description }}</h2>
+    {% endif %}
+  {% endif %}
   <label for="main-nav-check">Menu</label>
 </div>
 <nav class="menubar mobile-nav" id="mobile-nav">
