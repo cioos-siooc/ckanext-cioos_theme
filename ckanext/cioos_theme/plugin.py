@@ -207,6 +207,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             # 'cioos_get_organization_dict_extra': cioos_helpers.get_organization_dict_extra
             'cioos_datasets': cioos_helpers.cioos_datasets,
             'cioos_count_datasets': cioos_helpers.cioos_count_datasets,
+            'cioos_get_eovs': cioos_helpers.cioos_get_eovs
         }
 
     def get_validators(self):

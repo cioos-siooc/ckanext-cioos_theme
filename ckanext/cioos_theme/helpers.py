@@ -14,6 +14,7 @@ import ckan.logic as logic
 import ckan.model as model
 from ckan.common import config
 from paste.deploy.converters import asbool
+import copy
 
 get_action = logic.get_action
 
@@ -54,6 +55,60 @@ get_action = logic.get_action
 #             return extra['value']
 #
 #     return default
+
+
+def _merge_lists(key, list1, list2):
+    merged = {}
+    for item in list1 + list2:
+        if item[key] in merged:
+            merged[item[key]].update(item)
+        else:
+            merged[item[key]] = item
+    return [v for (k, v) in merged.items()]
+
+
+def cioos_get_eovs(show_all=False):
+    '''Return a list of eov's in a similar format to the facet list
+    If show_all is true then the complete list of eov's is returned. The name
+    and display_name fields are updated from the eoc choices list as found in
+    ckanext-scheming. If show_all is false only the eov's returned as part of
+    the active facet list are returned.
+
+    param show_all: display all eov fields or only the ones that are currently
+                    active.
+       '''
+    schema = toolkit.h.scheming_get_dataset_schema('dataset')
+    fields = []
+    choices = []
+    facets = toolkit.h.cioos_get_facets()  # needed to make get_facet_items_dict work
+    eov = toolkit.h.get_facet_items_dict('eov', limit=None, exclude_active=False)
+    if schema:
+        fields = schema.get('dataset_fields')
+    if fields:
+        # retreave a copy of the choices list for the eov field
+        choices = copy.deepcopy(toolkit.h.scheming_field_choices(toolkit.h.scheming_field_by_name(fields, 'eov')))
+        # make choices list more facet like
+        for x in choices:
+            x['name'] = x['value']
+            x['display_name'] = x['label']
+
+    if show_all:
+        output = _merge_lists('name', eov, choices)
+    else:
+        lookup = {x['name']: x for x in eov}
+        for x in choices:
+            if x['name'] in lookup:
+                lookup[x['name']].update(x)
+        output = list(lookup.values())
+
+    for x in output:
+        # set count to zero for eov's not in facet list
+        if 'count' not in x:
+            x['count'] = 0
+        # generate icon file name if not set
+        if 'icon' not in x:
+            x['icon'] = 'icon-' + x['name'].lower() + '.png'
+    return output
 
 
 def cioos_count_datasets():

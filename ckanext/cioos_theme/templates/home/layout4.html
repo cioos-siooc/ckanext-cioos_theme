@@ -14,6 +14,7 @@
         {% snippet 'home/snippets/search.html' %}
         {% endblock %}
       </div>
+      <!--
       <div class="col-md-12 col1 module-content-end">
         <h3 class="heading">SEARCH BY OCEAN VARIABLE</h3>
         <div class="module-content box">
@@ -278,28 +279,26 @@
               <span class="hidden separator"> - </span>
               <span class="item-count badge">123</span>
             </li>
-            
+
           </ul>
         </div>
       </div>
-      <!-- 
+      -->
       <div class="col-md-12 col1 module-content-end">
         <div class="module-content box">
           {% block eov_list %}
           <h3 class="heading">SEARCH BY OCEAN VARIABLE</h3>
-          {% set facets = h.cioos_get_facets() %}
-          {% set eov = h.get_facet_items_dict('eov', limit=None, exclude_active=False) %}
+          {% set eov = h.cioos_get_eovs(show_all=True) %}
           {% for grouper, list in eov|groupby('category') %}
           <h4>{{grouper}}</h4>
           <ul class="media-grid" data-module="media-grid">
             {% for item in list %}
             {% set href = h.url_for(controller='package', action='search', eov=item.name) %}
             {% set label = label_function(item) if label_function else item.display_name %}
-            {% set label_truncated = h.truncate(label, 22) if not label_function else label %}
+            {% set label_truncated = h.truncate(label, 20) if not label_function else label %}
             {% set count = count_label(item['count']) if count_label else ('%d' % item['count']) %}
-            {# set img_url = item.image_display_url or h.url_for_static('/base/images/' + item.name + '.png') #}
-            {% set img_url = item.image_display_url or h.url_for_static('/base/images/placeholder-group.png') %}
-            <li class="media-item">
+            {% set img_url = item.image_display_url or h.url_for_static('/base/images/' + item.get('icon')) %}
+            <li class="media-item {{ 'media-item-disabled' if count|trim == '0'}}">
               <a class="media-image" href="{{ href }}" title="{{ label if label != label_truncated else '' }}">
                 <img src="{{ img_url }}" alt="{{ item.name }}" class="media-image img-responsive">
               </a>
@@ -312,8 +311,8 @@
           {% endfor %}
           {% endblock %}
         </div>
-      </div> 
-      -->
+      </div>
+
     </div>
   </div>
 </div>
