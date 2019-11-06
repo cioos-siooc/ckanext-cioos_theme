@@ -56,6 +56,22 @@ get_action = logic.get_action
 #     return default
 
 
+def cioos_count_datasets():
+    '''Return a count of datasets'''
+    datasets = toolkit.h.cioos_datasets()
+    return len(datasets)
+
+
+def cioos_datasets():
+    '''Return a list of the datasets'''
+
+    user = logic.get_action('get_site_user')({'model': model, 'ignore_auth': True}, {})
+    context = {'model': model, 'session': model.Session, 'user': user['name']}
+    # Get a list of all the site's datasets from CKAN
+    datasets = logic.get_action('package_list')(context, {})
+    return datasets
+
+
 def cioos_get_facets(package_type='dataset'):
     ''' get all dataset for the given package type, including private ones.
         This function works similarly to code found in ckan/ckan/controllers/package.py

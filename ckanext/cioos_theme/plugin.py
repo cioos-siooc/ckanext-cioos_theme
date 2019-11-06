@@ -205,6 +205,8 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             # 'cioos_get_organization_list': cioos_helpers.get_organization_list,
             # 'cioos_get_organization_dict': cioos_helpers.get_organization_dict,
             # 'cioos_get_organization_dict_extra': cioos_helpers.get_organization_dict_extra
+            'cioos_datasets': cioos_helpers.cioos_datasets,
+            'cioos_count_datasets': cioos_helpers.cioos_count_datasets,
         }
 
     def get_validators(self):
