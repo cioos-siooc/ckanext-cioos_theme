@@ -42,7 +42,13 @@
       <ul>
         <li><a href="http://twitter.com/cioos_siooc" tabindex="0" aria-label="Twitter"><i class="fa fa-twitter"></i></a></li>
         <li><a href="http://facebook.com/cioos.siooc/" tabindex="0" aria-label="Facebook"><i class="fa fa-facebook-square"></i></a></li>
-        <li>{% snippet "snippets/language_selector.html" %}</li>
+        <li>
+          {%- if h.lang() == 'en' -%}
+            <a href="{% url_for h.current_url(), locale='fr' %}" tabindex="0" aria-label="French/English">FR</a>
+          {%- else -%}
+            <a href="{% url_for h.current_url(), locale='en' %}" tabindex="0" aria-label="French/English">EN</a>
+          {%- endif -%}
+        </li>
         </ul>
     </nav>
   </div>
