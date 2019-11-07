@@ -29,21 +29,21 @@
               {% if url %}
               <p style="margin-left:20px;margin-bottom: 0px;">
                   {% if h.is_url(url) %}
-                    <span> {{_("Harvested from ")}} </span><a href="{{url}}">{{ title }}</a>
+                    <span> {{ _("Harvested from") }} </span><a href="{{url}}">{{ title }}</a>
                   {% else %}
                     <span> {{ url }}{{ guid }} </span>
                   {% endif %}
                 </p>
 
               {% if xml_modified_date %}
-                <p style="margin-left:50px;font-size:small;line-height: 1;margin-bottom: 2.5px;"><span>{{_("Source last modified")}} </span> {% snippet 'snippets/local_friendly_datetime.html', datetime_obj=xml_modified_date %}</p>
+                <p style="margin-left:50px;font-size:small;line-height: 1;margin-bottom: 2.5px;"><span>{{ _("Source last modified") }} </span> {% snippet 'snippets/local_friendly_datetime.html', datetime_obj=xml_modified_date %}</p>
               {% else %}
               {% endif %}
 
               {% endif %}
               {% if source_id %}
                 <p style="margin-left:20px;margin-bottom: 0px;">
-                <span > {{_("Other records harvested from ")}} </span><a href="{{h.url_for('harvest_read', id = source_id)}}">{{ title }}</a>
+                <span > {{ _("Other records harvested from") }} </span><a href="{{h.url_for('harvest_read', id = source_id)}}">{{ title }}</a>
                 </p>
               {% endif %}
 

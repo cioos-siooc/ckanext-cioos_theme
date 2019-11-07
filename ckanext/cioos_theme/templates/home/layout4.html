@@ -2,8 +2,8 @@
   <div class="container">
     <div class="row row1">
       <div class="col-md-12 col1 centertext title module-content-end">
-        <h1><span>CIOOS</span> Data Catalogue</h1>
-        <h2>Search, find, download — all of our <span>{{h.cioos_count_datasets()}}</span> datasets.</h2>
+        <h1><span>{{ _('CIOOS') }}</span> {{ _('Data Catalogue') }}</h1>
+        <h2>{{ _('Search, find, download — all of our') }} <span>{{h.cioos_count_datasets()}}</span> {{ _('datasets') }}.</h2>
         <!-- old block -->
         {# block promoted #}
         {# snippet 'home/snippets/promoted.html' #}
@@ -287,14 +287,15 @@
       <div class="col-md-12 col1 module-content-end">
         <div class="module-content box">
           {% block eov_list %}
-          <h3 class="heading">SEARCH BY OCEAN VARIABLE</h3>
+          <h3 class="heading">{{ _('SEARCH BY OCEAN VARIABLE') }}</h3>
           {% set eov = h.cioos_get_eovs(show_all=True) %}
           {% for grouper, list in eov|groupby('category') %}
-          <h4>{{grouper}}</h4>
+          <h4>{{ _(grouper) }}</h4>
           <ul class="media-grid" data-module="media-grid">
             {% for item in list %}
             {% set href = h.url_for(controller='package', action='search', eov=item.name) %}
             {% set label = label_function(item) if label_function else item.display_name %}
+            {% set label = _(label) %}
             {% set label_truncated = h.truncate(label, 20) if not label_function else label %}
             {% set count = count_label(item['count']) if count_label else ('%d' % item['count']) %}
             {% set img_url = item.image_display_url or h.url_for_static('/base/images/' + item.get('icon')) %}

@@ -208,3 +208,66 @@ msgstr "Chercheur principal"
 
 msgid "Not Specified"
 msgstr "Non précisé"
+
+msgid "CIOOS"
+msgstr "SIOOC"
+
+msgid "Data Catalogue"
+msgstr "Catalogue de données"
+
+msgid "Search, find, download — all of our"
+msgstr "Rechercher, trouver, télécharger - tous nos"
+
+msgid "SEARCH BY KEYWORD"
+msgstr "RECHERCHE PAR MOTS-CLÉS"
+
+msgid "Ocean Variables"
+msgstr "Variables Océan"
+
+msgid "SEARCH BY OCEAN VARIABLE"
+msgstr "RECHERCHE PAR OCÉAN VARIABLE"
+
+msgid "Search"
+msgstr "Chercher"
+
+msgid "Biogeochemical"
+msgstr "Biogéochimique"
+
+msgid "Physical"
+msgstr "Physique"
+
+msgid "BACK TO CIOOS MAIN WEBSITE"
+msgstr "RETOUR AU SITE PRINCIPAL SIOOC"
+
+msgid "CONTACT US"
+msgstr "CONTACTEZ-NOUS"
+
+msgid "Filter by location"
+msgstr "Filtrer par lieu"
+
+msgid "Clear"
+msgstr "Clair"
+
+msgid "Map data"
+msgstr "Données cartographiques"
+
+msgid "Tiles by"
+msgstr "Tuiles par"
+
+msgid "contributors"
+msgstr "contributeurs"
+
+msgid "Show Permalink"
+msgstr "Montrer Permalink"
+
+msgid "Harvested from"
+msgstr "Récolté à partir de"
+
+msgid "Other records harvested from"
+msgstr "Autres documents récoltés à partir de"
+
+msgid "Source last modified"
+msgstr "Source modifiée en dernier"
+
+msgid "Dataset extent"
+msgstr "Étendue du jeu de données"
