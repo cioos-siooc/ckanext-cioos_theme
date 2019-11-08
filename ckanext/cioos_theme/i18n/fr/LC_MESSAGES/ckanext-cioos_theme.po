@@ -230,11 +230,101 @@ msgstr "RECHERCHE PAR OCÉAN VARIABLE"
 msgid "Search"
 msgstr "Chercher"
 
-msgid "Biogeochemical"
-msgstr "Biogéochimique"
+msgid "PHYSIC"
+msgstr "PHYSIQUE"
 
-msgid "Physical"
-msgstr "Physique"
+msgid "Temperature"
+msgstr "Température"
+
+msgid "Potential Temperature"
+msgstr "Température potentielle"
+
+msgid "Sub Surface Temperature"
+msgstr "Température sous la surface"
+
+msgid "Sea Surface Height"
+msgstr "Hauteur de la surface de la mer"
+
+msgid "Seawater Density"
+msgstr "Densité d'eau de mer"
+
+msgid "Potential Density"
+msgstr "Densité Potentielle"
+
+msgid "Speed of Sound"
+msgstr "Vitesse du son"
+
+msgid "Sea Ice"
+msgstr "Glace de mer"
+
+msgid "Sea Surface Salinity"
+msgstr "Salinité de la surface de la mer"
+
+msgid "Sea Surface Temperature"
+msgstr "Température de la surface de la mer"
+
+msgid "Sub Surface Currents"
+msgstr "Courants sous-marins"
+
+msgid "Sub Surface Salinity"
+msgstr "Salinité sous la surface"
+
+msgid "Surface Currents"
+msgstr "Courants de surface"
+
+msgid "Wind"
+msgstr "Vent"
+
+msgid "Ice"
+msgstr "Glace"
+
+msgid "Sea State"
+msgstr "État de la mer"
+
+msgid "Density"
+msgstr "Densité"
+
+msgid "Salinity"
+msgstr "Salinité"
+
+msgid "Current"
+msgstr "Courant"
+
+msgid "Speed of sound"
+msgstr "Vitesse du son"
+
+msgid "BIOGEOCHEMISTRY"
+msgstr "BIOGÉOCHIMIE"
+
+msgid "Oxygen"
+msgstr "Oxygène"
+
+msgid "Phosphate"
+msgstr "Phosphate"
+
+msgid "Nitrate"
+msgstr "Nitrate"
+
+msgid "Nutrients"
+msgstr "Nutriments"
+
+msgid "Inorganic Carbon"
+msgstr "Carbone inorganique"
+
+msgid "Dissolved Organic Carbon"
+msgstr "Carbone organique dissous"
+
+msgid "Silicate"
+msgstr "Silicate"
+
+msgid "BIOLOGY"
+msgstr "BIOLOGIE"
+
+msgid "Whales"
+msgstr "Baleines"
+
+msgid "Capelin"
+msgstr "Capelan"
 
 msgid "BACK TO CIOOS MAIN WEBSITE"
 msgstr "RETOUR AU SITE PRINCIPAL SIOOC"
