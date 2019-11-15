@@ -8,29 +8,43 @@
               {% set licence_extras = [] %}
               {%  for extra in pkg_dict.extras %}
                 {% if 'licence' == extra.key %}
-                  {% set _ = licence_extras.append( '\n'.join(h.cioos_load_json(extra.value)) ) %}
+                  {% set _ = licence_extras.append( ''.join(h.cioos_load_json(extra.value)) ) %}
                 {% endif %}
               {% endfor %}
               {% set licence = pkg_dict.license_title or pkg_dict.license_id or 'Not Specified'%}
               <span>
-                <strong>Licence:</strong>
-                {% if pkg_dict.license_url%}
+                <strong>Licence: </strong>
+                {%- if pkg_dict.license_url -%}
                   <a href="{{pkg_dict.license_url}}">{{ licence }}</a>
-                {% else %}
+                {%- else -%}
                   {{ licence }}
+                {%- endif -%}
+              </span>
+              {% if licence != licence_extras[-1] and licence_extras[-1] %}
+                <br/>
+                <span>
+                    {{- licence_extras[-1] -}}
+                </span>
+              {% endif %}
+
+              {%- for extra in pkg_dict -%}
+                {% if 'use-constraints' == extra.key %}
+                  <span>
+                    <strong>Limitations: </strong>
+                    {{- '\n'.join(h.cioos_load_json(extra.value)) -}}
+                  </span>
                 {% endif %}
-              </span>
-              <br/>
-              <span>
-                {{ licence_extras[-1] }}
-              </span>
-          		<span>
-                {%  for extra in pkg_dict %}
-            		  {% if 'access_constraints' == extra.key %}
-            		    {{ '\n'.join(h.cioos_load_json(extra.value)) }}
-            		  {% endif %}
-            		{% endfor %}
-          		</span>
+              {%- endfor -%}
+
+              {%-  for extra in pkg_dict -%}
+          		  {% if 'access-constraints' == extra.key %}
+                  <span>
+                    <strong>Access: </strong>
+            		    {{- '\n'.join(h.cioos_load_json(extra.value)) -}}
+                  </span>
+          		  {% endif %}
+          		{%- endfor -%}
+
             </td>
           </tr>
       {% endblock %}
