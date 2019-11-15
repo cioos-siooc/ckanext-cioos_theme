@@ -5,7 +5,12 @@
       {% block package_metadata_source %}
           <tr>
             {% if pkg_dict.organization.image_url %}
-              <td style="width:76px;"><img src='../uploads/group/{{ pkg_dict.organization.image_url }}' style="max-height:50px; max-width: 50px;"/></td>
+              {% if h.is_url(pkg_dict.organization.image_url) %}
+                {% set image_url = pkg_dict.organization.image_url %}
+              {% else %}
+                {% set image_url = '../uploads/group/' + pkg_dict.organization.image_url %}
+              {% endif %}
+              <td style="width:76px;"><img src='{{ image_url }}' style="max-height:50px; max-width: 50px;"/></td>
             {% endif %}
             <td>
         {% set xml_location_extras = pkg_dict.extras | selectattr("key","equalto","xml_location_url") | map(attribute="value") | join('')%}

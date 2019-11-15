@@ -15,6 +15,8 @@ import ckan.model as model
 from ckan.common import config
 from paste.deploy.converters import asbool
 import copy
+import logging
+log = logging.getLogger(__name__)
 
 get_action = logic.get_action
 
@@ -113,8 +115,13 @@ def cioos_get_eovs(show_all=False):
 
 def cioos_count_datasets():
     '''Return a count of datasets'''
-    datasets = toolkit.h.cioos_datasets()
-    return len(datasets)
+    user = logic.get_action('get_site_user')({'model': model, 'ignore_auth': True}, {})
+    context = {'model': model, 'session': model.Session, 'user': user['name']}
+    # Get a list of all the site's datasets from CKAN
+    datasets = logic.get_action('package_search')(context, {"fl": "id"})
+    log.debug(datasets)
+
+    return datasets['count']
 
 
 def cioos_datasets():
@@ -123,7 +130,8 @@ def cioos_datasets():
     user = logic.get_action('get_site_user')({'model': model, 'ignore_auth': True}, {})
     context = {'model': model, 'session': model.Session, 'user': user['name']}
     # Get a list of all the site's datasets from CKAN
-    datasets = logic.get_action('package_list')(context, {})
+    datasets = logic.get_action('package_search')(context, {"fl": "id"})
+
     return datasets
 
 
