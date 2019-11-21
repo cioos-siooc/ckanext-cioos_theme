@@ -289,7 +289,8 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                 # Make translation 'on the fly' of facet tags.
                 # Should check for all translated fields.
                 # Should check translation exists.
-                if key == 'tags':
+                if key == 'tags' or key == 'organization':
+                # if key == 'tags':
                     facets_dict[key + '_' + self.lang()] = value
                 else:
                     facets_dict[key] = value
@@ -315,9 +316,17 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             log.error("error:%s, keywords:%r", err, data_dict.get('keywords', '{}'))
             tags_dict = {"en": [], "fr": []}
 
+        # update tag list by language
         data_dict['tags_en'] = tags_dict.get('en', [])
         data_dict['tags_fr'] = tags_dict.get('fr', [])
         data_dict['tags'] = data_dict['tags_en'] + data_dict['tags_fr']
+
+        # update organization list by language
+        org_id = data_dict.get('owner_org', '')
+        org_details = toolkit.get_action('organization_show')(data_dict={'id': org_id, 'all_fields': True})
+        org_title = org_details.get('title_translated', {})
+        data_dict['organization_en'] = org_title.get('en', '')
+        data_dict['organization_fr'] = org_title.get('fr', '')
 
         te = data_dict.get('temporal-extent', '{}')
         if te:
@@ -348,6 +357,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
 
     # update eov search facets with keys from choices list in the scheming extension schema
     # format search results for consistant json output
+    # add organization extra fields to results
     def after_search(self, search_results, search_params):
         search_facets = search_results.get('search_facets', {})
         eov = search_facets.get('eov', {})
@@ -381,7 +391,46 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             if(keywords):
                 result['keywords'] = load_json(keywords)
 
+            # update organization object while we are at it
+            org_id = result.get('owner_org', '')
+            org_details = toolkit.get_action('organization_show')(data_dict={'id': org_id, 'all_fields': True})
+            org_title = org_details.get('title_translated', {})
+            organization = result.get('organization', {})
+            if not organization:
+                organization = {}
+            if org_title:
+                organization['title_translated'] = org_title
+            org_description = org_details.get('description_translated', {})
+            if org_description:
+                organization['description_translated'] = org_description
+            org_image_url = org_details.get('image_url_translated', {})
+            if org_image_url:
+                organization['image_url_translated'] = org_image_url
+            if organization:
+                result['organization'] = organization
+
         return search_results
+
+    # add organization extras to organization object in package.
+    # this will make the show and search endpoints look the same
+    def after_show(self, context, package_dict):
+        org_id = package_dict.get('owner_org', '')
+        org_details = toolkit.get_action('organization_show')(data_dict={'id': org_id, 'all_fields': True})
+
+        org_title = org_details.get('title_translated', {})
+        if org_title:
+            package_dict['organization']['title_translated'] = org_title
+
+        org_description = org_details.get('description_translated', {})
+        if org_description:
+            package_dict['organization']['description_translated'] = org_description
+
+        org_image_url = org_details.get('image_url_translated', {})
+        if org_image_url:
+            package_dict['organization']['image_url_translated'] = org_image_url
+
+        return package_dict
+
 
     # Custom section
     def read_template(self):
