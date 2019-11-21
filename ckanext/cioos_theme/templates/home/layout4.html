@@ -298,7 +298,7 @@
             {% set label = _(label) %}
             {% set label_truncated = h.truncate(label, 20) if not label_function else label %}
             {% set count = count_label(item['count']) if count_label else ('%d' % item['count']) %}
-            {% set img_url = item.image_display_url or h.url_for_static('/base/images/' + item.get('icon')) %}
+            {% set img_url = item.image_display_url or h.url_for_static('/base/images/eov-icons-svg/' + item.get('icon')) %}
             <li class="media-item {{ 'media-item-disabled' if count|trim == '0'}}">
               <a class="media-image" href="{{ href }}" title="{{ label if label != label_truncated else '' }}">
                 <img src="{{ img_url }}" alt="{{ item.name }}" class="media-image img-responsive">
