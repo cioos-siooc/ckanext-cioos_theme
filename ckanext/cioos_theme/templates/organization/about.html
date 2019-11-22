@@ -5,7 +5,7 @@
 {% block primary_content_inner %}
   <h1>{% block page_heading %}{{ h.get_translated(c.group_dict, "title") }}{% endblock %}</h1>
   {% block organization_description %}
-    {% if c.group_dict.description %}
+    {% if h.get_translated(c.group_dict, 'description') %}
       {{ h.render_markdown(h.get_translated(c.group_dict, 'description')) }}
     {% endif %}
   {% endblock %}

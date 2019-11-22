@@ -22,7 +22,7 @@ Example:
     <h3 class="media-heading">{{ h.get_translated(organization, 'title') }}</h3>
   {% endblock %}
   {% block description %}
-    {% if organization.description %}
+    {% if h.get_translated(organization, 'description') %}
       <p>{{ h.markdown_extract(h.get_translated(organization, 'description'), extract_length=80) }}</p>
     {% endif %}
   {% endblock %}
