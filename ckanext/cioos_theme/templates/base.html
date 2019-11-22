@@ -35,21 +35,15 @@
   {# defined in the config.ini under "ckan.template_head_end" #}
   {{ g.template_head_end | safe }}
   {% endblock %}
+  <link rel="stylesheet" type="text/css" href="{{h.url_for_static('/cioos_theme.css')}}" />
   {%- block custom_styles %}
   {%- if g.site_custom_css -%}
-
   <style>
-  {
-      {
-      g.site_custom_css | safe
-    }
-  }
-
+    {{ g.site_custom_css | safe }}
   </style>
   {%- endif %}
   {% endblock %}
   <link href="https://fonts.googleapis.com/css?family=Montserrat:400,600,700,800,900|Quicksand:300,400&display=swap" rel="stylesheet">
-  <link rel="stylesheet" type="text/css" href="{{h.url_for_static('/cioos_theme.css')}}" />
 </head>
 <body {% block bodytag %} data-site-root="{{ h.url_for('/', locale='default', qualified=true) }}" data-locale-root="{{ h.url_for('/', qualified=true) }}" {% endblock %}>
 
