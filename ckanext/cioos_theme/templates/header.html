@@ -3,8 +3,14 @@
 <!-- TOP MENU STARTS HERE -->
 <input type="checkbox" class="main-nav-check" id="main-nav-check" />
 <div class="mobileheader toggle-menu">
+  {# site_logo can be set in config.ini by changing ckan.site_logo or on admin config page #}
   {% if g.site_logo %}
-    <a class="logo" href="{{ h.url_for('home.index') }}"><img src="{{ h.url_for_static_or_external(g.site_logo) }}" alt="{{ g.site_title }}" title="{{ g.site_title }}" /></a>
+    {% if h.is_url(g.site_logo) %}
+      {% set logo_url = g.site_logo %}
+    {% else %}
+      {% set logo_url = h.url_for_static_or_external(g.site_logo) %}
+    {% endif %}
+    <a class="logo" href="{{ h.url_for('home.index') }}"><img src="{{ logo_url }}" alt="{{ g.site_title }}" title="{{ g.site_title }}" /></a>
   {% else %}
     <h1>
       <a href="{{ h.url_for('home.index') }}">{{ g.site_title }}</a>
