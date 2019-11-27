@@ -119,8 +119,6 @@ def cioos_count_datasets():
     context = {'model': model, 'session': model.Session, 'user': user['name']}
     # Get a list of all the site's datasets from CKAN
     datasets = logic.get_action('package_search')(context, {"fl": "id"})
-    log.debug(datasets)
-
     return datasets['count']
 
 
@@ -131,7 +129,6 @@ def cioos_datasets():
     context = {'model': model, 'session': model.Session, 'user': user['name']}
     # Get a list of all the site's datasets from CKAN
     datasets = logic.get_action('package_search')(context, {"fl": "id"})
-
     return datasets
 
 
