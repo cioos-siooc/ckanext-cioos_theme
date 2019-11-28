@@ -322,11 +322,12 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         data_dict['tags'] = data_dict['tags_en'] + data_dict['tags_fr']
 
         # update organization list by language
-        org_id = data_dict.get('owner_org', '')
-        org_details = toolkit.get_action('organization_show')(data_dict={'id': org_id, 'all_fields': True})
-        org_title = org_details.get('title_translated', {})
-        data_dict['organization_en'] = org_title.get('en', '')
-        data_dict['organization_fr'] = org_title.get('fr', '')
+        org_id = data_dict.get('owner_org')
+        if org_id:
+            org_details = toolkit.get_action('organization_show')(data_dict={'id': org_id, 'all_fields': True})
+            org_title = org_details.get('title_translated', {})
+            data_dict['organization_en'] = org_title.get('en', '')
+            data_dict['organization_fr'] = org_title.get('fr', '')
 
         te = data_dict.get('temporal-extent', '{}')
         if te:
@@ -359,6 +360,10 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
     # format search results for consistant json output
     # add organization extra fields to results
     def after_search(self, search_results, search_params):
+        # no need to do all this if not returning data anyway
+        if search_params.get('rows') == 0:
+            return search_results
+
         search_facets = search_results.get('search_facets', {})
         eov = search_facets.get('eov', {})
         items = eov.get('items', [])
@@ -376,6 +381,8 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                 new_eovs.append(item)
             search_results['search_facets']['eov']['items'] = new_eovs
 
+        org_list = toolkit.get_action('organization_list')(data_dict={'all_fields': True, 'include_dataset_count': False, 'include_extras': True})
+        org_dict = {x['id']: x for x in org_list}
         # convert string encoded json to json objects for translated fields
         # package_search with filters uses solr index values which are strings
         # this is inconsistant with package data which is returned as json objects
@@ -392,42 +399,46 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                 result['keywords'] = load_json(keywords)
 
             # update organization object while we are at it
-            org_id = result.get('owner_org', '')
-            org_details = toolkit.get_action('organization_show')(data_dict={'id': org_id, 'all_fields': True})
-            org_title = org_details.get('title_translated', {})
-            organization = result.get('organization', {})
-            if not organization:
-                organization = {}
-            if org_title:
-                organization['title_translated'] = org_title
-            org_description = org_details.get('description_translated', {})
-            if org_description:
-                organization['description_translated'] = org_description
-            org_image_url = org_details.get('image_url_translated', {})
-            if org_image_url:
-                organization['image_url_translated'] = org_image_url
-            if organization:
-                result['organization'] = organization
+            org_id = result.get('owner_org')
+            if org_id:
+                org_details = org_dict.get(org_id)
+                org_title = org_details.get('title_translated', {})
+                organization = result.get('organization', {})
+                if not organization:
+                    organization = {}
+                if org_title:
+                    organization['title_translated'] = org_title
+                org_description = org_details.get('description_translated', {})
+                if org_description:
+                    organization['description_translated'] = org_description
+                org_image_url = org_details.get('image_url_translated', {})
+                if org_image_url:
+                    organization['image_url_translated'] = org_image_url
+                if organization:
+                    result['organization'] = organization
+            else:
+                log.warn('No owner_org for dataset %s: %s: %s', result.get('id'), result.get('name'), result.get('title'))
 
         return search_results
 
     # add organization extras to organization object in package.
     # this will make the show and search endpoints look the same
     def after_show(self, context, package_dict):
-        org_id = package_dict.get('owner_org', '')
-        org_details = toolkit.get_action('organization_show')(data_dict={'id': org_id, 'all_fields': True})
+        org_id = package_dict.get('owner_org')
+        if org_id:
+            org_details = toolkit.get_action('organization_show')(data_dict={'id': org_id, 'all_fields': True})
 
-        org_title = org_details.get('title_translated', {})
-        if org_title:
-            package_dict['organization']['title_translated'] = org_title
+            org_title = org_details.get('title_translated', {})
+            if org_title:
+                package_dict['organization']['title_translated'] = org_title
 
-        org_description = org_details.get('description_translated', {})
-        if org_description:
-            package_dict['organization']['description_translated'] = org_description
+            org_description = org_details.get('description_translated', {})
+            if org_description:
+                package_dict['organization']['description_translated'] = org_description
 
-        org_image_url = org_details.get('image_url_translated', {})
-        if org_image_url:
-            package_dict['organization']['image_url_translated'] = org_image_url
+            org_image_url = org_details.get('image_url_translated', {})
+            if org_image_url:
+                package_dict['organization']['image_url_translated'] = org_image_url
 
         return package_dict
 
