@@ -329,6 +329,13 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             data_dict['organization_en'] = org_title.get('en', '')
             data_dict['organization_fr'] = org_title.get('fr', '')
 
+        try:
+            title = json.loads(data_dict.get('title_translated', '{}'))
+            data_dict['title_en'] = title.get('en', [])
+            data_dict['title_fr'] = title.get('fr', [])
+        except Exception as err:
+            log.error(err)
+
         te = data_dict.get('temporal-extent', '{}')
         if te:
             temporal_extent = load_json(te)
