@@ -18,10 +18,7 @@
 
       {{ form.input('ckan.site_description', id='field-ckan-site-description', label=_('Site Tag Line'), value=data['ckan.site_description'], error=error, classes=['control-medium']) }}
 
-      {% set field_url = 'ckan.site_logo' %}
-      {% set is_upload = data[field_url] and not data[field_url].startswith('http') %}
-      {% set is_url = data[field_url] and data[field_url].startswith('http') %}
-      {# form.image_upload(data, errors, is_upload_enabled=h.uploads_enabled(), is_url=is_url, is_upload=is_upload, upload_label = _('Site logo'), url_label=_('Site logo'),  field_url=field_url, field_upload='logo_upload', field_clear='clear_logo_upload' ) #}
+      {# default page has an image upload input here. TODO: create custom image_upload snippet based on the image_upload macro in /ckan/ckan/templates/macros/form.html #}
       {{ form.input('ckan.site_logo_translated', id='field-ckan-site-logo', label=_('Site logo'), value=data['ckan.site_logo_translated'], error=error, classes=['control-medium']) }}
 
       {{ form.markdown('ckan.site_about', id='field-ckan-site-about', label=_('About'), value=data['ckan.site_about'], error=error, placeholder=_('About page text')) }}

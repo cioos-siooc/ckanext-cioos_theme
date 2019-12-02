@@ -1,5 +1,5 @@
 {% set gns = namespace() %}
-{% set gns.site_logo =  h.scheming_language_text(h.cioos_load_json(g.site_logo_translated)) %}
+{% set gns.site_logo =  h.scheming_language_text(h.cioos_load_json(g.site_logo_translated or g.site_logo)) %}
 {% set gns.site_title = h.scheming_language_text(h.cioos_load_json(g.site_title)) %}
 {% set gns.site_description = h.render_markdown(h.scheming_language_text(h.cioos_load_json(g.site_description))) %}
 
