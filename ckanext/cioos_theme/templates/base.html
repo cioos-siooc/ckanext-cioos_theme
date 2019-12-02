@@ -22,7 +22,7 @@
     {%- block title -%}
     {%- block subtitle %}{% endblock -%}
     {%- if self.subtitle()|trim %} {{ g.template_title_deliminater }} {% endif -%}
-    {{ g.site_title }}
+    {{ h.scheming_language_text(h.cioos_load_json(g.site_title)) }}
     {%- endblock -%}
   </title>
   {% block links -%}

@@ -1,0 +1,27 @@
+{% extends "page.html" %}
+
+{% set gns = namespace() %}
+{% set gns.site_about = h.render_markdown(h.scheming_language_text(h.cioos_load_json(g.site_about))) %}
+
+{% block subtitle %}{{ _('About') }}{% endblock %}
+
+{% block breadcrumb_content %}
+  <li class="active">{% link_for _('About'), 'home.about' %}</li>
+{% endblock %}
+
+{% block primary %}
+  <article class="module">
+    <div class="module-content">
+      {% block about %}
+        {% if gns.site_about %}
+          {{ gns.site_about }}
+        {% else %}
+          <h1 class="page-heading">{{ _('About') }}</h1>
+          {% snippet 'home/snippets/about_text.html' %}
+        {% endif %}
+      {% endblock %}
+    </div>
+  </article>
+{% endblock %}
+
+{% block secondary %}{% endblock %}

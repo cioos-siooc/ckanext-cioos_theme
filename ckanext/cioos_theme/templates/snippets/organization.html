@@ -41,7 +41,7 @@ Example:
       {% block description %}
       {% if h.get_translated(organization, 'description') %}
         <p>
-          {{ h.markdown_extract(h.get_translated(organization, 'description'), 180) }}
+          {{ h.render_markdown(h.get_translated(organization, 'description'), 180) }}
           {% link_for _('read more'), controller='organization', action='about', id=organization.name %}
         </p>
       {% else %}
