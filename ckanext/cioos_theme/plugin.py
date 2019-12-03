@@ -323,8 +323,20 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
 
         # update organization list by language
         org_id = data_dict.get('owner_org')
-        if org_id:
-            org_details = toolkit.get_action('organization_show')(data_dict={'id': org_id, 'all_fields': True})
+        data_type = data_dict.get('type')
+        if org_id and data_type == 'dataset':
+            org_details = toolkit.get_action('organization_show')(
+                data_dict={
+                    'id': org_id,
+                    'include_datasets': False,
+                    'include_dataset_count': False,
+                    'include_extras': True,
+                    'include_users': False,
+                    'include_groups': False,
+                    'include_tags': False,
+                    'include_followers': False,
+                }
+            )
             org_title = org_details.get('title_translated', {})
             data_dict['organization_en'] = org_title.get('en', '')
             data_dict['organization_fr'] = org_title.get('fr', '')
@@ -388,7 +400,17 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                 new_eovs.append(item)
             search_results['search_facets']['eov']['items'] = new_eovs
 
-        org_list = toolkit.get_action('organization_list')(data_dict={'all_fields': True, 'include_dataset_count': False, 'include_extras': True})
+        # need to turn off dataset_count here as it causes a recursive loop with package_search
+        org_list = toolkit.get_action('organization_list')(
+            data_dict={
+                'all_fields': True,
+                'include_dataset_count': False,
+                'include_extras': True,
+                'include_users': False,
+                'include_groups': False,
+                'include_tags': False,
+            }
+        )
         org_dict = {x['id']: x for x in org_list}
         # convert string encoded json to json objects for translated fields
         # package_search with filters uses solr index values which are strings
@@ -432,8 +454,21 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
     # this will make the show and search endpoints look the same
     def after_show(self, context, package_dict):
         org_id = package_dict.get('owner_org')
-        if org_id:
-            org_details = toolkit.get_action('organization_show')(data_dict={'id': org_id, 'all_fields': True})
+        data_type = package_dict.get('type')
+        if org_id and data_type == 'dataset':
+            # need to turn off dataset_count, usersand groups here as it causes a recursive loop
+            org_details = toolkit.get_action('organization_show')(
+                data_dict={
+                    'id': org_id,
+                    'include_datasets': False,
+                    'include_dataset_count': False,
+                    'include_extras': True,
+                    'include_users': False,
+                    'include_groups': False,
+                    'include_tags': False,
+                    'include_followers': False,
+                }
+            )
 
             org_title = org_details.get('title_translated', {})
             if org_title:
