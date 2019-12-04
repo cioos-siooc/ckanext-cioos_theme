@@ -117,7 +117,7 @@ def cioos_count_datasets():
     '''Return a count of datasets'''
     user = logic.get_action('get_site_user')({'model': model, 'ignore_auth': True}, {})
     context = {'model': model, 'session': model.Session, 'user': user['name']}
-    # Get a list of all the site's datasets from CKAN, no need to return actuall data
+    # Get a list of all the site's datasets from CKAN, no need to return actual data
     datasets = logic.get_action('package_search')(context, {"fl": "id", "rows": "0"})
     return datasets['count']
 
