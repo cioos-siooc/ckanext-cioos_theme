@@ -134,6 +134,28 @@ def clean_and_populate_eovs(field, schema):
 
     return validator
 
+@scheming_validator
+def fluent_field_default(field, schema):
+
+    def validator(key, data, errors, context):
+        if not data[key]:
+            # field is blank, populate with default value
+            data[key] = {}
+            lang_list = toolkit.h.fluent_form_languages()
+            for l in lang_list:
+                data[key][l] = ''
+
+        elif not data[key].startswith('{'):
+            # its a string, need to format as a json object
+            new_dict = {}
+            lang_list = toolkit.h.fluent_form_languages()
+            for l in lang_list:
+                new_dict[l] = data[key]
+            data[key] = new_dict
+        # we should now have a json object so nothing left to do.
+        return data
+    return validator
+
 class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
     plugins.implements(plugins.ITranslation)
     plugins.implements(plugins.IConfigurer)
@@ -187,6 +209,21 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         toolkit.add_template_directory(config_, 'templates')
         toolkit.add_public_directory(config_, 'public')
         toolkit.add_resource('fanstatic', 'cioos_theme')
+
+    def update_config_schema(self, schema):
+
+        ignore_missing = toolkit.get_validator('ignore_missing')
+        fluent_text = toolkit.get_validator('fluent_text')
+
+        schema.update({
+            'ckan.site_title': [ignore_missing, fluent_field_default(None, None), fluent_text(None, None)],
+            'ckan.site_description': [ignore_missing, fluent_field_default(None, None), fluent_text(None, None)],
+            'ckan.site_about': [ignore_missing, fluent_field_default(None, None), fluent_text(None, None)],
+            'ckan.site_intro_text': [ignore_missing, fluent_field_default(None, None), fluent_text(None, None)],
+            'ckan.site_logo_translated': [ignore_missing, fluent_field_default(None, None), fluent_text(None, None)]
+
+        })
+        return schema
 
     def get_helpers(self):
         """Register the most_popular_groups() function above as a template helper function."""

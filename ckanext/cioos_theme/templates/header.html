@@ -1,22 +1,27 @@
-{% block header_wrapper %}
+{% set gns = namespace() %}
+{% set gns.site_logo =  h.scheming_language_text(h.cioos_load_json(g.site_logo_translated or g.site_logo)) %}
+{% set gns.site_title = h.scheming_language_text(h.cioos_load_json(g.site_title)) %}
+{% set gns.site_description = h.render_markdown(h.scheming_language_text(h.cioos_load_json(g.site_description))) %}
 
+{% block header_wrapper %}
 <!-- TOP MENU STARTS HERE -->
 <input type="checkbox" class="main-nav-check" id="main-nav-check" />
 <div class="mobileheader toggle-menu">
   {# site_logo can be set in config.ini by changing ckan.site_logo or on admin config page #}
-  {% if g.site_logo %}
-    {% if h.is_url(g.site_logo) %}
-      {% set logo_url = g.site_logo %}
+  {% if gns.site_logo %}
+    {% if h.is_url(gns.site_logo) %}
+      {% set logo_url = gns.site_logo %}
     {% else %}
-      {% set logo_url = h.url_for_static_or_external(g.site_logo) %}
+      {% set logo_url = h.url_for_static_or_external(gns.site_logo) %}
     {% endif %}
-    <a class="logo" href="{{ h.url_for('home.index') }}"><img src="{{ logo_url }}" alt="{{ g.site_title }}" title="{{ g.site_title }}" /></a>
+    {{ logo_url}}
+    <a class="logo" href="{{ h.url_for('home.index') }}"><img src="{{ logo_url }}" alt="{{ gns.site_title }}" title="{{ gns.site_title }}" /></a>
   {% else %}
     <h1>
-      <a href="{{ h.url_for('home.index') }}">{{ g.site_title }}</a>
+      <a href="{{ h.url_for('home.index') }}">{{ gns.site_title }}</a>
     </h1>
-    {% if g.site_description %}
-      <h2>{{ g.site_description }}</h2>
+    {% if gns.site_description %}
+      <h2>{{ gns.site_description }}</h2>
     {% endif %}
   {% endif %}
   <label for="main-nav-check">Menu</label>
@@ -63,19 +68,19 @@
   <div class="container">
     {# site_logo can be set in config.ini by changing ckan.site_logo or on admin config page #}
     {% block header_logo %}
-      {% if g.site_logo %}
-        {% if h.is_url(g.site_logo) %}
-          {% set logo_url = g.site_logo %}
+      {% if (gns.site_logo) %}
+        {% if h.is_url(gns.site_logo) %}
+          {% set logo_url = gns.site_logo %}
         {% else %}
-          {% set logo_url = h.url_for_static_or_external(g.site_logo) %}
+          {% set logo_url = h.url_for_static_or_external(gns.site_logo) %}
         {% endif %}
-        <a class="logo" href="{{ h.url_for('home.index') }}"><img src="{{ logo_url }}" alt="{{ g.site_title }}" title="{{ g.site_title }}" /></a>
+        <a class="logo" href="{{ h.url_for('home.index') }}"><img src="{{ logo_url }}" alt="{{ gns.site_title }}" title="{{ gns.site_title }}" /></a>
       {% else %}
         <h1>
-          <a href="{{ h.url_for('home.index') }}">{{ g.site_title }}</a>
+          <a href="{{ h.url_for('home.index') }}">{{ gns.site_title }}</a>
         </h1>
-        {% if g.site_description %}
-          <h2>{{ g.site_description }}</h2>
+        {% if gns.site_description %}
+          <h2>{{ gns.site_description }}</h2>
         {% endif %}
       {% endif %}
     {% endblock %}
