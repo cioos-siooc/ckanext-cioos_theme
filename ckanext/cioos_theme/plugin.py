@@ -8,7 +8,9 @@ from shapely.geometry import shape
 import logging
 import ckan.lib.navl.dictization_functions as df
 from ckan.common import c
-
+from six.moves.urllib.parse import urlparse
+import string
+from ckan.common import _
 
 StopOnError = df.StopOnError
 missing = df.missing
@@ -156,6 +158,24 @@ def fluent_field_default(field, schema):
         return data
     return validator
 
+def url_validator_with_port(key, data, errors, context):
+    ''' Checks that the provided value (if it is present) is a valid URL, accepts port numbers in URL '''
+
+    url = data.get(key, None)
+    if not url:
+        return
+
+    try:
+        pieces = urlparse(url)
+        if all([pieces.scheme, pieces.netloc]) and \
+           set(pieces.netloc) <= set(string.letters + string.digits + '-.:') and \
+           pieces.scheme in ['http', 'https']:
+            return
+    except ValueError:
+        # url is invalid
+        pass
+    errors[key].append(_('Please provide a valid URL'))
+
 class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
     plugins.implements(plugins.ITranslation)
     plugins.implements(plugins.IConfigurer)
@@ -220,7 +240,8 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             'ckan.site_description': [ignore_missing, fluent_field_default(None, None), fluent_text(None, None)],
             'ckan.site_about': [ignore_missing, fluent_field_default(None, None), fluent_text(None, None)],
             'ckan.site_intro_text': [ignore_missing, fluent_field_default(None, None), fluent_text(None, None)],
-            'ckan.site_logo_translated': [ignore_missing, fluent_field_default(None, None), fluent_text(None, None)]
+            'ckan.site_logo_translated': [ignore_missing, fluent_field_default(None, None), fluent_text(None, None)],
+            'ckan.site_home_url': [ignore_missing, url_validator_with_port]
 
         })
         return schema
