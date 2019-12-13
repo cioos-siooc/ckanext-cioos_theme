@@ -33,9 +33,9 @@
       {% block header_mobilesite_navigation2 %}
       <nav>
         <ul id="menu-mobile-menu" class="menu">
-          <li><a href="{{ h.url_for('home.index') }}">{{ _('HOME') }}</a></li>
+          <li><a href="{{ g.site_home_url }}">{{ _('HOME') }}</a></li>
           {% block header_mobilesite_navigation_tabs %} {{ h.build_nav_main( ('search', _('Datasets')), ('organizations_index', _('Organizations')),
-          ('group_index', _('Groups')), ('home.about', _('About')) ) }} {% endblock %}
+          ('group_index', _('Groups')), ('home.about', _('About')), ('home.index', _('Catalogue Home')) ) }} {% endblock %}
           <ul class="shareicons">
             <li><a href="http://twitter.com/cioos_siooc" tabindex="0" aria-label="Twitter"><i class="fa fa-twitter"></i></a></li>
             <li><a href="http://facebook.com/cioos.siooc/" tabindex="0" aria-label="Facebook"><i class="fa fa-facebook-square"></i></a></li>
@@ -90,7 +90,7 @@
         {% block header_site_navigation_tabs %}
         <li><a href="{{ g.site_home_url }}">{{ _('HOME') }}</a></li>
         {{ h.build_nav_main( ('search', _('Datasets')), ('organizations_index', _('Organizations')),
-        ('group_index', _('Groups')), ('home.about', _('About')), ('home.index', _('Data Catalogue')) ) }} {% endblock %}
+        ('group_index', _('Groups')), ('home.about', _('About')), ('home.index', _('Catalogue Home')) ) }} {% endblock %}
       </ul>
     </nav>
     {% endblock %}
