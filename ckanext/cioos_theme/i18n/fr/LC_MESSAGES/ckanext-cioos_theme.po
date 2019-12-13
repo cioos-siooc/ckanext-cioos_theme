@@ -361,3 +361,12 @@ msgstr "Source modifiée en dernier"
 
 msgid "Dataset extent"
 msgstr "Étendue du jeu de données"
+
+msgid "Site Landing Page"
+msgstr "Page de destination du site"
+
+msgid "Catalogue Home"
+msgstr "Accueil du Catalogue"
+
+msgid "HOME"
+msgstr "DOMICILE"
