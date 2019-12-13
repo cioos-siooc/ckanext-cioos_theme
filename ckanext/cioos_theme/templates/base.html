@@ -10,52 +10,53 @@
 <!--<![endif]-->
 {%- endblock -%}
 
-<head {% block headtag %}{% endblock %}>
-  {%- block meta -%}
-  <meta charset="utf-8" />
-  {% block meta_generator %}
-  <meta name="generator" content="ckan {{ h.ckan_version() }}" />{% endblock %}
-  {% block meta_viewport %}
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">{% endblock %}
-  {%- endblock -%}
-  <title>
-    {%- block title -%}
-    {%- block subtitle %}{% endblock -%}
-    {%- if self.subtitle()|trim %} {{ g.template_title_deliminater }} {% endif -%}
-    {{ h.scheming_language_text(h.cioos_load_json(g.site_title)) }}
+  <head {% block headtag %}{% endblock %}>
+    {%- block meta -%}
+      <meta charset="utf-8" />
+      {% block meta_generator %}<meta name="generator" content="ckan {{ h.ckan_version() }}" />{% endblock %}
+      {% block meta_viewport %}<meta name="viewport" content="width=device-width, initial-scale=1.0">{% endblock %}
     {%- endblock -%}
-  </title>
-  {% block links -%}
-  <link rel="shortcut icon" href="{{ g.favicon }}" />
-  {% endblock -%}
-  {%- block styles %}
-  {% resource g.main_css[6:] %}
-  {% endblock %}
-  {% block head_extras %}
-  {# defined in the config.ini under "ckan.template_head_end" #}
-  {{ g.template_head_end | safe }}
-  {% endblock %}
-  <link rel="stylesheet" type="text/css" href="{{h.url_for_static('/cioos_theme.css')}}" />
-  {%- block custom_styles %}
-  {%- if g.site_custom_css -%}
-  <style>
-    {{ g.site_custom_css | safe }}
-  </style>
-  {%- endif %}
-  {% endblock %}
-  <link href="https://fonts.googleapis.com/css?family=Montserrat:400,600,700,800,900|Quicksand:300,400&display=swap" rel="stylesheet">
-</head>
-<body {% block bodytag %} data-site-root="{{ h.url_for('/', locale='default', qualified=true) }}" data-locale-root="{{ h.url_for('/', qualified=true) }}" {% endblock %}>
 
+    <title>
+      {%- block title -%}
+      {%- block subtitle %}{% endblock -%}
+      {%- if self.subtitle()|trim %} {{ g.template_title_deliminater }} {% endif -%}
+      {{ h.scheming_language_text(h.cioos_load_json(g.site_title)) }}
+      {%- endblock -%}
+    </title>
 
-  {%- block page %}{% endblock -%}
+    {% block links -%}
+      <link rel="shortcut icon" href="{{ g.favicon }}" />
+    {% endblock -%}
 
+    {%- block styles %}
+      {% resource g.main_css[6:] %}
+      <link rel="stylesheet" type="text/css" href="{{h.url_for_static('/cioos_theme.css')}}" />
+      <link href="https://fonts.googleapis.com/css?family=Montserrat:400,600,700,800,900|Quicksand:300,400&display=swap" rel="stylesheet">
+    {% endblock %}
 
-  {%- block scripts %}{% endblock -%}
-  {% block body_extras -%}
-  {# defined in the config.ini under "ckan.template_footer_end" #}
-  {{ g.template_footer_end | safe }}
-  {%- endblock %}
-</body>
+    {% block head_extras %}
+      {# defined in the config.ini under "ckan.template_head_end" #}
+      {{ g.template_head_end | safe }}
+    {% endblock %}
+
+    {%- block custom_styles %}
+      {%- if g.site_custom_css -%}
+      <style>
+        {{ g.site_custom_css | safe }}
+      </style>
+      {%- endif %}
+    {% endblock %}
+  </head>
+  <body {% block bodytag %} data-site-root="{{ h.url_for('/', locale='default', qualified=true) }}" data-locale-root="{{ h.url_for('/', qualified=true) }}" {% endblock %}>
+
+    {%- block page %}{% endblock -%}
+
+    {%- block scripts %}{% endblock -%}
+    {% block body_extras -%}
+      {# defined in the config.ini under "ckan.template_footer_end" #}
+      {{ g.template_footer_end | safe }}
+    {%- endblock %}
+  </body>
 
 </html>
