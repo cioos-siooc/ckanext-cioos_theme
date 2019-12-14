@@ -15,10 +15,10 @@
       {% set logo_url = h.url_for_static_or_external(gns.site_logo) %}
     {% endif %}
     {{ logo_url}}
-    <a class="logo" href="{{ h.url_for('home.index') }}"><img src="{{ logo_url }}" alt="{{ gns.site_title }}" title="{{ gns.site_title }}" /></a>
+    <a class="logo" href="{{ g.site_home_url or h.url_for('home.index') }}"><img src="{{ logo_url }}" alt="{{ gns.site_title }}" title="{{ gns.site_title }}" /></a>
   {% else %}
     <h1>
-      <a href="{{ h.url_for('home.index') }}">{{ gns.site_title }}</a>
+      <a href="{{ g.site_home_url or h.url_for('home.index') }}">{{ gns.site_title }}</a>
     </h1>
     {% if gns.site_description %}
       <h2>{{ gns.site_description }}</h2>
@@ -33,9 +33,9 @@
       {% block header_mobilesite_navigation2 %}
       <nav>
         <ul id="menu-mobile-menu" class="menu">
-          <li><a href="{{ h.url_for('home.index') }}">Home</a></li>
+          <li><a href="{{ g.site_home_url }}">{{ _('HOME') }}</a></li>
           {% block header_mobilesite_navigation_tabs %} {{ h.build_nav_main( ('search', _('Datasets')), ('organizations_index', _('Organizations')),
-          ('group_index', _('Groups')), ('home.about', _('About')) ) }} {% endblock %}
+          ('group_index', _('Groups')), ('home.about', _('About')), ('home.index', _('Catalogue Home')) ) }} {% endblock %}
           <ul class="shareicons">
             <li><a href="http://twitter.com/cioos_siooc" tabindex="0" aria-label="Twitter"><i class="fa fa-twitter"></i></a></li>
             <li><a href="http://facebook.com/cioos.siooc/" tabindex="0" aria-label="Facebook"><i class="fa fa-facebook-square"></i></a></li>
@@ -74,10 +74,10 @@
         {% else %}
           {% set logo_url = h.url_for_static_or_external(gns.site_logo) %}
         {% endif %}
-        <a class="logo" href="{{ h.url_for('home.index') }}"><img src="{{ logo_url }}" alt="{{ gns.site_title }}" title="{{ gns.site_title }}" /></a>
+        <a class="logo" href="{{ g.site_home_url or h.url_for('home.index') }}"><img src="{{ logo_url }}" alt="{{ gns.site_title }}" title="{{ gns.site_title }}" /></a>
       {% else %}
         <h1>
-          <a href="{{ h.url_for('home.index') }}">{{ gns.site_title }}</a>
+          <a href="{{ g.site_home_url or h.url_for('home.index') }}">{{ gns.site_title }}</a>
         </h1>
         {% if gns.site_description %}
           <h2>{{ gns.site_description }}</h2>
@@ -87,8 +87,10 @@
     {% block header_site_navigation %}
     <nav>
       <ul>
-        {% block header_site_navigation_tabs %} {{ h.build_nav_main( ('search', _('Datasets')), ('organizations_index', _('Organizations')),
-        ('group_index', _('Groups')), ('home.about', _('About')) ) }} {% endblock %}
+        {% block header_site_navigation_tabs %}
+        <li><a href="{{ g.site_home_url }}">{{ _('HOME') }}</a></li>
+        {{ h.build_nav_main( ('search', _('Datasets')), ('organizations_index', _('Organizations')),
+        ('group_index', _('Groups')), ('home.about', _('About')), ('home.index', _('Catalogue Home')) ) }} {% endblock %}
       </ul>
     </nav>
     {% endblock %}

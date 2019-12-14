@@ -1,0 +1,7 @@
+{# Used to insert the home icon into a breadcrumb #}
+
+{% set home_url = g.site_home_url or h.url_for('home.index')%}
+<li class="home"><a href="{{ home_url }}"><i class="fa fa-home"></i><span> {{ _('Home') }}</span></a></li>
+{% if g.site_home_url %}
+<li><a href="{{ h.url_for('home.index') }}"><span> {{ _('Catalogue') }}</span></a></li>
+{% endif %}
