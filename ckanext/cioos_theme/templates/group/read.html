@@ -32,7 +32,7 @@
 {% block secondary_content %}
   {{ super() }}
 
-  {% snippet "spatial/snippets/spatial_query.html" , default_extent="[[48.0, -130.0], [60.0, -110.0]]", alternative_url=h.full_current_url() %}
+  {% snippet "spatial/snippets/spatial_query.html" , default_extent= h.spatial_default_extent(), alternative_url=h.full_current_url() %}
 
   <div class="filters">
     <div>
