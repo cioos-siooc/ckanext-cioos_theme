@@ -3,7 +3,7 @@
     <div class="row row1">
       <div class="col-md-12 col1 centertext title module-content-end">
         <h1><span>{{ _('CIOOS') }}</span> {{ _('Data Catalogue') }}</h1>
-        <h2>{{ _('Search, find, download — all of our') }} <span>{{h.cioos_count_datasets()}}</span> {{ _('datasets') }}.</h2>
+        <h2>{{ _('Search, find, download — all of our') }} <span><a href="{{ h.url_for(controller='package', action='search') }}">{{h.cioos_count_datasets()}}</a></span> {{ _('datasets') }}.</h2>
         <!-- old block -->
         {# block promoted #}
         {# snippet 'home/snippets/promoted.html' #}
