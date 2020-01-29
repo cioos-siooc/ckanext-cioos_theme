@@ -335,20 +335,23 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         :param facets_dict:
         :return:
         """
-        if 'themes' not in facets_dict or 'eov' not in facets_dict:
+
+        if 'themes' not in facets_dict \
+                or 'eov' not in facets_dict \
+                or 'responsible_organizations' not in facets_dict:
             # Horrible hack
             # Insert facet themes at first position of the OrderedDict facets_dict.
             ordered_dict = facets_dict.copy()
             facets_dict.clear()
             # facets_dict['themes'] = toolkit._('Theme')
             facets_dict['eov'] = toolkit._('Ocean Variables')
+            facets_dict['responsible_organizations'] = toolkit._('Responsible Organization')
 
             for key, value in ordered_dict.items():
                 # Make translation 'on the fly' of facet tags.
                 # Should check for all translated fields.
                 # Should check translation exists.
                 if key == 'tags' or key == 'organization':
-                # if key == 'tags':
                     facets_dict[key + '_' + self.lang()] = value
                 else:
                     facets_dict[key] = value
@@ -373,6 +376,8 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             log.error(type(err))
             log.error("error:%s, keywords:%r", err, data_dict.get('keywords', '{}'))
             tags_dict = {"en": [], "fr": []}
+
+        data_dict['responsible_organizations'] = [x.get('organisation-name') for x in json.loads(data_dict.get('cited-responsible-party', '{}')) if x.get('role') in ['originator']]
 
         # update tag list by language
         data_dict['tags_en'] = tags_dict.get('en', [])
