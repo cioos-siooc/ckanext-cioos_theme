@@ -289,7 +289,7 @@
           {% block eov_list %}
           <h3 class="heading">{{ _('SEARCH BY OCEAN VARIABLE') }}</h3>
           {% set eov = h.cioos_get_eovs(show_all=True) %}
-          {% for grouper, list in eov|groupby('category') %}
+          {% for grouper, list in eov|groupby('category') if grouper %}
           {% if grouper %}
           <h4>{{ _(grouper) }}</h4>
           <ul class="media-grid" data-module="media-grid">
