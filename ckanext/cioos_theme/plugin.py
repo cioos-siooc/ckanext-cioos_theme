@@ -242,6 +242,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             'ckan.site_intro_text': [ignore_missing, fluent_field_default(None, None), fluent_text(None, None)],
             'ckan.site_logo_translated': [ignore_missing, fluent_field_default(None, None), fluent_text(None, None)],
             'ckan.site_home_url': [ignore_missing, url_validator_with_port]
+            'ckan.eov_icon_base_path': [ignore_missing]
 
         })
         return schema
