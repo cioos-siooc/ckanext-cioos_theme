@@ -92,18 +92,28 @@ body {
 #topmenu nav {
   width: 50%;
   float: right;
-  padding: 0 2em 0 0
+  padding: 0 3.1em 0 0
 }
 
 #topmenu li {
   float: right;
   display: block;
-  margin: 5px 0 5px 30px;
-  padding: 0
+  margin: 0 0 0 30px;
+  padding: 0;
+  vertical-align: middle;
+  height: 45px;
+  line-height: 45px;
 }
 
 #topmenu a {
   color: #fff
+}
+
+#topmenu img {
+  vertical-align: middle;
+  border: 0;
+  height: auto;
+
 }
 
 #mainmenu {
