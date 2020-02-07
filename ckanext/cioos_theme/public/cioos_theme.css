@@ -118,7 +118,7 @@ body {
 }
 
 #mainmenu nav {
-  width: 50%;
+  /* width: 50%; */
   float: right;
   padding: .75em 2em .25em 0
 }
@@ -140,6 +140,9 @@ body {
   font-family: "Quicksand", sans-serif;
   font-weight: bold;
   text-transform: uppercase
+  padding-right: 15px;
+  padding-left: 15px;
+
 }
 
 .box, .wrapper {
@@ -736,6 +739,23 @@ header nav ul#menu-primary li a, .header nav ul#menu-primary li a, .nav nav ul#m
 .media-item-disabled {
   pointer-events: none;
   opacity: .6
+}
+
+div.search-input-group {
+  width: 100%;
+}
+
+.search-input-group .btn {
+    position: absolute;
+    right: 0px;
+    background: #fa7268;
+    border-radius: 23px;
+    width: 46px;
+    height: 100%;
+}
+
+.search-input-group #field-giant-search{
+  border-radius: 23px
 }
 
 /*# sourceMappingURL=cioos_theme.css.map */
