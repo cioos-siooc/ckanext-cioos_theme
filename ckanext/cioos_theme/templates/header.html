@@ -14,7 +14,6 @@
     {% else %}
       {% set logo_url = h.url_for_static_or_external(gns.site_logo) %}
     {% endif %}
-    {{ logo_url}}
     <a class="logo" href="{{ g.site_home_url or h.url_for('home.index') }}"><img src="{{ logo_url }}" alt="{{ gns.site_title }}" title="{{ gns.site_title }}" /></a>
   {% else %}
     <h1>
@@ -34,12 +33,21 @@
       <nav>
         <ul id="menu-mobile-menu" class="menu">
           <li><a href="{{ g.site_home_url }}">{{ _('HOME') }}</a></li>
-          {% block header_mobilesite_navigation_tabs %} {{ h.build_nav_main( ('search', _('Datasets')), ('organizations_index', _('Organizations')),
-          ('group_index', _('Groups')), ('home.about', _('About')), ('home.index', _('Data Catalogue')) ) }} {% endblock %}
+          {{ h.build_nav_main( ('search', _('DATASETS')), ('organizations_index', _('ORGANIZATIONS')) ) }}
+          <li><a href="{{ g.site_home_url }}about/ ">{{ _('ABOUT') }}</a></li>
+          <li><a href="{{ g.site_home_url }}data-applications/ ">{{ _('CIOOS APPLIED') }}</a></li>
+          <li><a href="{{ g.site_home_url }}data-tools">{{ _('DATA TOOLS') }}</a></li>
+          {{ h.build_nav_main( ('home.index', _('DATA CATALOGUE')) ) }}
           <ul class="shareicons">
             <li><a href="http://twitter.com/cioos_siooc" tabindex="0" aria-label="Twitter"><i class="fa fa-twitter"></i></a></li>
             <li><a href="http://facebook.com/cioos.siooc/" tabindex="0" aria-label="Facebook"><i class="fa fa-facebook-square"></i></a></li>
-            <li>{% snippet "snippets/language_selector.html" %}</li>
+            <li>
+              {%- if h.lang() == 'en' -%}
+                <a href="{% url_for h.current_url(), locale='fr' %}" tabindex="0" aria-label="French/English">FR</a>
+              {%- else -%}
+                <a href="{% url_for h.current_url(), locale='en' %}" tabindex="0" aria-label="French/English">EN</a>
+              {%- endif -%}
+            </li>
           </ul>
         </ul>
       </nav>
@@ -89,11 +97,11 @@
       <ul>
         {% block header_site_navigation_tabs %}
         <li><a href="{{ g.site_home_url }}">{{ _('HOME') }}</a></li>
-        {{ h.build_nav_main( ('search', _('Datasets')), ('organizations_index', _('Organizations')) ) }}
-        <li><a href="{{ g.site_home_url }}about/ ">{{ _('CIOOS APPLIED') }}</a></li>
+        {{ h.build_nav_main( ('search', _('DATASETS')), ('organizations_index', _('ORGANIZATIONS')) ) }}
+        <li><a href="{{ g.site_home_url }}about/ ">{{ _('ABOUT') }}</a></li>
         <li><a href="{{ g.site_home_url }}data-applications/ ">{{ _('CIOOS APPLIED') }}</a></li>
         <li><a href="{{ g.site_home_url }}data-tools">{{ _('DATA TOOLS') }}</a></li>
-        {{ h.build_nav_main( ('home.index', _('Data Catalogue')) ) }} {% endblock %}
+        {{ h.build_nav_main( ('home.index', _('DATA CATALOGUE')) ) }} {% endblock %}
       </ul>
     </nav>
     {% endblock %}
