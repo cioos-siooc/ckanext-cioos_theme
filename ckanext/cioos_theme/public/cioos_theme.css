@@ -139,13 +139,22 @@ body {
   margin: 3em 0 0 0;
   font-family: "Quicksand", sans-serif;
   font-weight: bold;
-  text-transform: uppercase
+  text-transform: uppercase;
   padding-right: 15px;
   padding-left: 15px;
 
 }
 
 .box, .wrapper {
+  background-color: #f8f8f8;
+  /* border: 1px solid #52a79b; */
+  /* border-width: 0 0 0 1px; */
+  border-radius: 0;
+  box-shadow: none;
+  position: relative
+}
+
+.homepage .box, .homepage .wrapper {
   background-color: #f8f8f8;
   border: 1px solid #52a79b;
   border-width: 0 0 0 4px;
@@ -156,19 +165,22 @@ body {
 
 @media(min-width:1000px) {
   .container {
-    width: 900px
+    max-width: 900px;
+    width: unset;
   }
 }
 
 @media(min-width:1192px) {
   .container {
-    width: 1170px
+    max-width: 1170px;
+    width: unset;
   }
 }
 
 @media(min-width:1400px) {
   .container {
-    width: 1390px
+    max-width: 1640px;
+    width: unset;
   }
 }
 
@@ -722,6 +734,16 @@ header nav ul#menu-primary li a, .header nav ul#menu-primary li a, .nav nav ul#m
   }
 }
 
+.logo img {
+    width: auto;
+    max-height: 85px;
+    -webkit-transition: all 0.3s ease;
+    -moz-transition: all 0.3s ease;
+    -ms-transition: all 0.3s ease;
+    -o-transition: all 0.3s ease;
+    transition: all 0.3s ease;
+}
+
 .media-grid {
   border: 0
 }
@@ -758,4 +780,12 @@ div.search-input-group {
   border-radius: 23px
 }
 
+.toolbar .breadcrumb a {
+  color: #505050;
+}
+
+.filters .module-heading {
+    border-right: 1px solid #dddddd;
+    background-color: #eaeaea;
+}
 /*# sourceMappingURL=cioos_theme.css.map */
