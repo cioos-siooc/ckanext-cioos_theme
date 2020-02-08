@@ -290,10 +290,11 @@
           <h3 class="heading">{{ _('SEARCH BY OCEAN VARIABLE') }}</h3>
           {% set eov = h.cioos_get_eovs(show_all=True) %}
           {% for grouper, list in eov|groupby('category') %}
-          {% if grouper %}
+          {% if grouper and grouper not in g.exclude_eov_category %}
           <h4>{{ _(grouper) }}</h4>
           <ul class="media-grid" data-module="media-grid">
             {% for item in list %}
+            {% if item.name not in g.exclude_eov %}
             {% set href = h.url_for(controller='package', action='search', eov=item.name) %}
             {% set label = label_function(item) if label_function else item.display_name %}
             {% set label = _(label) %}
@@ -308,6 +309,7 @@
               <span class="hidden separator"> - </span>
               <span class="item-count badge">{{ count }}</span>
             </li>
+            {% endif %}
             {% endfor %}
           </ul>
           {% endif %}
