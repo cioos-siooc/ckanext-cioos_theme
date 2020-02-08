@@ -156,7 +156,7 @@ body {
 }
 
 .box, .wrapper {
-  background-color: #f8f8f8;
+  /* background-color: #f8f8f8; */
   /* border: 1px solid #52a79b; */
   /* border-width: 0 0 0 1px; */
   border-radius: 0;
@@ -794,8 +794,12 @@ div.search-input-group {
   color: #505050;
 }
 
-.filters .module-heading {
+.filters .module-heading, .secondary .module-heading {
     border-right: 1px solid #dddddd;
     background-color: #eaeaea;
+}
+
+.page-header {
+    background-color: #ffffff; */
 }
 /*# sourceMappingURL=cioos_theme.css.map */
