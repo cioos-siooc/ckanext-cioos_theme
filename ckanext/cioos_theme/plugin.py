@@ -494,20 +494,23 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             org_id = result.get('owner_org')
             if org_id:
                 org_details = org_dict.get(org_id)
-                org_title = org_details.get('title_translated', {})
-                organization = result.get('organization', {})
-                if not organization:
-                    organization = {}
-                if org_title:
-                    organization['title_translated'] = org_title
-                org_description = org_details.get('description_translated', {})
-                if org_description:
-                    organization['description_translated'] = org_description
-                org_image_url = org_details.get('image_url_translated', {})
-                if org_image_url:
-                    organization['image_url_translated'] = org_image_url
-                if organization:
-                    result['organization'] = organization
+                if org_details:
+                    org_title = org_details.get('title_translated', {})
+                    organization = result.get('organization', {})
+                    if not organization:
+                        organization = {}
+                    if org_title:
+                        organization['title_translated'] = org_title
+                    org_description = org_details.get('description_translated', {})
+                    if org_description:
+                        organization['description_translated'] = org_description
+                    org_image_url = org_details.get('image_url_translated', {})
+                    if org_image_url:
+                        organization['image_url_translated'] = org_image_url
+                    if organization:
+                        result['organization'] = organization
+                else:
+                    log.warn('No org details for owner_org %s', result.get('org_descriptionid'))
             else:
                 log.warn('No owner_org for dataset %s: %s: %s', result.get('id'), result.get('name'), result.get('title'))
 
