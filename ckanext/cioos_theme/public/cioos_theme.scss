@@ -29,16 +29,16 @@ $master_margin_width: 30px;
 $singlepagecontainer: 600px;
 
 //Fullscreen
-$papabreak: 1400px;
-$papawidth: 1390px;
+$papabreak: 1140px;
+$papawidth: 1140px;
 
 //tablets landscape and small screens
-$mamabreak: 1192px;
-$mamawidth: 1170px;
+$mamabreak: 950px;
+$mamawidth: 900px;
 
 //tablets portrait all the way down to the smallest phones.
-$teenbreak: 1000px;
-$teenwidth: 900px;
+$teenbreak: 770px;
+$teenwidth: 100%;
 
 
 
@@ -84,6 +84,12 @@ $teenwidth: 900px;
 .account-masthead {
   background-color: #3c7394;
   color: white;
+  border-top: 1px solid #00232e;
+  background-image: none
+}
+
+.account-masthead .account {
+  border-right: 1px solid #00232e
 }
 
 /* The "bubble" containing the number of new notifications. */
@@ -176,22 +182,31 @@ body {
 #topmenu nav {
   width: 50%;
   float: right;
-  padding: 0 2em 0 0;
+  padding: 0 3.1em 0 0
+
 }
 
 #topmenu li {
   float: right;
   display: block;
-  margin: 5px 0px 5px 30px;
+  margin: 0 0 0 30px;
   padding: 0;
+  vertical-align: middle;
+  height: 45px;
+  line-height: 45px;
 
 }
 
 
 #topmenu a {
-  color: #fff;
+  color: #fff; 
 }
+#topmenu img {
+  vertical-align: middle;
+  border: none;
+  height: auto;
 
+}
 #mainmenu {
   border: 1px solid #52A79B;
   border-width: 0 0 1px 0;
@@ -199,11 +214,13 @@ body {
 }
 
 #mainmenu img {
-  padding: .75em 0 .25em 2em;
+    padding: .75em 0 .25em 2em;
+    width:auto;
+  max-height: 85px
 }
 
 #mainmenu nav {
-  width: 50%;
+  // width: 50%;
   float: right;
   padding: .75em 2em .25em 0;
 }
@@ -223,33 +240,47 @@ body {
   font-family: 'Quicksand', sans-serif;
   font-weight: bold;
   text-transform: uppercase;
+  padding-right: 15px;
+  padding-left: 15px;
 }
 
 .box,
 .wrapper {
   background-color: #F8F8F8;
-  border: 1px solid #52A79B;
-  border-width: 0 0 0 4px;
   border-radius: 0;
   box-shadow: none;
   position: relative;
 }
+.homepage {
+  .box,
+  .wrapper {
+  background-color: #f8f8f8;
+  border: 1px solid #52a79b;
+  border-width: 0 0 0 4px;
+  border-radius: 0;
+  box-shadow: none;
+  position: relative
+  }
+}
 
 @media (min-width: $teenbreak) {
   .container {
-    width: $teenwidth;
+    max-width: $teenwidth;
+    width: unset;
   }
 }
 
 @media (min-width: $mamabreak) {
   .container {
-    width: $mamawidth;
+    max-width: $mamawidth;
+    width: unset;
   }
 }
 
 @media (min-width: $papabreak) {
   .container {
-    width: $papawidth;
+    max-width: $papawidth;
+    width: unset;
   }
 }
 
@@ -299,9 +330,6 @@ header nav,
   ul {
     margin: 0;
     padding: 0;
-    margin-inline-start: 0px;
-    margin-inline-end: 0px;
-    padding-inline-start: 0px;
   }
 
   .main-nav,
@@ -327,9 +355,6 @@ header nav,
       padding: 0;
       overflow: hidden;
       list-style: none;
-      margin-inline-start: 0px;
-      margin-inline-end: 0px;
-      padding-inline-start: 0px;
       ul.shareicons {
         display: flex;
         justify-content: space-between;
@@ -668,6 +693,9 @@ header nav,
 /* ===========================================
    News widget
    =========================================== */
+.search-input-group .btn {
+  border-color: #fa7268
+}
 
 .newsitem {
   position: relative;
@@ -729,11 +757,11 @@ header nav,
 
 .search-form .search-input.search-giant button {
   top: 15px;
-  right: 16px;
+  right: 15px;
   background: #fa7268;
   border-radius: 27px;
-  width: 53px;
-  height: 53px;
+  width: 54px;
+  height: 100%;
 }
 
 .search-form .search-input button i {
@@ -762,6 +790,16 @@ header nav,
 
 .title h2 span {
   color: #FA7268;
+}
+
+.title h2 span a {
+  color: #fa7268;
+  text-decoration: none
+}
+
+.title h2 span a:hover {
+  color: #fa7268;
+  text-decoration: none
 }
 
 .search-form {
@@ -813,6 +851,61 @@ header nav,
   }
 }
 
+.logo img {
+    width: auto;
+    max-height: 85px;
+    -webkit-transition: all 0.3s ease;
+    -moz-transition: all 0.3s ease;
+    -ms-transition: all 0.3s ease;
+    -o-transition: all 0.3s ease;
+    transition: all 0.3s ease;
+}
+
 .media-grid {
     border: none;
+}
+
+
+.composite-control-repeating {
+  padding-left: 0;
+  height: auto
+}
+
+.composite-control-repeating .composite-subfield {
+  padding-left: 20px;
+  margin-bottom: 10px
+}
+
+.media-item-disabled {
+  pointer-events: none;
+  opacity: .6
+}
+
+div.search-input-group {
+  width: 100%;
+}
+
+.search-input-group .btn {
+    position: absolute;
+    right: 0px;
+    background: #fa7268;
+    border-radius: 23px;
+    width: 46px;
+    height: 100%;
+}
+
+.search-input-group #field-giant-search{
+  border-radius: 23px
+}
+
+.toolbar .breadcrumb a {
+  color: #505050;
+}
+
+.filters .module-heading {
+    border-right: 1px solid #dddddd;
+    background-color: #eaeaea;
+}
+.page-header {
+    background-color: #ffffff; 
 }
