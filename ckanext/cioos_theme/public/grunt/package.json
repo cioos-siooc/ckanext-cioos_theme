@@ -13,6 +13,7 @@
     "grunt-notify": "*"
   },
   "dependencies": {
-    "grunt-sass-globbing": "^1.5.1"
+    "grunt-sass-globbing": "^1.5.1",
+    "ruby": "^0.6.1"
   }
 }

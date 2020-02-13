@@ -43,7 +43,7 @@ module.exports = function(grunt) {
       // Additional configuration options can be found at https://github.com/gruntjs/grunt-contrib-sass
       dist: {
         options: {
-          style: 'nested', // This controls the compiled css and can be changed to nested, compact or compressed
+          style: 'compressed', // This controls the compiled css and can be changed to nested, compact or compressed
 
         },
         files: [{

@@ -17,7 +17,7 @@ $navbghover: $maincolor; //Used in pagination hover
 $hakaigrey: rgba(149, 149, 145, 1); //Used in Author color, share button BG, single page #BBB
 $hakaigreylight: rgba(243, 241, 237, 1); //Used in correction backgrounds and audio edition BG
 $body_link_color: rgba(79, 170, 189, 1); //Colour of text links in body copy
-$body_link_hover_color: $maincolor; //Colour of text link 
+$body_link_hover_color: $maincolor; //Colour of text link
 $rotatingheaderselectbg: rgba(0, 0, 0, 1);
 $captionlink: lighten($navbg, 50%);
 $captionlinkcolor: lighten($navbghover, 40%);
@@ -33,7 +33,7 @@ $papabreak: 1140px;
 $papawidth: 1140px;
 
 //tablets landscape and small screens
-$mamabreak: 950px;
+$mamabreak: 980px;
 $mamawidth: 900px;
 
 //tablets portrait all the way down to the smallest phones.
@@ -182,14 +182,14 @@ body {
 #topmenu nav {
   width: 50%;
   float: right;
-  padding: 0 3.1em 0 0
+  padding: 0
 
 }
 
 #topmenu li {
   float: right;
   display: block;
-  margin: 0 0 0 30px;
+  margin: 0 0 0 35px;
   padding: 0;
   vertical-align: middle;
   height: 45px;
@@ -199,7 +199,7 @@ body {
 
 
 #topmenu a {
-  color: #fff; 
+  color: #fff;
 }
 #topmenu img {
   vertical-align: middle;
@@ -907,5 +907,5 @@ div.search-input-group {
     background-color: #eaeaea;
 }
 .page-header {
-    background-color: #ffffff; 
+    background-color: #ffffff;
 }
