@@ -904,6 +904,20 @@ div.search-input-group {
   border-radius: 23px
 }
 
+.search-form .search-input-group button {
+    border-color: #fa7268;
+}
+
+.search-form .search-input-group button i {
+    color: #fff;
+    font-size: 24px;
+    width: 24px;
+}
+
+.search-form .search-input-group button:hover i {
+    color: #000000;
+}
+
 .toolbar .breadcrumb a {
   color: #505050;
 }
