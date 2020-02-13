@@ -3,6 +3,8 @@
 {% set gns.site_title = h.scheming_language_text(h.cioos_load_json(g.site_title)) %}
 {% set gns.site_description = h.render_markdown(h.scheming_language_text(h.cioos_load_json(g.site_description))) %}
 
+
+
 {% block header_wrapper %}
 <!-- TOP MENU STARTS HERE -->
 <input type="checkbox" class="main-nav-check" id="main-nav-check" />
@@ -77,9 +79,14 @@
     </nav>
   </div>
 </header>
+
+{% include 'header_wp.html' %}
+
+{#
 <header id="mainmenu" class="nav main-nav">
   <div class="container">
     {# site_logo can be set in config.ini by changing ckan.site_logo or on admin config page #}
+{#
     {% block header_logo %}
       {% if (gns.site_logo) %}
         {% if h.is_url(gns.site_logo) %}
@@ -112,4 +119,5 @@
     {% endblock %}
   </div>
 </header>
+#}
 {% endblock %}
