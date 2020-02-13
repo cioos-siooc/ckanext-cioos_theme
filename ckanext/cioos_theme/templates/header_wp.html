@@ -266,9 +266,11 @@
     transition: width .5s
   }
 
-  #header .menu>li>a span:hover::after {
-    width: 100%
-  }
+  #header .menu>li>a span:hover::after,
+  #header .menu>li.current_page_item>a span::after {
+     width: 100%
+   }
+
   #topmenu nav {
       width: unset;
       padding: 0px;
@@ -320,20 +322,20 @@
 </div>
 <script>
   window.onload = function() {
-    var pDiv = document.getElementsByClassName('menu-parent');
-    for (var i = 0; i < pDiv.length; i++) {
-      pDiv[i].addEventListener('mouseover', function() {
-        var cDiv = this.getElementsByClassName('sub-menu');
-        for (var j = 0; j < cDiv.length; j++) {
-          cDiv[j].classList.toggle("subshow")
-        };
-      }, false);
-      pDiv[i].addEventListener('mouseout', function() {
-        var cDiv = this.getElementsByClassName('sub-menu');
-        for (var j = 0; j < cDiv.length; j++) {
-          cDiv[j].classList.toggle("subshow")
-        };
-      }, false);
-    };
+  	var pDiv = document.getElementsByClassName('menu-parent');
+  	for (var i = 0; i < pDiv.length; i++) {
+  		pDiv[i].addEventListener('mouseover', function() {
+  			var cDiv = this.getElementsByClassName('sub-menu');
+  			for (var j = 0; j < cDiv.length; j++) {
+  				cDiv[j].classList.add("subshow")
+  			};
+  		}, false);
+  		pDiv[i].addEventListener('mouseout', function() {
+  			var cDiv = this.getElementsByClassName('sub-menu');
+  			for (var j = 0; j < cDiv.length; j++) {
+  				cDiv[j].classList.remove("subshow")
+  			};
+  		}, false);
+  	};
   };
 </script>
