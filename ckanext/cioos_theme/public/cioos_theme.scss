@@ -267,6 +267,8 @@ body {
   .container {
     max-width: $teenwidth;
     width: unset;
+    padding-left: 10px;
+    padding-right: 10px;
   }
 }
 
@@ -274,6 +276,8 @@ body {
   .container {
     max-width: $mamawidth;
     width: unset;
+    padding-left: 10px;
+    padding-right: 10px;
   }
 }
 
@@ -281,6 +285,8 @@ body {
   .container {
     max-width: $papawidth;
     width: unset;
+    padding-left: 10px;
+    padding-right: 10px;
   }
 }
 
