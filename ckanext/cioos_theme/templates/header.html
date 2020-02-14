@@ -80,7 +80,7 @@
   </div>
 </header>
 
-{% include 'header_wp.html' %}
+{% include ['%s' % g.header_file_name, 'header_wp.html']  ignore missing %}
 
 {#
 <header id="mainmenu" class="nav main-nav">

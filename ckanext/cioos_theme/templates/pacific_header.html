@@ -1,0 +1,341 @@
+<style>
+  body,
+  button,
+  input,
+  select,
+  textarea {
+    color: #3d3d3d;
+    word-wrap: break-word;
+    font: 14px/1.8 "Helvetica Neue", Helvetica, Arial, sans-serif;
+  }
+
+  body {
+    background: #FFF;
+    margin: 0;
+    padding: 0
+  }
+
+  #body-core {
+    background: #fff;
+    min-width: 320px;
+    overflow: hidde n
+  }
+
+  #pre-header-core,
+  #header-core,
+  #content-core,
+  #footer-core,
+  #sub-footer-core,
+  #sub-footer-widgets,
+  #sub-footer-close,
+  #notification-core,
+  #intro-core,
+  #introaction-core,
+  #outroaction-core {
+    display: block;
+    max-width: 1140px;
+    margin: 0 auto
+  }
+
+  #nav-above,
+  #nav-below {
+    padding: 20px 0 60px
+  }
+
+  .nav-previous,
+  .nav-next {
+    float: left;
+    margin-right: 10px
+  }
+
+  .nav-previous a,
+  .nav-next a {
+    float: left
+  }
+
+  .nav-previous a .meta-icon,
+  .nav-next a .meta-ico n {
+    display: table;
+    float: left;
+    height: 43px;
+    width: 43px
+  }
+
+  .nav-previous i,
+  .nav-next i {
+    vertical-align: middle !important;
+    display: table-cell
+  }
+
+  #logo {
+    float: left;
+    margin-top: 20px;
+    transition: all .3s ease
+  }
+
+  #logo img {
+    width: au to;
+    max-height: 85px;
+    vertical-align: middle;
+    border: 0;
+    transition: all .3s ease
+  }
+
+  ::after,
+  ::before {
+    box-sizing: border-box
+  }
+
+  .main-navigation::after {
+    clear: both;
+    content: "";
+    display: block
+  }
+
+  #header-links-inner {
+    display: tab le;
+    float: right
+  }
+
+  .main-navigation ul {
+    list-style: none;
+    margin: 0;
+    padding-left: 0
+  }
+
+  #header-links-inner>.menu,
+  #header-search {
+    display: table-cell;
+    vertical-align: middle
+  }
+
+  #header .header-links>ul>li a {
+    text-decoration: n one !important;
+    color: #0a0a0a !important
+  }
+
+  #header .header-links li {
+    float: left
+  }
+
+  .sub-menu {
+    box-shadow: #115172 0 -4px 0 0px, rgba(0, 0, 0, 0.15) 1px 1px 2px 0;
+    float: left;
+    position: absolute;
+    z-index: 9999;
+    background: #FFF;
+    border: 1px solid #E1E1E1
+  }
+
+  #header .menu>li.menu-hover>a,
+  #header .menu>li.current-menu-item>a,
+  #header .menu>li.current-menu-ancestor>a,
+  #header .menu>li>a:hover,
+  #header-sticky .menu>li.menu-hover>a,
+  #header- sticky .menu>li.current-menu-item>a,
+  #header-sticky .menu>li.current-menu-ancestor>a,
+  #header-sticky .menu>li>a:hover {
+    color: #0a0a0a !important;
+    background: #FFF !important
+  }
+
+  #header .header-links>ul>li a {
+    text-dec oration: none !important
+  }
+
+  #header .header-links li a {
+    display: block;
+    padding: 8px 14px;
+    margin: 0
+  }
+
+  #header .header-links>ul>li a {
+    font-size: 13px;
+    color: #bebebe;
+    padding: 50px 15px
+  }
+
+  #header .menu>li>a {
+    transition: all .3s ease
+  }
+
+  #header .menu>li.current-menu-item>a span {
+    color: #ffc857;
+    font-weight: 700
+  }
+
+  #header .menu>li>a span {
+    padding: 10px
+  }
+
+  #header .menu>li.menu-hover>a span,
+  #header .menu>li.current-menu-item>a span,
+  #header .men u>li.current-menu-ancestor>a span,
+  #header .menu>li>a:hover span,
+  #header-sticky .menu>li.menu-hover>a span,
+  #header-sticky .menu>li.current-menu-item>a span,
+  #header-sticky .menu>li.current-menu-ancestor>a s pan,
+  #header-sticky .menu>li>a:hover span {
+    border-color: #0a0a0a !important
+  }
+
+  #header .menu>li>a span::after {
+    content: '';
+    display: block;
+    width: 0;
+    height: 2px;
+    background: #006e90;
+    transition: width .5s
+  }
+
+  #header .header-l inks>ul>li.menu-parent>a::after {
+    position: relative;
+    content: "\f107";
+    font-family: fontawesome;
+    padding-left: 6px
+  }
+
+  .header-fancydrop #header .header-links .sub-menu {
+    box-shadow: #115172 0 -4px 0 0px, rgba(0, 0, 0, 0.15) 1px 1px 2px 0
+  }
+
+  #header .header-links .sub-menu {
+    display: none;
+    float: left;
+    position: absolute;
+    z-index: 9999;
+    background: #FFF;
+    border: 1px solid #E1E1E1;
+    border-top: none
+  }
+
+  #header .header-links .subshow {
+    display: block;
+    visibility: visible
+  }
+
+  #header .header-links .subhide {
+    display: none;
+    visibility: hidden
+  }
+
+  #header .header-links .sub-menu li {
+    float: none
+  }
+
+  #header .sub-menu li {
+    padding: 0 20px
+  }
+
+  #pre-header .sub-menu li,
+  #header .sub-me nu li {
+    position: relative
+  }
+
+  #header .header-links .sub-menu a,
+  #header-sticky .header-links .sub-menu a {
+    color: #0a0a0a !important
+  }
+
+  #header .header-links .sub-menu a {
+    color: #bebebe;
+    font-size: 13px;
+    line-height: 32px;
+    m in-width: 100px;
+    margin: 0;
+    padding: 2px 10px;
+    font-weight: 400
+  }
+
+  #header .header-links>ul>li a {
+    text-decoration: none !important
+  }
+
+  #header .header-links li a {
+    display: block;
+    padding: 8px 14px;
+    margin: 0
+  }
+
+  #header .menu>li>a span::after {
+    content: '';
+    display: block;
+    width: 0;
+    height: 2px;
+    background: #006e90;
+    transition: width .5s
+  }
+
+  #header .menu>li>a span:hover::after,
+  #header .menu>li.current_page_item>a span::after {
+     width: 100%
+   }
+
+  #topmenu nav {
+      width: unset;
+      padding: 0px;
+  }
+  #topmenu li {
+    float: right;
+    display: block;
+    margin: 0 0 0 35px;
+    padding: 0;
+    vertical-align: middle;
+    height: 45px;
+    line-height: 45px;
+}
+</style>
+<div id="header">
+  <div id="header-core">
+    <div id="logo">
+      <a rel="home" href="{{ g.site_home_url }}"><img src="{{ logo_url }}" alt="Logo"></a> </div>
+    <div id="header-links" class="main-navigation">
+      <div id="header-links-inner" class="header-links">
+        <ul id="menu-main-menu-en" class="menu">
+          <li id="menu-item-921" class="menu-item  menu-item-home"><a href="{{ g.site_home_url }}"><span>HOME</span></a></li>
+          <li id="menu-item-920" class="menu-item  menu-item-has-children menu-parent"><a href="{{ g.site_home_url }}about/"><span>ABOUT</span></a>
+            <ul class="sub-menu" style=" min-width: 94px;">
+              <li id="menu-item-1872" class="menu-item "><a href="{{ g.site_home_url }}about/data-management/">Data Management</a></li>
+              <li id="menu-item-1934" class="menu-item "><a href="{{ g.site_home_url }}about/essential-ocean-variables/">Essential Ocean Variables</a></li>
+              <li id="menu-item-1873" class="menu-item "><a href="{{ g.site_home_url }}about/partners/">Partners</a></li>
+            </ul>
+          </li>
+          <li id="menu-item-1673" class="menu-item  menu-item-has-children menu-parent"><a href="{{ g.site_home_url }}data-applications/"><span>CIOOS APPLIED</span></a>
+            <ul class="sub-menu" style=" min-width: 144px;">
+              <li id="menu-item-1743" class="menu-item "><a href="{{ g.site_home_url }}data-applications/baynes-sound/">Baynes Sound Ecosystem Monitoring</a></li>
+              <li id="menu-item-1940" class="menu-item "><a href="{{ g.site_home_url }}under-construction/">Marine Heatwaves</a></li>
+              <li id="menu-item-1942" class="menu-item "><a href="{{ g.site_home_url }}under-construction/">Ocean Climate</a></li>
+              <li id="menu-item-1941" class="menu-item "><a href="{{ g.site_home_url }}under-construction/">Strait of Georgia Currents</a></li>
+            </ul>
+          </li>
+          <li id="menu-item-1359" class="menu-item "><a href="{{ g.site_home_url }}data-tools/"><span>DATA TOOLS</span></a></li>
+          <li id="menu-item-1652" class="menu-item menu-item-has-children menu-parent current-menu-item current_page_item"><a href="/ckan/"><span>DATA CATALOGUE</span></a>
+            <ul class="sub-menu" style=" min-width: 161px;">
+              <li id="menu-item-1999" class="menu-item"><a href="{{ h.url_for('home.index') }}dataset">Datasets</a></li>
+              <li id="menu-item-2001" class="menu-item"><a href="{{ h.url_for('home.index') }}organization">Organizations</a></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  window.onload = function() {
+  	var pDiv = document.getElementsByClassName('menu-parent');
+  	for (var i = 0; i < pDiv.length; i++) {
+  		pDiv[i].addEventListener('mouseover', function() {
+  			var cDiv = this.getElementsByClassName('sub-menu');
+  			for (var j = 0; j < cDiv.length; j++) {
+  				cDiv[j].classList.add("subshow")
+  			};
+  		}, false);
+  		pDiv[i].addEventListener('mouseout', function() {
+  			var cDiv = this.getElementsByClassName('sub-menu');
+  			for (var j = 0; j < cDiv.length; j++) {
+  				cDiv[j].classList.remove("subshow")
+  			};
+  		}, false);
+  	};
+  };
+</script>

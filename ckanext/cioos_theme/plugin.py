@@ -244,7 +244,8 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             'ckan.site_home_url': [ignore_missing, url_validator_with_port],
             'ckan.exclude_eov_category': [ignore_missing],
             'ckan.exclude_eov': [ignore_missing],
-            'ckan.eov_icon_base_path': [ignore_missing]
+            'ckan.eov_icon_base_path': [ignore_missing],
+            'ckan.header_file_name': [ignore_missing]
 
         })
         return schema
