@@ -337,6 +337,10 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         :return:
         """
 
+        # remove groups facet
+        if 'groups' in facets_dict:
+            facets_dict.pop('groups')
+
         if 'themes' not in facets_dict \
                 or 'eov' not in facets_dict \
                 or 'responsible_organizations' not in facets_dict:
