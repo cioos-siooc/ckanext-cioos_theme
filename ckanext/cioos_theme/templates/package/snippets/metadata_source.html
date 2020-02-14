@@ -27,7 +27,7 @@
         {% set url = pkg_dict.xml_location_url or xml_location_extras or gn_view_metadata_url or h_source_url %}
 
 	      {% if harvest_object %}
-	        <span style="font-weight:bold;">{{_("View Harvested Metadata")}}: <a href="{{ remote_ckan_base_url + h.url_for('harvest_object_show', id = harvest_object ) }}">XML</a></span><br>
+	        <span style="font-weight:bold;">{{_("View Harvested Metadata")}}: <a href="{{ remote_ckan_base_url + h.url_for('harvest_object_show', id = harvest_object ) }}">XML/JSON</a></span><br>
 	      {% else %}
 	        <span>Source information unavailable</span><br>
 	      {% endif %}
@@ -35,7 +35,7 @@
               {% if url %}
               <p style="margin-left:20px;margin-bottom: 0px;">
                   {% if h.is_url(url) %}
-                    <span> {{ _("Harvested from") }} </span><a href="{{url}}">{{ title }}</a>
+                    <span> {{ _("Access full metadata ") }} </span><b><a href="{{url}}">here</a></b>
                   {% else %}
                     <span> {{ url }}{{ guid }} </span>
                   {% endif %}
