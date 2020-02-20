@@ -1,123 +1,94 @@
 {% set gns = namespace() %}
-{% set gns.site_logo =  h.scheming_language_text(h.cioos_load_json(g.site_logo_translated or g.site_logo)) %}
+{% set gns.site_logo =  h.scheming_language_text(h.cioos_load_json(g.site_logo_translated or g.site_logo or '{"fr": "/base/images/ckan-logo.png", "en": "/base/images/ckan-logo.png"}' )) %}
 {% set gns.site_title = h.scheming_language_text(h.cioos_load_json(g.site_title)) %}
 {% set gns.site_description = h.render_markdown(h.scheming_language_text(h.cioos_load_json(g.site_description))) %}
 
+{% if h.is_url(gns.site_logo) %}
+  {% set logo_url = gns.site_logo %}
+{% else %}
+  {% set logo_url = h.url_for_static_or_external(gns.site_logo) %}
+{% endif %}
 
+{# import macros from ra header file #}
+{% from '%s' % g.header_file_name or 'header_wp.html' import include_site_header, include_mobile_header with context %}
 
-{% block header_wrapper %}
-<!-- TOP MENU STARTS HERE -->
-<input type="checkbox" class="main-nav-check" id="main-nav-check" />
-<div class="mobileheader toggle-menu">
-  {# site_logo can be set in config.ini by changing ckan.site_logo or on admin config page #}
-  {% if gns.site_logo %}
-    {% if h.is_url(gns.site_logo) %}
-      {% set logo_url = gns.site_logo %}
-    {% else %}
-      {% set logo_url = h.url_for_static_or_external(gns.site_logo) %}
-    {% endif %}
+<div id="header-container">
+  {% block header_wrapper %}
+  {# mobile header menu #}
+  <input type="checkbox" class="main-nav-check" id="main-nav-check" />
+  <!-- Logo -->
+  <div class="mobileheader toggle-menu">
     <a class="logo" href="{{ g.site_home_url or h.url_for('home.index') }}"><img src="{{ logo_url }}" alt="{{ gns.site_title }}" title="{{ gns.site_title }}" /></a>
-  {% else %}
-    <h1>
-      <a href="{{ g.site_home_url or h.url_for('home.index') }}">{{ gns.site_title }}</a>
-    </h1>
-    {% if gns.site_description %}
-      <h2>{{ gns.site_description }}</h2>
-    {% endif %}
-  {% endif %}
-  <label for="main-nav-check">Menu</label>
-</div>
-<nav class="menubar mobile-nav" id="mobile-nav">
-  <h4 class="invis">Mobile Navigation</h4>
-  <div id="menu-mobile" class="menu">
-    <div class="menu-mobile-menu-container">
-      {% block header_mobilesite_navigation2 %}
+    <label for="main-nav-check">Menu</label>
+  </div>
+  <!-- Menu -->
+  <nav class="menubar mobile-nav" id="mobile-nav">
+    <h4 class="invis">Mobile Navigation</h4>
+    <div id="menu-mobile" class="menu">
+      <div class="menu-mobile-menu-container">
+        {{ include_mobile_header() }}
+      </div>
+    </div>
+  </nav>
+
+
+  {# full page header menu #}
+  <!-- Top Bar -->
+  <header id="topmenu" class="nav main-nav">
+    <div class="container">
       <nav>
-        <ul id="menu-mobile-menu" class="menu">
-          <li><a href="{{ g.site_home_url }}">{{ _('HOME') }}</a></li>
-          {{ h.build_nav_main( ('search', _('DATASETS')), ('organizations_index', _('ORGANIZATIONS')) ) }}
-          <li><a href="{{ g.site_home_url }}about/ ">{{ _('ABOUT') }}</a></li>
-          <li><a href="{{ g.site_home_url }}data-applications/ ">{{ _('APPLIED DATA') }}</a></li>
-          <li><a href="{{ g.site_home_url }}data-tools">{{ _('DATA TOOLS') }}</a></li>
-          {{ h.build_nav_main( ('home.index', _('DATA CATALOGUE')) ) }}
-          <ul class="shareicons">
-            <li><a href="http://twitter.com/cioos_siooc" tabindex="0" aria-label="Twitter"><i class="fa fa-twitter"></i></a></li>
-            <li><a href="http://facebook.com/cioos.siooc/" tabindex="0" aria-label="Facebook"><i class="fa fa-facebook-square"></i></a></li>
-            <li>
-              {%- if h.lang() == 'en' -%}
-                <a href="{% url_for h.current_url(), locale='fr' %}" tabindex="0" aria-label="French/English">FR</a>
-              {%- else -%}
-                <a href="{% url_for h.current_url(), locale='en' %}" tabindex="0" aria-label="French/English">EN</a>
-              {%- endif -%}
-            </li>
+        <ul>
+          <li><a href="http://twitter.com/cioos_siooc" tabindex="0" aria-label="Twitter"><i class="fa fa-twitter"></i></a></li>
+          <li>
+            {%- if h.lang() == 'en' -%}
+              <a href="{% url_for h.current_url(), locale='fr' %}" tabindex="0" aria-label="French/English">FR</a>
+            {%- else -%}
+              <a href="{% url_for h.current_url(), locale='en' %}" tabindex="0" aria-label="French/English">EN</a>
+            {%- endif -%}
+          </li>
+          <li>
+            <a href="https://cioos.ca">
+              <img class="mega-menu-logo" width="425" height="60" src="{{ h.url_for_static_or_external('/base/images/logos/Artboard-2-425x60.png') }}">
+            </a>
+          </li>
           </ul>
-        </ul>
       </nav>
-      {% endblock %}
+    </div>
+  </header>
+
+  <!-- Logo and Menu -->
+  <div id="header" class="nav main-nav">
+    <div id="header-core">
+      <div id="logo">
+        <a rel="home" href="{{ g.site_home_url }}"><img src="{{ logo_url }}" alt="Logo"></a>
+      </div>
+      <div id="header-links" class="main-navigation">
+        <div id="header-links-inner" class="header-links">
+          {{ include_site_header() }}
+        </div>
+      </div>
     </div>
   </div>
-</nav>
-<header id="topmenu" class="nav main-nav">
-  <div class="container">
-    <nav>
-      <ul>
-        <li><a href="http://twitter.com/cioos_siooc" tabindex="0" aria-label="Twitter"><i class="fa fa-twitter"></i></a></li>
-        <li><a href="http://facebook.com/cioos.siooc/" tabindex="0" aria-label="Facebook"><i class="fa fa-facebook-square"></i></a></li>
-        <li>
-          {%- if h.lang() == 'en' -%}
-            <a href="{% url_for h.current_url(), locale='fr' %}" tabindex="0" aria-label="French/English">FR</a>
-          {%- else -%}
-            <a href="{% url_for h.current_url(), locale='en' %}" tabindex="0" aria-label="French/English">EN</a>
-          {%- endif -%}
-        </li>
-        <li>
-          <a href="https://cioos.ca">
-            <img class="mega-menu-logo" width="425" height="60" src="{{ h.url_for_static_or_external('/base/images/logos/Artboard-2-425x60.png') }}">
-          </a>
-        </li>
-        </ul>
-    </nav>
-  </div>
-</header>
 
-{% include ['%s' % g.header_file_name, 'header_wp.html']  ignore missing %}
+  <script>
+    window.onload = function() {
+      var pDiv = document.getElementsByClassName('menu-parent');
+      for (var i = 0; i < pDiv.length; i++) {
+        pDiv[i].addEventListener('mouseover', function() {
+          var cDiv = this.getElementsByClassName('sub-menu');
+          for (var j = 0; j < cDiv.length; j++) {
+            cDiv[j].classList.add("subshow")
+          };
+        }, false);
+        pDiv[i].addEventListener('mouseout', function() {
+          var cDiv = this.getElementsByClassName('sub-menu');
+          for (var j = 0; j < cDiv.length; j++) {
+            cDiv[j].classList.remove("subshow")
+          };
+        }, false);
+      };
+    };
+  </script>
 
-{#
-<header id="mainmenu" class="nav main-nav">
-  <div class="container">
-    {# site_logo can be set in config.ini by changing ckan.site_logo or on admin config page #}
-{#
-    {% block header_logo %}
-      {% if (gns.site_logo) %}
-        {% if h.is_url(gns.site_logo) %}
-          {% set logo_url = gns.site_logo %}
-        {% else %}
-          {% set logo_url = h.url_for_static_or_external(gns.site_logo) %}
-        {% endif %}
-        <a class="logo" href="{{ g.site_home_url or h.url_for('home.index') }}"><img src="{{ logo_url }}" alt="{{ gns.site_title }}" title="{{ gns.site_title }}" /></a>
-      {% else %}
-        <h1>
-          <a href="{{ g.site_home_url or h.url_for('home.index') }}">{{ gns.site_title }}</a>
-        </h1>
-        {% if gns.site_description %}
-          <h2>{{ gns.site_description }}</h2>
-        {% endif %}
-      {% endif %}
-    {% endblock %}
-    {% block header_site_navigation %}
-    <nav>
-      <ul>
-        {% block header_site_navigation_tabs %}
-        <li><a href="{{ g.site_home_url }}">{{ _('HOME') }}</a></li>
-        {{ h.build_nav_main( ('search', _('DATASETS')), ('organizations_index', _('ORGANIZATIONS')) ) }}
-        <li><a href="{{ g.site_home_url }}about/ ">{{ _('ABOUT') }}</a></li>
-        <li><a href="{{ g.site_home_url }}data-applications/ ">{{ _('APPLIED DATA') }}</a></li>
-        <li><a href="{{ g.site_home_url }}data-tools">{{ _('DATA TOOLS') }}</a></li>
-        {{ h.build_nav_main( ('home.index', _('DATA CATALOGUE')) ) }} {% endblock %}
-      </ul>
-    </nav>
-    {% endblock %}
-  </div>
-</header>
-#}
-{% endblock %}
+  {% endblock %}
+</div>
