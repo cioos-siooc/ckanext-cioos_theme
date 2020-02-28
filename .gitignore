@@ -40,3 +40,4 @@ coverage.xml
 
 # Sphinx documentation
 docs/_build/
+ckanext/cioos_theme/public/grunt/yarn.lock

@@ -34,6 +34,9 @@
       {{ form.input('ckan.exclude_eov_category', id='field-ckan-exclude-eov-categoryl', label=_('Exclude eov\'s by category'), value=data['ckan.exclude_eov_category'], error=error) }}
 
       {{ form.input('ckan.exclude_eov', id='field-ckan-exclude-eov', label=_('Exlcude individul eov\'s'), value=data['ckan.exclude_eov'], error=error) }}
+
+      {{ form.input('ckan.header_file_name', id='field-ckan-header-file-name', label=_('Custom header filename'), value=data['ckan.header_file_name'], error=error) }}
+
       {% endblock %}
       <div class="form-actions">
         <a href="{% url_for 'admin.reset_config' %}" class="btn btn-danger pull-left" data-module="confirm-action" data-module-content="{{ _('Are you sure you want to reset the config?') }}">{{ _('Reset') }}</a>

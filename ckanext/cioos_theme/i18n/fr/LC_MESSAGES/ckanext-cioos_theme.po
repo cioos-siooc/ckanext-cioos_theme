@@ -369,4 +369,22 @@ msgid "Catalogue Home"
 msgstr "Accueil du Catalogue"
 
 msgid "HOME"
-msgstr "DOMICILE"
+msgstr "ACCUEIL"
+
+msgid "DATASETS"
+msgstr "JEUX DE DONNÉES"
+
+msgid "ORGANIZATIONS"
+msgstr "ORGANISATIONS"
+
+msgid "ABOUT"
+msgstr "À PROPOS"
+
+msgid "CIOOS APPLIED"
+msgstr "CIOOS APPLIQUÉS"
+
+msgid "DATA TOOLS"
+msgstr "OUTILS DE DONNÉES"
+
+msgid "DATA CATALOGUE"
+msgstr "CATALOGUE DE DONNÉES"
