@@ -384,7 +384,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             log.error("error:%s, keywords:%r", err, data_dict.get('keywords', '{}'))
             tags_dict = {"en": [], "fr": []}
 
-        data_dict['responsible_organizations'] = [x.get('organisation-name') for x in json.loads(data_dict.get('cited-responsible-party', '{}')) if x.get('role') in ['originator']]
+        data_dict['responsible_organizations'] = [x.get('organisation-name','').strip() for x in json.loads(data_dict.get('cited-responsible-party', '{}')) if x.get('role') in ['originator']]
 
         # update tag list by language
         data_dict['tags_en'] = tags_dict.get('en', [])
