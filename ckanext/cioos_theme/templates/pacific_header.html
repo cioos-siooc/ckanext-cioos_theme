@@ -45,14 +45,14 @@
   {% block header_main %}
   <ul id="menu-main-menu-en" class="menu">
     <li id="menu-item-921" class="menu-item  menu-item-home"><a href="{{ g.site_home_url }}"><span>HOME</span></a></li>
-    <li id="menu-item-920" class="menu-item  menu-item-has-children menu-parent"><a href="{{ g.site_home_url }}about/"><span>ABOUT</span></a>
+    <li id="menu-item-920" class="menu-item  menu-item-has-children menu-parent"><a href="{{ g.site_home_url }}about/"><span class="mega-indicator">ABOUT</span></a>
       <ul class="sub-menu" style=" min-width: 94px;">
         <li id="menu-item-1872" class="menu-item "><a href="{{ g.site_home_url }}about/data-management/">Data Management</a></li>
         <li id="menu-item-1934" class="menu-item "><a href="{{ g.site_home_url }}about/essential-ocean-variables/">Essential Ocean Variables</a></li>
         <li id="menu-item-1873" class="menu-item "><a href="{{ g.site_home_url }}about/partners/">Partners</a></li>
       </ul>
     </li>
-    <li id="menu-item-1673" class="menu-item  menu-item-has-children menu-parent"><a href="{{ g.site_home_url }}data-applications/"><span>APPLIED DATA</span></a>
+    <li id="menu-item-1673" class="menu-item  menu-item-has-children menu-parent"><a href="{{ g.site_home_url }}data-applications/"><span class="mega-indicator">APPLIED DATA</span></a>
       <ul class="sub-menu" style=" min-width: 144px;">
         <li id="menu-item-1743" class="menu-item "><a href="{{ g.site_home_url }}data-applications/baynes-sound/">Baynes Sound Ecosystem Monitoring</a></li>
         <li id="menu-item-1940" class="menu-item "><a href="{{ g.site_home_url }}under-construction/">Marine Heatwaves</a></li>
@@ -61,7 +61,7 @@
       </ul>
     </li>
     <li id="menu-item-1359" class="menu-item "><a href="{{ g.site_home_url }}data-tools/"><span>DATA TOOLS</span></a></li>
-    <li id="menu-item-1652" class="menu-item menu-item-has-children menu-parent current-menu-item current_page_item"><a href="{{ h.url_for('home.index') }}"><span>DATA CATALOGUE</span></a>
+    <li id="menu-item-1652" class="menu-item menu-item-has-children menu-parent current-menu-item current_page_item"><a href="{{ h.url_for('home.index') }}"><span class="mega-indicator">DATA CATALOGUE</span></a>
       <ul class="sub-menu" style=" min-width: 161px;">
         <li id="menu-item-1999" class="menu-item"><a href="{{ h.url_for('home.index') }}dataset">Datasets</a></li>
         <li id="menu-item-2001" class="menu-item"><a href="{{ h.url_for('home.index') }}organization">Organizations</a></li>

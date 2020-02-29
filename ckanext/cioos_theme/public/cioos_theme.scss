@@ -1089,7 +1089,7 @@ div.search-input-group {
     #header .header-links>ul>li a {
       font-size: 13px;
       color: #bebebe;
-      padding: 50px 15px
+      padding: 50px 15px 15px 15px
     }
 
     #header .menu>li>a {
@@ -1114,15 +1114,6 @@ div.search-input-group {
     #header-sticky .menu>li.current-menu-ancestor>a s pan,
     #header-sticky .menu>li>a:hover span {
       border-color: #0a0a0a !important
-    }
-
-    #header .menu>li>a span::after {
-      content: '';
-      display: block;
-      width: 0;
-      height: 2px;
-      background: #006e90;
-      transition: width .5s
     }
 
     #header .header-l inks>ul>li.menu-parent>a::after {
@@ -1220,5 +1211,23 @@ div.search-input-group {
       vertical-align: middle;
       height: 45px;
       line-height: 45px;
+    }
+    #header .menu>li>a span.mega-indicator:after {
+      content: '\f107';
+      font-family: fontawesome;
+      font-weight: normal;
+      display: inline-block;
+      margin: 0 0 0 6px;
+      vertical-align: top;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      transform: rotate(0);
+      color: inherit;
+      position: relative;
+      background: transparent;
+      height: auto;
+      width: auto;
+      right: auto;
+      line-height: inherit;
+    }
   }
-}
