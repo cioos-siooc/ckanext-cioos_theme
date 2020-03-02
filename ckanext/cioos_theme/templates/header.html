@@ -47,9 +47,15 @@
             {%- endif -%}
           </li>
           <li>
+            {%- if h.lang() == 'en' -%}
             <a href="https://cioos.ca">
-              <img class="mega-menu-logo" width="259" height="37" src="{{ h.url_for_static_or_external('/base/images/logos/Artboard-2-425x60.png') }}">
+              <img class="mega-menu-logo" width="260" height="37" src="{{ h.url_for_static_or_external('/base/images/logos/cioos-banner-en.png') }}">
             </a>
+            {%- else -%}
+            <a href="https://cioos.ca">
+              <img class="mega-menu-logo" width="305" height="37" src="{{ h.url_for_static_or_external('/base/images/logos/cioos-banner-fr.png') }}">
+            </a>
+            {%- endif -%}
           </li>
           </ul>
       </nav>
