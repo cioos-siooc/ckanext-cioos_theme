@@ -10,7 +10,11 @@
 {% endif %}
 
 {# import macros from ra header file #}
-{% from '%s' % g.header_file_name or 'header_wp.html' import include_site_header, include_mobile_header with context %}
+{% if self._TemplateReference__context.name != g.header_file_name %}
+  {% from '%s' % g.header_file_name or 'header_wp.html' import include_site_header, include_mobile_header with context %}
+{% else %}
+  {% from 'header_wp.html' import include_site_header, include_mobile_header with context %}
+{% endif %}
 
 <div id="header-container">
   {% block header_wrapper %}
