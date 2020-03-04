@@ -366,6 +366,9 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
 
     # IPackageController
 
+    def _cited_responsible_party_to_responsible_organizations(self, parties):
+        return [x.get('organisation-name', '').strip() for x in json.loads(parties) if x.get('role') in ['originator']]
+
     # def after_create(self, context, pkg_dict):
     #     # dosn't work to update name in validator as id is populated by database. better to use a validator and populate usig uuid
     #     # import uuid
@@ -384,7 +387,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             log.error("error:%s, keywords:%r", err, data_dict.get('keywords', '{}'))
             tags_dict = {"en": [], "fr": []}
 
-        data_dict['responsible_organizations'] = [x.get('organisation-name','').strip() for x in json.loads(data_dict.get('cited-responsible-party', '{}')) if x.get('role') in ['originator']]
+        data_dict['responsible_organizations'] = self._cited_responsible_party_to_responsible_organizations(data_dict.get('cited-responsible-party', '{}'))
 
         # update tag list by language
         data_dict['tags_en'] = tags_dict.get('en', [])
@@ -487,6 +490,9 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         # this is inconsistant with package data which is returned as json objects
         # by the package_show and package_search end points whout filters applied
         for result in search_results.get('results', []):
+            cited_responsible_party = result.get('cited-responsible-party')
+            if(cited_responsible_party and not result.get('responsible_organizations')):
+                result['responsible_organizations'] = self._cited_responsible_party_to_responsible_organizations(cited_responsible_party)
             title = result.get('title_translated')
             if(title):
                 result['title_translated'] = load_json(title)
@@ -554,6 +560,10 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             org_image_url = org_details.get('image_url_translated', {})
             if org_image_url:
                 package_dict['organization']['image_url_translated'] = org_image_url
+
+        cited_responsible_party = package_dict.get('cited-responsible-party')
+        if(cited_responsible_party and not package_dict.get('responsible_organizations')):
+            package_dict['responsible_organizations'] = self._cited_responsible_party_to_responsible_organizations(cited_responsible_party)
 
         return package_dict
 

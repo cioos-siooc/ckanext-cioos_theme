@@ -73,4 +73,30 @@
     {% snippet "snippets/license.html", pkg_dict=pkg, has_context_title=true %}
   {% endblock %}
 
+ <section class="module module-narrow module-shallow">
+     <h2 class="module-heading">
+       <i class="fa fa-database"></i>
+       {{ _('Responsible Organizations') }}
+     </h2>
+     {% with items = pkg.get('responsible_organizations') %}
+     {% if items %}
+       <nav>
+         <ul class="{{ nav_class or 'list-unstyled nav nav-simple nav-facet' }}">
+           {% for item in items %}
+             {% set href = h.add_url_param(new_params={'responsible_organizations': item}, controller='package', action='search') %}
+             {% set label = item %}
+             {% set label_truncated = h.truncate(label, 30) %}
+               <li class="nav-item">
+                 <a href="{{ href }}" title="{{ label if label != label_truncated else '' }}">
+                   <span class="item-label">{{ label_truncated }}</span>
+                 </a>
+               </li>
+           {% endfor %}
+         </ul>
+       </nav>
+     {% endif %}
+     {% endwith %}
+ </section>
+
+
 {% endblock %}
