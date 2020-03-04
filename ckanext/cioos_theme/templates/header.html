@@ -10,7 +10,11 @@
 {% endif %}
 
 {# import macros from ra header file #}
-{% from '%s' % g.header_file_name or 'header_wp.html' import include_site_header, include_mobile_header with context %}
+{% if self._TemplateReference__context.name != g.header_file_name %}
+  {% from '%s' % g.header_file_name or 'header_wp.html' import include_site_header, include_mobile_header with context %}
+{% else %}
+  {% from 'header_wp.html' import include_site_header, include_mobile_header with context %}
+{% endif %}
 
 <div id="header-container">
   {% block header_wrapper %}
@@ -47,15 +51,9 @@
             {%- endif -%}
           </li>
           <li>
-            {%- if h.lang() == 'en' -%}
             <a href="https://cioos.ca">
-              <img class="mega-menu-logo" width="260" height="37" src="{{ h.url_for_static_or_external('/base/images/logos/cioos-banner-en.png') }}">
+              <img class="mega-menu-logo" width="259" height="37" src="{{ h.url_for_static_or_external('/base/images/logos/cioos-banner-' + h.lang() +'.png') }}">
             </a>
-            {%- else -%}
-            <a href="https://cioos.ca">
-              <img class="mega-menu-logo" width="305" height="37" src="{{ h.url_for_static_or_external('/base/images/logos/cioos-banner-fr.png') }}">
-            </a>
-            {%- endif -%}
           </li>
           </ul>
       </nav>
