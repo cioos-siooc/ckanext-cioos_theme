@@ -66,8 +66,8 @@
   {% block header_main %}
   <ul id="menu-main-menu-en" class="menu">
     {%- if h.lang() == 'en' -%}
-    <li id="menu-item-921" class="menu-item  menu-item-home"><a href="{{ g.site_home_url }}"><span>HOME</span></a></li>
-    <li id="menu-item-920" class="menu-item  menu-item-has-children menu-parent"><a href="{{ g.site_home_url }}about/"><span class="mega-indicator">ABOUT</span></a>
+    <li id="menu-item-921" class="menu-item  menu-item-home"><a href="{{ g.site_home_url }}"><span>Home</span></a></li>
+    <li id="menu-item-920" class="menu-item  menu-item-has-children menu-parent"><a href="{{ g.site_home_url }}about/"><span class="mega-indicator">About</span></a>
     {%- else -%}
     <li id="menu-item-921" class="menu-item  menu-item-home"><a href="{{ g.site_home_url }}/fr/"><span>Accueil</span></a></li>
     <li id="menu-item-920" class="menu-item  menu-item-has-children menu-parent"><a href="{{ g.site_home_url }}/fr/"><span class="mega-indicator">À Propos</span></a>
@@ -89,14 +89,14 @@
       </ul>
     </li>
     {%- if h.lang() == 'en' -%}
-    <li id="menu-item-1359" class="menu-item "><a href="{{ g.site_home_url }}data-tools/"><span>DATA TOOLS</span></a></li>
-    <li id="menu-item-1652" class="menu-item menu-item-has-children menu-parent current-menu-item current_page_item"><a href="{{ h.url_for('home.index') }}"><span class="mega-indicator">DATA CATALOGUE</span></a>
+    <li id="menu-item-1359" class="menu-item "><a href="{{ g.site_home_url }}data-tools/"><span>Data Tools</span></a></li>
+    <li id="menu-item-1652" class="menu-item menu-item-has-children menu-parent current-menu-item current_page_item"><a href="{{ h.url_for('home.index') }}"><span class="mega-indicator">Data Catalogue</span></a>
       <ul class="sub-menu" style=" min-width: 161px;">
         <li id="menu-item-1999" class="menu-item"><a href="{{ h.url_for('home.index') }}dataset">Datasets</a></li>
         <li id="menu-item-2001" class="menu-item"><a href="{{ h.url_for('home.index') }}organization">Organizations</a></li>
       </ul>
     </li>
-    <li id="menu-item-2002" class="menu-item"><a href="{{ g.site_home_url }}resources/"><span class="mega-indicator">RESOURCES</span></a>
+    <li id="menu-item-2002" class="menu-item"><a href="{{ g.site_home_url }}resources/"><span class="mega-indicator">Resources</span></a>
     </li>
     {%- else -%}
     <li id="menu-item-1359" class="menu-item "><a href="{{ g.site_home_url }}/fr/"><span>Outils de Données</span></a></li>
