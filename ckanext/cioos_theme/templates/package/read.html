@@ -1,6 +1,8 @@
 {% ckan_extends %}
 
 {% set pkg = c.pkg_dict %}
+
+
 {%- set schema = h.scheming_get_dataset_schema(dataset_type) -%}
 
 {% block primary_content_inner %}
@@ -14,6 +16,20 @@
     <h1>
       {% block page_heading %}
         {{ h.dataset_display_name(pkg) }}
+
+        {% set title_translation_method = h.cioos_load_json( h.get_pkg_dict_extra(pkg, 'title_translation_method') or pkg.get('title_translation_method') or '{}' ) %}
+        {% set tmethod = title_translation_method.get(h.lang()) %}
+        {% if tmethod %}
+          <span class="translation_icon_group" title="{{ tmethod }}">
+            <i class="fa fa-language translation_icon" aria-hidden="true"></i>
+            {% if tmethod == 'Automatic Translation' %}
+              <i class="fa fa-desktop translation_icon" aria-hidden="true"></i>
+            {% else %}
+              <i class="fa fa-user translation_icon" aria-hidden="true"></i>
+            {% endif%}
+          </span>
+        {% endif%}
+
         {% if pkg.state.startswith('draft') %}
           [{{ _('Draft') }}]
         {% endif %}
@@ -24,7 +40,6 @@
     </h1>
 
     {% block package_notes %}
-      {# this block will be overwriten by scheming/package/read.html if the scheming extension is being used #}
       {%- if not dataset_type -%}
         <p>
         dataset_type not passed to template. your version of CKAN
@@ -34,6 +49,20 @@
       {% if ( h.scheming_field_by_name(schema.dataset_fields, 'notes') or h.scheming_field_by_name(schema.dataset_fields, 'notes_translated') ) and h.get_translated(pkg, 'notes') %}
         <div class="notes embedded-content">
           {{ h.render_markdown(h.get_translated(pkg, 'notes')) }}
+
+          {% set notes_translation_method = h.cioos_load_json( h.get_pkg_dict_extra(pkg, 'notes_translation_method') or pkg.get('notes_translation_method') or '{}' ) %}
+          {% set nmethod = notes_translation_method.get(h.lang()) %}
+          {% if nmethod %}
+            <span class="translation_icon_group" title="{{ nmethod }}">
+              <i class="fa fa-language translation_icon" aria-hidden="true"></i>
+              {% if nmethod == 'Automatic Translation' %}
+                <i class="fa fa-desktop translation_icon" aria-hidden="true"></i>
+              {% else %}
+                <i class="fa fa-user translation_icon" aria-hidden="true"></i>
+              {% endif%}
+            </span>
+          {% endif%}
+
         </div>
       {% endif %}
     {% endblock %}
@@ -55,14 +84,19 @@
     {% snippet "package/snippets/dates.html", pkg_dict=pkg %}
   {% endblock %}
 
+{#
   {% block package_citation %}
     {% if pkg.doi %}
       {% snippet "doi/snippets/package_citation.html", pkg_dict=pkg %}
     {% endif %}
   {% endblock %}
-
+#}
   {% block package_metadata_source %}
     {% snippet "package/snippets/metadata_source.html", pkg_dict=pkg %}
+  {% endblock %}
+
+  {% block package_citation %}
+    {% snippet "package/snippets/citation.html", pkg_dict=pkg %}
   {% endblock %}
 
   {% block package_img_preview %}
@@ -73,7 +107,7 @@
     {% snippet "package/snippets/tags.html", tags=h.cioos_load_json(pkg.get('keywords', {}))[h.lang()] %}
   {% endblock %}
 
-  {% set dataset_extent = h.get_pkg_dict_extra(c.pkg_dict, 'spatial') or c.pkg_dict.get('spatial') %}
+  {% set dataset_extent = h.get_pkg_dict_extra(pkg, 'spatial') or pkg.get('spatial') %}
   {% if dataset_extent %}
     {% snippet "spatial/snippets/dataset_map.html", extent=dataset_extent %}
   {% endif %}
