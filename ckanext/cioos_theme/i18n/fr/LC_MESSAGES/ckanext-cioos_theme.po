@@ -45,8 +45,9 @@ msgid "Popular"
 msgstr "Populaire"
 
 #: ckanext/cioos_theme/templates/group/read.html:19
-msgid "Search datasets..."
-msgstr "Rechercher des jeux de donnée..."
+#: ckanext/cioos_theme/templates/package/search.html:38
+msgid "Search datasets"
+msgstr "Rechercher les jeux de donnée"
 
 #: ckanext/cioos_theme/templates/home/snippets/promoted.html:8
 msgid "Welcome to CKAN"
@@ -209,6 +210,9 @@ msgstr "Chercheur principal"
 msgid "Not Specified"
 msgstr "Non précisé"
 
+msgid "CIOOS Data Catalogue"
+msgstr "Catalogue de données du SIOOC"
+
 msgid "CIOOS"
 msgstr "SIOOC"
 
@@ -216,22 +220,37 @@ msgid "Data Catalogue"
 msgstr "Catalogue de données"
 
 msgid "Search, find, download — all of our"
-msgstr "Rechercher, trouver, télécharger - tous nos"
+msgstr "Recherche, trouve, télécharge nos"
 
 msgid "SEARCH BY KEYWORD"
 msgstr "RECHERCHE PAR MOTS-CLÉS"
 
 msgid "Ocean Variables"
-msgstr "Variables Océan"
+msgstr "Variables Océaniques"
 
 msgid "SEARCH BY OCEAN VARIABLE"
-msgstr "RECHERCHE PAR OCÉAN VARIABLE"
+msgstr "RECHERCHE PAR VARIABLE OCÉANIQUE"
 
 msgid "Search"
 msgstr "Chercher"
 
 msgid "PHYSIC"
 msgstr "PHYSIQUE"
+
+msgid "Biogeochemical"
+msgstr "Biogéochimique"
+
+msgid "Physical"
+msgstr "Physique"
+
+msgid "Biology"
+msgstr "Biologie"
+
+msgid "Other"
+msgstr "Autre"
+
+msgid "Responsible Organization"
+msgstr "Organisation Responsable"
 
 msgid "Temperature"
 msgstr "Température"
@@ -336,7 +355,7 @@ msgid "Filter by location"
 msgstr "Filtrer par lieu"
 
 msgid "Clear"
-msgstr "Clair"
+msgstr "Effacer"
 
 msgid "Map data"
 msgstr "Données cartographiques"
@@ -372,7 +391,7 @@ msgid "HOME"
 msgstr "ACCUEIL"
 
 msgid "DATASETS"
-msgstr "JEUX DE DONNÉES"
+msgstr "ENSEMBLES DE DONNÉES"
 
 msgid "ORGANIZATIONS"
 msgstr "ORGANISATIONS"
@@ -383,8 +402,41 @@ msgstr "À PROPOS"
 msgid "CIOOS APPLIED"
 msgstr "CIOOS APPLIQUÉS"
 
+msgid "APPLIED DATA"
+msgstr "APPLICATION DE DONNÉES"
+
 msgid "DATA TOOLS"
 msgstr "OUTILS DE DONNÉES"
 
 msgid "DATA CATALOGUE"
 msgstr "CATALOGUE DE DONNÉES"
+
+msgid "Partners"
+msgstr "Partenaires"
+
+msgid "Data Management"
+msgstr "Gestion de données"
+
+msgid "Essential Ocean Variables"
+msgstr "Variables océaniques essentielles"
+
+msgid "Baynes Sound Ecosystem Monitoring"
+msgstr "Surveillance de l’écosystème de Baynes Sound"
+
+msgid "Marine Heatwaves"
+msgstr "Surveillance des vagues de chaleur marines"
+
+msgid "Ocean Climate"
+msgstr "Climat océanique"
+
+msgid "Strait of Georgia Currents"
+msgstr "Courants du détroit de Georgie"
+
+msgid "Oldest First"
+msgstr "Plus Ancient"
+
+msgid "Newest First"
+msgstr "Plus Récent"
+
+msgid "E.g. temperature"
+msgstr "Ex. température"
