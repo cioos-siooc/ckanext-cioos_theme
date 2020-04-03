@@ -62,12 +62,6 @@ msgstr ""
 "Il s’agit d’un paragraphe d’introduction intéressant sur CKAN ou le site "
 "en général. Nous n'avons pas encore de copie pour y aller mais bientôt"
 
-#: ckanext/cioos_theme/templates/package/search.html:4
-#, fuzzy
-#| msgid "Search datasets..."
-msgid "Datasets"
-msgstr "Rechercher des jeux de donnée..."
-
 #: ckanext/cioos_theme/templates/package/search.html:56
 #, python-format
 msgid ""
@@ -390,11 +384,11 @@ msgstr "Accueil du Catalogue"
 msgid "HOME"
 msgstr "ACCUEIL"
 
-msgid "DATASETS"
-msgstr "ENSEMBLES DE DONNÉES"
+msgid "Datasets"
+msgstr "Ensembles de données"
 
-msgid "ORGANIZATIONS"
-msgstr "ORGANISATIONS"
+msgid "Organizations"
+msgstr "Organisations"
 
 msgid "ABOUT"
 msgstr "À PROPOS"
