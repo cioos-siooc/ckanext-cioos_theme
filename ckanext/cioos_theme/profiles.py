@@ -87,6 +87,27 @@ class CIOOSDCATProfile(SchemaOrgProfile):
         values['publisher_email'] = email
         values['publisher_url'] = url
 
+    def _basic_fields_graph(self, dataset_ref, dataset_dict):
+        notes = dataset_dict.get('notes_translated', dataset_dict.get('notes'))
+
+        # remove previous notes and replace with translated version
+        for s, p, o in self.g.triples((None, RDF.type, SCHEMA.Dataset)):
+            self.g.remove((s, SCHEMA.description, None))
+            self.g.add((s, SCHEMA.description, Literal(toolkit.h.scheming_language_text(load_json(notes)))))
+
+    def _catalog_graph(self, dataset_ref, dataset_dict):
+        # remove all previous catalogs set by base profile as it is garbage.
+        for s, p, o in self.g.triples((None, RDF.type, SCHEMA.DataCatalog)):
+            log.debug('%s, %s, %s', s, p, o)
+            self.g.remove((s, None, None))
+
+        data_catalog = BNode()
+        self.g.add((dataset_ref, SCHEMA.includedInDataCatalog, data_catalog))
+        self.g.add((data_catalog, RDF.type, SCHEMA.DataCatalog))
+        self.g.add((data_catalog, SCHEMA.name, Literal(toolkit.h.scheming_language_text(load_json(toolkit.config.get('ckan.site_title'))))))
+        self.g.add((data_catalog, SCHEMA.description, Literal(toolkit.h.scheming_language_text(load_json(toolkit.config.get('ckan.site_description'))))))
+        self.g.add((data_catalog, SCHEMA.url, Literal(toolkit.config.get('ckan.site_url'))))
+
     def _publisher_graph(self, dataset_ref, dataset_dict):
         if any([
             self._get_dataset_value(dataset_dict, 'publisher_uri'),
@@ -208,6 +229,15 @@ class CIOOSDCATProfile(SchemaOrgProfile):
                 g.add((geo_shape, SCHEMA.box, Literal(bbox_str)))
                 # Add bounding box element
                 g.add((spatial_ref, SCHEMA.geo, geo_shape))
+
+        #### TODO: Remove schema:description and replace with this plus translation
+        #('notes', SCHEMA.description, None, Literal),
+
+        # Basic fields
+        self._basic_fields_graph(dataset_ref, dataset_dict)
+
+        # Catalog
+        self._catalog_graph(dataset_ref, dataset_dict)
 
         # Publisher
         self.infer_publisher(dataset_dict)
