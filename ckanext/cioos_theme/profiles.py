@@ -100,6 +100,7 @@ class CIOOSDCATProfile(SchemaOrgProfile):
         for s, p, o in self.g.triples((None, RDF.type, SCHEMA.DataCatalog)):
             log.debug('%s, %s, %s', s, p, o)
             self.g.remove((s, None, None))
+        self.g.remove((dataset_ref, SCHEMA.includedInDataCatalog, None))
 
         data_catalog = BNode()
         self.g.add((dataset_ref, SCHEMA.includedInDataCatalog, data_catalog))
