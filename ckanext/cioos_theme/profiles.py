@@ -44,7 +44,7 @@ class CIOOSDCATProfile(SchemaOrgProfile):
             parties = load_json(values['cited-responsible-party']) + [(load_json(values['metadata-point-of-contact']))]
         else:
             parties = load_json(values['cited-responsible-party']) + load_json(values['metadata-point-of-contact'])
-        log.debug('parties:%r', parties)
+
         for responsible_party in parties:
             if responsible_party['role'] == 'publisher':
                 name = responsible_party.get('organisation-name')
@@ -98,7 +98,6 @@ class CIOOSDCATProfile(SchemaOrgProfile):
     def _catalog_graph(self, dataset_ref, dataset_dict):
         # remove all previous catalogs set by base profile as it is garbage.
         for s, p, o in self.g.triples((None, RDF.type, SCHEMA.DataCatalog)):
-            log.debug('%s, %s, %s', s, p, o)
             self.g.remove((s, None, None))
         self.g.remove((dataset_ref, SCHEMA.includedInDataCatalog, None))
 
@@ -125,7 +124,6 @@ class CIOOSDCATProfile(SchemaOrgProfile):
 
             # remove all previous contact points set by base profile as it is garbage.
             for s, p, o in self.g.triples((None, SCHEMA.contactType, None)):
-                log.debug('%s, %s, %s', s, p, o)
                 self.g.remove((s, None, None))
 
             self.g.remove((publisher_details, SCHEMA.name, None))
