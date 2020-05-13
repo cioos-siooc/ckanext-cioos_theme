@@ -1,5 +1,7 @@
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
+import ckan.model as model
+from ckan.logic import NotFound
 import ckanext.cioos_theme.helpers as cioos_helpers
 from ckanext.scheming.validation import scheming_validator
 from ckan.lib.plugins import DefaultTranslation
@@ -11,6 +13,7 @@ from ckan.common import c
 from six.moves.urllib.parse import urlparse
 import string
 from ckan.common import _
+import urllib2
 
 StopOnError = df.StopOnError
 missing = df.missing
@@ -443,6 +446,38 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         # eov is multi select so it is a json list rather then a python list
         if(data_dict.get('eov')):
             data_dict['eov'] = load_json(data_dict['eov'])
+
+        # Index Source XML
+        # harvest object will be json if harvested from another ckan instance. TODO check it is xml
+        # try harvest object (xml)
+        h_object_id = data_dict.get('harvest_object_id', 'none')
+        context = {'model': model,
+                   'session': model.Session,
+                   'ignore_auth': True}
+
+        pkg_dict = {'id': h_object_id}
+
+        try:
+            harvest_object = toolkit.get_action('harvest_object_show')(context, pkg_dict)
+            content = harvest_object.get('content', '')
+            if content.startswith('<'):
+                data_dict['extras_harvest_document_content'] = harvest_object.get('content', '')
+            else:
+                raise NotFound
+        except NotFound:
+            log.warning('Unable to find harvest object "%s" or dose not contain valid xml '
+                        'referenced by dataset "%s". Trying xml url',
+                        pkg_dict['id'], data_dict['id'])
+
+            # try reading from xml url
+            xml_url = data_dict.get('xml_location_url')
+            try:
+                data_dict['extras_harvest_document_content'] = urllib2.urlopen(xml_url).read(100000)  # read only 100 000 chars
+            except Exception as e:
+                log.warning('Unable to read from xml url "%s" '
+                            'referenced by dataset "%s" Error: %s',
+                            xml_url, data_dict['id'], e)
+
         return data_dict
 
     # update eov search facets with keys from choices list in the scheming extension schema
