@@ -14,6 +14,7 @@ from six.moves.urllib.parse import urlparse
 import string
 from ckan.common import _
 import urllib2
+import xml.etree.ElementTree as ET
 
 StopOnError = df.StopOnError
 missing = df.missing
@@ -470,14 +471,22 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                         pkg_dict['id'], data_dict['id'])
 
             # try reading from xml url
+            xml_str = ''
             xml_url = data_dict.get('xml_location_url')
             try:
-                data_dict['extras_harvest_document_content'] = urllib2.urlopen(xml_url).read(100000)  # read only 100 000 chars
+                xml_str = urllib2.urlopen(xml_url).read(100000)  # read only 100 000 chars
             except Exception as e:
                 log.warning('Unable to read from xml url "%s" '
                             'referenced by dataset "%s" Error: %s',
                             xml_url, data_dict['id'], e)
 
+            # test for valid xml
+            if xml_str:
+                try:
+                    root = ET.XML(xml_str)
+                    data_dict['extras_harvest_document_content'] = xml_str
+                except ET.ParseError as e:
+                    log.warning('XML string is invalid. %s', e)
         return data_dict
 
     # update eov search facets with keys from choices list in the scheming extension schema
