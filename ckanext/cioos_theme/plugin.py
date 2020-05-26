@@ -528,6 +528,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
     def after_show(self, context, package_dict):
         org_id = package_dict.get('owner_org')
         data_type = package_dict.get('type')
+
         if org_id and data_type == 'dataset':
             # need to turn off dataset_count, usersand groups here as it causes a recursive loop
             org_details = toolkit.get_action('organization_show')(

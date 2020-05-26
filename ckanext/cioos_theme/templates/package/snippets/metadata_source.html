@@ -24,7 +24,7 @@
 	      {% set job = pkg_dict.extras | selectattr("key","equalto","h_job_id") | map(attribute="value") | join('') %}
 	      {% set harvest_object = pkg_dict.extras | selectattr("key","equalto","h_object_id") | map(attribute="value") | join('') %}
 	      {# {% set gn_view_metadata_url = pkg_dict.extras | selectattr("key","equalto","gn_view_metadata_url") | map(attribute="value") | join('') %} #}
-        {% set url = pkg_dict.xml_location_url or xml_location_extras or gn_view_metadata_url or h_source_url %}
+        {% set url = h.cioos_load_json(pkg_dict.xml_location_url or xml_location_extras or gn_view_metadata_url or h_source_url) %}
 
 	      {% if harvest_object %}
 	        <span style="font-weight:bold;">{{_("View Harvested Metadata")}}: <a href="{{ remote_ckan_base_url + h.url_for('harvest_object_show', id = harvest_object ) }}">XML/JSON</a></span><br>
@@ -34,7 +34,14 @@
 
               {% if url %}
               <p style="margin-left:20px;margin-bottom: 0px;">
-                  {% if h.is_url(url) %}
+                  {% if url is iterable and url is not string %}
+                    <span> {{ _("Access full metadata ") }} </span>
+                    <ul>
+                    {% for item in url %}
+                      <li><a href="{{item}}">{{ item.rsplit('/', 1)[-1] }}</a></li>
+                    {% endfor %}
+                    </ul>
+                  {% elif h.is_url(url) %}
                     <span> {{ _("Access full metadata ") }} </span><b><a href="{{url}}">here</a></b>
                   {% else %}
                     <span> {{ url }}{{ guid }} </span>
