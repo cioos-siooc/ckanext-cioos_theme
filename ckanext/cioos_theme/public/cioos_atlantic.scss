@@ -1,6 +1,6 @@
 $atlantic-primary: #e55162;
 $text-dark: #404041;
-
+$atlantic-secondary: #e55162;
 // Header
 #topmenu.nav.main-nav nav {
     padding: 0 !important;
@@ -17,7 +17,12 @@ $text-dark: #404041;
                     color: $atlantic-primary !important;
                 }
                 &::after {
-                    background: none;
+                    content:"";
+                    display:block;
+                    width:0;
+                    height:2px;
+                    background: $atlantic-secondary !important;
+                    transition:width .5s
                 }
             }
             &.current-menu-item > a {
@@ -32,6 +37,10 @@ $text-dark: #404041;
                 font-size: 12px;
                 margin-top: 3px;
                 font-weight: 700;
+            }
+            &.current-menu-item>a span {
+                color: $atlantic-secondary !important;
+                font-weight: 400;
             }
         }
     }
@@ -58,6 +67,17 @@ $text-dark: #404041;
             }
         }
     }
+}
+
+#header-container #header-sticky {
+  .menu {
+      > li {
+          > a:hover {
+              color: $atlantic-secondary;
+              background: #fff;
+          }
+      }
+  }
 }
 
 // Titles & Headings
