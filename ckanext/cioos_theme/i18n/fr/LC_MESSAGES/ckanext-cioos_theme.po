@@ -45,8 +45,9 @@ msgid "Popular"
 msgstr "Populaire"
 
 #: ckanext/cioos_theme/templates/group/read.html:19
-msgid "Search datasets..."
-msgstr "Rechercher des jeux de donnée..."
+#: ckanext/cioos_theme/templates/package/search.html:38
+msgid "Search datasets"
+msgstr "Rechercher les jeux de données"
 
 #: ckanext/cioos_theme/templates/home/snippets/promoted.html:8
 msgid "Welcome to CKAN"
@@ -60,12 +61,6 @@ msgid ""
 msgstr ""
 "Il s’agit d’un paragraphe d’introduction intéressant sur CKAN ou le site "
 "en général. Nous n'avons pas encore de copie pour y aller mais bientôt"
-
-#: ckanext/cioos_theme/templates/package/search.html:4
-#, fuzzy
-#| msgid "Search datasets..."
-msgid "Datasets"
-msgstr "Rechercher des jeux de donnée..."
 
 #: ckanext/cioos_theme/templates/package/search.html:56
 #, python-format
@@ -209,6 +204,9 @@ msgstr "Chercheur principal"
 msgid "Not Specified"
 msgstr "Non précisé"
 
+msgid "<span>CIOOS</span> Data Catalogue"
+msgstr "Catalogue de données du <span>SIOOC</span>"
+
 msgid "CIOOS"
 msgstr "SIOOC"
 
@@ -216,22 +214,37 @@ msgid "Data Catalogue"
 msgstr "Catalogue de données"
 
 msgid "Search, find, download — all of our"
-msgstr "Rechercher, trouver, télécharger - tous nos"
+msgstr "Recherche, trouve, télécharge nos"
 
 msgid "SEARCH BY KEYWORD"
 msgstr "RECHERCHE PAR MOTS-CLÉS"
 
 msgid "Ocean Variables"
-msgstr "Variables Océan"
+msgstr "Variables Océaniques"
 
 msgid "SEARCH BY OCEAN VARIABLE"
-msgstr "RECHERCHE PAR OCÉAN VARIABLE"
+msgstr "RECHERCHE PAR VARIABLE OCÉANIQUE"
 
 msgid "Search"
 msgstr "Chercher"
 
 msgid "PHYSIC"
 msgstr "PHYSIQUE"
+
+msgid "Biogeochemical"
+msgstr "Biogéochimique"
+
+msgid "Physical"
+msgstr "Physique"
+
+msgid "Biology"
+msgstr "Biologie"
+
+msgid "Other"
+msgstr "Autre"
+
+msgid "Responsible Organization"
+msgstr "Organisation Responsable"
 
 msgid "Temperature"
 msgstr "Température"
@@ -336,7 +349,7 @@ msgid "Filter by location"
 msgstr "Filtrer par lieu"
 
 msgid "Clear"
-msgstr "Clair"
+msgstr "Effacer"
 
 msgid "Map data"
 msgstr "Données cartographiques"
@@ -371,11 +384,11 @@ msgstr "Accueil du Catalogue"
 msgid "HOME"
 msgstr "ACCUEIL"
 
-msgid "DATASETS"
-msgstr "JEUX DE DONNÉES"
+msgid "Datasets"
+msgstr "Ensembles de données"
 
-msgid "ORGANIZATIONS"
-msgstr "ORGANISATIONS"
+msgid "Organizations"
+msgstr "Organisations"
 
 msgid "ABOUT"
 msgstr "À PROPOS"
@@ -383,8 +396,56 @@ msgstr "À PROPOS"
 msgid "CIOOS APPLIED"
 msgstr "CIOOS APPLIQUÉS"
 
+msgid "APPLIED DATA"
+msgstr "APPLICATION DE DONNÉES"
+
 msgid "DATA TOOLS"
 msgstr "OUTILS DE DONNÉES"
 
 msgid "DATA CATALOGUE"
 msgstr "CATALOGUE DE DONNÉES"
+
+msgid "Partners"
+msgstr "Partenaires"
+
+msgid "Data Management"
+msgstr "Gestion de données"
+
+msgid "Essential Ocean Variables"
+msgstr "Variables océaniques essentielles"
+
+msgid "Baynes Sound Ecosystem Monitoring"
+msgstr "Surveillance de l’écosystème de Baynes Sound"
+
+msgid "Marine Heatwaves"
+msgstr "Surveillance des vagues de chaleur marines"
+
+msgid "Ocean Climate"
+msgstr "Climat océanique"
+
+msgid "Strait of Georgia Currents"
+msgstr "Courants du détroit de Georgie"
+
+msgid "Oldest First"
+msgstr "Plus Ancient"
+
+msgid "Newest First"
+msgstr "Plus Récent"
+
+msgid "E.g. temperature"
+msgstr "Ex. température"
+
+#: ckan/templates/group/activity_stream.html:3
+#: ckan/templates/group/activity_stream.html:6
+#: ckan/templates/group/read_base.html:18
+#: ckan/templates/organization/activity_stream.html:3
+#: ckan/templates/organization/activity_stream.html:6
+#: ckan/templates/organization/read_base.html:18
+#: ckan/templates/package/activity.html:3
+#: ckan/templates/package/activity.html:6
+#: ckan/templates/package/read_base.html:21
+#: ckan/templates/user/activity_stream.html:3
+#: ckan/templates/user/activity_stream.html:6
+#: ckan/templates/user/read_base.html:20
+msgid "Activity Stream"
+msgstr "Flux d'Activités"

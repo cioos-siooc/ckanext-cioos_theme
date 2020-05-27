@@ -1,32 +1,28 @@
-$bodyfont: "adobe-garamond-pro",
-"Georgia",
-serif; //bodyfont
-$headlinefont: "nimbus-sans",
-"Arial",
-sans-serif; //headlines, captions and infoboxes
-$headerfont: "fira-sans",
-"Arial",
-sans-serif; //Site header slogan
+// $bodyfont: "adobe-garamond-pro",
+// "Georgia",
+// serif; //bodyfont
+$headlinefont: "Quicksand", "nimbus-sans", "Arial", sans-serif; //headlines, captions and infoboxes
+// $headerfont: "fira-sans", "Arial", sans-serif; //Site header slogan
 
 $darkestblack: rgba(73, 73, 72, 1); //the darkest black used for font color and body copy
-$maincolor: rgba(30, 93, 111, 1); //Header color - behind the logo - #205f71;
+// $maincolor: rgba(30, 93, 111, 1); //Header color - behind the logo - #205f71;
 $lighttextcolor: lighten($darkestblack, 95%); //white text #ffffff
-$specialseries: rgba(190, 228, 234, 1);
+// $specialseries: rgba(190, 228, 234, 1);
 $navbg: #52a79b; //Dark blue, behind nav area, behind share logos #1c4552
-$navbghover: $maincolor; //Used in pagination hover
-$hakaigrey: rgba(149, 149, 145, 1); //Used in Author color, share button BG, single page #BBB
-$hakaigreylight: rgba(243, 241, 237, 1); //Used in correction backgrounds and audio edition BG
-$body_link_color: rgba(79, 170, 189, 1); //Colour of text links in body copy
-$body_link_hover_color: $maincolor; //Colour of text link
-$rotatingheaderselectbg: rgba(0, 0, 0, 1);
-$captionlink: lighten($navbg, 50%);
-$captionlinkcolor: lighten($navbghover, 40%);
-
-
-//Layout
-$number_of_columns:4;
-$master_margin_width: 30px;
-$singlepagecontainer: 600px;
+// $navbghover: $maincolor; //Used in pagination hover
+// $hakaigrey: rgba(149, 149, 145, 1); //Used in Author color, share button BG, single page #BBB
+// $hakaigreylight: rgba(243, 241, 237, 1); //Used in correction backgrounds and audio edition BG
+// $body_link_color: rgba(79, 170, 189, 1); //Colour of text links in body copy
+// $body_link_hover_color: $maincolor; //Colour of text link
+// $rotatingheaderselectbg: rgba(0, 0, 0, 1);
+// $captionlink: lighten($navbg, 50%);
+// $captionlinkcolor: lighten($navbghover, 40%);
+//
+//
+// //Layout
+// $number_of_columns:4;
+// $master_margin_width: 30px;
+// $singlepagecontainer: 600px;
 
 //Fullscreen
 $papabreak: 1140px;
@@ -39,10 +35,6 @@ $mamawidth: 900px;
 //tablets portrait all the way down to the smallest phones.
 $teenbreak: 770px;
 $teenwidth: 100%;
-
-
-
-
 
 .media-heading {
   font-size: 16px;
@@ -83,7 +75,7 @@ $teenwidth: 100%;
    ===================================================== */
 
 .account-masthead {
-  background-color: #3c7394;
+  background-color: $navbg;
   color: white;
   border-top: 1px solid #00232e;
   background-image: none
@@ -139,51 +131,52 @@ $teenwidth: 100%;
 }
 
 
-/* ===========================================
-   The content in the middle of the front page
-   =========================================== */
+/* nav on admin page */
 
-/* Change the colors of the "Search Your Data" box. */
-/* .homepage .module-search .module-content {
-  color: rgb(68, 68, 68);
-  background-color: #f8f8f8;
-} */
-
-/* Change the colors of the "Search Your Data" box. */
-/* .homepage .module-search .module-content {
-  color: rgb(68, 68, 68);
-  background-color: #f8f8f8;
-} */
-
-/* Change the background color of the "Popular Tags" box. */
-/* .homepage .module-search .tags {
-  background-color: #52a7d7;
-} */
+.nav-tabs > li > a {
+  color: black;
+}
 
 /* ====================================
    The footer at the bottom of the site
    ==================================== */
-.site-footer {
-  background-color: #3c7394;
+
+#footer {
+  background-color: $navbg;
+  background-repeat: no-repeat;
+  background-position: 111%;
+  color: #fff;
+  padding: 10px;
 }
+
+/* The text in the footer. */
+#footer,
+#footer label,
+#footer small {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+/* The link texts in the footer. */
+#footer a {
+  color: rgba(0, 0, 0, 0.6);
+}
+
 
 body {
   background: #ffffff;
   font-family: 'Montserrat', sans-serif;
 }
 
-
-
 #topmenu {
-  background: #52A79B;
+  background: $navbg;
   color: #fff;
   overflow: hidden;
 }
 
 #topmenu nav {
-  width: 50%;
+  width: unset;
   float: right;
-  padding: 0
+  padding: 0px;
 
 }
 
@@ -195,11 +188,9 @@ body {
   vertical-align: middle;
   height: 45px;
   line-height: 45px;
-
 }
 
-
-#topmenu a {
+#topmenu a{
   color: #fff;
 }
 #topmenu img {
@@ -208,46 +199,9 @@ body {
   height: auto;
 
 }
-#mainmenu {
-  border: 1px solid #52A79B;
-  border-width: 0 0 1px 0;
-  width: 100%;
-}
-
-#mainmenu img {
-    padding: .75em 0 .25em 2em;
-    width:auto;
-  max-height: 85px
-}
-
-#mainmenu nav {
-  // width: 50%;
-  float: right;
-  padding: .75em 2em .25em 0;
-}
-
-#mainmenu ul {
-  overflow: hidden;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  justify-content: space-between;
-}
-
-#mainmenu li {
-  float: right;
-  display: block;
-  margin: 3em 0 0 0;
-  font-family: 'Quicksand', sans-serif;
-  font-weight: bold;
-  text-transform: uppercase;
-  padding-right: 15px;
-  padding-left: 15px;
-}
 
 .box,
 .wrapper {
-  //background-color: #F8F8F8;
   border-radius: 0;
   box-shadow: none;
   position: relative;
@@ -256,7 +210,7 @@ body {
   .box,
   .wrapper {
   background-color: #f8f8f8;
-  border: 1px solid #52a79b;
+  border: 1px solid $navbg;
   border-width: 0 0 0 4px;
   border-radius: 0;
   box-shadow: none;
@@ -293,32 +247,6 @@ body {
 
 /* Main navigation
 ================================================== */
-
-header nav,
-.header nav,
-.nav nav {
-  float: left;
-
-  ul#menu-primary {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-
-    li {
-      display: table-cell;
-      padding: 0;
-
-      a {
-        text-decoration: none;
-      }
-    }
-  }
-}
-
-.skip-link {
-  position: absolute;
-  left: 100000px
-}
 
 .main-nav-check,
 .mobile-nav,
@@ -701,9 +629,6 @@ header nav,
 /* ===========================================
    News widget
    =========================================== */
-.search-input-group .btn {
-  border-color: #fa7268
-}
 
 .newsitem {
   position: relative;
@@ -724,7 +649,7 @@ header nav,
   display: inline-block;
   left: 0px;
   top: 22px;
-  background: #52A79B;
+  background: $navbg;
   width: 150px;
   padding: 3px 10px;
 }
@@ -825,25 +750,6 @@ header nav,
   margin-bottom: 100px;
 }
 
-#footer {
-  background-color: #52A79B;
-  background-repeat: no-repeat;
-  background-position: 111%;
-  color: #fff;
-  padding: 10px;
-}
-
-/* The text in the footer. */
-.site-footer,
-.site-footer label,
-.site-footer small {
-  color: rgba(0, 0, 0, 0.6);
-}
-
-/* The link texts in the footer. */
-.site-footer a {
-  color: rgba(0, 0, 0, 0.6);
-}
 
 @media only screen and (max-width: $teenbreak) and (min-width: 0) {
 
@@ -896,6 +802,7 @@ div.search-input-group {
 .search-input-group .btn {
     position: absolute;
     right: 0px;
+    border-color: #fa7268;
     background: #fa7268;
     border-radius: 23px;
     width: 46px;
@@ -1040,20 +947,18 @@ div.search-input-group {
     #header-links-inner>.menu,
     #header-search {
       display: table-cell;
-      vertical-align: middle
+      vertical-align: middle;
+      padding: 4em 1em 0 1em;
     }
 
-    #header .header-links>ul>li a {
-      text-decoration: n one !important;
-      color: #0a0a0a !important
-    }
+
 
     #header .header-links li {
       float: left
     }
 
     #header .sub-menu {
-      box-shadow: #115172 0 -4px 0 0px, rgba(0, 0, 0, 0.15) 1px 1px 2px 0;
+      box-shadow: $navbg 0 -4px 0 0px, rgba(0, 0, 0, 0.15) 1px 1px 2px 0;
       float: left;
       position: absolute;
       z-index: 9999;
@@ -1073,18 +978,16 @@ div.search-input-group {
     #header- sticky .menu>li.current-menu-item>a,
     #header-sticky .menu>li.current-menu-ancestor>a,
     #header-sticky .menu>li>a:hover {
-      color: #ffc857 !important;
-      background: #FFF !important
+      color: $navbg;
+      background: #FFF
     }
 
-    #header .header-links>ul>li a {
-      text-decoration: none !important;
-    }
 
     #header .header-links>ul>li{
       font-size: 13px;
       color: #bebebe;
-      padding: 50px 28px 15px 0px
+      padding: 0 0 1em 0;
+      margin: 0 2em 0 0;
     }
 
     #header .menu>li>a {
@@ -1092,8 +995,8 @@ div.search-input-group {
     }
 
     #header .menu>li.current-menu-item>a span {
-      color: #ffc857;
-      font-weight: 700
+      color: $navbg;
+      font-weight: 400;
     }
 
     #header .menu>li.menu-item-has-children>a span:after {
@@ -1124,7 +1027,7 @@ div.search-input-group {
     #header-sticky .menu>li.current-menu-item>a span,
     #header-sticky .menu>li.current-menu-ancestor>a s pan,
     #header-sticky .menu>li>a:hover span {
-      border-color: #0a0a0a !important
+      border-color: #0a0a0a
     }
 
     #header .header-l inks>ul>li.menu-parent>a::after {
@@ -1134,8 +1037,8 @@ div.search-input-group {
       padding-left: 6px
     }
 
-    .header-fancydrop #header .header-links .sub-menu {
-      box-shadow: #115172 0 -4px 0 0px, rgba(0, 0, 0, 0.15) 1px 1px 2px 0
+    #header .header-links .sub-menu {
+      box-shadow: $navbg 0 -4px 0 0px, rgba(0, 0, 0, 0.15) 1px 1px 2px 0
     }
 
     #header .header-links .sub-menu {
@@ -1172,23 +1075,28 @@ div.search-input-group {
       position: relative
     }
 
-    #header .header-links .sub-menu a,
-    #header-sticky .header-links .sub-menu a {
-      color: #0a0a0a !important
+
+
+    #header .menu > li > a span, #header .sub-menu > li > a span{
+       font-weight: 400;
     }
 
     #header .header-links .sub-menu a {
-      color: #bebebe;
+      color: #0a0a0a;
       font-size: 13px;
       line-height: 32px;
       min-width: 100px;
       margin: 0;
       padding: 2px 10px;
-      font-weight: 400
     }
 
     #header .header-links>ul>li a {
-      text-decoration: none !important
+      text-decoration: none;
+      color: #0a0a0a;
+      font-family: Quicksand;
+      font-weight: 400;
+      font-size: 14px;
+      font-style: normal;
     }
 
     #header .menu>li>a::after {
@@ -1196,7 +1104,7 @@ div.search-input-group {
       display: block;
       width: 0;
       height: 2px;
-      background: #006e90;
+      background: $navbg;
       transition: width .5s
     }
 
@@ -1205,19 +1113,7 @@ div.search-input-group {
        width: 100%
      }
 
-    #topmenu nav {
-        width: unset;
-        padding: 0px;
-    }
-    #topmenu li {
-      float: right;
-      display: block;
-      margin: 0 0 0 35px;
-      padding: 0;
-      vertical-align: middle;
-      height: 45px;
-      line-height: 45px;
-    }
   }
 
 @import 'cioos_atlantic.scss';
+@import url(//fonts.googleapis.com/css?family=Quicksand:300,400,600,700|);
