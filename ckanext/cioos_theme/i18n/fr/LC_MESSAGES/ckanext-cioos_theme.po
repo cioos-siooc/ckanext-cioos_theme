@@ -204,8 +204,8 @@ msgstr "Chercheur principal"
 msgid "Not Specified"
 msgstr "Non précisé"
 
-msgid "<span>CIOOS</span> Data Catalogue"
-msgstr "Catalogue de données du <span>SIOOC</span>"
+msgid "<span>CIOOS Atlantic</span> Data Catalogue"
+msgstr "Catalogue de données du <span>SIOOC Atlantique</span>"
 
 msgid "CIOOS"
 msgstr "SIOOC"
