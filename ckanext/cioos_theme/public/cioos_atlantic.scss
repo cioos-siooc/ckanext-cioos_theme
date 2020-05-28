@@ -1,0 +1,186 @@
+$atlantic-primary: #e55162;
+$text-dark: #404041;
+$atlantic-secondary: #e55162;
+// Header
+#topmenu.nav.main-nav nav {
+    padding: 0 !important;
+}
+
+#header {
+    margin: 3em 0;
+}
+#header-container #header {
+    .menu {
+        > li {
+            > a {
+                &:hover {
+                    color: $atlantic-primary !important;
+                }
+                &::after {
+                    content:"";
+                    display:block;
+                    width:0;
+                    height:2px;
+                    background: $atlantic-secondary !important;
+                    transition:width .5s
+                }
+            }
+            &.current-menu-item > a {
+                color: $atlantic-primary !important;
+                span {
+                    color: $atlantic-primary;
+                    font-weight: 400;
+                }
+            }
+            &.menu-item-has-children > a span:after {
+                color: $text-dark !important;
+                font-size: 12px;
+                margin-top: 3px;
+                font-weight: 700;
+            }
+            &.current-menu-item>a span {
+                color: $atlantic-secondary !important;
+                font-weight: 400;
+            }
+        }
+    }
+    .header-links {
+        .sub-menu {
+            box-shadow: $atlantic-primary 0 -4px 0 0px, rgba(0,0,0,0.15) 1px 1px 2px 0;
+            a {
+                font-size: 14px;
+                line-height: 40px;
+                color: $text-dark !important;
+                &:hover {
+                    color: $atlantic-primary !important;
+                    transition: color 0.3s ease;
+                }
+            }
+        }
+        > ul > li {
+            font-size: 15px;
+            &:last-child {
+                padding-right: 10px;
+            }
+            a {
+                color: $text-dark !important;
+                font-family: "Montserrat", sans-serif;
+                font-size: 15px;
+            }
+        }
+    }
+}
+
+#header-container #header-sticky {
+  .menu {
+      > li {
+          > a:hover {
+              color: $atlantic-secondary;
+              background: #fff;
+          }
+      }
+  }
+}
+
+// Titles & Headings
+.title {
+    letter-spacing: -1px;
+    h1 {
+        font-size: 36px;
+        color: $text-dark;
+        margin-bottom: 5px;
+        span {
+            font-weight: 600;
+        }
+    }
+    h2 {
+        font-size: 24px;
+        margin-top: 0px;
+        span a {
+            color: $text-dark;
+        }
+    }
+}
+h3.heading {
+    font-size: 16px;
+    margin-bottom: 4px;
+}
+
+// Layout/Style on Home Page
+.homepage .module-content-end {
+    margin-bottom: 50px;
+}
+.homepage .box {
+    border-color: $atlantic-primary;
+}
+
+// Search
+.form-control {
+    border-color: #b5b5b5;
+    &:focus, &:hover {
+        border-color: $atlantic-primary;
+    }
+}
+.search-form .search-input.search-giant button {
+    background: $atlantic-primary;
+    top: 18px;
+    right: 3px;
+    width: 48px;
+    height: 48px;
+}
+.cioos-module-search {
+    .module-content {
+        padding: 0;
+        background: none;
+    }
+    .box {
+        background: none;
+        border: none;
+    }
+    .col-md-6 {
+        width: 100%;
+        padding: 0;
+    }
+}
+.cioos-search {
+    margin-left: 15px;
+}
+
+// Footer
+#footer {
+    padding: 40px;
+    .col-md-6 {
+        padding: 0;
+    }
+    a {
+        font-weight: 700;
+        &:hover {
+            text-decoration: none;
+        }
+    }
+}
+.account-masthead {
+    border-top: none;
+    background-color: $atlantic-primary;
+    .account {
+        border: none;
+        ul li {
+            border: none;
+            a {
+                color: #fff;
+                padding: 0;
+                &:hover {
+                    background-color: $atlantic-primary;
+                }
+            }
+        }
+    }
+}
+
+// Debug
+#debug-toggle {
+    bottom: 5px;
+    color: $text-dark;
+    opacity: 1 !important;
+    font-weight: 700;
+}
