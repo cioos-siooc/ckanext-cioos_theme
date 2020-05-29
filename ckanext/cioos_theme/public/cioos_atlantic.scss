@@ -1,6 +1,7 @@
 $atlantic-primary: #e55162;
 $text-dark: #404041;
 $atlantic-secondary: #e55162;
+
 // Header
 #topmenu.nav.main-nav nav {
     padding: 0 !important;
@@ -17,12 +18,7 @@ $atlantic-secondary: #e55162;
                     color: $atlantic-primary !important;
                 }
                 &::after {
-                    content:"";
-                    display:block;
-                    width:0;
-                    height:2px;
-                    background: $atlantic-secondary !important;
-                    transition:width .5s
+                    background: $atlantic-secondary;
                 }
             }
             &.current-menu-item > a {
@@ -63,7 +59,7 @@ $atlantic-secondary: #e55162;
                 padding-right: 10px;
             }
             a {
-                color: $text-dark !important;
+                color: $text-dark;
             }
         }
     }
@@ -183,7 +179,7 @@ h3.heading {
     font-weight: 700;
 }
 
-#header .header-links>ul>li a {
+#header-container #header .header-links>ul>li a {
     font-family: "Montserrat", sans-serif;
     font-size: 15px;
 }
