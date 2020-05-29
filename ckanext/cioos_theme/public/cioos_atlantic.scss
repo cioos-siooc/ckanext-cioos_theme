@@ -183,3 +183,12 @@ h3.heading {
     font-family: "Montserrat", sans-serif;
     font-size: 15px;
 }
+
+#header-container #header-links-inner>.menu{
+    padding: 0px;
+}
+
+#header-container #header .header-links>ul>li {
+    padding: 50px 28px 15px 0px;
+    margin: 0px;
+}
