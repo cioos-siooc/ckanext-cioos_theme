@@ -1,0 +1,43 @@
+{% extends "page.html" %}
+
+{% block subtitle %}{{ _('Resource Formats') }}{% endblock %}
+
+{% block breadcrumb_content %}
+  <li class="active"><a href="">{{ _('Formats') }}</a></li>
+{% endblock %}
+
+
+{% set format_registry = h.resource_formats()|dictsort(false,'key') %}
+{% set ns = namespace(letter_catagory='') %}
+{% set ns.letter_catagory = '' %}
+
+{% block primary_content %}
+  <article class="module">
+    <div class="module-content">
+      <h1 class="page-heading">{% block page_heading %}{{ _('Formats') }}{% endblock %}</h1>
+      {% block format_list %}
+        <ul class="list-unstyled">
+          {% block format_list_inner %}
+            {% for key, value in format_registry %}
+              {% set first_char = (key|trim)[0] %}
+              {% if ns.letter_catagory != first_char %}
+                {% set ns.letter_catagory = first_char %}
+                <h2>{{ ns.letter_catagory|upper() }}</h2>
+              {% endif %}
+              <li>{{key}}</li>
+            {% endfor %}
+          {% endblock %}
+        </ul>
+      {% endblock %}
+    </div>
+  </article>
+{% endblock %}
+
+{% block secondary_content %}
+  <section class="module module-narrow module-shallow">
+    <h2 class="module-heading"><i class="fa fa-info-circle"></i> {{ _('What\'s a resource format?') }}</h2>
+    <div class="module-content">
+      <p>{{ _('A resource format is based on the mime type or file extension of the resource being uploaded / linked to. A List of available format options are shown here.') }}</p>
+
+  </section>
+{% endblock %}

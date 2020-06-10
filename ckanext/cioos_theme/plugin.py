@@ -184,6 +184,18 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
     plugins.implements(plugins.IPackageController, inherit=True)
     plugins.implements(plugins.IValidators)
     plugins.implements(plugins.IAuthenticator)
+    plugins.implements(plugins.IRoutes, inherit=True)
+
+
+
+
+
+    # IRoutes
+    def before_map(self, map):
+        controller = 'ckanext.cioos_theme.controller:CioosThemeController'
+        map.redirect('/formats', '/formats/index.html')
+        map.connect('formats.index', '/formats/index.html', controller=controller, action="index")
+        return map
 
     # IAuthenticator
 
