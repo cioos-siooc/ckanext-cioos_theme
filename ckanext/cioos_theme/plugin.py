@@ -11,6 +11,7 @@ from ckan.common import c
 from six.moves.urllib.parse import urlparse
 import string
 from ckan.common import _
+import ckanext.cioos_theme.logic as cioos_logic
 
 StopOnError = df.StopOnError
 missing = df.missing
@@ -184,6 +185,23 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
     plugins.implements(plugins.IPackageController, inherit=True)
     plugins.implements(plugins.IValidators)
     plugins.implements(plugins.IAuthenticator)
+    plugins.implements(plugins.IActions)
+    plugins.implements(plugins.IRoutes, inherit=True)
+
+    # IRoutes
+    def before_map(self, map_):
+        map_.connect(
+            'cioos_package_export',
+            '/dataset/{package_id}.{extension}',
+            controller='ckanext.cioos_theme.controller:PackageExportController',
+            action = 'cioos_package_export'
+        )
+        return map_
+    # IActions
+    def get_actions(self):
+        return {
+            'cioos_package_export': cioos_logic.cioos_package_export,
+             }
 
     # IAuthenticator
 
