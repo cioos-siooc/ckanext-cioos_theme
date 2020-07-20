@@ -47,7 +47,7 @@ msgstr "Populaire"
 #: ckanext/cioos_theme/templates/group/read.html:19
 #: ckanext/cioos_theme/templates/package/search.html:38
 msgid "Search datasets"
-msgstr "Rechercher les jeux de donnée"
+msgstr "Rechercher les jeux de données"
 
 #: ckanext/cioos_theme/templates/home/snippets/promoted.html:8
 msgid "Welcome to CKAN"
@@ -434,3 +434,18 @@ msgstr "Plus Récent"
 
 msgid "E.g. temperature"
 msgstr "Ex. température"
+
+#: ckan/templates/group/activity_stream.html:3
+#: ckan/templates/group/activity_stream.html:6
+#: ckan/templates/group/read_base.html:18
+#: ckan/templates/organization/activity_stream.html:3
+#: ckan/templates/organization/activity_stream.html:6
+#: ckan/templates/organization/read_base.html:18
+#: ckan/templates/package/activity.html:3
+#: ckan/templates/package/activity.html:6
+#: ckan/templates/package/read_base.html:21
+#: ckan/templates/user/activity_stream.html:3
+#: ckan/templates/user/activity_stream.html:6
+#: ckan/templates/user/read_base.html:20
+msgid "Activity Stream"
+msgstr "Flux d'Activités"
