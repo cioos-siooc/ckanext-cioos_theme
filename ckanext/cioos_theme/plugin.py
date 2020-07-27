@@ -268,7 +268,8 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             # 'cioos_get_organization_dict_extra': cioos_helpers.get_organization_dict_extra
             'cioos_datasets': cioos_helpers.cioos_datasets,
             'cioos_count_datasets': cioos_helpers.cioos_count_datasets,
-            'cioos_get_eovs': cioos_helpers.cioos_get_eovs
+            'cioos_get_eovs': cioos_helpers.cioos_get_eovs,
+            'cioos_get_locale_url': self.get_locale_url
         }
 
     def get_validators(self):
@@ -565,3 +566,10 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
     def lang(self):
         from ckantoolkit import h
         return h.lang()
+
+    def get_locale_url(self, base_url, locale_urls):
+        default_locale = toolkit.config.get('ckan.locale_default', toolkit.config.get('ckan.locales_offered', ['en'])[0])
+        lang = toolkit.h.lang() or default_locale
+        if base_url.endswith('/'):
+            return base_url + locale_urls.get(lang)
+        return base_url + '/' + locale_urls.get(lang)
