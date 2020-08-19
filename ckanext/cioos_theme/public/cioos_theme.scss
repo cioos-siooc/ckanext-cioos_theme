@@ -1,6 +1,7 @@
 // $bodyfont: "adobe-garamond-pro",
 // "Georgia",
 // serif; //bodyfont
+$defaultfont: Raleway, Helvetica, Arial;
 $headlinefont: "Quicksand", "nimbus-sans", "Arial", sans-serif; //headlines, captions and infoboxes
 // $headerfont: "fira-sans", "Arial", sans-serif; //Site header slogan
 $darkestblack: rgba(73, 73, 72, 1); //the darkest black used for font color and body copy
@@ -143,7 +144,8 @@ $teenwidth: 100%;
 
 body {
   background: #ffffff;
-  font-family: 'Montserrat', sans-serif;
+  //font-family: 'Montserrat', sans-serif;
+  font-family: $defaultfont;
 }
 
 #topmenu {
@@ -1159,7 +1161,7 @@ div.search-input-group {
   select,
   textarea {
     color: rgba(255,255,255,1);
-    font-family: Raleway, Helvetica, Arial;
+    font-family: $defaultfont;
     word-wrap: break-word;
   }
 
@@ -1180,26 +1182,33 @@ div.search-input-group {
     color: white;
   }
 
-  .last {
-    float: right;
-    margin-right: 0;
+  .one_half, .one_third, .two_third, .one_fourth, .three_fourth, .one_fifth, .two_fifth, .three_fifth, .four_fifth, .one_sixth, .five_sixth {
+      margin-right: 2.6%;
+      margin-bottom: 20px;
+      position: relative;
+      float: left;
+      padding: 0;
   }
 
-  #footer-col1,
-  #footer-col2 {
-    margin-right: 2.55%;
-    margin-bottom: 20px;
-    width: 25%;
+  .one_sixth {
+      width: 14.5%;
   }
 
-  #footer-col3.last {
+  .one_third {
+      width: 31.6%;
+  }
+  
+  .one_half {
+    width: 48.7%;
+  }
+
+  .width_auto {
     width: auto;
   }
 
-  #footer-col1,
-  #footer-col2,
-  #footer-col3 {
-    padding: 0;
+  .last {
+    float: right;
+    margin-right: 0;
   }
 
   .widget {
