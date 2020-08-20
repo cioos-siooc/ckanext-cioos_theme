@@ -2,6 +2,7 @@
   color: #ffc857;
   background: #FFF
 }
+
 #header-container #header .header-links>ul>li.current-menu-item>a span {
   color: #ffc857;
 }
@@ -15,15 +16,15 @@
 }
 
 #main-nav-check:checked~.mobile-nav ul.menu ul.subshow li a {
-    line-height: 2.5em;
-    border-width: 1px 0 0 0;
-    transition: all .2s ease;
-    height: auto;
-    width: 100%
-  }
+  line-height: 2.5em;
+  border-width: 1px 0 0 0;
+  transition: all .2s ease;
+  height: auto;
+  width: 100%
+}
 
 #header-container #header .header-links>ul>li a {
-    color: #58595b;
+  //color: #58595b;
 }
 
 .homepage .box,
@@ -39,10 +40,19 @@
 .account-masthead {
   background-image: none;
   background: #006e90;
+  border-top-width: 0px;
 }
 
-#footer {
-  background: #006e90;
+.authed {
+  border-top: 1px solid #00232e;
+}
+
+.account-masthead .not-authed ul li {
+  border-left: 0px;
+}
+
+.account-masthead .not-authed {
+  border-right: 0px;
 }
 
 .account-masthead .account ul li a {
@@ -72,7 +82,75 @@
 }
 
 #header-container #header .menu>li>a::after {
-background:rgb(185, 214, 242);
+  background: rgb(185, 214, 242);
 }
 
+.translation_icon_group {
+  padding-left: 3px;
+  font-size: medium;
+}
+
+.title h2 span a,
+.title h2 span a:hover {
+  color: #ff6b35;
+}
+
+.search-form .search-input.search-giant button {
+  background-color: #ff6b35;
+}
+
+.form-control {
+  border-color: #ff6b35;
+}
+
+#footer {
+  background: #006e90;
+}
+
+#footer a {
+  color: #FFFFFF;
+  font-family: inherit;
+}
+
+#footer .mc-field-group input[type=email] {
+  border: 1px solid white;
+  padding: 5px 20px;
+  background: rgba(47, 47, 47, 0.1);
+  color: #FFFFFF;
+}
+
+#footer .subscribe_container {
+  display: -ms-flexbox;
+  display: flex;
+  width: 28em;
+  margin-top: 1em;
+}
+
+#footer input.subscribe {
+  overflow: hidden;
+  color: #FFF;
+  text-align: center;
+  background: #115172;
+  border: 1px solid rgb(255, 255, 255);
+  box-shadow: 0 0 0;
+  transition: all 0.3s ease;
+  line-height: 13px;
+  margin: 0;
+  cursor: pointer;
+  -webkit-appearance: button;
+  padding: 11px 24px;
+}
+
+#footer input.subscribe:hover {
+  color: #115172;
+  background: rgba(17, 81, 114, 0.2);
+}
+
+#footer #footer-col1, #footer #footer-col2 {
+  width: 25%;
+}
+
+#topmenu i.fa-facebook {
+  font-size: 12px;
+}
 /*# sourceMappingURL=pacific.css.map */

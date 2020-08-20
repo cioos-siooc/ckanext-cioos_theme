@@ -1110,16 +1110,17 @@ div.search-input-group {
       content: '';
       display: block;
       width: 0;
-      height: 2px;
+      height: 3px;
       background: $navbg;
       transition: width .5s
     }
 
     #header .menu>li>a:hover::after,
     #header .menu>li.current_page_item>a::after {
-       width: 100%
+       width: 100%;
+       margin-top: -3px;
      }
 
   }
 
-  @import url(//fonts.googleapis.com/css?family=Quicksand:300,400,600,700|);
+  @import url(//fonts.googleapis.com/css?family=Montserrat:400,600,700,800,900|Quicksand:300,400,600|PT+Sans:400|Raleway:400);
