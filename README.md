@@ -36,7 +36,7 @@ To install ckanext-cioos_theme:
 
      pip install ckanext-cioos_theme
 
-3. Add ``sep`` to the ``ckan.plugins`` setting in your CKAN
+3. Add ``cioos_theme`` to the ``ckan.plugins`` setting in your CKAN
    config file (by default the config file is located at
    ``/etc/ckan/default/production.ini``).
 
