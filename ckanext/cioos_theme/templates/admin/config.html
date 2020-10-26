@@ -37,6 +37,8 @@
 
       {{ form.input('ckan.header_file_name', id='field-ckan-header-file-name', label=_('Custom header filename'), value=data['ckan.header_file_name'], error=error) }}
 
+      {{ form.input('ckan.footer_file_name', id='field-ckan-footer-file-name', label=_('Custom footer filename'), value=data['ckan.footer_file_name'], error=error) }}
+
       {% endblock %}
       <div class="form-actions">
         <a href="{% url_for 'admin.reset_config' %}" class="btn btn-danger pull-left" data-module="confirm-action" data-module-content="{{ _('Are you sure you want to reset the config?') }}">{{ _('Reset') }}</a>
