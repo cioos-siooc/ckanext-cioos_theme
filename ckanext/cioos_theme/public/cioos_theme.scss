@@ -114,6 +114,11 @@ body {
   overflow: hidden;
 }
 
+#topmenu .container {
+  padding-left: 0;
+  padding-right: 0;
+}
+
 #topmenu nav {
   width: unset;
   float: right;
@@ -187,10 +192,7 @@ body {
     //padding-right: 13px;
   }
 }
-.container {
-  padding-left: 0;
-  padding-right: 0;
-}
+
 /* Main navigation
 ================================================== */
 .main-nav-check,
@@ -783,7 +785,7 @@ div.search-input-group {
   #header-core
   {
     display: block;
-    max-width: 1170px; // increased from 1140 to acount for row maring of -15px left and right
+    max-width: 1140px;
     margin: 0 auto;
   }
 
