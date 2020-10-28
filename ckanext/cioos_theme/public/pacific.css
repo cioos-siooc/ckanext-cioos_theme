@@ -1,9 +1,9 @@
-#header-container #header .header-links>ul>li a:hover {
+#header-container #header .menu>li a:hover {
   color: #ffc857;
   background: #FFF
 }
 
-#header-container #header .header-links>ul>li.current-menu-item>a span {
+#header-container #header .menu>li.current-menu-item>a span {
   color: #ffc857;
 }
 
@@ -21,10 +21,6 @@
   transition: all .2s ease;
   height: auto;
   width: 100%
-}
-
-#header-container #header .header-links>ul>li a {
-  //color: #58595b;
 }
 
 .homepage .box,

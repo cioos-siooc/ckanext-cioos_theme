@@ -43,7 +43,7 @@
       <nav>
         <ul>
           {{ include_site_social() }}
-          <li>
+          <li id="language_picker">
             {%- if h.lang() == 'en' -%}
               <a href="{% url_for h.current_url(), locale='fr' %}" tabindex="0" aria-label="French/English">FR</a>
             {%- else -%}
