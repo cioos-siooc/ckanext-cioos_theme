@@ -783,7 +783,7 @@ div.search-input-group {
   #header-core
   {
     display: block;
-    max-width: 1140px;
+    max-width: 1170px; // increased from 1140 to acount for row maring of -15px left and right
     margin: 0 auto;
   }
 
