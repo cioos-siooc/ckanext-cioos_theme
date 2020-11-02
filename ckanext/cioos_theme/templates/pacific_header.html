@@ -47,7 +47,7 @@
         <span>{{_('DATA TOOLS')}}</span>
       </a>
     </li>
-    <li id="menu-item-1652" class="menu-item menu-item-has-children menu-parent current-menu-item current_page_item">
+    <li id="menu-item-1652" class="menu-item menu-item-has-children menu-parent current-menu-item current_page_item last">
       <a href="{{ h.url_for('home.index') }}">
         <span>{{_('DATA CATALOGUE')}}</span>
       </a>
@@ -61,8 +61,7 @@
       </ul>
     </li>
     <ul class="shareicons">
-      <li><a href="http://twitter.com/cioos_siooc" tabindex="0" aria-label="Twitter"><i class="fa fa-twitter"></i></a>
-      </li>
+      {{ include_site_social() }}
       <li>
         {%- if h.lang() == 'en' -%}
         <a href="{% url_for h.current_url(), locale='fr' %}" tabindex="0" aria-label="French/English">FR</a>
@@ -123,7 +122,7 @@
       <span>{{_('DATA TOOLS')}}</span>
     </a>
   </li>
-  <li id="menu-item-1652" class="menu-item menu-item-has-children menu-parent current-menu-item current_page_item">
+  <li id="menu-item-1652" class="menu-item menu-item-has-children menu-parent current-menu-item current_page_item last">
     <a href="{{ h.url_for('home.index') }}"><span class="mega-indicator">{{_('DATA CATALOGUE')}}</span>
     </a>
     <ul class="sub-menu" style=" min-width: 161px;">
@@ -137,4 +136,11 @@
   </li>
 </ul>
 {% endblock %}
+{% endmacro %}
+
+{% macro include_site_social() %}
+  {% block header_social_list %}
+    <li><a href="https://www.facebook.com/CIOOSPacific/" tabindex="0" aria-label="Facebook"><i class="fa fa-facebook"></i></a></li>
+    <li><a href="http://twitter.com/cioos_siooc" tabindex="0" aria-label="Twitter"><i class="fa fa-twitter"></i></a></li>
+  {% endblock %}
 {% endmacro %}
