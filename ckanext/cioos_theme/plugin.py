@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
 import ckan.model as model
@@ -20,6 +22,17 @@ StopOnError = df.StopOnError
 missing = df.missing
 log = logging.getLogger(__name__)
 
+show_responsible_organizations = toolkit.asbool(
+    toolkit.config.get('cioos.show_responsible_organizations_facet', "True"))
+
+contact_email = toolkit.config.get('cioos.contact_email', "info@cioos.ca")
+organizations_info_text = toolkit.config.get(
+    'cioos.organizations_info_text', 
+    { 
+        "en":"CKAN Organizations are used to create, manage and publish collections of datasets. Users can have different roles within an Organization, depending on their level of authorisation to create, edit and publish.",
+        "fr":u"Les Organisations CKAN sont utilisées pour créer, gérer et publier des collections de jeux de données. Les utilisateurs peuvent avoir différents rôles au sein d'une Organisation, en fonction de leur niveau d'autorisation pour créer, éditer et publier."
+    }
+)
 
 def load_json(j):
     try:
@@ -31,71 +44,6 @@ def load_json(j):
 
 def geojson_to_bbox(o):
     return shape(o).bounds
-
-
-# from the docs
-# def most_popular_groups():
-#     '''Return a sorted list of the groups with the most datasets.'''
-#
-#     # Get a list of all the site's groups from CKAN, sorted by number of
-#     # datasets.
-#     groups = toolkit.get_action('group_list')(
-#         data_dict={'sort': 'package_count desc', 'all_fields': True})
-#
-#     # Truncate the list to the 10 most popular groups only.
-#     groups = groups[:5]
-#
-#     return groups
-#
-#
-# def groups():
-#     '''Return a sorted list of the groups'''
-#
-#     # Get a list of all the site's groups from CKAN, sorted by number of
-#     # datasets.
-#     groups = toolkit.get_action('group_list')(
-#         data_dict={'sort': 'title asc', 'all_fields': True})
-#
-#     return groups
-#
-#
-# # from the docs
-# def most_popular_datasets():
-#     '''Return a sorted list of the groups with the most datasets.'''
-#
-#     # Get a list of all the site's groups from CKAN, sorted by number of
-#     # datasets.
-#     groups = toolkit.get_action('package_search')(
-#         data_dict={'sort': 'views_recent desc', 'all_fields': True})
-#
-#     # Truncate the list to the 10 most popular groups only.
-#     groups = groups[:5]
-#
-#     return groups
-#
-#
-# def most_popular_resources():
-#     '''Return a sorted list of the groups with the most datasets.'''
-#
-#     # Get a list of all the site's groups from CKAN, sorted by number of
-#     # datasets.
-#     groups = toolkit.get_action('resource_search')(
-#         data_dict={'sort': 'views_recent desc', 'all_fields': True})
-#
-#     # Truncate the list to the 10 most popular groups only.
-#     groups = groups[:5]
-#
-#     return groups
-#
-# def recent_packages_html():
-#     '''Return a sorted list of the groups with the most datasets.'''
-#
-#     # Get a list of all the site's groups from CKAN, sorted by number of
-#     # datasets.
-#     groups = toolkit.get_action('recently_changed_packages_activity_list_html')(
-#         data_dict={'limit': '5'})
-#
-#     return groups
 
 # IValidators
 
@@ -263,6 +211,8 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         # extension they belong to, to avoid clashing with functions from
         # other extensions.
         return {
+            'cioos_organizations_info_text': lambda: organizations_info_text,
+            'cioos_contact_email': lambda: contact_email,
             'cioos_load_json': load_json,
             'cioos_geojson_to_bbox': geojson_to_bbox,
             # 'cioos_most_popular_groups': most_popular_groups,
@@ -361,7 +311,9 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             facets_dict.clear()
             # facets_dict['themes'] = toolkit._('Theme')
             facets_dict['eov'] = toolkit._('Ocean Variables')
-            facets_dict['responsible_organizations'] = toolkit._('Responsible Organization')
+            
+            if show_responsible_organizations:
+                facets_dict['responsible_organizations'] = toolkit._('Responsible Organization')
 
             for key, value in ordered_dict.items():
                 # Make translation 'on the fly' of facet tags.
