@@ -11,9 +11,9 @@
 
 {# import macros from ra header file #}
 {% if self._TemplateReference__context.name != g.header_file_name %}
-  {% from '%s' % g.header_file_name or 'header_wp.html' import include_site_header, include_mobile_header with context %}
+  {% from '%s' % g.header_file_name or 'header_wp.html' import include_site_header, include_mobile_header, include_site_social with context %}
 {% else %}
-  {% from 'header_wp.html' import include_site_header, include_mobile_header with context %}
+  {% from 'header_wp.html' import include_site_header, include_mobile_header, include_site_social with context %}
 {% endif %}
 
 <div id="header-container">
@@ -42,8 +42,8 @@
     <div class="container">
       <nav>
         <ul>
-          <li><a href="http://twitter.com/cioos_siooc" tabindex="0" aria-label="Twitter"><i class="fa fa-twitter"></i></a></li>
-          <li>
+          {{ include_site_social() }}
+          <li id="language_picker">
             {%- if h.lang() == 'en' -%}
               <a href="{% url_for h.current_url(), locale='fr' %}" tabindex="0" aria-label="French/English">FR</a>
             {%- else -%}
@@ -52,7 +52,7 @@
           </li>
           <li>
             <a href="https://cioos.ca">
-              <img class="mega-menu-logo" width="259" height="37" src="{{ h.url_for_static_or_external('/base/images/logos/cioos-banner-' + h.lang() +'.png') }}">
+              <img class="mega-menu-logo" width="auto" height="37" src="{{ h.url_for_static_or_external('/base/images/logos/cioos-banner-' + h.lang() +'.png') }}">
             </a>
           </li>
           </ul>
