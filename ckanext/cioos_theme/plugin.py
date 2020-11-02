@@ -1,5 +1,7 @@
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
+import ckan.model as model
+from ckan.logic import NotFound
 import ckanext.cioos_theme.helpers as cioos_helpers
 from ckanext.scheming.validation import scheming_validator
 from ckan.lib.plugins import DefaultTranslation
@@ -11,6 +13,8 @@ from ckan.common import c
 from six.moves.urllib.parse import urlparse
 import string
 from ckan.common import _
+import urllib2
+import xml.etree.ElementTree as ET
 
 StopOnError = df.StopOnError
 missing = df.missing
@@ -136,6 +140,7 @@ def clean_and_populate_eovs(field, schema):
 
     return validator
 
+
 @scheming_validator
 def fluent_field_default(field, schema):
 
@@ -158,6 +163,7 @@ def fluent_field_default(field, schema):
         return data
     return validator
 
+
 def url_validator_with_port(key, data, errors, context):
     ''' Checks that the provided value (if it is present) is a valid URL, accepts port numbers in URL '''
 
@@ -175,6 +181,7 @@ def url_validator_with_port(key, data, errors, context):
         # url is invalid
         pass
     errors[key].append(_('Please provide a valid URL'))
+
 
 class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
     plugins.implements(plugins.ITranslation)
@@ -378,6 +385,10 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
 
     # modfiey tags, keywords, and eov fields so that they properly index
     def before_index(self, data_dict):
+        data_type = data_dict.get('type')
+        if data_type != 'dataset':
+            return data_dict
+
         try:
             tags_dict = json.loads(data_dict.get('keywords', '{}'))
         except Exception as err:
@@ -386,7 +397,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             log.error("error:%s, keywords:%r", err, data_dict.get('keywords', '{}'))
             tags_dict = {"en": [], "fr": []}
 
-        data_dict['responsible_organizations'] = [x.get('organisation-name','').strip() for x in json.loads(data_dict.get('cited-responsible-party', '{}')) if x.get('role') in ['originator']]
+        data_dict['responsible_organizations'] = [x.get('organisation-name', '').strip() for x in json.loads(data_dict.get('cited-responsible-party', '{}')) if x.get('role') in ['originator']]
 
         # update tag list by language
         data_dict['tags_en'] = tags_dict.get('en', [])
@@ -395,8 +406,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
 
         # update organization list by language
         org_id = data_dict.get('owner_org')
-        data_type = data_dict.get('type')
-        if org_id and data_type == 'dataset':
+        if org_id:
             org_details = toolkit.get_action('organization_show')(
                 data_dict={
                     'id': org_id,
@@ -445,6 +455,61 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         # eov is multi select so it is a json list rather then a python list
         if(data_dict.get('eov')):
             data_dict['eov'] = load_json(data_dict['eov'])
+
+        # Index Source XML
+        # harvest object will be json if harvested from another ckan instance. TODO check it is xml
+        # try harvest object (xml)
+        h_object_id = data_dict.get('harvest_object_id', 'none')
+        context = {'model': model,
+                   'session': model.Session,
+                   'ignore_auth': True}
+
+        pkg_dict = {'id': h_object_id}
+
+        try:
+            harvest_object = toolkit.get_action('harvest_object_show')(context, pkg_dict)
+            content = harvest_object.get('content', '')
+            if content.startswith('<'):
+                data_dict['extras_harvest_document_content'] = harvest_object.get('content', '')
+            else:
+                raise NotFound
+        except NotFound:
+            log.warning('Unable to find harvest object "%s" '
+                        'referenced by dataset "%s". Trying xml url',
+                        pkg_dict['id'], data_dict['id'])
+
+            # try reading from xml url
+            xml_str = ''
+            xml_url = load_json(data_dict.get('xml_location_url'))
+            # single file
+            if xml_url and isinstance(xml_url, basestring):
+                try:
+                    xml_str = urllib2.urlopen(xml_url).read(100000)  # read only 100 000 chars
+                    ET.XML(xml_str)  # test for valid xml
+                    data_dict['extras_harvest_document_content'] = xml_str
+                except ET.ParseError as e:
+                    log.error('XML string is invalid. %s', e)
+                except Exception as e:
+                    log.error('Unable to read from xml url "%s" '
+                              'referenced by dataset "%s" Error: %s',
+                              xml_url, data_dict['id'], e)
+            # list of files
+            elif xml_url and isinstance(xml_url, list):
+                for xml_file in xml_url:
+                    try:
+                        xml_file_str = urllib2.urlopen(xml_file).read(100000)  # read only 100 000 chars
+                        xml_root_str = ET.tostring(ET.XML(xml_file_str))
+                        xml_str = xml_str + '<doc>' + xml_root_str + '</doc>'
+                    except ET.ParseError as e:
+                        log.error('XML string is invalid. %s', e)
+                    except Exception as e:
+                        log.error('Unable to read from xml url "%s" '
+                                  'referenced by dataset "%s" Error: %s',
+                                  xml_file, data_dict['id'], e)
+                if xml_str:
+                    xml_str = xml_str = '<?xml version="1.0" encoding="utf-8"?><docs>' + xml_str + '</docs>'
+                    data_dict['extras_harvest_document_content'] = xml_str
+
         return data_dict
 
     # update eov search facets with keys from choices list in the scheming extension schema
@@ -465,10 +530,10 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             choices = toolkit.h.scheming_field_choices(field)
             new_eovs = []
             for item in items:
-                for c in choices:
-                    if c['value'] == item['name']:
-                        item['display_name'] = toolkit.h.scheming_language_text(c.get('label', item['name']))
-                        item['category'] = c.get('catagory', u'')
+                for ch in choices:
+                    if ch['value'] == item['name']:
+                        item['display_name'] = toolkit.h.scheming_language_text(ch.get('label', item['name']))
+                        item['category'] = ch.get('catagory', u'')
                 new_eovs.append(item)
             search_results['search_facets']['eov']['items'] = new_eovs
 
@@ -558,7 +623,6 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                 package_dict['organization']['image_url_translated'] = org_image_url
 
         return package_dict
-
 
     # Custom section
     def read_template(self):
