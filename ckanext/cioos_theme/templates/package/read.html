@@ -56,9 +56,9 @@
   {% endblock %}
 
   {% block package_citation %}
-    {% if pkg.doi %}
-      {% snippet "doi/snippets/package_citation.html", pkg_dict=pkg %}
-    {% endif %}
+    {# if pkg.citation #}
+      {% snippet "package/snippets/package_citation.html", pkg_dict=pkg %}
+    {# endif #}
   {% endblock %}
 
   {% block package_metadata_source %}

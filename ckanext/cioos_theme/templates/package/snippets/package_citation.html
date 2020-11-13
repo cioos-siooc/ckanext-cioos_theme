@@ -1,0 +1,111 @@
+{#
+Renders a citation for a package
+#}
+
+{% block citation %}
+  <section class="citation">
+
+    <h3>{{ _('Citation') }}</h3>
+
+    <table class="table table-bordered">
+      <tbody>
+        <tr>
+          <td>
+            <p id=cite_output></p>
+            <div class="dropdown btn-group" style="float:right;">
+              <a href="#" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                Download Citation
+                <span class="caret"></span>
+              </a>
+              <ul class="dropdown-menu">
+                <li>
+                  <button class="dropdown-item" type="button" onclick="loadCite(cite_template, 'text', 'bibtex', true)">
+                      BibTeX
+                  </button>
+                </li>
+                <li>
+                  <button class="dropdown-item" type="button" onclick="loadCite(cite_template, 'text', 'bibtxt', true)">
+                      Bib.TXT
+                  </button>
+                </li>
+                <li>
+                  <button class="dropdown-item" type="button" onclick="loadCite(cite_template, 'text', 'bibliography', true)">
+                      CSL Bibliography
+                  </button>
+                </li>
+                <li>
+                  <button class="dropdown-item" type="button" onclick="loadCite(cite_template, 'text', 'citation', true)">
+                      CSL Citation
+                  </button>
+                </li>
+                <li>
+                  <button class="dropdown-item" type="button" onclick="loadCite(cite_template, 'text', 'ris', true)">
+                      RIS
+                  </button>
+                </li>
+                <li>
+                  <button class="dropdown-item" type="button" onclick="loadCite(cite_template, 'text', 'label', true)">
+                      authorTitleYear
+                  </button>
+                </li>
+                <li>
+                  <button class="dropdown-item" type="button" onclick="loadCite(cite_template, 'text', 'data', true)">
+                      JSON
+                  </button>
+                </li>
+              </ul>
+            </div>
+            <span style="float:right; margin-right:5px;">
+              <label for="template">Style</label>
+              <select id="cite_template name="template" size="1" onChange="loadCite(this.value); cite_template=this.value;">
+              <option value="apa" selected="selected">APA</option>
+              <option value="vancouver">Vancouver</option>
+              <option value="harvard1">Harvard</option>
+              </select>
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+
+  <style>
+  .btn-secondary {
+      /* background-color: lightgrey; */
+      border-color: #333333;
+      color: #333333;
+      height: 28px;
+      line-height: 20px;
+      padding: 3px 12px;
+  }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/citation-js@0.4.0-8" type="text/javascript"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.2/dist/FileSaver.min.js" type="text/javascript"></script>
+
+  <script>
+    const Cite = require('citation-js');
+
+    async function loadCite(template_style = 'apa', output_type = 'html', cite_format = 'bibliography', download = false){
+      let cite_data = await Cite.async("{{ h.scheming_language_text(pkg_dict.get('citation')) }}")
+
+      let output = cite_data.format(cite_format, {
+        format: output_type,
+        type: output_type,
+        template: template_style,
+        lang: 'en-US'
+      })
+      if(download == false){
+        document.getElementById("cite_output").innerHTML=output;
+      }else{
+        var blob = new Blob([output], {type: "text/plain;charset=utf-8"});
+        saveAs(blob, cite_format + ".txt");
+      }
+      console.log(output);
+    }
+    var cite_template = 'apa';
+    loadCite();
+  </script>
+
+{% endblock %}
