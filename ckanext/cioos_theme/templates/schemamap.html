@@ -1,0 +1,61 @@
+{% extends "page.html" %}
+
+{% block subtitle %}{{ _('Schema Map') }}{% endblock %}
+
+{% block breadcrumb_content %}
+  <li class="active">{% link_for _('Schema Map'), controller='ckanext.cioos_theme.plugin:CIOOSController', action='schemamap' %}</li>
+{% endblock %}
+
+{% block primary %}
+  <article class="module">
+    <div class="module-content">
+    {% block schema_map %}
+      <section id=schemamap>
+      {{ h.cioos_schema_field_map() }}
+      </section>
+    {% endblock %}
+    <button type="button" onclick="saveMD()">
+        SaveAs Markdown
+    </button>
+    </div>
+  </article>
+
+  <style>
+    tr.child1 i{
+      margin-left: 10px;
+      margin-right: 5px;
+    }
+    tr.child2 i{
+      margin-left: 20px;
+      margin-right: 5px;
+    }
+    tr.child3 i{
+      margin-left: 30px;
+      margin-right: 5px;
+    }
+    tr.child4 i{
+      margin-left: 40px;
+      margin-right: 5px;
+    }
+    td span.required{
+      font-weight: bold;
+      color: darkred;
+    }
+
+  </style>
+  <script src="{{h.url_for_static('/js/htmltabletomarkdown.js')}}" type="text/javascript"></script>
+  <script src="{{h.url_for_static('/js/FileSaver.min.js')}}" type="text/javascript"></script>
+
+  <script>
+    function saveMD(){
+
+      let el = document.querySelector("#schemamap table");
+      let md = toMarkdown(el);
+
+      let blob = new Blob([md], {type: "text/plain;charset=utf-8"});
+      saveAs(blob, "schema_map.md");
+    }
+  </script>
+{% endblock %}
+
+{% block secondary %}{% endblock %}

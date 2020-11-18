@@ -16,6 +16,8 @@ from ckan.common import config
 from paste.deploy.converters import asbool
 import copy
 import logging
+import json
+import jsonpickle
 log = logging.getLogger(__name__)
 
 get_action = logic.get_action
@@ -130,6 +132,117 @@ def cioos_datasets():
     # Get a list of all the site's datasets from CKAN
     datasets = logic.get_action('package_search')(context, {"fl": "id"})
     return datasets
+
+def cioos_schema_field_map():
+    from ckanext.spatial.model import ISODocument
+    import jinja2
+
+    map = [
+        {'schema': 'title_translated', 'spatial': 'title'},
+        {'schema': 'notes_translated', 'spatial': 'abstract'},
+        {'schema': 'name', 'spatial': 'unique_resource_identifier'},
+        {'schema': ['keywords', 'eov'], 'spatial': 'keywords'},
+        {'schema': ['bbox-north-lat', 'bbox-south-lat', 'bbox-east-long', 'bbox-west-long'], 'spatial': 'bbox'}
+    ]
+
+    mapkey = {x['spatial']: x['schema'] for x in map}
+
+    schema = toolkit.h.scheming_get_dataset_schema('dataset')
+    fields = schema['dataset_fields']
+    doc = ISODocument('<xml></xml>')
+    j = jsonpickle.encode(doc.elements)
+
+    # output = '|name|*|xml path|'
+    # for item in json.loads(j):
+    #     output += '|' + item['name'] + '|' + item['multiplicity'] + '|' + ',\n'.join(item['search_paths']) + '|'
+
+    output = '<table class="table table-striped table-bordered table-condensed"><thead><tr><th>Req</th><th style="width:200px;">schema name</th><th style="width:200px;">harvest name</th><th style="width:40px;">N</th><th>xml path</th></tr></thead><tbody>'
+    matched_schema_fields = []
+    for item in json.loads(j):
+        sp = item['search_paths']
+        if isinstance(item['search_paths'], list):
+            sp = '<br/>'.join(item['search_paths'])
+
+        search_item = mapkey.get(item['name'], item['name'])
+        field = toolkit.h.scheming_field_by_name(fields, search_item)
+        if isinstance(search_item, list):
+            fn = []
+            fl = []
+            for x in search_item:
+                field = toolkit.h.scheming_field_by_name(fields, x)
+                fn.append(field['field_name'])
+                fl.append(toolkit.h.scheming_language_text(field['label']))
+                matched_schema_fields.append(field['field_name'])
+            field = {}
+            field['field_name'] = ',<br/>'.join(fn)
+            field['label'] = ',<br/>'.join(fl)
+
+        schema_name = ''
+        schema_label = ''
+        subfields = None
+        required = ''
+
+        if field:
+            schema_name = field['field_name']
+            schema_label = ' (' + toolkit.h.scheming_language_text(field['label']) + ')'
+            subfields = field.get('subfields')
+            if field.get('required'):
+                required = '<span class="required">*</span>'
+            matched_schema_fields.append(schema_name)
+
+        output = output + '<tr><td>' + required + '</td><td>' + schema_name + schema_label + '</td><td>' + item['name'] + '</td><td>' + item['multiplicity'] + '</td><td>' + sp + '</td></tr>'
+        output = output + cioos_schema_field_map_child(subfields, item.get('elements'), "", 1, matched_schema_fields)
+
+    for field in fields:
+        if field['field_name'] not in matched_schema_fields:
+            schema_name = field['field_name']
+            schema_label = ' (' + toolkit.h.scheming_language_text(field['label']) + ')'
+            matched_schema_fields.append(schema_name)
+            output = output + '<tr><td></td><td>' + schema_name + schema_label + '</td><td>' + '</td><td>' + '</td><td>' + '</td></tr>'
+    return jinja2.Markup(output + '</tbody></table>')
+
+
+def cioos_schema_field_map_child(schema_subfields, harvest_elements, path, indent, matched_schema_fields):
+    output = ''
+    if harvest_elements and isinstance(harvest_elements, list):
+        for item in harvest_elements:
+            if not item.get('name'):
+                continue
+            sp = item['search_paths']
+            if isinstance(item['search_paths'], list):
+                sp = '<br/>'.join(item['search_paths'])
+
+            schema_name = ''
+            schema_label = ''
+            subfields = schema_subfields
+            field = None
+
+            log.debug(path + item['name'])
+
+            if schema_subfields:
+                field = toolkit.h.scheming_field_by_name(schema_subfields, item['name']) or \
+                    toolkit.h.scheming_field_by_name(schema_subfields, path + item['name'])
+            if field:
+                schema_name = field['field_name']
+                schema_label = ' (' + toolkit.h.scheming_language_text(field['label']) + ')'
+                subfields = field.get('subfields')
+                matched_schema_fields.append(schema_name)
+                if schema_name:
+                    schema_name = '<i class="fa fa-angle-right"></i>' + schema_name
+            harvest_name = ''
+            if item['name']:
+                harvest_name = '<i class="fa fa-angle-right"></i>' + item['name']
+
+            output = output + '<tr class="child' + str(indent) + '"><td>' + schema_name + schema_label + '</td><td>' + harvest_name + '</td><td>' + item['multiplicity'] + '</td><td>' + sp + '</td></tr>'
+            output = output + cioos_schema_field_map_child(subfields, item.get('elements'), path + item['name'] + '_', indent + 1, matched_schema_fields)
+    if schema_subfields:
+        for field in schema_subfields:
+            if field['field_name'] not in matched_schema_fields:
+                schema_name = field['field_name']
+                schema_label = ' (' + toolkit.h.scheming_language_text(field['label']) + ')'
+                matched_schema_fields.append(schema_name)
+                output = output + '<tr><td>' + schema_name + schema_label + '</td><td>' + '</td><td>' + '</td><td>' + '</td></tr>'
+    return output
 
 
 def cioos_get_facets(package_type='dataset'):
