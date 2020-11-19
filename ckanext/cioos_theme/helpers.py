@@ -152,11 +152,16 @@ def cioos_schema_field_map():
     doc = ISODocument('<xml></xml>')
     j = jsonpickle.encode(doc.elements)
 
-    # output = '|name|*|xml path|'
-    # for item in json.loads(j):
-    #     output += '|' + item['name'] + '|' + item['multiplicity'] + '|' + ',\n'.join(item['search_paths']) + '|'
-
-    output = '<table class="table table-striped table-bordered table-condensed"><thead><tr><th>Req</th><th style="width:200px;">schema name</th><th style="width:200px;">harvest name</th><th style="width:40px;">N</th><th>xml path</th></tr></thead><tbody>'
+    output = '''<table class="table table-bordered table-condensed">
+        <thead>
+            <tr>
+                <th style="width:40px;">Req</th>
+                <th style="width:200px;">Schema Name</th>
+                <th style="width:200px;">Harvest Name</th>
+                <th style="width:40px;">N</th>
+                <th>XML Path</th>
+            </tr>
+        </thead><tbody>'''
     matched_schema_fields = []
     for item in json.loads(j):
         sp = item['search_paths']
@@ -198,7 +203,10 @@ def cioos_schema_field_map():
             schema_name = field['field_name']
             schema_label = ' (' + toolkit.h.scheming_language_text(field['label']) + ')'
             matched_schema_fields.append(schema_name)
-            output = output + '<tr><td></td><td>' + schema_name + schema_label + '</td><td>' + '</td><td>' + '</td><td>' + '</td></tr>'
+            required = ''
+            if field.get('required'):
+                required = '<span class="required">*</span>'
+            output = output + '<tr><td>' + required + '</td><td>' + schema_name + schema_label + '</td><td>' + '</td><td>' + '</td><td>' + '</td></tr>'
     return jinja2.Markup(output + '</tbody></table>')
 
 
@@ -216,6 +224,7 @@ def cioos_schema_field_map_child(schema_subfields, harvest_elements, path, inden
             schema_label = ''
             subfields = schema_subfields
             field = None
+            required = ''
 
             log.debug(path + item['name'])
 
@@ -227,13 +236,15 @@ def cioos_schema_field_map_child(schema_subfields, harvest_elements, path, inden
                 schema_label = ' (' + toolkit.h.scheming_language_text(field['label']) + ')'
                 subfields = field.get('subfields')
                 matched_schema_fields.append(schema_name)
+                if field.get('required'):
+                    required = '<span class="required">*</span>'
                 if schema_name:
                     schema_name = '<i class="fa fa-angle-right"></i>' + schema_name
             harvest_name = ''
             if item['name']:
                 harvest_name = '<i class="fa fa-angle-right"></i>' + item['name']
 
-            output = output + '<tr class="child' + str(indent) + '"><td>' + schema_name + schema_label + '</td><td>' + harvest_name + '</td><td>' + item['multiplicity'] + '</td><td>' + sp + '</td></tr>'
+            output = output + '<tr class="child' + str(indent) + '"><td>' + required + '</td><td>' + schema_name + schema_label + '</td><td>' + harvest_name + '</td><td>' + item['multiplicity'] + '</td><td>' + sp + '</td></tr>'
             output = output + cioos_schema_field_map_child(subfields, item.get('elements'), path + item['name'] + '_', indent + 1, matched_schema_fields)
     if schema_subfields:
         for field in schema_subfields:
@@ -241,7 +252,10 @@ def cioos_schema_field_map_child(schema_subfields, harvest_elements, path, inden
                 schema_name = field['field_name']
                 schema_label = ' (' + toolkit.h.scheming_language_text(field['label']) + ')'
                 matched_schema_fields.append(schema_name)
-                output = output + '<tr><td>' + schema_name + schema_label + '</td><td>' + '</td><td>' + '</td><td>' + '</td></tr>'
+                required = ''
+                if field.get('required'):
+                    required = '<span class="required">*</span>'
+                output = output + '<tr><td>' + required + '</td><td>' + schema_name + schema_label + '</td><td>' + '</td><td>' + '</td><td>' + '</td></tr>'
     return output
 
 
