@@ -1,72 +1,146 @@
 {% macro include_mobile_header() %}
-  {% block header_mobilesite_navigation2 %}
-  <nav>
-    <ul id="menu-mobile-menu" class="menu">
-      <li id="menu-item-921" class="menu-item  menu-item-home"><a href="{{ g.site_home_url }}"><span>HOME</span></a></li>
-      <li id="menu-item-920" class="menu-item  menu-item-has-children menu-parent"><a href="{{ g.site_home_url }}about/"><span>ABOUT</span></a>
-        <ul class="sub-menu">
-          <li id="menu-item-1873" class="menu-item "><a href="{{ g.site_home_url }}about/partners/">Partners</a></li>
-          <li id="menu-item-1872" class="menu-item "><a href="{{ g.site_home_url }}about/data-management/">Data Management</a></li>
-          <li id="menu-item-1934" class="menu-item "><a href="{{ g.site_home_url }}about/essential-ocean-variables/">Essential Ocean Variables</a></li>
-        </ul>
-      </li>
-      <li id="menu-item-1673" class="menu-item  menu-item-has-children menu-parent"><a href="{{ g.site_home_url }}data-applications/"><span>APPLIED DATA</span></a>
-        <ul class="sub-menu">
-          <li id="menu-item-1743" class="menu-item "><a href="{{ g.site_home_url }}data-applications/baynes-sound/">Baynes Sound Ecosystem Monitoring</a></li>
-          <li id="menu-item-1940" class="menu-item "><a href="{{ g.site_home_url }}under-construction/">Marine Heatwaves</a></li>
-          <li id="menu-item-1942" class="menu-item "><a href="{{ g.site_home_url }}under-construction/">Ocean Climate</a></li>
-          <li id="menu-item-1941" class="menu-item "><a href="{{ g.site_home_url }}under-construction/">Strait of Georgia Currents</a></li>
-        </ul>
-      </li>
-      <li id="menu-item-1359" class="menu-item "><a href="{{ g.site_home_url }}data-tools/"><span>DATA TOOLS</span></a></li>
-      <li id="menu-item-1652" class="menu-item menu-item-has-children menu-parent current-menu-item current_page_item"><a href="{{ h.url_for('home.index') }}"><span>DATA CATALOGUE</span></a>
-        <ul class="sub-menu">
-          <li id="menu-item-1999" class="menu-item"><a href="{{ h.url_for('home.index') }}dataset">Datasets</a></li>
-          <li id="menu-item-2001" class="menu-item"><a href="{{ h.url_for('home.index') }}organization">Organizations</a></li>
-        </ul>
-      </li>
-      <ul class="shareicons">
-        <li><a href="http://twitter.com/cioos_siooc" tabindex="0" aria-label="Twitter"><i class="fa fa-twitter"></i></a></li>
-        <li>
-          {%- if h.lang() == 'en' -%}
-            <a href="{% url_for h.current_url(), locale='fr' %}" tabindex="0" aria-label="French/English">FR</a>
-          {%- else -%}
-            <a href="{% url_for h.current_url(), locale='en' %}" tabindex="0" aria-label="French/English">EN</a>
-          {%- endif -%}
+{% block header_mobilesite_navigation2 %}
+<nav>
+  <ul id="menu-mobile-menu" class="menu">
+    <li id="menu-item-921" class="menu-item  menu-item-home">
+      <a href="{{ h.cioos_get_locale_url(g.site_home_url, {'en':'', 'fr':'fr/'}) }}">
+        <span>{{_('HOME')}}</span>
+      </a>
+    </li>
+    <li id="menu-item-920" class="menu-item  menu-item-has-children menu-parent">
+      <a href="{{ h.cioos_get_locale_url(g.site_home_url, {'en':'about/', 'fr':'fr/a-propos/'}) }}about/">
+        <span>{{_('ABOUT')}}</span>
+      </a>
+      <ul class="sub-menu">
+        <li id="menu-item-1873" class="menu-item ">
+          <a href="{{ h.cioos_get_locale_url(g.site_home_url, {'en':'about/partners/', 'fr':'fr/a-propos/partenaires/'}) }}">{{_('Partners')}}</a>
+        </li>
+        <li id="menu-item-1872" class="menu-item ">
+          <a href="{{ h.cioos_get_locale_url(g.site_home_url, {'en':'about/data-management/', 'fr':'fr/a-propos/gestion-de-donnees/'}) }}">{{_('Data Management')}}</a>
+        </li>
+        <li id="menu-item-1934" class="menu-item ">
+          <a href="{{ h.cioos_get_locale_url(g.site_home_url, {'en':'about/essential-ocean-variables/', 'fr':'fr/a-propos/variables-oceaniques-essentielles/'}) }}">{{_('Essential Ocean Variables')}}</a>
         </li>
       </ul>
+    </li>
+    <li id="menu-item-1673" class="menu-item  menu-item-has-children menu-parent">
+      <a href="{{ h.cioos_get_locale_url(g.site_home_url, {'en':'data-applications/', 'fr':'fr/application-de-donnees/'}) }}">
+        <span>{{_('APPLIED DATA')}}</span>
+      </a>
+      <ul class="sub-menu">
+        <li id="menu-item-1743" class="menu-item ">
+          <a href="{{ h.cioos_get_locale_url(g.site_home_url, {'en':'applied-data/baynes-sound/', 'fr':'fr/application-de-donnees/surveillance-de-lecosysteme-de-baynes-sound/'}) }}">{{_('Baynes Sound Ecosystem Monitoring')}}</a>
+        </li>
+        <li id="menu-item-1940" class="menu-item ">
+          <a href="{{ h.cioos_get_locale_url(g.site_home_url, {'en':'applied-data/marine-heatwave-monitor/', 'fr':'fr/application-de-donnees/vagues-de-chaleur-marines/'}) }}">{{_('Marine Heatwaves')}}</a>
+        </li>
+        <li id="menu-item-1942" class="menu-item ">
+          <a href="{{ h.cioos_get_locale_url(g.site_home_url, {'en':'applied-data/station-papa/', 'fr':'fr/application-de-donnees/climat-des-oceans/'}) }}">{{_('Ocean Climate')}}</a>
+        </li>
+        <li id="menu-item-1941" class="menu-item ">
+          <a href="{{ h.cioos_get_locale_url(g.site_home_url, {'en':'applied-data/sog-currents/', 'fr':'fr/application-de-donnees/les-courants-du-detroit-de-georgie/'}) }}">{{_('Strait of Georgia Currents')}}</a>
+        </li>
+      </ul>
+    </li>
+    <li id="menu-item-1359" class="menu-item ">
+      <a href="{{ h.cioos_get_locale_url(g.site_home_url, {'en':'data-tools/', 'fr':'fr/outils-de-donnees/'}) }}">
+        <span>{{_('DATA TOOLS')}}</span>
+      </a>
+    </li>
+    <li id="menu-item-1652" class="menu-item menu-item-has-children menu-parent current-menu-item current_page_item last">
+      <a href="{{ h.url_for('home.index') }}">
+        <span>{{_('DATA CATALOGUE')}}</span>
+      </a>
+      <ul class="sub-menu">
+        <li id="menu-item-1999" class="menu-item">
+          <a href="{{ h.url_for('home.index') }}dataset">{{_('Datasets')}}</a>
+        </li>
+        <li id="menu-item-2001" class="menu-item">
+          <a href="{{ h.url_for('home.index') }}organization">{{_('Organizations')}}</a>
+        </li>
+      </ul>
+    </li>
+    <ul class="shareicons">
+      {{ include_site_social() }}
+      <li>
+        {%- if h.lang() == 'en' -%}
+        <a href="{% url_for h.current_url(), locale='fr' %}" tabindex="0" aria-label="French/English">FR</a>
+        {%- else -%}
+        <a href="{% url_for h.current_url(), locale='en' %}" tabindex="0" aria-label="French/English">EN</a>
+        {%- endif -%}
+      </li>
     </ul>
-  </nav>
-  {% endblock %}
+  </ul>
+</nav>
+{% endblock %}
 {% endmacro %}
 
 
 {% macro include_site_header() %}
-  {% block header_main %}
-  <ul id="menu-main-menu-en" class="menu">
-    <li id="menu-item-921" class="menu-item  menu-item-home"><a href="{{ g.site_home_url }}"><span>HOME</span></a></li>
-    <li id="menu-item-920" class="menu-item  menu-item-has-children menu-parent"><a href="{{ g.site_home_url }}about/"><span class="mega-indicator">ABOUT</span></a>
-      <ul class="sub-menu" style=" min-width: 94px;">
-        <li id="menu-item-1873" class="menu-item "><a href="{{ g.site_home_url }}about/partners/">Partners</a></li>
-        <li id="menu-item-1872" class="menu-item "><a href="{{ g.site_home_url }}about/data-management/">Data Management</a></li>
-        <li id="menu-item-1934" class="menu-item "><a href="{{ g.site_home_url }}about/essential-ocean-variables/">Essential Ocean Variables</a></li>
-      </ul>
-    </li>
-    <li id="menu-item-1673" class="menu-item  menu-item-has-children menu-parent"><a href="{{ g.site_home_url }}data-applications/"><span class="mega-indicator">APPLIED DATA</span></a>
-      <ul class="sub-menu" style=" min-width: 144px;">
-        <li id="menu-item-1743" class="menu-item "><a href="{{ g.site_home_url }}data-applications/baynes-sound/">Baynes Sound Ecosystem Monitoring</a></li>
-        <li id="menu-item-1940" class="menu-item "><a href="{{ g.site_home_url }}under-construction/">Marine Heatwaves</a></li>
-        <li id="menu-item-1942" class="menu-item "><a href="{{ g.site_home_url }}under-construction/">Ocean Climate</a></li>
-        <li id="menu-item-1941" class="menu-item "><a href="{{ g.site_home_url }}under-construction/">Strait of Georgia Currents</a></li>
-      </ul>
-    </li>
-    <li id="menu-item-1359" class="menu-item "><a href="{{ g.site_home_url }}data-tools/"><span>DATA TOOLS</span></a></li>
-    <li id="menu-item-1652" class="menu-item menu-item-has-children menu-parent current-menu-item current_page_item"><a href="{{ h.url_for('home.index') }}"><span class="mega-indicator">DATA CATALOGUE</span></a>
-      <ul class="sub-menu" style=" min-width: 161px;">
-        <li id="menu-item-1999" class="menu-item"><a href="{{ h.url_for('home.index') }}dataset">Datasets</a></li>
-        <li id="menu-item-2001" class="menu-item"><a href="{{ h.url_for('home.index') }}organization">Organizations</a></li>
-      </ul>
-    </li>
-  </ul>
+{% block header_main %}
+<ul id="menu-main-menu-en" class="menu">
+  <li id="menu-item-921" class="menu-item  menu-item-home">
+    <a href="{{ h.cioos_get_locale_url(g.site_home_url, {'en':'', 'fr':'fr/'}) }}">
+      <span>{{_('HOME')}}</span>
+    </a>
+  </li>
+  <li id="menu-item-920" class="menu-item  menu-item-has-children menu-parent">
+    <a href="{{ h.cioos_get_locale_url(g.site_home_url, {'en':'about/', 'fr':'fr/a-propos/'}) }}"><span class="mega-indicator">{{_('ABOUT')}}</span>
+    </a>
+    <ul class="sub-menu" style=" min-width: 94px;">
+      <li id="menu-item-1873" class="menu-item ">
+        <a href="{{ h.cioos_get_locale_url(g.site_home_url, {'en':'about/partners/', 'fr':'fr/a-propos/partenaires/'}) }}">{{_('Partners')}}</a>
+      </li>
+      <li id="menu-item-1872" class="menu-item ">
+        <a href="{{ h.cioos_get_locale_url(g.site_home_url, {'en':'about/data-management', 'fr':'fr/a-propos/gestion-de-donnees/'}) }}">{{_('Data Management')}}</a>
+      </li>
+      <li id="menu-item-1934" class="menu-item ">
+        <a href="{{ h.cioos_get_locale_url(g.site_home_url, {'en':'about/essential-ocean-variables', 'fr':'fr/a-propos/variables-oceaniques-essentielles/'}) }}">{{_('Essential Ocean Variables')}}</a>
+      </li>
+    </ul>
+  </li>
+  <li id="menu-item-1673" class="menu-item  menu-item-has-children menu-parent">
+    <a href="{{ h.cioos_get_locale_url(g.site_home_url, {'en':'data-applications', 'fr':'fr/application-de-donnees/'})  }}"><span class="mega-indicator">{{_('APPLIED DATA')}}</span>
+    </a>
+    <ul class="sub-menu" style=" min-width: 144px;">
+      <li id="menu-item-1743" class="menu-item ">
+        <a href="{{ h.cioos_get_locale_url(g.site_home_url, {'en':'applied-data/baynes-sound/', 'fr':'fr/application-de-donnees/surveillance-de-lecosysteme-de-baynes-sound/'}) }}">{{_('Baynes Sound Ecosystem Monitoring')}}</a>
+      </li>
+      <li id="menu-item-1940" class="menu-item ">
+        <a href="{{ h.cioos_get_locale_url(g.site_home_url, {'en':'applied-data/marine-heatwave-monitor/', 'fr':'fr/application-de-donnees/vagues-de-chaleur-marines/'}) }}">{{_('Marine Heatwaves')}}</a>
+      </li>
+      <li id="menu-item-1942" class="menu-item ">
+        <a href="{{ h.cioos_get_locale_url(g.site_home_url, {'en':'applied-data/station-papa/', 'fr':'fr/application-de-donnees/climat-des-oceans/'}) }}">{{_('Ocean Climate')}}</a>
+      </li>
+      <li id="menu-item-1941" class="menu-item ">
+        <a href="{{ h.cioos_get_locale_url(g.site_home_url, {'en':'applied-data/sog-currents/', 'fr':'fr/application-de-donnees/les-courants-du-detroit-de-georgie/'}) }}">{{_('Strait of Georgia Currents')}}</a>
+      </li>
+    </ul>
+  </li>
+  <li id="menu-item-1359" class="menu-item ">
+    <a href="{{ h.cioos_get_locale_url(g.site_home_url, {'en':'data-tools/', 'fr':'fr/outils-de-donnees/'}) }}">
+      <span>{{_('DATA TOOLS')}}</span>
+    </a>
+  </li>
+  <li id="menu-item-1652" class="menu-item menu-item-has-children menu-parent current-menu-item current_page_item last">
+    <a href="{{ h.url_for('home.index') }}"><span class="mega-indicator">{{_('DATA CATALOGUE')}}</span>
+    </a>
+    <ul class="sub-menu" style=" min-width: 161px;">
+      <li id="menu-item-1999" class="menu-item">
+        <a href="{{ h.url_for('home.index') }}dataset">{{_('Datasets')}}</a>
+      </li>
+      <li id="menu-item-2001" class="menu-item">
+        <a href="{{ h.url_for('home.index') }}organization">{{_('Organizations')}}</a>
+      </li>
+    </ul>
+  </li>
+</ul>
+{% endblock %}
+{% endmacro %}
+
+{% macro include_site_social() %}
+  {% block header_social_list %}
+    <li><a href="https://www.facebook.com/CIOOSPacific/" tabindex="0" aria-label="Facebook"><i class="fa fa-facebook"></i></a></li>
+    <li><a href="http://twitter.com/cioos_siooc" tabindex="0" aria-label="Twitter"><i class="fa fa-twitter"></i></a></li>
   {% endblock %}
 {% endmacro %}
