@@ -19,6 +19,31 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.3.4\n"
 
+#: ckanext/cioos_theme/templates/error_document_template.html:4
+msgid "Page not found"
+msgstr "Impossible de trouver la page"
+
+#: ckanext/cioos_theme/templates/error_document_template.html:6
+#, python-format
+msgid "Error %(error_code)s"
+msgstr "Erreur %(error_code)s"
+
+#: ckanext/cioos_theme/templates/error_document_template.html:14
+msgid "404 - Page not found"
+msgstr "404 - Impossible de trouver la page"
+
+#: ckanext/cioos_theme/templates/error_document_template.html:15
+msgid "Sorry, we could not find the page you are looking for."
+msgstr "Malheureusement, la page recherchée est introuvable."
+
+#: ckanext/cioos_theme/templates/error_document_template.html:16
+msgid "Follow this link to explore our datasets "
+msgstr "Vous pouvez suivre le lien suivant pour explorer nos jeux de données"
+
+#: ckanext/cioos_theme/templates/error_document_template.html:17
+msgid "Or contact us at "
+msgstr "Ou nous contacter à l'adresse "
+
 #: ckanext/cioos_theme/templates/group/read.html:13
 #: ckanext/cioos_theme/templates/package/search.html:29
 msgid "Relevance"
@@ -214,7 +239,7 @@ msgid "Data Catalogue"
 msgstr "Catalogue de données"
 
 msgid "Search, find, download — all of our"
-msgstr "Recherche, trouve, télécharge nos"
+msgstr "Recherche, trouve, et télécharge - nos"
 
 msgid "SEARCH BY KEYWORD"
 msgstr "RECHERCHE PAR MOTS-CLÉS"
@@ -232,7 +257,7 @@ msgid "PHYSIC"
 msgstr "PHYSIQUE"
 
 msgid "Biogeochemical"
-msgstr "Biogéochimique"
+msgstr "Biogéochimie"
 
 msgid "Physical"
 msgstr "Physique"
@@ -385,7 +410,7 @@ msgid "HOME"
 msgstr "ACCUEIL"
 
 msgid "Datasets"
-msgstr "Ensembles de données"
+msgstr "Jeux de données"
 
 msgid "Organizations"
 msgstr "Organisations"

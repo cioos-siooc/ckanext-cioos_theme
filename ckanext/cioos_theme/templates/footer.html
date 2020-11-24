@@ -1,13 +1,22 @@
-<div id="footer">
-  <div class="container">
-    <div class="col-md-6 col1">
-      <a href="mailto:info@cioos.ca" title="{{ _('CONTACT US') }}">{{ _('CONTACT US') }}</a>
-    </div>
-    <div class="col-md-6 col1 rightalign">
-      <a href="{{ g.site_home_url or h.url_for('home.index') }}" title="{{ _('BACK TO CIOOS MAIN WEBSITE') }}">{{ _('BACK TO CIOOS MAIN WEBSITE') }}</a>
-    </div>
-  </div>
-</div>
+{# import macros from ra footer file #}
+{% if self._TemplateReference__context.name != g.footer_file_name %}
+  {% from '%s' % g.footer_file_name or 'footer_wp.html' import include_site_footer with context %}
+{% else %}
+  {% from 'footer_wp.html' import include_site_footer with context %}
+{% endif %}
+
+
+<footer>
+	<div id="footer">
+		<div id="footer-core" class="option15 container">
+			{{ include_site_footer() }}
+		</div>
+	</div>
+	<!-- #footer -->
+</footer>
+<a id="scrollUp" href="#top" style="position: fixed; z-index: 2147483647; display: block;"></a>
+
+
 {% block header_account %}
 <header class="account-masthead">
   <div class="container">

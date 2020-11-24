@@ -11,9 +11,9 @@
 
 {# import macros from ra header file #}
 {% if self._TemplateReference__context.name != g.header_file_name %}
-  {% from '%s' % g.header_file_name or 'header_wp.html' import include_site_header, include_mobile_header with context %}
+  {% from '%s' % g.header_file_name or 'header_wp.html' import include_site_header, include_mobile_header, include_site_social with context %}
 {% else %}
-  {% from 'header_wp.html' import include_site_header, include_mobile_header with context %}
+  {% from 'header_wp.html' import include_site_header, include_mobile_header, include_site_social with context %}
 {% endif %}
 
 <div id="header-container">
@@ -40,10 +40,11 @@
   <!-- Top Bar -->
   <header id="topmenu" class="nav main-nav">
     <div class="container">
+      {% block header_topmenu %}
       <nav>
         <ul>
-          <li><a href="http://twitter.com/cioos_siooc" tabindex="0" aria-label="Twitter"><i class="fa fa-twitter"></i></a></li>
-          <li>
+          {{ include_site_social() }}
+          <li id="language_picker">
             {%- if h.lang() == 'en' -%}
               <a href="{% url_for h.current_url(), locale='fr' %}" tabindex="0" aria-label="French/English">FR</a>
             {%- else -%}
@@ -57,6 +58,7 @@
           </li>
           </ul>
       </nav>
+      {% endblock %}
     </div>
   </header>
 
@@ -64,7 +66,9 @@
   <div id="header" class="nav main-nav">
     <div id="header-core">
       <div id="logo">
-        <a rel="home" href="{{ g.site_home_url }}"><img src="{{ logo_url }}" alt="CIOOS Atlantic"></a>
+        {% block header_logo %}
+        <a rel="home" href="{{ g.site_home_url }}"><img src="{{ logo_url }}" alt="Logo"></a>
+        {% endblock %}
       </div>
       <div id="header-links" class="main-navigation">
         <div id="header-links-inner" class="header-links">

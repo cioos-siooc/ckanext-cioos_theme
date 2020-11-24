@@ -1,5 +1,9 @@
+# encoding: utf-8
+
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
+import ckan.model as model
+from ckan.logic import NotFound
 import ckanext.cioos_theme.helpers as cioos_helpers
 from ckanext.scheming.validation import scheming_validator
 from ckan.lib.plugins import DefaultTranslation
@@ -11,11 +15,24 @@ from ckan.common import c
 from six.moves.urllib.parse import urlparse
 import string
 from ckan.common import _
+import urllib2
+import xml.etree.ElementTree as ET
 
 StopOnError = df.StopOnError
 missing = df.missing
 log = logging.getLogger(__name__)
 
+show_responsible_organizations = toolkit.asbool(
+    toolkit.config.get('cioos.show_responsible_organizations_facet', "True"))
+
+contact_email = toolkit.config.get('cioos.contact_email', "info@cioos.ca")
+organizations_info_text = toolkit.config.get(
+    'cioos.organizations_info_text', 
+    { 
+        "en":"CKAN Organizations are used to create, manage and publish collections of datasets. Users can have different roles within an Organization, depending on their level of authorisation to create, edit and publish.",
+        "fr":u"Les Organisations CKAN sont utilisées pour créer, gérer et publier des collections de jeux de données. Les utilisateurs peuvent avoir différents rôles au sein d'une Organisation, en fonction de leur niveau d'autorisation pour créer, éditer et publier."
+    }
+)
 
 def load_json(j):
     try:
@@ -27,71 +44,6 @@ def load_json(j):
 
 def geojson_to_bbox(o):
     return shape(o).bounds
-
-
-# from the docs
-# def most_popular_groups():
-#     '''Return a sorted list of the groups with the most datasets.'''
-#
-#     # Get a list of all the site's groups from CKAN, sorted by number of
-#     # datasets.
-#     groups = toolkit.get_action('group_list')(
-#         data_dict={'sort': 'package_count desc', 'all_fields': True})
-#
-#     # Truncate the list to the 10 most popular groups only.
-#     groups = groups[:5]
-#
-#     return groups
-#
-#
-# def groups():
-#     '''Return a sorted list of the groups'''
-#
-#     # Get a list of all the site's groups from CKAN, sorted by number of
-#     # datasets.
-#     groups = toolkit.get_action('group_list')(
-#         data_dict={'sort': 'title asc', 'all_fields': True})
-#
-#     return groups
-#
-#
-# # from the docs
-# def most_popular_datasets():
-#     '''Return a sorted list of the groups with the most datasets.'''
-#
-#     # Get a list of all the site's groups from CKAN, sorted by number of
-#     # datasets.
-#     groups = toolkit.get_action('package_search')(
-#         data_dict={'sort': 'views_recent desc', 'all_fields': True})
-#
-#     # Truncate the list to the 10 most popular groups only.
-#     groups = groups[:5]
-#
-#     return groups
-#
-#
-# def most_popular_resources():
-#     '''Return a sorted list of the groups with the most datasets.'''
-#
-#     # Get a list of all the site's groups from CKAN, sorted by number of
-#     # datasets.
-#     groups = toolkit.get_action('resource_search')(
-#         data_dict={'sort': 'views_recent desc', 'all_fields': True})
-#
-#     # Truncate the list to the 10 most popular groups only.
-#     groups = groups[:5]
-#
-#     return groups
-#
-# def recent_packages_html():
-#     '''Return a sorted list of the groups with the most datasets.'''
-#
-#     # Get a list of all the site's groups from CKAN, sorted by number of
-#     # datasets.
-#     groups = toolkit.get_action('recently_changed_packages_activity_list_html')(
-#         data_dict={'limit': '5'})
-#
-#     return groups
 
 # IValidators
 
@@ -136,6 +88,7 @@ def clean_and_populate_eovs(field, schema):
 
     return validator
 
+
 @scheming_validator
 def fluent_field_default(field, schema):
 
@@ -158,6 +111,7 @@ def fluent_field_default(field, schema):
         return data
     return validator
 
+
 def url_validator_with_port(key, data, errors, context):
     ''' Checks that the provided value (if it is present) is a valid URL, accepts port numbers in URL '''
 
@@ -175,6 +129,7 @@ def url_validator_with_port(key, data, errors, context):
         # url is invalid
         pass
     errors[key].append(_('Please provide a valid URL'))
+
 
 class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
     plugins.implements(plugins.ITranslation)
@@ -245,7 +200,8 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             'ckan.exclude_eov_category': [ignore_missing],
             'ckan.exclude_eov': [ignore_missing],
             'ckan.eov_icon_base_path': [ignore_missing],
-            'ckan.header_file_name': [ignore_missing]
+            'ckan.header_file_name': [ignore_missing],
+            'ckan.footer_file_name': [ignore_missing],
         })
         return schema
 
@@ -255,6 +211,8 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         # extension they belong to, to avoid clashing with functions from
         # other extensions.
         return {
+            'cioos_organizations_info_text': lambda: organizations_info_text,
+            'cioos_contact_email': lambda: contact_email,
             'cioos_load_json': load_json,
             'cioos_geojson_to_bbox': geojson_to_bbox,
             # 'cioos_most_popular_groups': most_popular_groups,
@@ -268,7 +226,8 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             # 'cioos_get_organization_dict_extra': cioos_helpers.get_organization_dict_extra
             'cioos_datasets': cioos_helpers.cioos_datasets,
             'cioos_count_datasets': cioos_helpers.cioos_count_datasets,
-            'cioos_get_eovs': cioos_helpers.cioos_get_eovs
+            'cioos_get_eovs': cioos_helpers.cioos_get_eovs,
+            'cioos_get_locale_url': self.get_locale_url
         }
 
     def get_validators(self):
@@ -352,7 +311,9 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             facets_dict.clear()
             # facets_dict['themes'] = toolkit._('Theme')
             facets_dict['eov'] = toolkit._('Ocean Variables')
-            facets_dict['responsible_organizations'] = toolkit._('Responsible Organization')
+            
+            if show_responsible_organizations:
+                facets_dict['responsible_organizations'] = toolkit._('Responsible Organization')
 
             for key, value in ordered_dict.items():
                 # Make translation 'on the fly' of facet tags.
@@ -376,6 +337,10 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
 
     # modfiey tags, keywords, and eov fields so that they properly index
     def before_index(self, data_dict):
+        data_type = data_dict.get('type')
+        if data_type != 'dataset':
+            return data_dict
+
         try:
             tags_dict = json.loads(data_dict.get('keywords', '{}'))
         except Exception as err:
@@ -384,7 +349,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             log.error("error:%s, keywords:%r", err, data_dict.get('keywords', '{}'))
             tags_dict = {"en": [], "fr": []}
 
-        data_dict['responsible_organizations'] = [x.get('organisation-name','').strip() for x in json.loads(data_dict.get('cited-responsible-party', '{}')) if x.get('role') in ['originator']]
+        data_dict['responsible_organizations'] = [x.get('organisation-name', '').strip() for x in json.loads(data_dict.get('cited-responsible-party', '{}')) if x.get('role') in ['originator']]
 
         # update tag list by language
         data_dict['tags_en'] = tags_dict.get('en', [])
@@ -393,8 +358,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
 
         # update organization list by language
         org_id = data_dict.get('owner_org')
-        data_type = data_dict.get('type')
-        if org_id and data_type == 'dataset':
+        if org_id:
             org_details = toolkit.get_action('organization_show')(
                 data_dict={
                     'id': org_id,
@@ -443,6 +407,61 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         # eov is multi select so it is a json list rather then a python list
         if(data_dict.get('eov')):
             data_dict['eov'] = load_json(data_dict['eov'])
+
+        # Index Source XML
+        # harvest object will be json if harvested from another ckan instance. TODO check it is xml
+        # try harvest object (xml)
+        h_object_id = data_dict.get('harvest_object_id', 'none')
+        context = {'model': model,
+                   'session': model.Session,
+                   'ignore_auth': True}
+
+        pkg_dict = {'id': h_object_id}
+
+        try:
+            harvest_object = toolkit.get_action('harvest_object_show')(context, pkg_dict)
+            content = harvest_object.get('content', '')
+            if content.startswith('<'):
+                data_dict['extras_harvest_document_content'] = harvest_object.get('content', '')
+            else:
+                raise NotFound
+        except NotFound:
+            log.warning('Unable to find harvest object "%s" '
+                        'referenced by dataset "%s". Trying xml url',
+                        pkg_dict['id'], data_dict['id'])
+
+            # try reading from xml url
+            xml_str = ''
+            xml_url = load_json(data_dict.get('xml_location_url'))
+            # single file
+            if xml_url and isinstance(xml_url, basestring):
+                try:
+                    xml_str = urllib2.urlopen(xml_url).read(100000)  # read only 100 000 chars
+                    ET.XML(xml_str)  # test for valid xml
+                    data_dict['extras_harvest_document_content'] = xml_str
+                except ET.ParseError as e:
+                    log.error('XML string is invalid. %s', e)
+                except Exception as e:
+                    log.error('Unable to read from xml url "%s" '
+                              'referenced by dataset "%s" Error: %s',
+                              xml_url, data_dict['id'], e)
+            # list of files
+            elif xml_url and isinstance(xml_url, list):
+                for xml_file in xml_url:
+                    try:
+                        xml_file_str = urllib2.urlopen(xml_file).read(100000)  # read only 100 000 chars
+                        xml_root_str = ET.tostring(ET.XML(xml_file_str))
+                        xml_str = xml_str + '<doc>' + xml_root_str + '</doc>'
+                    except ET.ParseError as e:
+                        log.error('XML string is invalid. %s', e)
+                    except Exception as e:
+                        log.error('Unable to read from xml url "%s" '
+                                  'referenced by dataset "%s" Error: %s',
+                                  xml_file, data_dict['id'], e)
+                if xml_str:
+                    xml_str = xml_str = '<?xml version="1.0" encoding="utf-8"?><docs>' + xml_str + '</docs>'
+                    data_dict['extras_harvest_document_content'] = xml_str
+
         return data_dict
 
     # update eov search facets with keys from choices list in the scheming extension schema
@@ -463,10 +482,10 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             choices = toolkit.h.scheming_field_choices(field)
             new_eovs = []
             for item in items:
-                for c in choices:
-                    if c['value'] == item['name']:
-                        item['display_name'] = toolkit.h.scheming_language_text(c.get('label', item['name']))
-                        item['category'] = c.get('catagory', u'')
+                for ch in choices:
+                    if ch['value'] == item['name']:
+                        item['display_name'] = toolkit.h.scheming_language_text(ch.get('label', item['name']))
+                        item['category'] = ch.get('catagory', u'')
                 new_eovs.append(item)
             search_results['search_facets']['eov']['items'] = new_eovs
 
@@ -557,7 +576,6 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
 
         return package_dict
 
-
     # Custom section
     def read_template(self):
         return 'package/read.html'
@@ -565,3 +583,10 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
     def lang(self):
         from ckantoolkit import h
         return h.lang()
+
+    def get_locale_url(self, base_url, locale_urls):
+        default_locale = toolkit.config.get('ckan.locale_default', toolkit.config.get('ckan.locales_offered', ['en'])[0])
+        lang = toolkit.h.lang() or default_locale
+        if base_url.endswith('/'):
+            return base_url + locale_urls.get(lang)
+        return base_url + '/' + locale_urls.get(lang)
