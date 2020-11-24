@@ -9,15 +9,15 @@
         {# snippet 'home/snippets/promoted.html' #}
         {# endblock #}
       </div>
-      <div class="col-md-12 col1 module-content-end cioos-module-search">
+      <div class="col-md-12 col1 module-content-end">
         {% block search %}
         {% snippet 'home/snippets/search.html' %}
         {% endblock %}
       </div>
       <div class="col-md-12 col1 module-content-end">
-        <h3 class="heading">{{ _('Search By Ocean Variable:') }}</h3>
         <div class="module-content box">
           {% block eov_list %}
+          <h3 class="heading">{{ _('SEARCH BY OCEAN VARIABLE') }}</h3>
           {% set eov = h.cioos_get_eovs(show_all=True) %}
           {% for grouper, list in eov|groupby('category') %}
           {% if grouper and grouper not in g.exclude_eov_category %}
