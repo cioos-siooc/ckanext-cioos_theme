@@ -25,7 +25,6 @@ function toMarkdown(doc) {
         for (let j = 0; j < tds.length; j++) {
             let td = tds.item(j);
             l = '';
-            console.log(tr.className)
             if (tr.className.startsWith('child')){
               l = '--'.repeat(tr.className.match(/\d+$/)[0]-1) + '> ';
             }

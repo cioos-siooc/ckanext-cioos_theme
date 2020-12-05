@@ -52,9 +52,10 @@
   <script>
     function saveMD(){
 
-      let el = document.querySelector("#schemamap table");
-      let md = toMarkdown(el);
-
+      let el = document.querySelectorAll("#schemamap table");
+      let md = toMarkdown(el[0]);
+      md = md + "\n" + toMarkdown(el[1]);
+      md = md.replaceAll('<span class="required">*</span>', '**\\***');
       let blob = new Blob([md], {type: "text/plain;charset=utf-8"});
       saveAs(blob, "schema_map.md");
     }

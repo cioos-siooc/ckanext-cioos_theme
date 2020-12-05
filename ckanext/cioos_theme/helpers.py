@@ -149,13 +149,11 @@ def cioos_schema_field_map():
         }
 
     schema = toolkit.h.scheming_get_dataset_schema('dataset')
-    fields = schema['dataset_fields']
-    resource_fields_schema = [{'field_name': 'resource_fields', 'subfields': schema['resource_fields']}]
-
     doc = spatial_model.ISODocument('<xml></xml>')
-    #jsonpickle.set_preferred_backend('simplejson')
-    j = jsonpickle.encode(doc.elements)
 
+    # load classes, we have to pre load class defenitions and later update them
+    # vecouse pickle dosn't do it properly. Might be becouse our isodocument
+    # class is so large
     classes = inspect.getmembers(spatial_model, inspect.isclass)
     classes_pickled = json.loads(jsonpickle.encode(classes, unpicklable=False))
     class_dict = {}
@@ -172,14 +170,17 @@ def cioos_schema_field_map():
 
         class_dict[x[0]]['class'] = jsonpickle.encode(instanse)
 
+    # Dataset
+    fields = schema['dataset_fields']
+    j = jsonpickle.encode(doc.elements)
     isodoc_dict = json.loads(j)
     output = cioos_schema_field_map_parent(fields, isodoc_dict, class_dict, map, 'Dataset Fields')
 
     # Resources
+    resource_fields_schema = [{'field_name': 'resource_fields', 'subfields': schema['resource_fields']}]
     j = jsonpickle.encode([x for x in doc.elements if isinstance(x, spatial_model.ISOResourceLocator)], unpicklable=False)
     isodoc_dict = json.loads(j)
     resource_locator = [x for x in isodoc_dict if x['name'] == 'resource-locator']
-    #log.debug(resource_locator)
 
     map = {
         'resource-locator': 'resource_fields'
@@ -189,6 +190,7 @@ def cioos_schema_field_map():
     return jinja2.Markup(output)
 
 
+# process any first level fields in the isodocument
 def cioos_schema_field_map_parent(fields, isodoc_dict, class_dict, mapkey, caption):
     output = '''<table class="table table-bordered table-condensed">
         <caption>''' + caption + '''</caption>
@@ -202,19 +204,30 @@ def cioos_schema_field_map_parent(fields, isodoc_dict, class_dict, mapkey, capti
             </tr>
         </thead><tbody>'''
     matched_schema_fields = []
+
+    # loop through spatial harvester isodocument fields
     for item in isodoc_dict:
+        # get class name of entry in spatial harvester class
         (objpath, delimiter, objtype) = item.get('py/object', '').rpartition('.')
+        # update class with pre determined definition if appropreit
         if objtype != 'ISOElement' and item.get('elements') and objtype.startswith('ISO'):
             class_json_def = json.loads(class_dict.get(objtype, {}).get('class', '{}'))
             log.debug(class_json_def)
             elem = class_json_def.get('elements', [])
             item['elements'] = elem
+
+        # get the search paths for the current item
         sp = item['search_paths']
         if isinstance(item['search_paths'], list):
             sp = '<br/>'.join(item['search_paths'])
 
+        # map item name to a new name if it is entered in the mapkey dictinary
         search_item = mapkey.get(item['name'], item['name'])
+
+        # get ckan schema field with the same name, if it exists
         field = toolkit.h.scheming_field_by_name(fields, search_item)
+        # the mapkey fields could be a list as sometimes more then one ckan
+        # schema field maps to a spatial harvest field
         if isinstance(search_item, list):
             fn = []
             fl = []
@@ -241,13 +254,12 @@ def cioos_schema_field_map_parent(fields, isodoc_dict, class_dict, mapkey, capti
             matched_schema_fields.append(schema_name)
 
         output = output + '<tr><td>' + required + '</td><td>' + schema_name + schema_label + '</td><td>' + item['name'] + '</td><td>' + item['multiplicity'] + '</td><td>' + sp + '</td></tr>'
-        #log.debug('P1:%r', matched_schema_fields)
         (output_new, matched_schema_fields) = cioos_schema_field_map_child(subfields, None, item.get('elements'), "", 1, matched_schema_fields)
         output = output + output_new
-        #log.debug('P2:%r', matched_schema_fields)
+
+    # add any fields in schema that have not found a match in spatial harvest
     for field in fields:
         if field['field_name'] not in matched_schema_fields:
-            #log.debug('P3:%r', field['field_name'])
             schema_name = field['field_name']
             schema_label = ' (' + toolkit.h.scheming_language_text(field.get('label', '')) + ')'
             matched_schema_fields.append(schema_name)
@@ -257,14 +269,12 @@ def cioos_schema_field_map_parent(fields, isodoc_dict, class_dict, mapkey, capti
             output = output + '<tr><td>' + required + '</td><td>' + schema_name + schema_label + '</td><td>' + '</td><td>' + '</td><td>' + '</td></tr>'
     return output + '</tbody></table>'
 
-
+# process any child elements of first level or lower isodocument fields.
 def cioos_schema_field_map_child(schema_subfields, schema_parentfields, harvest_elements, path, indent, matched_schema_fields):
     output = ''
     if not harvest_elements:
-        #log.debug('harvest_elements:%r', harvest_elements)
         return output, matched_schema_fields
     if not isinstance(harvest_elements, list):
-        #log.debug('harvest_elements:%r', harvest_elements)
         return output, matched_schema_fields
 
     for item in harvest_elements:
@@ -273,8 +283,6 @@ def cioos_schema_field_map_child(schema_subfields, schema_parentfields, harvest_
         sp = item['search_paths']
         if isinstance(item['search_paths'], list):
             sp = '<br/>'.join(item['search_paths'])
-
-        #log.debug(path + item['name'])
 
         field = None
         if schema_subfields:
@@ -304,14 +312,13 @@ def cioos_schema_field_map_child(schema_subfields, schema_parentfields, harvest_
             harvest_name = '<i class="fa fa-angle-right"></i>' + item['name']
 
         output = output + '<tr class="child' + str(indent) + '"><td>' + required + '</td><td>' + schema_name + schema_label + '</td><td>' + harvest_name + '</td><td>' + item['multiplicity'] + '</td><td>' + sp + '</td></tr>'
-        #log.debug('C1:%r', matched_schema_fields)
         (output_new, matched_schema_fields) = cioos_schema_field_map_child(subfields, parentfields, item.get('elements'), path + item['name'] + '_', indent + 1, matched_schema_fields)
-        #log.debug('C2:%r', matched_schema_fields)
         output = output + output_new
+
+    # outout any schema fields at this sublevel which do not have a match.
     if schema_subfields:
         for field in schema_subfields:
             if field['field_name'] not in matched_schema_fields:
-                #log.debug('C3:%r', field['field_name'])
                 schema_name = field['field_name']
                 schema_label = ' (' + toolkit.h.scheming_language_text(field.get('label', '')) + ')'
                 matched_schema_fields.append(schema_name)
