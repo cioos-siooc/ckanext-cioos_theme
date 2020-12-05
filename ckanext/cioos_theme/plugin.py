@@ -17,6 +17,8 @@ import string
 from ckan.common import _
 import urllib2
 import xml.etree.ElementTree as ET
+import routes.mapper
+import ckan.lib.base as base
 
 StopOnError = df.StopOnError
 missing = df.missing
@@ -27,8 +29,8 @@ show_responsible_organizations = toolkit.asbool(
 
 contact_email = toolkit.config.get('cioos.contact_email', "info@cioos.ca")
 organizations_info_text = toolkit.config.get(
-    'cioos.organizations_info_text', 
-    { 
+    'cioos.organizations_info_text',
+    {
         "en":"CKAN Organizations are used to create, manage and publish collections of datasets. Users can have different roles within an Organization, depending on their level of authorisation to create, edit and publish.",
         "fr":u"Les Organisations CKAN sont utilisées pour créer, gérer et publier des collections de jeux de données. Les utilisateurs peuvent avoir différents rôles au sein d'une Organisation, en fonction de leur niveau d'autorisation pour créer, éditer et publier."
     }
@@ -139,6 +141,17 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
     plugins.implements(plugins.IPackageController, inherit=True)
     plugins.implements(plugins.IValidators)
     plugins.implements(plugins.IAuthenticator)
+    plugins.implements(plugins.IRoutes)
+
+    # IRoute
+
+    def before_map(self, route_map):
+        with routes.mapper.SubMapper(route_map, controller='ckanext.cioos_theme.plugin:CIOOSController') as m:
+            m.connect('schemamap', '/schemamap', action='schemamap')
+        return route_map
+
+    def after_map(self, route_map):
+        return route_map
 
     # IAuthenticator
 
@@ -227,7 +240,8 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             'cioos_datasets': cioos_helpers.cioos_datasets,
             'cioos_count_datasets': cioos_helpers.cioos_count_datasets,
             'cioos_get_eovs': cioos_helpers.cioos_get_eovs,
-            'cioos_get_locale_url': self.get_locale_url
+            'cioos_get_locale_url': self.get_locale_url,
+            'cioos_schema_field_map': cioos_helpers.cioos_schema_field_map
         }
 
     def get_validators(self):
@@ -311,7 +325,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             facets_dict.clear()
             # facets_dict['themes'] = toolkit._('Theme')
             facets_dict['eov'] = toolkit._('Ocean Variables')
-            
+
             if show_responsible_organizations:
                 facets_dict['responsible_organizations'] = toolkit._('Responsible Organization')
 
@@ -325,15 +339,9 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                     facets_dict[key] = value
         return facets_dict
 
-    # IPackageController
 
-    # def after_create(self, context, pkg_dict):
-    #     # dosn't work to update name in validator as id is populated by database. better to use a validator and populate usig uuid
-    #     # import uuid
-    #     # str(uuid.uuid4())
-    #     name = pkg_dict.get('name', '')
-    #     if not name:
-    #         pkg_dict['name'] = pkg_dict.get('id', name)
+
+    # IPackageController
 
     # modfiey tags, keywords, and eov fields so that they properly index
     def before_index(self, data_dict):
@@ -590,3 +598,8 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         if base_url.endswith('/'):
             return base_url + locale_urls.get(lang)
         return base_url + '/' + locale_urls.get(lang)
+
+class CIOOSController(base.BaseController):
+
+    def schemamap(self):
+        return base.render('schemamap.html')
