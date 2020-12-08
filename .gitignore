@@ -41,3 +41,7 @@ coverage.xml
 # Sphinx documentation
 docs/_build/
 ckanext/cioos_theme/public/grunt/yarn.lock
+
+ckanext/cioos_theme/public/.sass-cache/
+
+ckanext/cioos_theme/public/sass/.sass-cache/
