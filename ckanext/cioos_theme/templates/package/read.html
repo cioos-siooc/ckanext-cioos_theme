@@ -18,17 +18,12 @@
         {{ h.dataset_display_name(pkg) }}
 
         {% set title_translation_method = h.cioos_load_json( h.get_pkg_dict_extra(pkg, 'title_translation_method') or pkg.get('title_translation_method') or '{}' ) %}
-        {% set tmethod = title_translation_method.get(h.lang()) %}
-        {% if tmethod %}
-          <span class="translation_icon_group" title="{{ tmethod }}">
+        {% set default_local = pkg.get('metadata-language') %}
+        {% if title_translation_method and default_local and default_local != h.lang() %}
+          <span class="translation_icon_group" title="{{ title_translation_method }}">
             <i class="fa fa-language translation_icon" aria-hidden="true"></i>
-            {% if tmethod == 'Automatic Translation' %}
-              <i class="fa fa-desktop translation_icon" aria-hidden="true"></i>
-            {% else %}
-              <i class="fa fa-user translation_icon" aria-hidden="true"></i>
-            {% endif%}
           </span>
-        {% endif%}
+        {% endif %}
 
         {% if pkg.state.startswith('draft') %}
           [{{ _('Draft') }}]
@@ -51,17 +46,12 @@
           {{ h.render_markdown(h.get_translated(pkg, 'notes')) }}
 
           {% set notes_translation_method = h.cioos_load_json( h.get_pkg_dict_extra(pkg, 'notes_translation_method') or pkg.get('notes_translation_method') or '{}' ) %}
-          {% set nmethod = notes_translation_method.get(h.lang()) %}
-          {% if nmethod %}
-            <span class="translation_icon_group" title="{{ nmethod }}">
+          {% set default_local = pkg.get('metadata-language') %}
+          {% if notes_translation_method and default_local and default_local != h.lang() %}
+            <span class="translation_icon_group" title="{{ notes_translation_method }}">
               <i class="fa fa-language translation_icon" aria-hidden="true"></i>
-              {% if nmethod == 'Automatic Translation' %}
-                <i class="fa fa-desktop translation_icon" aria-hidden="true"></i>
-              {% else %}
-                <i class="fa fa-user translation_icon" aria-hidden="true"></i>
-              {% endif%}
             </span>
-          {% endif%}
+          {% endif %}
 
         </div>
       {% endif %}
@@ -84,19 +74,8 @@
     {% snippet "package/snippets/dates.html", pkg_dict=pkg %}
   {% endblock %}
 
-{#
-  {% block package_citation %}
-    {% if pkg.doi %}
-      {% snippet "doi/snippets/package_citation.html", pkg_dict=pkg %}
-    {% endif %}
-  {% endblock %}
-#}
   {% block package_metadata_source %}
     {% snippet "package/snippets/metadata_source.html", pkg_dict=pkg %}
-  {% endblock %}
-
-  {% block package_citation %}
-    {% snippet "package/snippets/citation.html", pkg_dict=pkg %}
   {% endblock %}
 
   {% block package_img_preview %}
