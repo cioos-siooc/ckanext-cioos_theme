@@ -13,7 +13,7 @@
         <td style="width:76px;"><img src='{{ image_url }}' style="max-height:50px; max-width: 50px;" /></td>
         {% endif %}
         <td>
-
+        
           {% set xml_location_extras = pkg_dict.extras | selectattr("key","equalto","xml_location_url") | map(attribute="value") | join('')%}
           {% set xml_modified_date = pkg_dict.extras | selectattr("key","equalto","xml_modified_date") | map(attribute="value") | join('')%}
           {% set h_source_url = pkg_dict.extras | selectattr("key","equalto","h_source_url") | map(attribute="value") | join('') %}
