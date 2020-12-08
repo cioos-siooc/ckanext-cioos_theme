@@ -1,0 +1,11 @@
+<div class="module module-narrow module-shallow">
+    <h2 class="module-heading">
+      <i class="fa fa-info-circle"></i>
+      {{ _('What are Organizations?') }}
+    </h2>
+    <div class="module-content">
+      <p>
+        {{ h.scheming_language_text(h.cioos_load_json(h.cioos_organizations_info_text())) }}
+      </p>
+    </div>
+  </div>
