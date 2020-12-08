@@ -1092,4 +1092,27 @@ div.search-input-group {
   -o-transition: all 0.3s ease;
   transition: all 0.3s ease;
 }
+
+.citation{
+  .btn-secondary {
+      /* background-color: lightgrey; */
+      border-color: #333333;
+      color: #333333;
+      height: 28px;
+      line-height: 20px;
+      padding: 3px 12px;
+  }
+
+  button.dropdown-item:hover {
+      background-color: #f5f5f5;
+  }
+  
+  button.dropdown-item {
+      background-color: inherit;
+      border: none;
+      width: 100%;
+      text-align: left;
+  }
+}
+
 @import url(//fonts.googleapis.com/css?family=Montserrat:400,600,700,800,900|Quicksand:300,400,600,700|PT+Sans:400|Raleway:400);
