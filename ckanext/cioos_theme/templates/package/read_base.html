@@ -47,27 +47,26 @@
 
   {% block secondary_help_content %}{% endblock %}
 
-
   {% block package_info %}
     {% snippet 'package/snippets/info.html', pkg=pkg %}
   {% endblock %}
 
-
-{#
+{% if g.hide_organization_in_dataset_sidebar.lower() != 'true' %}
   {% block package_organization %}
     {% if pkg.organization %}
       {% set org = h.get_organization(pkg.organization.name) %}
       {% snippet "snippets/organization.html", organization=org, has_context_title=true %}
     {% endif %}
   {% endblock %}
-#}
+{% endif %}
 
-{#
+{% if g.show_social_in_dataset_sidebar.lower() == 'true' %}
   {% block package_social %}
     {% snippet "snippets/social.html" %}
   {% endblock %}
-#}
+{% endif %}
 
+{% if g.show_responsible_organization_in_dataset_sidebar.lower() == 'true' %}
 <section class="module module-narrow module-shallow">
     <h2 class="module-heading">
       <i class="fa fa-database"></i>
@@ -92,6 +91,7 @@
     {% endif %}
     {% endwith %}
 </section>
+{% endif %}
 
   {% block package_license %}
     {% snippet "snippets/license.html", pkg_dict=pkg, has_context_title=true %}

@@ -202,6 +202,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
 
         ignore_missing = toolkit.get_validator('ignore_missing')
         fluent_text = toolkit.get_validator('fluent_text')
+        boolean_validator = toolkit.get_validator('boolean_validator')
 
         schema.update({
             'ckan.site_title': [ignore_missing, fluent_field_default(None, None), fluent_text(None, None)],
@@ -215,6 +216,10 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             'ckan.eov_icon_base_path': [ignore_missing],
             'ckan.header_file_name': [ignore_missing],
             'ckan.footer_file_name': [ignore_missing],
+            'ckan.show_social_in_dataset_sidebar': [ignore_missing, boolean_validator],
+            'ckan.hide_organization_in_breadcrumb': [ignore_missing, boolean_validator],
+            'ckan.hide_organization_in_dataset_sidebar': [ignore_missing, boolean_validator],
+            'ckan.show_responsible_organization_in_dataset_sidebar': [ignore_missing, boolean_validator],
         })
         return schema
 

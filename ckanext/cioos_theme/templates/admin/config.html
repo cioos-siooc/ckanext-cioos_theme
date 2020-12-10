@@ -39,6 +39,14 @@
 
       {{ form.input('ckan.footer_file_name', id='field-ckan-footer-file-name', label=_('Custom footer filename'), value=data['ckan.footer_file_name'], error=error) }}
 
+      {{ form.input('ckan.show_social_in_dataset_sidebar', id='field-ckan-show-social-in-dataset-sidebar', label=_('Show social in dataset sidebar'), value=data['ckan.show_social_in_dataset_sidebar'], error=error) }}
+
+      {{ form.input('ckan.hide_organization_in_breadcrumb', id='field-ckan-hide-organization-in-breadcrumb', label=_('Hide Organization in breadcrumb'), value=data['ckan.hide_organization_in_breadcrumb'],  error=error) }}
+
+      {{ form.input('ckan.hide_organization_in_dataset_sidebar', id='field-ckan-hide-organization-in-dataset-sidebar', label=_('Hide Organization in dataset sidebar'), value=data['ckan.hide_organization_in_dataset_sidebar'], error=error) }}
+
+      {{ form.input('ckan.show_responsible_organization_in_dataset_sidebar', id='field-ckan-show-responsible-organization-in-dataset-sidebar', label=_('Show Responsible Organization in dataset sidebar'), value=data['ckan.show_responsible_organization_in_dataset_sidebar'], error=error) }}
+
       {% endblock %}
       <div class="form-actions">
         <a href="{% url_for 'admin.reset_config' %}" class="btn btn-danger pull-left" data-module="confirm-action" data-module-content="{{ _('Are you sure you want to reset the config?') }}">{{ _('Reset') }}</a>
