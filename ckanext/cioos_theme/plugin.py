@@ -241,7 +241,8 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             'cioos_count_datasets': cioos_helpers.cioos_count_datasets,
             'cioos_get_eovs': cioos_helpers.cioos_get_eovs,
             'cioos_get_locale_url': self.get_locale_url,
-            'cioos_schema_field_map': cioos_helpers.cioos_schema_field_map
+            'cioos_schema_field_map': cioos_helpers.cioos_schema_field_map,
+            'cioos_get_map_initial_max_zoom': cioos_helpers.cioos_get_map_initial_max_zoom
         }
 
     def get_validators(self):
