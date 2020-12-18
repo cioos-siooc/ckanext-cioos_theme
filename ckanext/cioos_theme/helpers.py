@@ -10,7 +10,6 @@ import ckan.plugins.toolkit as toolkit
 import ckan.plugins as p
 from ckan.common import OrderedDict, _, c
 # from ckantoolkit import h
-from ckan.lib.helpers import get_pkg_dict_extra
 import ckan.logic as logic
 import ckan.model as model
 from ckan.common import config
@@ -377,10 +376,3 @@ def cioos_get_facets(package_type='dataset'):
     #     'search': c.search_facets,
     #     'titles': c.facet_titles,
     # }
-
-
-def cioos_get_map_initial_max_zoom(pkg):
-    max_zoom = get_pkg_dict_extra(pkg, 'spatial_initial_max_zoom') or \
-        pkg.get('spatial_initial_max_zoom') or \
-        config.get('ckanext.spatial.common_map.initial_max_zoom', 9)
-    return max_zoom
