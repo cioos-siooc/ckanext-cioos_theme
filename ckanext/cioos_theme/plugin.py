@@ -202,6 +202,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
 
         ignore_missing = toolkit.get_validator('ignore_missing')
         fluent_text = toolkit.get_validator('fluent_text')
+        boolean_validator = toolkit.get_validator('boolean_validator')
 
         schema.update({
             'ckan.site_title': [ignore_missing, fluent_field_default(None, None), fluent_text(None, None)],
@@ -215,6 +216,10 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             'ckan.eov_icon_base_path': [ignore_missing],
             'ckan.header_file_name': [ignore_missing],
             'ckan.footer_file_name': [ignore_missing],
+            'ckan.show_social_in_dataset_sidebar': [ignore_missing, boolean_validator],
+            'ckan.hide_organization_in_breadcrumb': [ignore_missing, boolean_validator],
+            'ckan.hide_organization_in_dataset_sidebar': [ignore_missing, boolean_validator],
+            'ckan.show_responsible_organization_in_dataset_sidebar': [ignore_missing, boolean_validator],
         })
         return schema
 
@@ -343,6 +348,8 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
 
     # IPackageController
 
+    def _cited_responsible_party_to_responsible_organizations(self, parties):
+        return [x.get('organisation-name', '').strip() for x in json.loads(parties) if x.get('role') in ['originator']]
     # modfiey tags, keywords, and eov fields so that they properly index
     def before_index(self, data_dict):
         data_type = data_dict.get('type')
@@ -357,7 +364,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             log.error("error:%s, keywords:%r", err, data_dict.get('keywords', '{}'))
             tags_dict = {"en": [], "fr": []}
 
-        data_dict['responsible_organizations'] = [x.get('organisation-name', '').strip() for x in json.loads(data_dict.get('cited-responsible-party', '{}')) if x.get('role') in ['originator']]
+        data_dict['responsible_organizations'] = self._cited_responsible_party_to_responsible_organizations(data_dict.get('cited-responsible-party', '{}'))
 
         # update tag list by language
         data_dict['tags_en'] = tags_dict.get('en', [])
@@ -514,6 +521,9 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         # this is inconsistant with package data which is returned as json objects
         # by the package_show and package_search end points whout filters applied
         for result in search_results.get('results', []):
+            cited_responsible_party = result.get('cited-responsible-party')
+            if(cited_responsible_party and not result.get('responsible_organizations')):
+                result['responsible_organizations'] = self._cited_responsible_party_to_responsible_organizations(cited_responsible_party)
             title = result.get('title_translated')
             if(title):
                 result['title_translated'] = load_json(title)
@@ -582,6 +592,10 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             org_image_url = org_details.get('image_url_translated', {})
             if org_image_url:
                 package_dict['organization']['image_url_translated'] = org_image_url
+
+        cited_responsible_party = package_dict.get('cited-responsible-party')
+        if(cited_responsible_party and not package_dict.get('responsible_organizations')):
+            package_dict['responsible_organizations'] = self._cited_responsible_party_to_responsible_organizations(cited_responsible_party)
 
         return package_dict
 
