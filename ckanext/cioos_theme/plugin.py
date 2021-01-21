@@ -19,6 +19,9 @@ import urllib2
 import xml.etree.ElementTree as ET
 import routes.mapper
 import ckan.lib.base as base
+import re
+
+Invalid = df.Invalid
 
 StopOnError = df.StopOnError
 missing = df.missing
@@ -131,6 +134,17 @@ def url_validator_with_port(key, data, errors, context):
         # url is invalid
         pass
     errors[key].append(_('Please provide a valid URL'))
+
+
+@scheming_validator
+def cioos_tag_name_validator(field, schema):
+
+    def validator(value, context):
+        tagname_match = re.compile('[\w \-.\']*$', re.UNICODE)
+        if not tagname_match.match(value):
+            raise Invalid(_('Tag "%s" must be alphanumeric characters or symbols: -_.\'') % (value))
+        return value
+    return validator
 
 
 class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
@@ -253,7 +267,10 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         return {
             # 'cioos_if_empty_same_as__extras': if_empty_same_as__extras,
             'cioos_clean_and_populate_eovs': clean_and_populate_eovs,
-        }
+            'cioos_fluent_field_default': fluent_field_default,
+            'cioos_url_validator_with_port': url_validator_with_port,
+            'cioos_tag_name_validator': cioos_tag_name_validator,
+            }
 
     # IFacets
 
