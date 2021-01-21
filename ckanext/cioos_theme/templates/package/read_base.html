@@ -51,7 +51,7 @@
     {% snippet 'package/snippets/info.html', pkg=pkg %}
   {% endblock %}
 
-{% if g.hide_organization_in_dataset_sidebar.lower() != 'true' %}
+{% if g.hide_organization_in_dataset_sidebar.lower()|default('', 'false') != 'true' %}
   {% block package_organization %}
     {% if pkg.organization %}
       {% set org = h.get_organization(pkg.organization.name) %}
@@ -60,13 +60,13 @@
   {% endblock %}
 {% endif %}
 
-{% if g.show_social_in_dataset_sidebar.lower() == 'true' %}
+{% if g.show_social_in_dataset_sidebar.lower()|default('', 'false')  == 'true' %}
   {% block package_social %}
     {% snippet "snippets/social.html" %}
   {% endblock %}
 {% endif %}
 
-{% if g.show_responsible_organization_in_dataset_sidebar.lower() == 'true' %}
+{% if g.show_responsible_organization_in_dataset_sidebar.lower()|default('', 'true')  == 'true' %}
 <section class="module module-narrow module-shallow">
     <h2 class="module-heading">
       <i class="fa fa-database"></i>
