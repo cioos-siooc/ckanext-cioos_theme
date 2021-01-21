@@ -397,6 +397,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         except Exception as err:
             log.error(err)
 
+        # create temporal extent index.
         te = data_dict.get('temporal-extent', '{}')
         if te:
             temporal_extent = load_json(te)
@@ -409,6 +410,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             if(temporal_extent_begin and temporal_extent_end):
                 data_dict['temporal-extent-range'] = '[' + temporal_extent_begin + ' TO ' + temporal_extent_end + ']'
 
+        # create vertical extent index
         ve = data_dict.get('vertical-extent', '{}')
         if ve:
             vertical_extent = load_json(ve)
