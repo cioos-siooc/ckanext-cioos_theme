@@ -1093,5 +1093,10 @@ div.search-input-group {
   transition: all 0.3s ease;
 }
 
-@import 'cioos_atlantic.scss';
+i.fa.translation_icon {
+    font-size: large;
+    color: #585858;
+}
+
 @import url(//fonts.googleapis.com/css?family=Montserrat:400,600,700,800,900|Quicksand:300,400,600,700|PT+Sans:400|Raleway:400);
+@import 'cioos_atlantic.scss';
