@@ -45,9 +45,8 @@
       </li>
       <li id="menu-item-2002" class="menu-item"><a href="{{ g.site_home_url }}fr/ressources/"><span>Ressources</span></a>
       </li>
-      {%- endif -%}
       <ul class="shareicons">
-        <li><a href="http://twitter.com/cioos_siooc" tabindex="0" aria-label="Twitter"><i class="fa fa-twitter"></i></a></li>
+        {{ include_site_social() }}
         <li>
           {%- if h.lang() == 'en' -%}
             <a href="{% url_for h.current_url(), locale='fr' %}" tabindex="0" aria-label="French/English">FR</a>
