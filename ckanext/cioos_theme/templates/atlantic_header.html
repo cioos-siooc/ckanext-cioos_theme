@@ -112,3 +112,9 @@
   </ul>
   {% endblock %}
 {% endmacro %}
+
+{% macro include_site_social() %}
+  {% block header_social_list %}
+    <li><a href="http://twitter.com/cioos_siooc" tabindex="0" aria-label="Twitter"><i class="fa fa-twitter"></i></a></li>
+  {% endblock %}
+{% endmacro %}
