@@ -374,7 +374,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             return data_dict
 
         try:
-            tags_dict = json.loads(data_dict.get('keywords', '{}'))
+            tags_dict = load_json(data_dict.get('keywords', '{}'))
         except Exception as err:
             log.error(data_dict.get('id', 'NO ID'))
             log.error(type(err))
@@ -408,7 +408,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             data_dict['organization_fr'] = org_title.get('fr', '')
 
         try:
-            title = json.loads(data_dict.get('title_translated', '{}'))
+            title = load_json(data_dict.get('title_translated', '{}'))
             data_dict['title_en'] = title.get('en', [])
             data_dict['title_fr'] = title.get('fr', [])
         except Exception as err:
@@ -445,7 +445,8 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         # Index Source XML
         # harvest object will be json if harvested from another ckan instance. TODO check it is xml
         # try harvest object (xml)
-        h_object_id = data_dict.get('harvest_object_id', 'none')
+        #log.debug('DICT: %r', data_dict)
+        h_object_id = data_dict.get('harvest_object_id', data_dict.get('h_object_id', 'none'))
         context = {'model': model,
                    'session': model.Session,
                    'ignore_auth': True}
