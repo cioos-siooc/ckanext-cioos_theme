@@ -17,7 +17,6 @@
 
 {% block content_primary_nav %}
   {{ h.build_nav_icon('dataset_read', _('Dataset'), id=pkg.name) }}
-  {{ h.build_nav_icon('dataset_groups', _('Groups'), id=pkg.name) }}
   {{ h.build_nav_icon('dataset_activity', _('Activity Stream'), id=pkg.name) }}
 {% endblock %}
 
@@ -48,29 +47,57 @@
 
   {% block secondary_help_content %}{% endblock %}
 
-
   {% block package_info %}
     {% snippet 'package/snippets/info.html', pkg=pkg %}
   {% endblock %}
 
-
-
+{% if g.hide_organization_in_dataset_sidebar.lower()|default('', 'false') != 'true' %}
   {% block package_organization %}
     {% if pkg.organization %}
       {% set org = h.get_organization(pkg.organization.name) %}
       {% snippet "snippets/organization.html", organization=org, has_context_title=true %}
     {% endif %}
   {% endblock %}
+{% endif %}
 
-
-{#
+{% if g.show_social_in_dataset_sidebar.lower()|default('', 'false')  == 'true' %}
   {% block package_social %}
     {% snippet "snippets/social.html" %}
   {% endblock %}
-#}
+{% endif %}
+
+{% if g.show_responsible_organization_in_dataset_sidebar.lower()|default('', 'true')  == 'true' %}
+<section class="module module-narrow module-shallow">
+    <h2 class="module-heading">
+      <i class="fa fa-database"></i>
+      {{ _('Responsible Organizations') }}
+    </h2>
+    {% with items = pkg.responsible_organizations %}
+    {% if items %}
+      <nav>
+        <ul class="{{ nav_class or 'list-unstyled nav nav-simple nav-facet' }}">
+          {% for item in items %}
+            {% set href = h.add_url_param(new_params={'responsible_organizations': item}, controller='package', action='search') %}
+            {% set label = item %}
+            {% set label_truncated = h.truncate(label, 30) %}
+              <li class="nav-item">
+                <a href="{{ href }}" title="{{ label if label != label_truncated else '' }}">
+                  <span class="item-label">{{ label_truncated }}</span>
+                </a>
+              </li>
+          {% endfor %}
+        </ul>
+      </nav>
+    {% endif %}
+    {% endwith %}
+</section>
+{% endif %}
 
   {% block package_license %}
     {% snippet "snippets/license.html", pkg_dict=pkg, has_context_title=true %}
   {% endblock %}
+
+
+
 
 {% endblock %}

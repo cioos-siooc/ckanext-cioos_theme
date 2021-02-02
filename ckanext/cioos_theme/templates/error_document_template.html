@@ -1,0 +1,29 @@
+{% ckan_extends %}
+
+{% if code[0] == "404" %}
+    {% set titre_de_la_page = gettext('Page not found') %}
+{% else %}
+    {% set titre_de_la_page = gettext('Error %(error_code)s', error_code=code[0]) %}
+{% endif%}
+
+{% block primary %}
+     
+     <article class="module">
+        <div class="module-content">
+          {% if code[0] == "404" %}
+              <h1>{{ gettext('404 - Page not found') }}</h1>
+              <p>{{ gettext('Sorry, we could not find the page you are looking for.') }}</p>
+              <p>{{ gettext('Follow this link to explore our datasets ') }} <a href="{{h.url_for(controller='package', action='search')}}">{{ g.site_url }}{{h.url_for(controller='package', action='search')}}</a></p>
+              <p>{{ gettext('Or contact us at ') }}{{ h.cioos_contact_email() }}</p>
+          {% else %}
+            {{ content}}
+          {% endif%}
+        </div>
+      </article>
+{% endblock %}
+
+{% block flash %}
+  {# eat the flash messages caused by the 404 #}
+  {% set flash_messages = h.flash.pop_messages() %}
+{% endblock %}
+
