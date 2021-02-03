@@ -16,6 +16,7 @@ from six.moves.urllib.parse import urlparse
 import string
 from ckan.common import _
 import urllib2
+import socket
 import xml.etree.ElementTree as ET
 import routes.mapper
 import ckan.lib.base as base
@@ -468,31 +469,52 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             # try reading from xml url
             xml_str = ''
             xml_url = load_json(data_dict.get('xml_location_url'))
+            urlopen_timeout = toolkit.config.get('ckan.index_xml_url_read_timeout', 500) / 1000.0  # get value in millieseconds but urllib assumes it is in seconds
+
             # single file
             if xml_url and isinstance(xml_url, basestring):
                 try:
-                    xml_str = urllib2.urlopen(xml_url).read(100000)  # read only 100 000 chars
+                    xml_str = urllib2.urlopen(xml_url, timeout=urlopen_timeout).read(100000)  # read only 100 000 chars
                     ET.XML(xml_str)  # test for valid xml
                     data_dict['extras_harvest_document_content'] = xml_str
                 except ET.ParseError as e:
-                    log.error('XML string is invalid. %s', e)
+                    log.error('XML string is invalid. Type: %s Error: %s',
+                              type(e).__name__, e)
+                except urllib2.URLError as e:
+                    log.error('Error ready from URL:"%s" referenced by dataset '
+                              '"%s" Type: %s Error: %s',
+                              xml_url, data_dict['id'], type(e).__name__, e)
+                except socket.timeout as e:
+                    log.error('Timeout while reading from URL:"%s" referenced by '
+                              'dataset "%s" Type: %s Error: %s',
+                              xml_url, data_dict['id'], type(e).__name__, e)
                 except Exception as e:
                     log.error('Unable to read from xml url "%s" '
-                              'referenced by dataset "%s" Error: %s',
-                              xml_url, data_dict['id'], e)
+                              'referenced by dataset "%s" Type: %s Error: %s',
+                              xml_url, data_dict['id'], type(e).__name__, e)
+
             # list of files
             elif xml_url and isinstance(xml_url, list):
                 for xml_file in xml_url:
                     try:
-                        xml_file_str = urllib2.urlopen(xml_file).read(100000)  # read only 100 000 chars
+                        xml_file_str = urllib2.urlopen(xml_file, timeout=urlopen_timeout).read(100000)  # read only 100 000 chars
                         xml_root_str = ET.tostring(ET.XML(xml_file_str))
                         xml_str = xml_str + '<doc>' + xml_root_str + '</doc>'
                     except ET.ParseError as e:
-                        log.error('XML string is invalid. %s', e)
+                        log.error('XML string is invalid. Type: %s Error: %s',
+                                  type(e).__name__, e)
+                    except urllib2.URLError as e:
+                        log.error('Error ready from URL:"%s" referenced by dataset '
+                                  '"%s" Type: %s Error: %s',
+                                  xml_url, data_dict['id'], type(e).__name__, e)
+                    except socket.timeout as e:
+                        log.error('Timeout while reading from URL:"%s" referenced by '
+                                  'dataset "%s" Type: %s Error: %s',
+                                  xml_url, data_dict['id'], type(e).__name__, e)
                     except Exception as e:
                         log.error('Unable to read from xml url "%s" '
-                                  'referenced by dataset "%s" Error: %s',
-                                  xml_file, data_dict['id'], e)
+                                  'referenced by dataset "%s" Type: %s Error: %s',
+                                  xml_url, data_dict['id'], type(e).__name__, e)
                 if xml_str:
                     xml_str = xml_str = '<?xml version="1.0" encoding="utf-8"?><docs>' + xml_str + '</docs>'
                     data_dict['extras_harvest_document_content'] = xml_str
