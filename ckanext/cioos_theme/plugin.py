@@ -12,10 +12,12 @@ from shapely.geometry import shape
 import logging
 import ckan.lib.navl.dictization_functions as df
 from ckan.common import c
+from ckan.lib.search.common import SearchIndexError
 from six.moves.urllib.parse import urlparse
 import string
 from ckan.common import _
 import urllib2
+import socket
 import xml.etree.ElementTree as ET
 import routes.mapper
 import ckan.lib.base as base
@@ -34,10 +36,11 @@ contact_email = toolkit.config.get('cioos.contact_email', "info@cioos.ca")
 organizations_info_text = toolkit.config.get(
     'cioos.organizations_info_text',
     {
-        "en":"CKAN Organizations are used to create, manage and publish collections of datasets. Users can have different roles within an Organization, depending on their level of authorisation to create, edit and publish.",
-        "fr":u"Les Organisations CKAN sont utilisées pour créer, gérer et publier des collections de jeux de données. Les utilisateurs peuvent avoir différents rôles au sein d'une Organisation, en fonction de leur niveau d'autorisation pour créer, éditer et publier."
+        "en": "CKAN Organizations are used to create, manage and publish collections of datasets. Users can have different roles within an Organization, depending on their level of authorisation to create, edit and publish.",
+        "fr": u"Les Organisations CKAN sont utilisées pour créer, gérer et publier des collections de jeux de données. Les utilisateurs peuvent avoir différents rôles au sein d'une Organisation, en fonction de leur niveau d'autorisation pour créer, éditer et publier."
     }
 )
+
 
 def load_json(j):
     try:
@@ -49,6 +52,7 @@ def load_json(j):
 
 def geojson_to_bbox(o):
     return shape(o).bounds
+
 
 # IValidators
 
@@ -237,6 +241,9 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         })
         return schema
 
+    def get_additional_css_path(self):
+        return toolkit.config.get('ckan.cioos.ra_css_path', '/ra.css')
+
     def get_helpers(self):
         """Register the most_popular_groups() function above as a template helper function."""
         # Template helper function names should begin with the name of the
@@ -260,7 +267,8 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             'cioos_count_datasets': cioos_helpers.cioos_count_datasets,
             'cioos_get_eovs': cioos_helpers.cioos_get_eovs,
             'cioos_get_locale_url': self.get_locale_url,
-            'cioos_schema_field_map': cioos_helpers.cioos_schema_field_map
+            'cioos_schema_field_map': cioos_helpers.cioos_schema_field_map,
+            'cioos_get_additional_css_path': self.get_additional_css_path
         }
 
     def get_validators(self):
@@ -270,7 +278,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             'cioos_fluent_field_default': fluent_field_default,
             'cioos_url_validator_with_port': url_validator_with_port,
             'cioos_tag_name_validator': cioos_tag_name_validator,
-            }
+        }
 
     # IFacets
 
@@ -361,12 +369,11 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                     facets_dict[key] = value
         return facets_dict
 
-
-
     # IPackageController
 
     def _cited_responsible_party_to_responsible_organizations(self, parties):
         return [x.get('organisation-name', '').strip() for x in json.loads(parties) if x.get('role') in ['originator']]
+
     # modfiey tags, keywords, and eov fields so that they properly index
     def before_index(self, data_dict):
         data_type = data_dict.get('type')
@@ -445,7 +452,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         # Index Source XML
         # harvest object will be json if harvested from another ckan instance. TODO check it is xml
         # try harvest object (xml)
-        #log.debug('DICT: %r', data_dict)
+        # log.debug('DICT: %r', data_dict)
         h_object_id = data_dict.get('harvest_object_id', data_dict.get('h_object_id', 'none'))
         context = {'model': model,
                    'session': model.Session,
@@ -468,31 +475,62 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             # try reading from xml url
             xml_str = ''
             xml_url = load_json(data_dict.get('xml_location_url'))
+            urlopen_timeout = float(toolkit.config.get('ckan.index_xml_url_read_timeout', '500')) / 1000.0  # get value in millieseconds but urllib assumes it is in seconds
+
             # single file
             if xml_url and isinstance(xml_url, basestring):
                 try:
-                    xml_str = urllib2.urlopen(xml_url).read(100000)  # read only 100 000 chars
+                    xml_str = urllib2.urlopen(xml_url, timeout=urlopen_timeout).read(100000)  # read only 100 000 chars
                     ET.XML(xml_str)  # test for valid xml
                     data_dict['extras_harvest_document_content'] = xml_str
                 except ET.ParseError as e:
-                    log.error('XML string is invalid. %s', e)
+                    err = 'XML string is invalid. From URL:"%s" referenced by dataset "%s" Type: %s Error: %s' % \
+                        (xml_url, data_dict['id'], type(e).__name__, e)
+                    log.error(err)
+                    raise SearchIndexError(err)
+                except urllib2.URLError as e:
+                    err = 'Error ready from URL:"%s" referenced by dataset "%s" Type: %s Error: %s' % \
+                        (xml_url, data_dict['id'], type(e).__name__, e)
+                    log.error(err)
+                    raise SearchIndexError(err)
+                except socket.timeout as e:
+                    err = 'Timeout while reading from URL:"%s" referenced by dataset "%s" Type: %s Error: %s' % \
+                        (xml_url, data_dict['id'], type(e).__name__, e)
+                    log.error(err)
+                    raise SearchIndexError(err)
                 except Exception as e:
-                    log.error('Unable to read from xml url "%s" '
-                              'referenced by dataset "%s" Error: %s',
-                              xml_url, data_dict['id'], e)
+                    err = 'Unable to read from xml url "%s" referenced by dataset "%s" Type: %s Error: %s' % \
+                        (xml_url, data_dict['id'], type(e).__name__, e)
+                    log.error(err)
+                    raise SearchIndexError(err)
+
             # list of files
             elif xml_url and isinstance(xml_url, list):
                 for xml_file in xml_url:
                     try:
-                        xml_file_str = urllib2.urlopen(xml_file).read(100000)  # read only 100 000 chars
+                        xml_file_str = urllib2.urlopen(xml_file, timeout=urlopen_timeout).read(100000)  # read only 100 000 chars
                         xml_root_str = ET.tostring(ET.XML(xml_file_str))
                         xml_str = xml_str + '<doc>' + xml_root_str + '</doc>'
                     except ET.ParseError as e:
-                        log.error('XML string is invalid. %s', e)
+                        err = 'XML string is invalid. From URL:"%s" referenced by dataset "%s" Type: %s Error: %s' % \
+                            (xml_url, data_dict['id'], type(e).__name__, e)
+                        log.error(err)
+                        raise SearchIndexError(err)
+                    except urllib2.URLError as e:
+                        err = 'Error ready from URL:"%s" referenced by dataset "%s" Type: %s Error: %s' % \
+                            (xml_url, data_dict['id'], type(e).__name__, e)
+                        log.error(err)
+                        raise SearchIndexError(err)
+                    except socket.timeout as e:
+                        err = 'Timeout while reading from URL:"%s" referenced by dataset "%s" Type: %s Error: %s' % \
+                            (xml_url, data_dict['id'], type(e).__name__, e)
+                        log.error(err)
+                        raise SearchIndexError(err)
                     except Exception as e:
-                        log.error('Unable to read from xml url "%s" '
-                                  'referenced by dataset "%s" Error: %s',
-                                  xml_file, data_dict['id'], e)
+                        err = 'Unable to read from xml url "%s" referenced by dataset "%s" Type: %s Error: %s' % \
+                            (xml_url, data_dict['id'], type(e).__name__, e)
+                        log.error(err)
+                        raise SearchIndexError(err)
                 if xml_str:
                     xml_str = xml_str = '<?xml version="1.0" encoding="utf-8"?><docs>' + xml_str + '</docs>'
                     data_dict['extras_harvest_document_content'] = xml_str
@@ -633,6 +671,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         if base_url.endswith('/'):
             return base_url + locale_urls.get(lang)
         return base_url + '/' + locale_urls.get(lang)
+
 
 class CIOOSController(base.BaseController):
 
