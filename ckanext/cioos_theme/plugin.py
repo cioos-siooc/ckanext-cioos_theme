@@ -13,6 +13,7 @@ import logging
 import ckan.lib.navl.dictization_functions as df
 from ckan.common import c
 from ckan.lib.search.common import SearchIndexError
+# from ckan.lib.search.common import SearchIndexError
 from six.moves.urllib.parse import urlparse
 import string
 from ckan.common import _
@@ -484,25 +485,21 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                     ET.XML(xml_str)  # test for valid xml
                     data_dict['extras_harvest_document_content'] = xml_str
                 except ET.ParseError as e:
-                    err = 'XML string is invalid. From URL:"%s" referenced by dataset "%s" Type: %s Error: %s' % \
-                        (xml_url, data_dict['id'], type(e).__name__, e)
+                    err = '%s: XML string is invalid. From URL:"%s" referenced by dataset "%s" Error: %s' % \
+                        (type(e).__name__, xml_url, data_dict['id'], e)
                     log.error(err)
-                    raise SearchIndexError(err)
                 except urllib2.URLError as e:
-                    err = 'Error ready from URL:"%s" referenced by dataset "%s" Type: %s Error: %s' % \
-                        (xml_url, data_dict['id'], type(e).__name__, e)
+                    err = '%s: Error ready from URL:"%s" referenced by dataset "%s" Error: %s' % \
+                        (type(e).__name__, xml_url, data_dict['id'], e)
                     log.error(err)
-                    raise SearchIndexError(err)
                 except socket.timeout as e:
-                    err = 'Timeout while reading from URL:"%s" referenced by dataset "%s" Type: %s Error: %s' % \
-                        (xml_url, data_dict['id'], type(e).__name__, e)
+                    err = '%s: Timeout while reading from URL:"%s" referenced by dataset "%s" Error: %s' % \
+                        (type(e).__name__, xml_url, data_dict['id'], e)
                     log.error(err)
-                    raise SearchIndexError(err)
                 except Exception as e:
-                    err = 'Unable to read from xml url "%s" referenced by dataset "%s" Type: %s Error: %s' % \
-                        (xml_url, data_dict['id'], type(e).__name__, e)
+                    err = '%s: Unable to read from xml url "%s" referenced by dataset "%s" Error: %s' % \
+                        (type(e).__name__, xml_url, data_dict['id'], e)
                     log.error(err)
-                    raise SearchIndexError(err)
 
             # list of files
             elif xml_url and isinstance(xml_url, list):
@@ -512,25 +509,21 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                         xml_root_str = ET.tostring(ET.XML(xml_file_str))
                         xml_str = xml_str + '<doc>' + xml_root_str + '</doc>'
                     except ET.ParseError as e:
-                        err = 'XML string is invalid. From URL:"%s" referenced by dataset "%s" Type: %s Error: %s' % \
-                            (xml_url, data_dict['id'], type(e).__name__, e)
+                        err = '%s: XML string is invalid. From URL:"%s" referenced by dataset "%s" Error: %s' % \
+                            (type(e).__name__, xml_url, data_dict['id'], e)
                         log.error(err)
-                        raise SearchIndexError(err)
                     except urllib2.URLError as e:
-                        err = 'Error ready from URL:"%s" referenced by dataset "%s" Type: %s Error: %s' % \
-                            (xml_url, data_dict['id'], type(e).__name__, e)
+                        err = '%s: Error ready from URL:"%s" referenced by dataset "%s" Error: %s' % \
+                            (type(e).__name__, xml_url, data_dict['id'], e)
                         log.error(err)
-                        raise SearchIndexError(err)
                     except socket.timeout as e:
-                        err = 'Timeout while reading from URL:"%s" referenced by dataset "%s" Type: %s Error: %s' % \
-                            (xml_url, data_dict['id'], type(e).__name__, e)
+                        err = '%s: Timeout while reading from URL:"%s" referenced by dataset "%s" Error: %s' % \
+                            (type(e).__name__, xml_url, data_dict['id'], e)
                         log.error(err)
-                        raise SearchIndexError(err)
                     except Exception as e:
-                        err = 'Unable to read from xml url "%s" referenced by dataset "%s" Type: %s Error: %s' % \
-                            (xml_url, data_dict['id'], type(e).__name__, e)
+                        err = '%s: Unable to read from xml url "%s" referenced by dataset "%s" Error: %s' % \
+                            (type(e).__name__, xml_url, data_dict['id'], e)
                         log.error(err)
-                        raise SearchIndexError(err)
                 if xml_str:
                     xml_str = xml_str = '<?xml version="1.0" encoding="utf-8"?><docs>' + xml_str + '</docs>'
                     data_dict['extras_harvest_document_content'] = xml_str
