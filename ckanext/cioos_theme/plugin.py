@@ -366,7 +366,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
     # IPackageController
 
     def _cited_responsible_party_to_responsible_organizations(self, parties):
-        resp_org_roles = toolkit.config.get('ckan.responsible_organization_roles', ['owner', 'originator', 'custodian', 'author', 'principalInvestigator'])
+        resp_org_roles = json.loads(toolkit.config.get('ckan.responsible_organization_roles', '["owner", "originator", "custodian", "author", "principalInvestigator"]'))
         resp_orgs = [x.get('organisation-name', '').strip() for x in json.loads(parties) if x.get('role') in resp_org_roles]
         resp_orgs = list(dict.fromkeys(resp_orgs))  # remove duplicates
         return resp_orgs
