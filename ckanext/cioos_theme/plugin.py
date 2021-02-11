@@ -13,7 +13,6 @@ import logging
 import ckan.lib.navl.dictization_functions as df
 from ckan.common import c
 from ckan.lib.search.common import SearchIndexError
-# from ckan.lib.search.common import SearchIndexError
 from six.moves.urllib.parse import urlparse
 import string
 from ckan.common import _
