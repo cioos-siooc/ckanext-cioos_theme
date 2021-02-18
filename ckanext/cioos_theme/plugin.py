@@ -2,8 +2,6 @@
 
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
-import ckan.model as model
-from ckan.logic import NotFound
 import ckanext.cioos_theme.helpers as cioos_helpers
 from ckanext.scheming.validation import scheming_validator
 from ckan.lib.plugins import DefaultTranslation
@@ -12,21 +10,15 @@ from shapely.geometry import shape
 import logging
 import ckan.lib.navl.dictization_functions as df
 from ckan.common import c
-from ckan.lib.search.common import SearchIndexError
 from six.moves.urllib.parse import urlparse
 import string
 from ckan.common import _
-import urllib2
-import socket
-import xml.etree.ElementTree as ET
 import routes.mapper
 import ckan.lib.base as base
 import re
 
 Invalid = df.Invalid
 
-StopOnError = df.StopOnError
-missing = df.missing
 log = logging.getLogger(__name__)
 
 show_responsible_organizations = toolkit.asbool(
@@ -448,84 +440,6 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         # eov is multi select so it is a json list rather then a python list
         if(data_dict.get('eov')):
             data_dict['eov'] = load_json(data_dict['eov'])
-
-        # Index Source XML
-        # harvest object will be json if harvested from another ckan instance. TODO check it is xml
-        # try harvest object (xml)
-        # log.debug('DICT: %r', data_dict)
-        h_object_id = data_dict.get('harvest_object_id', data_dict.get('h_object_id', 'none'))
-        context = {'model': model,
-                   'session': model.Session,
-                   'ignore_auth': True}
-
-        pkg_dict = {'id': h_object_id}
-
-        try:
-            harvest_object = toolkit.get_action('harvest_object_show')(context, pkg_dict)
-            content = harvest_object.get('content', '')
-            if content.startswith('<'):
-                data_dict['extras_harvest_document_content'] = harvest_object.get('content', '')
-            else:
-                raise NotFound
-        except NotFound:
-            log.warning('Unable to find harvest object "%s" '
-                        'referenced by dataset "%s". Trying xml url',
-                        pkg_dict['id'], data_dict['id'])
-
-            # try reading from xml url
-            xml_str = ''
-            xml_url = load_json(data_dict.get('xml_location_url'))
-            urlopen_timeout = float(toolkit.config.get('ckan.index_xml_url_read_timeout', '500')) / 1000.0  # get value in millieseconds but urllib assumes it is in seconds
-
-            # single file
-            if xml_url and isinstance(xml_url, basestring):
-                try:
-                    xml_str = urllib2.urlopen(xml_url, timeout=urlopen_timeout).read(100000)  # read only 100 000 chars
-                    ET.XML(xml_str)  # test for valid xml
-                    data_dict['extras_harvest_document_content'] = xml_str
-                except ET.ParseError as e:
-                    err = '%s: XML string is invalid. From URL:"%s" referenced by dataset "%s" Error: %s' % \
-                        (type(e).__name__, xml_url, data_dict['id'], e)
-                    log.error(err)
-                except urllib2.URLError as e:
-                    err = '%s: Error ready from URL:"%s" referenced by dataset "%s" Error: %s' % \
-                        (type(e).__name__, xml_url, data_dict['id'], e)
-                    log.error(err)
-                except socket.timeout as e:
-                    err = '%s: Timeout while reading from URL:"%s" referenced by dataset "%s" Error: %s' % \
-                        (type(e).__name__, xml_url, data_dict['id'], e)
-                    log.error(err)
-                except Exception as e:
-                    err = '%s: Unable to read from xml url "%s" referenced by dataset "%s" Error: %s' % \
-                        (type(e).__name__, xml_url, data_dict['id'], e)
-                    log.error(err)
-
-            # list of files
-            elif xml_url and isinstance(xml_url, list):
-                for xml_file in xml_url:
-                    try:
-                        xml_file_str = urllib2.urlopen(xml_file, timeout=urlopen_timeout).read(100000)  # read only 100 000 chars
-                        xml_root_str = ET.tostring(ET.XML(xml_file_str))
-                        xml_str = xml_str + '<doc>' + xml_root_str + '</doc>'
-                    except ET.ParseError as e:
-                        err = '%s: XML string is invalid. From URL:"%s" referenced by dataset "%s" Error: %s' % \
-                            (type(e).__name__, xml_url, data_dict['id'], e)
-                        log.error(err)
-                    except urllib2.URLError as e:
-                        err = '%s: Error ready from URL:"%s" referenced by dataset "%s" Error: %s' % \
-                            (type(e).__name__, xml_url, data_dict['id'], e)
-                        log.error(err)
-                    except socket.timeout as e:
-                        err = '%s: Timeout while reading from URL:"%s" referenced by dataset "%s" Error: %s' % \
-                            (type(e).__name__, xml_url, data_dict['id'], e)
-                        log.error(err)
-                    except Exception as e:
-                        err = '%s: Unable to read from xml url "%s" referenced by dataset "%s" Error: %s' % \
-                            (type(e).__name__, xml_url, data_dict['id'], e)
-                        log.error(err)
-                if xml_str:
-                    xml_str = xml_str = '<?xml version="1.0" encoding="utf-8"?><docs>' + xml_str + '</docs>'
-                    data_dict['extras_harvest_document_content'] = xml_str
 
         return data_dict
 
