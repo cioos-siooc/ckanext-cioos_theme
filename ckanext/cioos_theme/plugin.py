@@ -371,6 +371,11 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         resp_orgs = list(dict.fromkeys(resp_orgs))  # remove duplicates
         return resp_orgs
 
+
+     def _get_extra(self, key, package_dict):
+         for extra in package_dict.get('extras', []):
+             if extra['key'] == key:
+                 return extra
     # modfiey tags, keywords, and eov fields so that they properly index
     def before_index(self, data_dict):
         data_type = data_dict.get('type')
@@ -385,6 +390,13 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             log.error("error:%s, keywords:%r", err, data_dict.get('keywords', '{}'))
             tags_dict = {"en": [], "fr": []}
 
+        force_resp_org = load_json(self._get_extra('force_responsible_organization', data_dict))
+        if force_resp_org:
+            if isinstance(force_resp_org, list):
+                data_dict['responsible_organizations'] = force_resp_org
+            else:
+                data_dict['responsible_organizations'] = [force_resp_org]
+        else:
         data_dict['responsible_organizations'] = self._cited_responsible_party_to_responsible_organizations(data_dict.get('cited-responsible-party', '{}'))
 
         # update tag list by language
