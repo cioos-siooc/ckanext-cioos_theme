@@ -365,17 +365,23 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
 
     # IPackageController
 
-    def _cited_responsible_party_to_responsible_organizations(self, parties):
-        resp_org_roles = json.loads(toolkit.config.get('ckan.responsible_organization_roles', '["owner", "originator", "custodian", "author", "principalInvestigator"]'))
-        resp_orgs = [x.get('organisation-name', '').strip() for x in json.loads(parties) if x.get('role') in resp_org_roles]
-        resp_orgs = list(dict.fromkeys(resp_orgs))  # remove duplicates
+    def _cited_responsible_party_to_responsible_organizations(self, parties, force_responsible_organization):
+        if force_responsible_organization:
+            if isinstance(force_responsible_organization, list):
+                resp_orgs = force_responsible_organization
+            else:
+                resp_orgs = [force_responsible_organization]
+        else:
+            resp_org_roles = json.loads(toolkit.config.get('ckan.responsible_organization_roles', '["owner", "originator", "custodian", "author", "principalInvestigator"]'))
+            resp_orgs = [x.get('organisation-name', '').strip() for x in json.loads(parties) if x.get('role') in resp_org_roles]
+            resp_orgs = list(dict.fromkeys(resp_orgs))  # remove duplicates
         return resp_orgs
 
+    def _get_extra_value(self, key, package_dict):
+        for extra in package_dict.get('extras', []):
+            if extra['key'] == key:
+                return extra['value']
 
-     def _get_extra(self, key, package_dict):
-         for extra in package_dict.get('extras', []):
-             if extra['key'] == key:
-                 return extra
     # modfiey tags, keywords, and eov fields so that they properly index
     def before_index(self, data_dict):
         data_type = data_dict.get('type')
@@ -390,14 +396,8 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             log.error("error:%s, keywords:%r", err, data_dict.get('keywords', '{}'))
             tags_dict = {"en": [], "fr": []}
 
-        force_resp_org = load_json(self._get_extra('force_responsible_organization', data_dict))
-        if force_resp_org:
-            if isinstance(force_resp_org, list):
-                data_dict['responsible_organizations'] = force_resp_org
-            else:
-                data_dict['responsible_organizations'] = [force_resp_org]
-        else:
-        data_dict['responsible_organizations'] = self._cited_responsible_party_to_responsible_organizations(data_dict.get('cited-responsible-party', '{}'))
+        force_resp_org = load_json(data_dict.get('force_responsible_organization', '[]'))
+        data_dict['responsible_organizations'] = self._cited_responsible_party_to_responsible_organizations(data_dict.get('cited-responsible-party', '{}'), force_resp_org)
 
         # update tag list by language
         data_dict['tags_en'] = tags_dict.get('en', [])
@@ -557,9 +557,12 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         # this is inconsistant with package data which is returned as json objects
         # by the package_show and package_search end points whout filters applied
         for result in search_results.get('results', []):
+
+            force_resp_org = load_json(self._get_extra_value('force_responsible_organization', result))
             cited_responsible_party = result.get('cited-responsible-party')
-            if(cited_responsible_party and not result.get('responsible_organizations')):
-                result['responsible_organizations'] = self._cited_responsible_party_to_responsible_organizations(cited_responsible_party)
+            if((cited_responsible_party or force_resp_org) and not result.get('responsible_organizations')):
+                result['responsible_organizations'] = self._cited_responsible_party_to_responsible_organizations(cited_responsible_party, force_resp_org)
+
             title = result.get('title_translated')
             if(title):
                 result['title_translated'] = load_json(title)
@@ -629,9 +632,10 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             if org_image_url:
                 package_dict['organization']['image_url_translated'] = org_image_url
 
+        force_resp_org = load_json(self._get_extra_value('force_responsible_organization', package_dict))
         cited_responsible_party = package_dict.get('cited-responsible-party')
-        if(cited_responsible_party and not package_dict.get('responsible_organizations')):
-            package_dict['responsible_organizations'] = self._cited_responsible_party_to_responsible_organizations(cited_responsible_party)
+        if((cited_responsible_party or force_resp_org) and not package_dict.get('responsible_organizations')):
+            package_dict['responsible_organizations'] = self._cited_responsible_party_to_responsible_organizations(cited_responsible_party, force_resp_org)
 
         return package_dict
 
