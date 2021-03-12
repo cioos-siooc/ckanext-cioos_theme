@@ -4,35 +4,49 @@
     <tbody>
       {% block package_dates %}
 
-        {% if pkg_dict.metadata_created %}
+
+        {% set metadata_created_source = pkg_dict.extras |
+            selectattr("key","equalto","metadata_created_source") |
+            map(attribute="value") | join('')%}
+        {% set metadata_modified_source = pkg_dict.extras |
+            selectattr("key","equalto","metadata_modified_source") |
+            map(attribute="value") | join('')%}
+
+        {% set extras_metadata_reference_date = pkg_dict.extras |
+            selectattr("key","equalto","metadata-reference-date") |
+            map(attribute="value") | join('') %}
+
+        {% set metadata_reference_date = pkg_dict['metadata-reference-date']
+            or extras_metadata_reference_date
+            or [{"type":"Creation","value":metadata_created_source or pkg_dict.metadata_created},
+                {"type":"Revision","value":metadata_modified_source or pkg_dict.metadata_modified} ]%}
+
+        {% set extras_dataset_reference_date = pkg_dict.extras |
+            selectattr("key","equalto","dataset-reference-date") %}
+        {% set dataset_reference_date = pkg_dict['dataset-reference-date']
+            or extras_dataset_reference_date %}
+
+        {% set extras_frequency_of_update = pkg_dict.extras |
+            selectattr("key","equalto","frequency-of-update") %}
+        {% set frequency_of_update = pkg_dict.get('frequency-of-update') or extras_frequency_of_update %}
+
+        {% if metadata_reference_date %}
           <tr>
-            <th scope="row" class="dataset-label">{{ _("Metadata Created") }}</th>
-
+            <th scope="row" class="dataset-label">{{ _("Metadata Reference Date(s)") }}</th>
             <td class="dataset-details">
-                {% if pkg_dict.metadata_created  | length == 10 %}
-                  {{ h.render_datetime(pkg_dict.metadata_created , '%B %d, %Y') }}
+              {% for d in h.cioos_load_json(metadata_reference_date) %}
+                {% if d['value']| length == 10 %}
+                  {{ h.render_datetime(d['value'], '%B %d, %Y') }} ({{_(d['type'].title())}})</br>
                 {% else %}
-                  {% snippet 'snippets/local_friendly_datetime.html', datetime_obj=pkg_dict.metadata_created %}
+                  {% snippet 'snippets/local_friendly_datetime.html',
+                      datetime_obj=d['value'] %} ({{_(d['type'].title())}})</br>
                 {% endif %}
-
+              {% endfor %}
             </td>
           </tr>
         {% endif %}
-        {% if pkg_dict.metadata_modified %}
-          <tr>
-            <th scope="row" class="dataset-label">{{ _("Metadata Updated") }}</th>
-            <td class="dataset-details">
-                {% if pkg_dict.metadata_modified | length == 10 %}
-                  {{ h.render_datetime(pkg_dict.metadata_modified, '%B %d, %Y') }}
-                {% else %}
-                  {% snippet 'snippets/local_friendly_datetime.html', datetime_obj=pkg_dict.metadata_modified %}
-                {% endif %}
 
-            </td>
-          </tr>
-        {% endif %}
-
-        {% if pkg_dict['temporal-extent'] %}
+        {# {% if pkg_dict['temporal-extent'] %}
           {% set te = h.cioos_load_json(pkg_dict['temporal-extent']) %}
           {% if te.begin %}
             <tr>
@@ -59,59 +73,37 @@
               </td>
             </tr>
           {% endif %}
-        {% endif %}
+        {% endif %} #}
 
-        {% if pkg_dict['dataset-reference-date'] %}
+        {% if dataset_reference_date and h.cioos_load_json(dataset_reference_date) | length > 0 %}
           <tr>
-            <th scope="row" class="dataset-label">{{ _("Reference Date(s)") }}</th>
+            <th scope="row" class="dataset-label">{{ _("Dataset Reference Date(s)") }}</th>
             <td class="dataset-details">
-              {% for d in h.cioos_load_json(pkg_dict['dataset-reference-date']) %}
+              {% for d in h.cioos_load_json(dataset_reference_date) %}
                 {% if d['value']| length == 10 %}
                   {{ h.render_datetime(d['value'], '%B %d, %Y') }} ({{_(d['type'].title())}})</br>
                 {% else %}
-                  {% snippet 'snippets/local_friendly_datetime.html', datetime_obj=d['value'] %} ({{_(d['type'].title())}})</br>
+                  {% snippet 'snippets/local_friendly_datetime.html', datetime_obj=d['value'] %}
+                    ({{_(d['type'].title())}})</br>
                 {% endif %}
               {% endfor %}
             </td>
           </tr>
         {% endif %}
 
-        {% for extra in h.sorted_extras(pkg_dict.extras) %}
-          {% set key, value = extra %}
 
-  	      {% if 'dataset-reference-date' == key %}
-            <tr rel="dc:relation" resource="_:extra{{ i }}">
-              <th scope="row" class="dataset-label" property="rdfs:label">{{ _("Reference Date(s)") }}</th>
-              <td class="dataset-details" property="rdf:value">
-                {% for d in h.cioos_load_json(value) %}
-                  {{d['value']}} ({{_(d['type'].title())}})</br>
-                {% endfor %}
-              </td>
-            </tr>
+        {%- set schema = h.scheming_get_dataset_schema('dataset') -%}
+        {%- set field = h.scheming_field_by_name(schema.dataset_fields, 'frequency-of-update') -%}
+        {%- set choices = h.scheming_field_choices(field) -%}
+        {% if frequency_of_update%}
+          <tr>
+            <th scope="row" class="dataset-label">{{ _("Frequency of Update") }}</th>
+            <td class="dataset-details">
+              {{- h.scheming_choices_label(choices, frequency_of_update) -}}
+            </td>
+          </tr>
+        {% endif %}
 
-          {# {% elif 'metadata-date' == key %}
-            <tr rel="dc:relation" resource="_:extra{{ i }}">
-              <th scope="row" class="dataset-label" property="rdfs:label">{{ _("Metadata Date") }}</th>
-              <td class="dataset-details" property="rdf:value">
-                {% if value | length == 10 %}
-                  {{ h.render_datetime(value, '%B %d, %Y') }}
-                {% else %}
-                  {% snippet 'snippets/local_friendly_datetime.html', datetime_obj=value %}
-                {% endif %}
-              </td>
-            </tr>
-          #}
-          {% elif 'frequency-of-update' == key %}
-            <tr rel="dc:relation" resource="_:extra{{ i }}">
-              <th scope="row" class="dataset-label" property="rdfs:label">{{ _("Frequency of Update") }}</th>
-              <td class="dataset-details" property="rdf:value">
-                {{value}}
-              </td>
-            </tr>
-
-          {% endif %}
-
-        {% endfor %}
 
       {% endblock %}
     </tbody>

@@ -2,8 +2,6 @@
 
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
-import ckan.model as model
-from ckan.logic import NotFound
 import ckanext.cioos_theme.helpers as cioos_helpers
 from ckanext.scheming.validation import scheming_validator
 from ckan.lib.plugins import DefaultTranslation
@@ -15,16 +13,12 @@ from ckan.common import c
 from six.moves.urllib.parse import urlparse
 import string
 from ckan.common import _
-import urllib2
-import xml.etree.ElementTree as ET
 import routes.mapper
 import ckan.lib.base as base
 import re
 
 Invalid = df.Invalid
 
-StopOnError = df.StopOnError
-missing = df.missing
 log = logging.getLogger(__name__)
 
 show_responsible_organizations = toolkit.asbool(
@@ -34,10 +28,11 @@ contact_email = toolkit.config.get('cioos.contact_email', "info@cioos.ca")
 organizations_info_text = toolkit.config.get(
     'cioos.organizations_info_text',
     {
-        "en":"CKAN Organizations are used to create, manage and publish collections of datasets. Users can have different roles within an Organization, depending on their level of authorisation to create, edit and publish.",
-        "fr":u"Les Organisations CKAN sont utilisées pour créer, gérer et publier des collections de jeux de données. Les utilisateurs peuvent avoir différents rôles au sein d'une Organisation, en fonction de leur niveau d'autorisation pour créer, éditer et publier."
+        "en": "CKAN Organizations are used to create, manage and publish collections of datasets. Users can have different roles within an Organization, depending on their level of authorisation to create, edit and publish.",
+        "fr": u"Les Organisations CKAN sont utilisées pour créer, gérer et publier des collections de jeux de données. Les utilisateurs peuvent avoir différents rôles au sein d'une Organisation, en fonction de leur niveau d'autorisation pour créer, éditer et publier."
     }
 )
+
 
 def load_json(j):
     try:
@@ -49,6 +44,7 @@ def load_json(j):
 
 def geojson_to_bbox(o):
     return shape(o).bounds
+
 
 # IValidators
 
@@ -76,7 +72,7 @@ def clean_and_populate_eovs(field, schema):
 
         d = json.loads(data.get(key, '[]'))
         for x in eov_data:
-            if isinstance(x, basestring):
+            if isinstance(x, str):
                 val = eov_list.get(x.lower(), '')
             else:
                 val = eov_list.get(x, '')
@@ -237,6 +233,9 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         })
         return schema
 
+    def get_additional_css_path(self):
+        return toolkit.config.get('ckan.cioos.ra_css_path', '/ra.css')
+
     def get_helpers(self):
         """Register the most_popular_groups() function above as a template helper function."""
         # Template helper function names should begin with the name of the
@@ -260,7 +259,8 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             'cioos_count_datasets': cioos_helpers.cioos_count_datasets,
             'cioos_get_eovs': cioos_helpers.cioos_get_eovs,
             'cioos_get_locale_url': self.get_locale_url,
-            'cioos_schema_field_map': cioos_helpers.cioos_schema_field_map
+            'cioos_schema_field_map': cioos_helpers.cioos_schema_field_map,
+            'cioos_get_additional_css_path': self.get_additional_css_path
         }
 
     def get_validators(self):
@@ -270,7 +270,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             'cioos_fluent_field_default': fluent_field_default,
             'cioos_url_validator_with_port': url_validator_with_port,
             'cioos_tag_name_validator': cioos_tag_name_validator,
-            }
+        }
 
     # IFacets
 
@@ -361,12 +361,25 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                     facets_dict[key] = value
         return facets_dict
 
-
-
     # IPackageController
 
-    def _cited_responsible_party_to_responsible_organizations(self, parties):
-        return [x.get('organisation-name', '').strip() for x in json.loads(parties) if x.get('role') in ['originator']]
+    def _cited_responsible_party_to_responsible_organizations(self, parties, force_responsible_organization):
+        if force_responsible_organization:
+            if isinstance(force_responsible_organization, list):
+                resp_orgs = force_responsible_organization
+            else:
+                resp_orgs = [force_responsible_organization]
+        else:
+            resp_org_roles = json.loads(toolkit.config.get('ckan.responsible_organization_roles', '["owner", "originator", "custodian", "author", "principalInvestigator"]'))
+            resp_orgs = [x.get('organisation-name', '').strip() for x in json.loads(parties) if x.get('role') in resp_org_roles]
+            resp_orgs = list(dict.fromkeys(resp_orgs))  # remove duplicates
+        return resp_orgs
+
+    def _get_extra_value(self, key, package_dict):
+        for extra in package_dict.get('extras', []):
+            if extra['key'] == key:
+                return extra['value']
+
     # modfiey tags, keywords, and eov fields so that they properly index
     def before_index(self, data_dict):
         data_type = data_dict.get('type')
@@ -381,7 +394,8 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             log.error("error:%s, keywords:%r", err, data_dict.get('keywords', '{}'))
             tags_dict = {"en": [], "fr": []}
 
-        data_dict['responsible_organizations'] = self._cited_responsible_party_to_responsible_organizations(data_dict.get('cited-responsible-party', '{}'))
+        force_resp_org = load_json(data_dict.get('force_responsible_organization', '[]'))
+        data_dict['responsible_organizations'] = self._cited_responsible_party_to_responsible_organizations(data_dict.get('cited-responsible-party', '{}'), force_resp_org)
 
         # update tag list by language
         data_dict['tags_en'] = tags_dict.get('en', [])
@@ -442,61 +456,6 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         if(data_dict.get('eov')):
             data_dict['eov'] = load_json(data_dict['eov'])
 
-        # Index Source XML
-        # harvest object will be json if harvested from another ckan instance. TODO check it is xml
-        # try harvest object (xml)
-        #log.debug('DICT: %r', data_dict)
-        h_object_id = data_dict.get('harvest_object_id', data_dict.get('h_object_id', 'none'))
-        context = {'model': model,
-                   'session': model.Session,
-                   'ignore_auth': True}
-
-        pkg_dict = {'id': h_object_id}
-
-        try:
-            harvest_object = toolkit.get_action('harvest_object_show')(context, pkg_dict)
-            content = harvest_object.get('content', '')
-            if content.startswith('<'):
-                data_dict['extras_harvest_document_content'] = harvest_object.get('content', '')
-            else:
-                raise NotFound
-        except NotFound:
-            log.warning('Unable to find harvest object "%s" '
-                        'referenced by dataset "%s". Trying xml url',
-                        pkg_dict['id'], data_dict['id'])
-
-            # try reading from xml url
-            xml_str = ''
-            xml_url = load_json(data_dict.get('xml_location_url'))
-            # single file
-            if xml_url and isinstance(xml_url, basestring):
-                try:
-                    xml_str = urllib2.urlopen(xml_url).read(100000)  # read only 100 000 chars
-                    ET.XML(xml_str)  # test for valid xml
-                    data_dict['extras_harvest_document_content'] = xml_str
-                except ET.ParseError as e:
-                    log.error('XML string is invalid. %s', e)
-                except Exception as e:
-                    log.error('Unable to read from xml url "%s" '
-                              'referenced by dataset "%s" Error: %s',
-                              xml_url, data_dict['id'], e)
-            # list of files
-            elif xml_url and isinstance(xml_url, list):
-                for xml_file in xml_url:
-                    try:
-                        xml_file_str = urllib2.urlopen(xml_file).read(100000)  # read only 100 000 chars
-                        xml_root_str = ET.tostring(ET.XML(xml_file_str))
-                        xml_str = xml_str + '<doc>' + xml_root_str + '</doc>'
-                    except ET.ParseError as e:
-                        log.error('XML string is invalid. %s', e)
-                    except Exception as e:
-                        log.error('Unable to read from xml url "%s" '
-                                  'referenced by dataset "%s" Error: %s',
-                                  xml_file, data_dict['id'], e)
-                if xml_str:
-                    xml_str = xml_str = '<?xml version="1.0" encoding="utf-8"?><docs>' + xml_str + '</docs>'
-                    data_dict['extras_harvest_document_content'] = xml_str
-
         return data_dict
 
     # update eov search facets with keys from choices list in the scheming extension schema
@@ -541,9 +500,12 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         # this is inconsistant with package data which is returned as json objects
         # by the package_show and package_search end points whout filters applied
         for result in search_results.get('results', []):
+
+            force_resp_org = load_json(self._get_extra_value('force_responsible_organization', result))
             cited_responsible_party = result.get('cited-responsible-party')
-            if(cited_responsible_party and not result.get('responsible_organizations')):
-                result['responsible_organizations'] = self._cited_responsible_party_to_responsible_organizations(cited_responsible_party)
+            if((cited_responsible_party or force_resp_org) and not result.get('responsible_organizations')):
+                result['responsible_organizations'] = self._cited_responsible_party_to_responsible_organizations(cited_responsible_party, force_resp_org)
+
             title = result.get('title_translated')
             if(title):
                 result['title_translated'] = load_json(title)
@@ -613,9 +575,10 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             if org_image_url:
                 package_dict['organization']['image_url_translated'] = org_image_url
 
+        force_resp_org = load_json(self._get_extra_value('force_responsible_organization', package_dict))
         cited_responsible_party = package_dict.get('cited-responsible-party')
-        if(cited_responsible_party and not package_dict.get('responsible_organizations')):
-            package_dict['responsible_organizations'] = self._cited_responsible_party_to_responsible_organizations(cited_responsible_party)
+        if((cited_responsible_party or force_resp_org) and not package_dict.get('responsible_organizations')):
+            package_dict['responsible_organizations'] = self._cited_responsible_party_to_responsible_organizations(cited_responsible_party, force_resp_org)
 
         return package_dict
 
@@ -633,6 +596,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         if base_url.endswith('/'):
             return base_url + locale_urls.get(lang)
         return base_url + '/' + locale_urls.get(lang)
+
 
 class CIOOSController(base.BaseController):
 

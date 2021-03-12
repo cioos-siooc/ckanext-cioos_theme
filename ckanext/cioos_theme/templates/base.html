@@ -32,6 +32,9 @@
     {%- block styles %}
       {% resource g.main_css[6:] %}
       <link rel="stylesheet" type="text/css" href="{{h.url_for_static('/cioos_theme.css')}}" />
+      {% if h.cioos_get_additional_css_path() %}
+      <link rel="stylesheet" type="text/css" href="{{h.url_for_static(h.cioos_get_additional_css_path())}}" />
+      {% endif %}
       <link href="https://fonts.googleapis.com/css?family=Montserrat:400,600,700,800,900|Quicksand:300,400,600|PT+Sans:400|Raleway:400&display=swap" rel="stylesheet">
     {% endblock %}
 
