@@ -1,8 +1,8 @@
-{% set intro = g.site_intro_text %}
+{% set intro = h.scheming_language_text(h.cioos_load_json(g.site_intro_text)) %}
 
 <div class="module-content box">
-  <h3 class="heading">{{ _("ABOUT THE DATA CATALOGUE") }}</h3>
-  {% if intro %}  
+  <h3 class="heading">{{ _("ABOUT THE METADATA CATALOGUE") }}</h3>
+  {% if intro %}
     {{ h.render_markdown(intro) }}
   {% else %}
     <p>
