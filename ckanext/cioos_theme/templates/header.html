@@ -1,102 +1,103 @@
-{% set gns = namespace() %}
-{% set gns.site_logo =  h.scheming_language_text(h.cioos_load_json(g.site_logo_translated or g.site_logo or '{"fr": "/base/images/ckan-logo.png", "en": "/base/images/ckan-logo.png"}' )) %}
-{% set gns.site_title = h.scheming_language_text(h.cioos_load_json(g.site_title)) %}
-{% set gns.site_description = h.render_markdown(h.scheming_language_text(h.cioos_load_json(g.site_description))) %}
-
-{% if h.is_url(gns.site_logo) %}
-  {% set logo_url = gns.site_logo %}
-{% else %}
-  {% set logo_url = h.url_for_static_or_external(gns.site_logo) %}
-{% endif %}
-
-{# import macros from ra header file #}
-{% if self._TemplateReference__context.name != g.header_file_name %}
-  {% from '%s' % g.header_file_name or 'header_wp.html' import include_site_header, include_mobile_header, include_site_social with context %}
-{% else %}
-  {% from 'header_wp.html' import include_site_header, include_mobile_header, include_site_social with context %}
-{% endif %}
-
-<div id="header-container">
-  {% block header_wrapper %}
-  {# mobile header menu #}
-  <input type="checkbox" class="main-nav-check" id="main-nav-check" />
-  <!-- Logo -->
-  <div class="mobileheader toggle-menu">
-    <a class="logo" href="{{ g.site_home_url or h.url_for('home.index') }}"><img src="{{ logo_url }}" alt="{{ gns.site_title }}" title="{{ gns.site_title }}" /></a>
-    <label for="main-nav-check">Menu</label>
-  </div>
-  <!-- Menu -->
-  <nav class="menubar mobile-nav" id="mobile-nav">
-    <h4 class="invis">Mobile Navigation</h4>
-    <div id="menu-mobile" class="menu">
-      <div class="menu-mobile-menu-container">
-        {{ include_mobile_header() }}
-      </div>
+{% block header_wrapper %} {% block header_account %}
+<header class="account-masthead">
+  <div class="container">
+    {% block header_account_container_content %} {% if c.userobj %}
+    <div class="account avatar authed" data-module="me" data-me="{{ c.userobj.id }}">
+      <ul class="list-unstyled">
+        {% block header_account_logged %} {% if c.userobj.sysadmin %}
+        <li>
+          <a href="{{ h.url_for(controller='admin', action='index') }}" title="{{ _('Sysadmin settings') }}">
+            <i class="fa fa-gavel" aria-hidden="true"></i>
+            <span class="text">{{ _('Admin') }}</span>
+          </a>
+        </li>
+        {% endif %}
+        <li>
+          <a href="{{ h.url_for('user.read', id=c.userobj.name) }}" class="image" title="{{ _('View profile') }}">
+                  {{ h.gravatar((c.userobj.email_hash if c and c.userobj else ''), size=22) }}
+                  <span class="username">{{ c.userobj.display_name }}</span>
+                </a>
+        </li>
+        {% set new_activities = h.new_activities() %}
+        <li class="notifications {% if new_activities > 0 %}notifications-important{% endif %}">
+          {% set notifications_tooltip = ngettext('Dashboard (%(num)d new item)', 'Dashboard (%(num)d new items)', new_activities)
+          %}
+          <a href="{{ h.url_for('dashboard.index') }}" title="{{ notifications_tooltip }}">
+            <i class="fa fa-tachometer" aria-hidden="true"></i>
+            <span class="text">{{ _('Dashboard') }}</span>
+            <span class="badge">{{ new_activities }}</span>
+          </a>
+        </li>
+        {% block header_account_settings_link %}
+        <li>
+          <a href="{{ h.url_for('user.edit', id=c.userobj.name) }}" title="{{ _('Edit settings') }}">
+            <i class="fa fa-cog" aria-hidden="true"></i>
+            <span class="text">{{ _('Settings') }}</span>
+          </a>
+        </li>
+        {% endblock %} {% block header_account_log_out_link %}
+        <li>
+          <a href="{{ h.url_for('/user/_logout') }}" title="{{ _('Log out') }}">
+            <i class="fa fa-sign-out" aria-hidden="true"></i>
+            <span class="text">{{ _('Log out') }}</span>
+          </a>
+        </li>
+        {% endblock %} {% endblock %}
+      </ul>
     </div>
-  </nav>
+    {% else %}
+    <nav class="account not-authed">
+      <ul class="list-unstyled">
+        {% block header_account_notlogged %}
+        <li>{% link_for _('Log in'), named_route='user.login' %}</li>
+        {% if h.check_access('user_create') %}
+        <li>{% link_for _('Register'), named_route='user.register', class_='sub' %}</li>
+        {% endif %} {% endblock %}
+      </ul>
+    </nav>
+    {% endif %} {% endblock %}
+  </div>
+</header>
+{% endblock %}
+<header class="navbar navbar-static-top masthead">
+  {% block header_debug %} {% if g.debug and not g.debug_supress_header %}
+  <div class="debug">Controller : {{ c.controller }}<br/>Action : {{ c.action }}</div>
+  {% endif %} {% endblock %}
+  <div class="container">
+    <div class="navbar-right">
+      <button data-target="#main-navigation-toggle" data-toggle="collapse" class="navbar-toggle collapsed" type="button">
+        <span class="fa fa-bars"></span>
+      </button>
+    </div>
+    <hgroup class="{{ g.header_class }} navbar-left">
+      {% block header_logo %} {% if g.site_logo %}
+      <a class="logo" href="{{ h.url_for('home.index') }}"><img src="{{ h.url_for_static_or_external(g.site_logo) }}" alt="{{ g.site_title }}" title="{{ g.site_title }}" /></a>
+      {% else %}
+      <h1>
+        <a href="{{ h.url_for('home.index') }}">{{ g.site_title }}</a>
+      </h1>
+      {% if g.site_description %}
+      <h2>{{ g.site_description }}</h2>{% endif %} {% endif %} {% endblock %}
+    </hgroup>
 
-
-  {# full page header menu #}
-  <!-- Top Bar -->
-  <header id="topmenu" class="nav main-nav">
-    <div class="container">
-      {% block header_topmenu %}
-      <nav>
-        <ul>
-          {{ include_site_social() }}
-          <li id="language_picker">
-            {%- if h.lang() == 'en' -%}
-              <a href="{% url_for h.current_url(), locale='fr' %}" tabindex="0" aria-label="French/English">FR</a>
-            {%- else -%}
-              <a href="{% url_for h.current_url(), locale='en' %}" tabindex="0" aria-label="French/English">EN</a>
-            {%- endif -%}
-          </li>
-          <li>
-            <a href="https://cioos.ca">
-              <img class="mega-menu-logo" width="auto" height="37" src="{{ h.url_for_static_or_external('/base/images/logos/cioos-banner-' + h.lang() +'.png') }}">
-            </a>
-          </li>
-          </ul>
+    <div class="collapse navbar-collapse" id="main-navigation-toggle">
+      {% block header_site_navigation %}
+      <nav class="section navigation">
+        <ul class="nav nav-pills">
+          {% block header_site_navigation_tabs %} {{ h.build_nav_main( ('search', _('Datasets')), ('organizations_index', _('Organizations')),
+          ('group_index', _('Groups')), ('home.about', _('About')) ) }} {% endblock %}
+        </ul>
       </nav>
+      {% endblock %} {% block header_site_search %}
+      <form class="section site-search simple-input" action="{% url_for controller='package', action='search' %}" method="get">
+        <div class="field">
+          <label for="field-sitewide-search">{% block header_site_search_label %}{{ _('Search Datasets') }}{% endblock %}</label>
+          <input id="field-sitewide-search" type="text" class="form-control" name="q" placeholder="{{ _('Search') }}" />
+          <button class="btn-search" type="submit"><i class="fa fa-search"></i></button>
+        </div>
+      </form>
       {% endblock %}
     </div>
-  </header>
-
-  <!-- Logo and Menu -->
-  <div id="header" class="nav main-nav">
-    <div id="header-core">
-      <div id="logo">
-        {% block header_logo %}
-        <a rel="home" href="{{ g.site_home_url }}"><img src="{{ logo_url }}" alt="Logo"></a>
-        {% endblock %}
-      </div>
-      <div id="header-links" class="main-navigation">
-        <div id="header-links-inner" class="header-links">
-          {{ include_site_header() }}
-        </div>
-      </div>
-    </div>
   </div>
-
-  <script>
-    window.onload = function() {
-      var pDiv = document.getElementsByClassName('menu-parent');
-      for (var i = 0; i < pDiv.length; i++) {
-        pDiv[i].addEventListener('mouseover', function() {
-          var cDiv = this.getElementsByClassName('sub-menu');
-          for (var j = 0; j < cDiv.length; j++) {
-            cDiv[j].classList.add("subshow")
-          };
-        }, false);
-        pDiv[i].addEventListener('mouseout', function() {
-          var cDiv = this.getElementsByClassName('sub-menu');
-          for (var j = 0; j < cDiv.length; j++) {
-            cDiv[j].classList.remove("subshow")
-          };
-        }, false);
-      };
-    };
-  </script>
-
-  {% endblock %}
-</div>
+</header>
+{% endblock %}
