@@ -1,0 +1,33 @@
+<div role="main" class="hero">
+  <div class="container">
+    {% block search %}
+      {% snippet 'home/snippets/search.html' %}
+    {% endblock %}
+  </div>
+</div>
+<div role="main">
+  <div class="container">
+    <div class="row row2">
+      <div class="col-md-6 col2">
+        {% block promoted %}
+          {% snippet 'home/snippets/promoted.html' %}
+        {% endblock %}
+      </div>
+      <div class="col-md-6 col1">
+        {% block stats %}
+          {% snippet 'home/snippets/stats.html' %}
+        {% endblock %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div role="main">
+  <div class="container">
+    <h3 class="heading">{{ _("SEARCH BY LOCATION") }}</h3>
+    <p> To perform a spatial search, define your search area using the draw tool</p>
+    <div class="box">
+  	  {% snippet "spatial/snippets/spatial_query.html" , default_extent= h.spatial_default_extent() %}
+  	</div>
+  </div>
+</div>
