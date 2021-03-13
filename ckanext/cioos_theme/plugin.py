@@ -355,7 +355,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                 # Make translation 'on the fly' of facet tags.
                 # Should check for all translated fields.
                 # Should check translation exists.
-                if key == 'tags' or key == 'organization':
+                if key == 'tags':
                     facets_dict[key + '_' + self.lang()] = value
                 else:
                     facets_dict[key] = value
