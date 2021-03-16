@@ -142,7 +142,7 @@ def cioos_schema_field_map():
     map = {
         'title': 'title_translated',
         'abstract': 'notes_translated',
-        'unique-resource-identifier': 'name',
+        'guid': 'name',
         'keywords': ['keywords', 'eov'],
         'bbox': ['bbox-north-lat', 'bbox-south-lat', 'bbox-east-long', 'bbox-west-long'],
         'license_id': 'use-constraints'
