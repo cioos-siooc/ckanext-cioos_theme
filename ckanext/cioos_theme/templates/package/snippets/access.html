@@ -2,52 +2,52 @@
   <h3>{{ _('Access and Use') }}</h3>
   <table class="table table-bordered">
     <tbody>
-      {% block package_access %}
-          <tr>
-            <td>
-              {% set licence_extras = [] %}
-              {%  for extra in pkg_dict.extras %}
-                {% if 'licence' == extra.key %}
-                  {% set _ = licence_extras.append( ''.join(h.cioos_load_json(extra.value)) ) %}
-                {% endif %}
-              {% endfor %}
-              {% set licence = pkg_dict.license_title or pkg_dict.license_id or 'Not Specified'%}
-              <span>
-                <strong>Licence: </strong>
-                {%- if pkg_dict.license_url -%}
-                  <a href="{{pkg_dict.license_url}}">{{ licence }}</a>
-                {%- else -%}
-                  {{ licence }}
-                {%- endif -%}
-              </span>
-              {% if licence != licence_extras[-1] and licence_extras[-1] %}
-                <br/>
-                <span>
-                    {{- licence_extras[-1] -}}
-                </span>
-              {% endif %}
+      <tr>
+        <td>
+          {% set licence_extras = [] %}
+          {% for extra in pkg_dict.extras %}
+          {% if 'licence' == extra.key %}
+          {% set _ = licence_extras.append( ''.join(h.cioos_load_json(extra.value)) ) %}
+          {% endif %}
+          {% endfor %}
+          {% set licence = pkg_dict.license_title or pkg_dict.license_id or licence_extras or 'Not Specified'%}
+          <span>
+            <strong>Licence: </strong>
+            {%- if pkg_dict.license_url -%}
+            <a href="{{pkg_dict.license_url}}">{{ licence }}</a>
+            {%- else -%}
+            {{ licence }}
+            {%- endif -%}
+          </span>
+          <br />
 
-              {%- for extra in pkg_dict -%}
-                {% if 'use-constraints' == extra.key %}
-                  <span>
-                    <strong>Limitations: </strong>
-                    {{- '\n'.join(h.cioos_load_json(extra.value)) -}}
-                  </span>
-                {% endif %}
-              {%- endfor -%}
+          {% set use_constraints = pkg_dict.extras | selectattr("key","equalto","use-constraints") | map(attribute="value") | join('')%}
+          {% set access_constraints = pkg_dict.extras | selectattr("key","equalto","access-constraints") | map(attribute="value") | join('')%}
+          {% set other_constraints = pkg_dict.extras | selectattr("key","equalto","limitations-on-public-access") | map(attribute="value") | join('')%}
 
-              {%-  for extra in pkg_dict -%}
-          		  {% if 'access-constraints' == extra.key %}
-                  <span>
-                    <strong>Access: </strong>
-            		    {{- '\n'.join(h.cioos_load_json(extra.value)) -}}
-                  </span>
-          		  {% endif %}
-          		{%- endfor -%}
+          {% if use_constraints%}
+          <span>
+            <strong>Limitations: </strong>
+            {{ h.cioos_load_json(use_constraints) }}
+          </span>
+          <br />
+          {% endif %}
 
-            </td>
-          </tr>
-      {% endblock %}
+          {% if access_constraints%}
+          <span>
+            <strong>Access: </strong>
+            {{ '\n'.join(h.cioos_load_json(access_constraints))|title }}
+            {% if other_constraints %}
+            {{ '\u2014' }} {{ '\n'.join(h.cioos_load_json(other_constraints)) }}
+            {% endif %}
+          </span>
+          <br />
+          {% endif %}
+
+
+
+        </td>
+      </tr>
     </tbody>
   </table>
 </section>
