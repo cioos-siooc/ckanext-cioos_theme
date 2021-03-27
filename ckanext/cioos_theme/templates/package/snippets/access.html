@@ -10,7 +10,12 @@
           {% set _ = licence_extras.append( ''.join(h.cioos_load_json(extra.value)) ) %}
           {% endif %}
           {% endfor %}
+
           {% set licence = pkg_dict.license_title or pkg_dict.license_id or licence_extras or 'Not Specified'%}
+          {% set use_constraints = pkg_dict.extras | selectattr("key","equalto","use-constraints") | map(attribute="value") | join('')%}
+          {% set access_constraints = pkg_dict.extras | selectattr("key","equalto","access-constraints") | map(attribute="value") | join('')%}
+          {% set other_constraints = pkg_dict.extras | selectattr("key","equalto","limitations-on-public-access") | map(attribute="value") | join('')%}
+
           <span>
             <strong>Licence: </strong>
             {%- if pkg_dict.license_url -%}
@@ -21,11 +26,9 @@
           </span>
           <br />
 
-          {% set use_constraints = pkg_dict.extras | selectattr("key","equalto","use-constraints") | map(attribute="value") | join('')%}
-          {% set access_constraints = pkg_dict.extras | selectattr("key","equalto","access-constraints") | map(attribute="value") | join('')%}
-          {% set other_constraints = pkg_dict.extras | selectattr("key","equalto","limitations-on-public-access") | map(attribute="value") | join('')%}
-
-          {% if use_constraints%}
+          {# no need to do this if just printing licence because use-constraints
+             is used to populate it in the first place #}
+          {% if use_constraints and pkg_dict.license_url %}
           <span>
             <strong>Limitations: </strong>
             {{ h.cioos_load_json(use_constraints) }}
