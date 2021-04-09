@@ -143,6 +143,16 @@ def cioos_tag_name_validator(field, schema):
     return validator
 
 
+@scheming_validator
+def cioos_is_valid_range(field, schema):
+
+    def validator(value, context):
+        range = json.loads(value)
+        if (not range.get('begin') and range.get('end')) or (range.get('end') and range['end'] < range['begin']):
+            raise Invalid(_('Invalid value "%r" found in "%s". Valid ranges must have begin <= end values') % (value, field['name']))
+        return value
+    return validator
+
 class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
     plugins.implements(plugins.ITranslation)
     plugins.implements(plugins.IConfigurer)
@@ -270,6 +280,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             'cioos_fluent_field_default': fluent_field_default,
             'cioos_url_validator_with_port': url_validator_with_port,
             'cioos_tag_name_validator': cioos_tag_name_validator,
+            'cioos_is_valid_range': cioos_is_valid_range,
         }
 
     # IFacets

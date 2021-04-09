@@ -1112,12 +1112,24 @@ i.fa.translation_icon {
   button.dropdown-item:hover {
       background-color: #f5f5f5;
   }
-  
+
   button.dropdown-item {
       background-color: inherit;
       border: none;
       width: 100%;
       text-align: left;
+  }
+}
+
+.additional-info {
+  tr th:first-child, tr td:first-child {
+    width: 25%;
+  }
+}
+
+.dates {
+  tr th:first-child, tr td:first-child {
+    width: 25%;
   }
 }
 
