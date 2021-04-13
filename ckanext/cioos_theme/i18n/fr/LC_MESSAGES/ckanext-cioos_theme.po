@@ -182,10 +182,10 @@ msgid "South Bounding Latitude"
 msgstr "Latitude limite Sud"
 
 msgid "East Bounding Longitude"
-msgstr "Latitude limite Est"
+msgstr "Longitude limite Est"
 
 msgid "West Bounding Longitude"
-msgstr "Latitude limite Ouest"
+msgstr "Longitude limite Ouest"
 
 msgid "Temporal Extent"
 msgstr "Étendue temporelle"
