@@ -1,3 +1,5 @@
+{% set harvest_object = pkg_dict.extras | selectattr("key","equalto","h_object_id") | map(attribute="value") | join('') %}
+{% if harvest_object %}
 <section class="metadata_source">
   <h3>{{ _('Metadata Source') }}</h3>
   <table class="table table-bordered table-condensed">
@@ -22,15 +24,10 @@
           {% set title = pkg_dict.extras | selectattr("key","equalto","h_source_title") | map(attribute="value") | join('') %}
           {% set source_id = pkg_dict.extras | selectattr("key","equalto","h_source_id") | map(attribute="value") | join('') %}
           {% set job = pkg_dict.extras | selectattr("key","equalto","h_job_id") | map(attribute="value") | join('') %}
-          {% set harvest_object = pkg_dict.extras | selectattr("key","equalto","h_object_id") | map(attribute="value") | join('') %}
           {# {% set gn_view_metadata_url = pkg_dict.extras | selectattr("key","equalto","gn_view_metadata_url") | map(attribute="value") | join('') %} #}
           {% set url = h.cioos_load_json(pkg_dict.xml_location_url or xml_location_extras or gn_view_metadata_url or h_source_url) %}
 
-          {% if harvest_object %}
           <span style="font-weight:bold;">{{_("View Harvested Metadata")}}: <a href="{{ remote_ckan_base_url + h.url_for('harvest_object_show', id = harvest_object ) }}">XML/JSON</a></span><br>
-          {% else %}
-          <span>Source information unavailable</span><br>
-          {% endif %}
 
           {% if url %}
           <p style="margin-left:20px;margin-bottom: 0px;">
@@ -67,3 +64,4 @@
     </tbody>
   </table>
 </section>
+{% endif %}
