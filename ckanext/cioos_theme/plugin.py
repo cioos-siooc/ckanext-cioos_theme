@@ -149,7 +149,7 @@ def cioos_is_valid_range(field, schema):
     def validator(value, context):
         range = json.loads(value)
         if (not range.get('begin') and range.get('end')) or (range.get('end') and range['end'] < range['begin']):
-            raise Invalid(_('Invalid value "%r" found in "%s". Valid ranges must have begin <= end values') % (value, field['name']))
+            raise Invalid(_('Invalid value "%r". Valid ranges must contain begin <= end values') % (value))
         return value
     return validator
 
