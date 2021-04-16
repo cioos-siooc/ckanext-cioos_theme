@@ -1098,4 +1098,39 @@ i.fa.translation_icon {
     color: #585858;
 }
 
+
+.citation{
+  .btn-secondary {
+      /* background-color: lightgrey; */
+      border-color: #333333;
+      color: #333333;
+      height: 28px;
+      line-height: 20px;
+      padding: 3px 12px;
+  }
+
+  button.dropdown-item:hover {
+      background-color: #f5f5f5;
+  }
+
+  button.dropdown-item {
+      background-color: inherit;
+      border: none;
+      width: 100%;
+      text-align: left;
+  }
+}
+
+.additional-info {
+  tr th:first-child, tr td:first-child {
+    width: 25%;
+  }
+}
+
+.dates {
+  tr th:first-child, tr td:first-child {
+    width: 25%;
+  }
+}
+
 @import url(//fonts.googleapis.com/css?family=Montserrat:400,600,700,800,900|Quicksand:300,400,600,700|PT+Sans:400|Raleway:400);

@@ -142,7 +142,7 @@ def cioos_schema_field_map():
     map = {
         'title': 'title_translated',
         'abstract': 'notes_translated',
-        'unique-resource-identifier': 'name',
+        'guid': 'name',
         'keywords': ['keywords', 'eov'],
         'bbox': ['bbox-north-lat', 'bbox-south-lat', 'bbox-east-long', 'bbox-west-long'],
         'license_id': 'use-constraints'
@@ -200,7 +200,9 @@ def cioos_schema_field_map_parent(fields, isodoc_dict, class_dict, mapkey, capti
                 <th style="width:200px;">Schema Name</th>
                 <th style="width:200px;">Harvest Name</th>
                 <th style="width:40px;">N</th>
+                <th style="width:100px;">Description</th>
                 <th>XML Path</th>
+
             </tr>
         </thead><tbody>'''
     matched_schema_fields = []
@@ -242,18 +244,20 @@ def cioos_schema_field_map_parent(fields, isodoc_dict, class_dict, mapkey, capti
 
         schema_name = ''
         schema_label = ''
+        schema_help = ''
         subfields = None
         required = ''
 
         if field:
             schema_name = field['field_name']
             schema_label = ' (' + toolkit.h.scheming_language_text(field.get('label', '')) + ')'
+            schema_help = field.get('help_text', '')
             subfields = field.get('subfields')
             if field.get('required'):
                 required = '<span class="required">*</span>'
             matched_schema_fields.append(schema_name)
 
-        output = output + '<tr><td>' + required + '</td><td>' + schema_name + schema_label + '</td><td>' + item['name'] + '</td><td>' + item['multiplicity'] + '</td><td>' + sp + '</td></tr>'
+        output = output + '<tr><td>' + required + '</td><td>' + schema_name + schema_label + '</td><td>' + item['name'] + '</td><td>' + item['multiplicity'] + '</td><td>' + schema_help +'</td><td>' + sp + '</td></tr>'
         (output_new, matched_schema_fields) = cioos_schema_field_map_child(subfields, None, item.get('elements'), "", 1, matched_schema_fields)
         output = output + output_new
 
@@ -266,7 +270,7 @@ def cioos_schema_field_map_parent(fields, isodoc_dict, class_dict, mapkey, capti
             required = ''
             if field.get('required'):
                 required = '<span class="required">*</span>'
-            output = output + '<tr><td>' + required + '</td><td>' + schema_name + schema_label + '</td><td>' + '</td><td>' + '</td><td>' + '</td></tr>'
+            output = output + '<tr><td>' + required + '</td><td>' + schema_name + schema_label + '</td><td></td><td></td><td></td><td></td></tr>'
     return output + '</tbody></table>'
 
 # process any child elements of first level or lower isodocument fields.
@@ -294,6 +298,7 @@ def cioos_schema_field_map_child(schema_subfields, schema_parentfields, harvest_
 
         schema_name = ''
         schema_label = ''
+        schema_help = ''
         subfields = None
         parentfields = schema_subfields
         required = ''
@@ -301,6 +306,7 @@ def cioos_schema_field_map_child(schema_subfields, schema_parentfields, harvest_
         if field:
             schema_name = field['field_name']
             schema_label = ' (' + toolkit.h.scheming_language_text(field.get('label', '')) + ')'
+            schema_help = field.get('help_text', '')
             subfields = field.get('subfields')
             matched_schema_fields.append(schema_name)
             schema_name = '<i class="fa fa-angle-right"></i>' + schema_name
@@ -311,7 +317,7 @@ def cioos_schema_field_map_child(schema_subfields, schema_parentfields, harvest_
         if item['name']:
             harvest_name = '<i class="fa fa-angle-right"></i>' + item['name']
 
-        output = output + '<tr class="child' + str(indent) + '"><td>' + required + '</td><td>' + schema_name + schema_label + '</td><td>' + harvest_name + '</td><td>' + item['multiplicity'] + '</td><td>' + sp + '</td></tr>'
+        output = output + '<tr class="child' + str(indent) + '"><td>' + required + '</td><td>' + schema_name + schema_label + '</td><td>' + harvest_name + '</td><td>' + item['multiplicity'] + '</td><td>' + schema_help +'</td><td>' + sp + '</td></tr>'
         (output_new, matched_schema_fields) = cioos_schema_field_map_child(subfields, parentfields, item.get('elements'), path + item['name'] + '_', indent + 1, matched_schema_fields)
         output = output + output_new
 
@@ -325,7 +331,7 @@ def cioos_schema_field_map_child(schema_subfields, schema_parentfields, harvest_
                 required = ''
                 if field.get('required'):
                     required = '<span class="required">*</span>'
-                output = output + '<tr><td>' + required + '</td><td>' + schema_name + schema_label + '</td><td>' + '</td><td>' + '</td><td>' + '</td></tr>'
+                output = output + '<tr><td>' + required + '</td><td>' + schema_name + schema_label + '</td><td></td><td></td><td></td><td></td></tr>'
     return output, matched_schema_fields
 
 

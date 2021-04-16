@@ -56,8 +56,8 @@
   {% endblock %}
 
   {% block package_citation %}
-    {% if pkg.doi %}
-      {% snippet "doi/snippets/package_citation.html", pkg_dict=pkg %}
+    {% if pkg.citation %}
+      {% snippet "package/snippets/package_citation.html", pkg_dict=pkg %}
     {% endif %}
   {% endblock %}
 
@@ -75,7 +75,7 @@
 
   {% set dataset_extent = h.get_pkg_dict_extra(c.pkg_dict, 'spatial') or c.pkg_dict.get('spatial') %}
   {% if dataset_extent %}
-    {% snippet "spatial/snippets/dataset_map.html", extent=dataset_extent %}
+    {% snippet "spatial/snippets/dataset_map.html", extent=dataset_extent, max_zoom=h.spatial_get_map_initial_max_zoom(pkg) %}
   {% endif %}
 
   {% block package_additional_info %}

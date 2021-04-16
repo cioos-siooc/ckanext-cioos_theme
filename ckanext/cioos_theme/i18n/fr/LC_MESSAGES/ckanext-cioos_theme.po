@@ -147,6 +147,61 @@ msgstr "État"
 msgid "dataset-reference-date"
 msgstr "date-de-référence-du-jeu-de-données"
 
+#: ckanext/scheming/templates/package/snippets/additional_info.html
+msgid "Organisation Name / Affiliation"
+msgstr "Organisation / Affiliation"
+
+msgid "On Going"
+msgstr "En cours"
+
+msgid "Completed"
+msgstr "Terminé"
+
+msgid "Owner"
+msgstr "Propriétaire"
+
+msgid "Authority"
+msgstr "Autorité"
+
+msgid "Contact Info Email"
+msgstr "Courriel de contact"
+
+msgid "Maintenance Note"
+msgstr "Note de maintenance"
+
+msgid "Point of Contact"
+msgstr "Point de Contact"
+
+msgid "Spatial Extent"
+msgstr "Étendue Spatiale"
+
+msgid "North Bounding Latitude"
+msgstr "Latitude limite Nord"
+
+msgid "South Bounding Latitude"
+msgstr "Latitude limite Sud"
+
+msgid "East Bounding Longitude"
+msgstr "Longitude limite Est"
+
+msgid "West Bounding Longitude"
+msgstr "Longitude limite Ouest"
+
+msgid "Temporal Extent"
+msgstr "Étendue temporelle"
+
+msgid "Vertical Extent"
+msgstr "Étendue Verticale"
+
+msgid "Default Locale"
+msgstr "Langue par défaut"
+
+msgid "Citation identifier"
+msgstr "Identifiant de citation"
+
+msgid "Scope"
+msgstr "Portée"
+
 #: ckanext/cioos_theme/templates/package/snippets/additional_info.html:104
 msgid "responsible-party"
 msgstr "partie-responsable"
