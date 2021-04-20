@@ -147,7 +147,7 @@ def cioos_tag_name_validator(field, schema):
 def cioos_is_valid_range(field, schema):
 
     def validator(value, context):
-        range = json.loads(value)
+        range = load_json(value)
         if (not range.get('begin') and range.get('end')) or (range.get('end') and range['end'] < range['begin']):
             raise Invalid(_('Invalid value "%r". Valid ranges must contain begin <= end values') % (value))
         return value
