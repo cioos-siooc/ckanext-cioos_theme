@@ -21,7 +21,7 @@
              {% else %}
                 {% set value = composite_dict[key] %}
              {% endif %}
-             {% if not (loop.first or (loop.index == 2 and composite_dict[loop.previtem]|length == 0)) %}<br>{% endif %}<b>{{ label_dict[key] }}:</b>
+             {% if not (loop.first or (loop.index == 2 and composite_dict[loop.previtem]|length == 0)) %}<br>{% endif %}<b>{{ _(label_dict[key]) }}:</b>
                {{ value.replace('(&#8224;)', '')|trim }}
                {% if '(&#8224;)' in value %}
                    (&#8224;)

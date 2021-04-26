@@ -147,9 +147,9 @@ def cioos_tag_name_validator(field, schema):
 def cioos_is_valid_range(field, schema):
 
     def validator(value, context):
-        range = json.loads(value)
+        range = load_json(value)
         if (not range.get('begin') and range.get('end')) or (range.get('end') and range['end'] < range['begin']):
-            raise Invalid(_('Invalid value "%r" found in "%s". Valid ranges must have begin <= end values') % (value, field['name']))
+            raise Invalid(_('Invalid value "%r". Valid ranges must contain begin <= end values') % (value))
         return value
     return validator
 
@@ -384,6 +384,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             resp_org_roles = json.loads(toolkit.config.get('ckan.responsible_organization_roles', '["owner", "originator", "custodian", "author", "principalInvestigator"]'))
             resp_orgs = [x.get('organisation-name', '').strip() for x in json.loads(parties) if x.get('role') in resp_org_roles]
             resp_orgs = list(dict.fromkeys(resp_orgs))  # remove duplicates
+            resp_orgs = list(filter(None, resp_orgs)) # remove empty elements (in a python 2 and 3 friendly way)
         return resp_orgs
 
     def _get_extra_value(self, key, package_dict):
