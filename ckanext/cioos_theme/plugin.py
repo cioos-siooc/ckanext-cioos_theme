@@ -72,7 +72,7 @@ def clean_and_populate_eovs(field, schema):
 
         d = json.loads(data.get(key, '[]'))
         for x in eov_data:
-            if isinstance(x, str):
+            if isinstance(x, basestring):  # TODO: change basestring to str when moving to python 3
                 val = eov_list.get(x.lower(), '')
             else:
                 val = eov_list.get(x, '')
