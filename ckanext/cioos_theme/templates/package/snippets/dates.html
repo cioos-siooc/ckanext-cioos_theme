@@ -75,7 +75,7 @@
           {% endif %}
         {% endif %} #}
 
-        {% if dataset_reference_date and h.cioos_load_json(dataset_reference_date) | length > 0 %}
+        {% if dataset_reference_date and h.cioos_load_json(dataset_reference_date) | list | length > 0 %}
           <tr>
             <th scope="row" class="dataset-label">{{ _("Dataset Reference Date(s)") }}</th>
             <td class="dataset-details">
