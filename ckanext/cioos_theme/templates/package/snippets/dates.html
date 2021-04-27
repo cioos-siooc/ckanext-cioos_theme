@@ -99,7 +99,10 @@
           <tr>
             <th scope="row" class="dataset-label">{{ _("Frequency of Update") }}</th>
             <td class="dataset-details">
-              {{- h.scheming_choices_label(choices, frequency_of_update) -}}
+              {% set value = h.scheming_choices_label(choices, frequency_of_update) %}
+              {% if value %}
+                {{- value -}}
+              {% endif %}
             </td>
           </tr>
         {% endif %}
