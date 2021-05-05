@@ -154,6 +154,15 @@ msgstr "Organisation / Affiliation"
 msgid "On Going"
 msgstr "En cours"
 
+msgid "As Needed"
+msgstr "Au besoin"
+
+msgid "active"
+msgstr "actif"
+
+msgid "French"
+msgstr "Français"
+
 msgid "Completed"
 msgstr "Terminé"
 
@@ -165,6 +174,15 @@ msgstr "Autorité"
 
 msgid "Contact Info Email"
 msgstr "Courriel de contact"
+
+msgid "Individual Name"
+msgstr "Nom de l'individu"
+
+msgid "Begin"
+msgstr "Début"
+
+msgid "End"
+msgstr "Fin"
 
 msgid "Maintenance Note"
 msgstr "Note de maintenance"
@@ -441,7 +459,22 @@ msgid "contributors"
 msgstr "contributeurs"
 
 msgid "Show Permalink"
-msgstr "Montrer Permalink"
+msgstr "Montrer le Permalien"
+
+msgid "Metadata Reference Date(s)"
+msgstr "Date(s) de référence des métadonnées"
+
+msgid "Dataset Reference Date(s)"
+msgstr "Date(s) de référence du jeu de données"
+
+msgid "View Harvested Metadata"
+msgstr "Voir les métadonnées moissonnées"
+
+msgid "Access full metadata"
+msgstr "Accédez au métadonnées complètes"
+
+msgid "here"
+msgstr "ici"
 
 msgid "Harvested from"
 msgstr "Récolté à partir de"
