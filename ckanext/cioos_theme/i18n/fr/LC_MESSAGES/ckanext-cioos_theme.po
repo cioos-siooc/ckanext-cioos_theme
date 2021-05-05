@@ -471,7 +471,7 @@ msgid "View Harvested Metadata"
 msgstr "Voir les métadonnées moissonnées"
 
 msgid "Access full metadata"
-msgstr "Accédez au métadonnées complètes"
+msgstr "Accédez aux métadonnées complètes"
 
 msgid "here"
 msgstr "ici"
