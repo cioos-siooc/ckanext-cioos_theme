@@ -558,7 +558,7 @@ body {
   display: inline-block;
   text-transform: uppercase;
   margin-bottom: 0;
-  font-family: Quicksand;
+  font-family: $defaultfont;
   font-weight: normal;
   text-align: center;
   vertical-align: middle;
@@ -994,7 +994,7 @@ div.search-input-group {
   h1, h2, h3, h4, h5, h6 {
     clear: both;
     margin: 0 0 0.8em;
-    font-family: PT Sans, Helvetica, Arial;
+    font-family: $defaultfont;
     line-height: 1.5;
   }
 
@@ -1007,6 +1007,10 @@ div.search-input-group {
 
   p {
     margin-bottom: 20px;
+  }
+
+  a {
+    color: #fff;
   }
 
   .textwidget,
