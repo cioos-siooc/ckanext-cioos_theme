@@ -12,6 +12,7 @@ from ckan.common import OrderedDict, _, c
 # from ckantoolkit import h
 import ckan.logic as logic
 import ckan.model as model
+from ckan.model import PackageRelationship
 from ckan.common import config
 from paste.deploy.converters import asbool
 import copy
@@ -59,6 +60,47 @@ get_action = logic.get_action
 #             return extra['value']
 #
 #     return default
+
+
+def get_package_relationships(pkg):
+    '''Returns the relationships of a package.
+
+    :param id: the id or name of the package
+    '''
+    rel = pkg.get('relationships_as_subject') + pkg.get('relationships_as_object')
+    b = []
+    for x in rel:
+        if x not in b:
+            b.append(x)
+    return b
+
+
+def print_package_relationship_type(type):
+    out = 'depends on'
+    if 'child' in type:
+        out = 'parent'
+    elif 'parent' in type:
+        out = 'child'
+    elif 'link' in type:
+        out = 'cross link'
+    return out
+    #return PackageRelationship.make_type_printable(type)
+
+
+def get_package_relationship_reverse_type(type):
+    return PackageRelationship.reverse_type(type)
+
+
+def get_package_title(id):
+    '''Returns the title of a package.
+
+    :param id: the id or name of the package
+    '''
+    try:
+        pkg = toolkit.get_action('package_show')(None, data_dict={'id': id})
+    except Exception as e:
+        return None
+    return toolkit.h.get_translated(pkg, 'title')
 
 
 def _merge_lists(key, list1, list2):
