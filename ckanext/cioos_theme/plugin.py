@@ -2,9 +2,18 @@
 
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
+import ckan.model as model
+from ckan.lib.search import rebuild
 import ckanext.cioos_theme.helpers as cioos_helpers
 from ckanext.scheming.validation import scheming_validator
+from ckanext.harvest.model import (HarvestJob, HarvestObject)
+from ckan.model import (Package, PackageRevision, PackageTagRevision, PackageTag, PackageExtra, PackageExtraRevision, PackageRelationship, PackageRelationshipRevision)
+from ckan.logic import NotFound
 from ckan.lib.plugins import DefaultTranslation
+# from ckanext.harvest import model as harvest_model
+from ckanext.harvest.queue import (resubmit_objects)
+from sqlalchemy import and_, or_, text, String
+from sqlalchemy.sql import select, update, delete, bindparam
 import json
 from shapely.geometry import shape
 import logging
@@ -16,10 +25,24 @@ from ckan.common import _
 import routes.mapper
 import ckan.lib.base as base
 import re
+import time
 
 Invalid = df.Invalid
 
 log = logging.getLogger(__name__)
+
+# import debugpy
+
+StopOnError = df.StopOnError
+missing = df.missing
+log = logging.getLogger(__name__)
+
+# debugpy.listen(('0.0.0.0', 5678))
+# log.debug("Waiting for debugger attach")
+# debugpy.wait_for_client()
+
+
+
 
 show_responsible_organizations = toolkit.asbool(
     toolkit.config.get('cioos.show_responsible_organizations_facet', "True"))
@@ -265,6 +288,10 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             # 'cioos_get_organization_list': cioos_helpers.get_organization_list,
             # 'cioos_get_organization_dict': cioos_helpers.get_organization_dict,
             # 'cioos_get_organization_dict_extra': cioos_helpers.get_organization_dict_extra
+            'cioos_get_package_title': cioos_helpers.get_package_title,
+            'cioos_get_package_relationships': cioos_helpers.get_package_relationships,
+            'cioos_print_package_relationship_type': cioos_helpers.print_package_relationship_type,
+            'cioos_get_package_relationship_reverse_type': cioos_helpers.get_package_relationship_reverse_type,
             'cioos_datasets': cioos_helpers.cioos_datasets,
             'cioos_count_datasets': cioos_helpers.cioos_count_datasets,
             'cioos_get_eovs': cioos_helpers.cioos_get_eovs,
@@ -391,6 +418,244 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         for extra in package_dict.get('extras', []):
             if extra['key'] == key:
                 return extra['value']
+
+    def _check_harvest_relationship_targets(self, context, package_dict, to_add, is_create):
+
+        related_datasets = [x["object"] for x in to_add]
+        # rd_query = 'name:(' + ' OR '.join(related_datasets) + ')'
+        # response = toolkit.get_action('package_search')(
+        #     context,
+        #     data_dict={
+        #         "q": rd_query,
+        #         "fl": "name"
+        #     })
+
+        # package_search action was not finding all newly created datasets
+        # so trying an ORM query instead
+        results = model.Session.query(Package)\
+            .filter(
+                or_(
+                    (Package.id.in_(related_datasets)),
+                    (Package.name.in_(related_datasets))
+                )
+            )  
+
+        existing_datasets = [x.name for x in results]
+        missing_datasets = [x for x in related_datasets if x not in existing_datasets]  # related_datasets - existing-datasets
+
+        log.debug('existing_datasets: %r', existing_datasets)
+        log.debug('missing_datasets: %r', missing_datasets)
+
+        if not missing_datasets:
+            return 'process'
+
+        # one or more relationship targets do not yet exist
+
+        # get current harvest object
+        h_obj = model.Session.query(HarvestObject)\
+            .filter(HarvestObject.package_id == bindparam('b_package_id'))\
+            .params(b_package_id=package_dict['id'])\
+            .first()
+
+        # Harvest objects will not have guid or package_id assigned
+        # until they have been processed. if one or more harvest objects
+        # state is not yet COMPLETE or ERROR then we will put this object
+        # back on the harvest queue. We will only do this ?once? however.
+
+        num_objects_in_progress = \
+            model.Session.query(HarvestObject.id) \
+                .filter(HarvestObject.harvest_job_id == h_obj.harvest_job_id) \
+                .filter(and_((HarvestObject.state != u'COMPLETE'),
+                            (HarvestObject.state != u'ERROR'))) \
+                .filter(HarvestObject.retry_times > 3) \
+                .count()
+
+        if not num_objects_in_progress:
+            return 'process'
+
+        # use retry_times so we know when to give up
+        # this isn't great because for a sufficiently complex set of
+        # relationship this will still fail to find all packages.
+        # Also I should not overload retry_times. how to add my own counter?
+        if h_obj.retry_times > 3:
+            log.debug('package relationships retry counter > 2. skipping relationship.')
+            return 'process'
+
+        # Return the harvest object to the wait queue
+        model.Session.query(HarvestObject) \
+            .filter(HarvestObject.harvest_job_id == h_obj.harvest_job_id) \
+            .filter(HarvestObject.package_id == h_obj.package_id) \
+            .update({HarvestObject.state: u'WAITING',
+                    HarvestObject.package_id: None,
+                    HarvestObject.import_started: None,
+                    HarvestObject.import_finished: None,
+                    HarvestObject.current: False,
+                    HarvestObject.metadata_modified_date: None}, synchronize_session='fetch')
+
+        # Resubmit pending harvest objects that are missing from
+        # Redis, like the one we just set to WAITING.
+        resubmit_objects()
+
+        if is_create:
+            # purge package so we don't get 'URL in use' errors or clutter up the trash
+            # probably a better way to do this?
+
+            # package_subquery = model.Session.query(Package.id)\
+            #     .filter(Package.id == package_dict['id']).subquery()
+            #
+            # model.Session.query(PackageTagRevision)\
+            #     .filter(PackageTagRevision.package_id.in_(package_subquery))\
+            #     .delete(synchronize_session='fetch')
+            # model.Session.query(PackageTag)\
+            #     .filter(PackageTag.package_id.in_(package_subquery))\
+            #     .delete(synchronize_session='fetch')
+            # model.Session.query(PackageExtraRevision)\
+            #     .filter(PackageExtraRevision.package_id.in_(package_subquery))\
+            #     .delete(synchronize_session='fetch')
+            # model.Session.query(PackageExtra)\
+            #     .filter(PackageExtra.package_id.in_(package_subquery))\
+            #     .delete(synchronize_session='fetch')
+            # model.Session.query(PackageRelationshipRevision)\
+            #     .filter((PackageRelationshipRevision.object_package_id.in_(package_subquery)) |
+            #             (PackageRelationshipRevision.subject_package_id.in_(package_subquery))) \
+            #     .delete(synchronize_session='fetch')
+            # model.Session.query(PackageRelationship)\
+            #     .filter((PackageRelationship.object_package_id.in_(package_subquery)) |
+            #             (PackageRelationship.subject_package_id.in_(package_subquery))) \
+            #     .delete(synchronize_session='fetch')
+            # model.Session.query(PackageRevision)\
+            #     .filter(PackageRevision.id.in_(package_subquery))\
+            #     .delete(synchronize_session='fetch')
+            # model.Session.query(Package)\
+            #     .filter(Package.id.in_(package_subquery))\
+            #     .delete(synchronize_session='fetch')
+
+            # model.Session.flush()
+
+            # remove resources as they are created after this function runs
+            package_dict.pop('resources')
+
+            # commit repository so that we can later pruge it, otherwise we get 'NotFound' errors on member
+            model.repo.commit()
+
+            # members = model.Session.query(model.Member) \
+            #     .filter(model.Member.table_id == package_dict['id']) \
+            #     .filter(model.Member.table_name == 'package')
+            # if members.count() > 0:
+            #     for m in members.all():
+            #         m.purge()
+
+            # for r in model.Session.query(model.PackageRelationship).filter(
+            #         or_(model.PackageRelationship.subject_package_id == package_dict['id'],
+            #             model.PackageRelationship.object_package_id == package_dict['id'])).all():
+            #     r.purge()
+
+            # pkg = model.Package.get(package_dict['id'])
+            # pkg.purge()
+            # model.repo.commit_and_remove()
+
+            toolkit.get_action('dataset_purge')(
+            data_dict={
+                'id': package_dict['id']
+            }
+        )
+        return 'retry'
+
+    def _update_package_relationships(self, context, package_dict, is_create):
+        to_delete = []
+        to_add = []
+        to_index = []
+        relationships_errors = []
+
+        user = toolkit.get_action('get_site_user')({'model': model, 'ignore_auth': True}, {})
+        context = {'model': model, 'session': model.Session, 'user': user['name']}
+
+        # compare schema field, here called aggregation-info and
+        # package relationships. This block should be split off 
+        # into it's own function so it can be overriden
+        existing_rels = []
+        rels_from_schema = []
+        for x in load_json(package_dict.get('aggregation-info', [])):
+            comment = '/'.join([x['initiative-type'], x['association-type']])
+            comment = re.sub(r'([A-Z])', r' \1', comment)
+            comment = comment.title()
+
+            type = 'links_to'
+            if x['association-type'] == 'largerWorkCitation':
+                type = 'child_of'
+            if x['association-type'] == 'crossReference':
+                type = 'links_to'
+            if x['association-type'] == 'dependency':
+                type = 'depends_on'
+            if x['association-type'] == 'revisionOf':
+                type = 'derives_from'
+            if x['association-type'] == 'series':
+                type = 'links_to'
+            if x['association-type'] == 'isComposedOf':
+                type = 'derives_from'
+            rels_from_schema.append({
+                "subject": package_dict['name'],
+                "type": type,
+                "object": x['aggregate-dataset-identifier'],
+                "comment": comment
+            })
+
+        # get existing package relationships where this package is the subject (from)
+        existing_rels = toolkit.get_action('package_relationships_list')(
+            data_dict={
+                'id': package_dict['id']
+            }
+        )
+
+        to_delete = to_delete + [x for x in existing_rels if x not in rels_from_schema]  # existing_rels - rels_from_schema
+        to_add = to_add + [x for x in rels_from_schema if x not in existing_rels]  # rels_from_schema - existing_rels
+
+        if to_add and context.get('validate') is None:
+            # We are in a harvest job so better check packages exist
+            if self._check_harvest_relationship_targets(context, package_dict, to_add, is_create) == 'retry':
+                return
+            
+
+        # delete relationships
+        for d in to_delete:
+            toolkit.get_action('package_relationship_delete')(data_dict=d)
+            to_index.append(d['object'])
+            log.debug('Deleted package relationship %s %s %s', d['subject'], d['type'], d['object'])
+
+        # create relationships
+        for a in to_add:
+            try:
+                toolkit.get_action('package_relationship_create')(context, data_dict=a)
+                to_index.append(a['object'])
+                log.debug('Created package relationship %s %s %s', a['subject'], a['type'], a['object'])
+            except toolkit.ObjectNotFound as e:
+                relationships_errors.append('Failed to create package relationship for dataset %s: %r' % (package_dict['id'], e))
+
+        # trigger indexing of datasets we are linking to
+        for package_id in to_index:
+            rebuild(package_id)
+
+        if relationships_errors:
+            raise toolkit.ValidationError(relationships_errors)
+
+        return package_dict
+
+    def after_create(self, context, package_dict):
+        self._update_package_relationships(context, package_dict, is_create=True)
+
+    def after_update(self, context, package_dict):
+        self._update_package_relationships(context, package_dict, is_create=False)
+
+    def before_update(self, context, package_dict):
+        if package_dict.state == 'deleted':
+            existing_rels = toolkit.get_action('package_relationships_list')(
+                data_dict={
+                    'id': package_dict['id']
+                }
+            )
+            for d in to_delete:
+                toolkit.get_action('package_relationship_delete')(data_dict=d)
+                to_index.append(d['object'])
 
     # modfiey tags, keywords, and eov fields so that they properly index
     def before_index(self, data_dict):
@@ -591,6 +856,39 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         cited_responsible_party = package_dict.get('cited-responsible-party')
         if((cited_responsible_party or force_resp_org) and not package_dict.get('responsible_organizations')):
             package_dict['responsible_organizations'] = self._cited_responsible_party_to_responsible_organizations(cited_responsible_party, force_resp_org)
+
+        # Update package relationships with package name
+        ras = package_dict['relationships_as_subject']
+        for rel in ras:
+            if rel.get('__extras'):
+                id = rel['__extras']['object_package_id']
+                result = toolkit.get_action('package_search')(context, data_dict={'q': 'id:%s' % id, 'fl': 'name'})
+                log.debug('Results: %r', result['results'])
+                if result['results']:
+                    rel['__extras']['object_package_name'] = result['results'][0]['name']
+                rel['__extras']['subject_package_name'] = package_dict['name']
+            else:
+                id = rel['object_package_id']
+                result = toolkit.get_action('package_search')(context, data_dict={'q': 'id:%s' % id, 'fl': 'name'})
+                log.debug('Results: %r', result['results'])
+                if result['results']:
+                    rel['object_package_name'] = result['results'][0]['name']
+                rel['subject_package_name'] = package_dict['name']
+
+        rao = package_dict['relationships_as_object']
+        for rel in rao:
+            if rel.get('__extras'):
+                rel['__extras']['object_package_name'] = package_dict['name']
+                id = rel['__extras']['subject_package_id']
+                result = toolkit.get_action('package_search')(context, data_dict={'q': 'id:%s' % id, 'fl': 'name'})
+                if result['results']:
+                    rel['__extras']['subject_package_name'] = result['results'][0]['name']
+            else:
+                rel['object_package_name'] = package_dict['name']
+                id = rel['subject_package_id']
+                result = toolkit.get_action('package_search')(context, data_dict={'q': 'id:%s' % id, 'fl': 'name'})
+                if result['results']:
+                    rel['subject_package_name'] = result['results'][0]['name']
 
         return package_dict
 

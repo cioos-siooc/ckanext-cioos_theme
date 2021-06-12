@@ -1,0 +1,52 @@
+{% if relationships %}
+<section class="relationships">
+  <h3>{{ _('Relationships') }}</h3>
+  <div class="card-group">
+    {% for rel in pkg_dict['relationships_as_subject'] %}
+    <div class="card">
+      <div class="row">
+        <div class="col-md-10">
+          <div class="card-body">
+            <h4 class="card-title">
+              {{ h.link_to(h.cioos_get_package_title(rel['__extras']['object_package_id']) or rel['__extras']['object_package_name'], rel['__extras']['object_package_name'], target='_blank') }}
+            </h4>
+            <p class="card-text">Type: <b>{{ rel["comment"] }}</b></p>
+          </div>
+        </div>
+        <div class="col-md-2 align-self-center">
+          <div class="card-body">
+            <span class="label label-clear-100">
+              {{ (h.cioos_print_package_relationship_type(rel["type"])).title() }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+
+    {% for rel in pkg_dict['relationships_as_object'] %}
+    <div class="card">
+      <div class="row">
+        <div class="col-md-10">
+          <div class="card-body">
+            <h4 class="card-title">
+              {{ h.link_to(h.cioos_get_package_title(rel['__extras']['subject_package_id']) or rel['__extras']['subject_package_name'], rel['__extras']['subject_package_name'], target='_blank') }}
+            </h4>
+            <p class="card-text">Type: <b>{{ rel["comment"] }}</b></p>
+          </div>
+        </div>
+        <div class="col-md-2 align-self-center">
+          <div class="card-body">
+            <span class="label label-clear-100">
+              {{ (h.cioos_print_package_relationship_type(h.cioos_get_package_relationship_reverse_type(rel["type"]))).title() }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+
+  </div>
+
+</section>
+{% endif %}
