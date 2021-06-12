@@ -23,6 +23,13 @@ log = logging.getLogger(__name__)
 
 get_action = logic.get_action
 
+def load_json(j):
+    try:
+        new_val = json.loads(j)
+    except Exception:
+        new_val = j
+    return new_val
+
 # def get_organization_list(data_dict):
 #     '''Returns a list of organizations.
 #
