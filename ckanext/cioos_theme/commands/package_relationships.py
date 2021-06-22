@@ -1,14 +1,18 @@
 from ckan import model
 from ckan.logic import get_action, ValidationError
-
+import ckan.lib.search
 from ckan.lib.cli import CkanCommand
 
 import re
 
 from ckanext.cioos_theme.helpers import load_json
-
+import debugpy
 import logging
 log = logging.getLogger(__name__)
+
+# debugpy.listen(('0.0.0.0', 5678))
+# log.debug("Waiting for debugger attach")
+# debugpy.wait_for_client()
 
 class PackageRelationships(CkanCommand):
     '''Performs package relationship related operations.
@@ -51,32 +55,32 @@ class PackageRelationships(CkanCommand):
     def rebuild(self, clear=False):
         from ckan.lib.search import rebuild, commit
 
-        to_delete = []
-        to_add = []
-        to_index = []
-        relationships_errors = []
         dataset_id_arg = None
 
         if len(self.args) > 1:
             dataset_id_arg = self.args[1]
 
-        user = get_action('get_site_user')({'model': model, 'ignore_auth': True}, {})
-        context = {'model': model, 'session': model.Session, 'user': user['name']}
+        context = {'model': model, 'session': model.Session, "ignore_auth": True}
 
         query_str = 'aggregation-info:[* TO *]'
         if dataset_id_arg:
             query_str = query_str + ' AND name:%s' % dataset_id_arg
 
+        # TODO: add paging incase we have more then 1000 records
         query = get_action('package_search')(
             context, data_dict={
                 "q": query_str,
-                "fl": "id,name,extras_aggregation-info"
+                "fl": "id,name,extras_aggregation-info",
+                "rows": 1000
             })
-        for package_dict in query['results']:
 
+        to_index = []
+        for package_dict in query['results']:
+            to_delete = []
+            to_add = []
             # compare schema field, here called aggregation-info and
             # package relationships. This block should be split off
-            # into it's own function so it can be overriden
+            # into it's own function so it can be overridden
             existing_rels = []
             rels_from_schema = []
             for x in load_json(package_dict.get('aggregation-info', [])):
@@ -104,7 +108,8 @@ class PackageRelationships(CkanCommand):
                     "comment": comment
                 })
 
-            # get existing package relationships where this package is the subject (from)
+            # get existing package relationships where this package is the
+            # subject (from)
             try:
                 existing_rels = get_action('package_relationships_list')(
                     data_dict={
@@ -112,37 +117,53 @@ class PackageRelationships(CkanCommand):
                     }
                 )
             except Exception as e:
-                log.warn('No package relationship found for dataset %s: %r' % (package_dict['id'], e))
+                print('No package relationship found for dataset %s: %r'
+                      % package_dict['id'], e)
                 existing_rels = []
 
             if clear:
                 to_delete = existing_rels
                 to_add = []
             else:
-                to_delete = to_delete + [x for x in existing_rels if x not in rels_from_schema]  # existing_rels - rels_from_schema
-                to_add = to_add + [x for x in rels_from_schema if x not in existing_rels]  # rels_from_schema - existing_rels
+                to_delete = to_delete + [x for x in existing_rels
+                                         if x not in rels_from_schema]  # existing_rels - rels_from_schema
+                to_add = to_add + [x for x in rels_from_schema
+                                   if x not in existing_rels]  # rels_from_schema - existing_rels
 
             # delete relationships
             for d in to_delete:
                 try:
-                    get_action('package_relationship_delete')(data_dict=d)
+                    get_action('package_relationship_delete')(context, data_dict=d)
                     to_index.append(d['object'])
-                    log.debug('Deleted package relationship %s %s %s', d['subject'], d['type'], d['object'])
+                    print('Deleted package relationship %s %s %s' % (d['subject'],
+                          d['type'], d['object']))
                 except Exception as e:
-                    log.warn('Failed to delete package relationship for dataset %s: %r' % (package_dict['id'], e))
+                    print('Failed to delete package relationship for dataset %s: %r' % (package_dict['id'], e))
+
+            if clear:
+                # we have to purge relationships flaged as deleted otherwise we
+                # will get a detachedinstanceerror when trying to re-add the
+                # relationship later
+                for r in model.Session.query(model.PackageRelationship).filter(
+                        model.PackageRelationship.state == 'deleted').all():
+                    r.purge()
+                model.repo.commit_and_remove()
+
             # create relationships
             for a in to_add:
                 try:
                     get_action('package_relationship_create')(context, data_dict=a)
                     to_index.append(a['object'])
-                    log.debug('Created package relationship %s %s %s', a['subject'], a['type'], a['object'])
+                    print('Created package relationship %s %s %s' % (a['subject'],
+                          a['type'], a['object']))
                 except Exception as e:
-                    log.warn('Failed to create package relationship for dataset %s: %r' % (package_dict['id'], e))
+                    print('Failed to create package relationship for dataset %s: %r' % (package_dict['id'], e))
 
-            # trigger indexing of datasets we are linking to
-            for target_package_id in to_index:
-                rebuild(target_package_id)
+            to_index.append(package_dict['id'])
 
-            # index this dataset
-            # if dataset_id_arg is None:
-            #    rebuild(package_dict['id'])
+        print('Indexing datasets: %r' % to_index)
+        # remove duplicates
+        to_index = list(dict.fromkeys(to_index))
+        # trigger indexing of datasets invovled in relationships
+        for target_package_id in to_index:
+            ckan.lib.search.rebuild(target_package_id)
