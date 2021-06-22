@@ -814,8 +814,8 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                         result['organization'] = organization
                 else:
                     log.warn('No org details for owner_org %s', result.get('org_descriptionid'))
-            else:
-                log.warn('No owner_org for dataset %s: %s: %s', result.get('id'), result.get('name'), result.get('title'))
+            # else:
+            #    log.warn('No owner_org for dataset %s: %s: %s', result.get('id'), result.get('name'), result.get('title'))
 
         return search_results
 
