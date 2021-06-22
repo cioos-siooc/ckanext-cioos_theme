@@ -5,6 +5,7 @@ import ckan.plugins.toolkit as toolkit
 import ckanext.cioos_theme.helpers as cioos_helpers
 from ckanext.scheming.validation import scheming_validator
 from ckan.lib.plugins import DefaultTranslation
+import ckan.model as model
 import json
 from shapely.geometry import shape
 import logging
@@ -617,11 +618,23 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         return base_url + '/' + locale_urls.get(lang)
 
 
-class CIOOSController(base.BaseController):
+class CIOOSController(toolkit.BaseController):
 
     def schemamap(self):
         return base.render('schemamap.html')
 
     def datacite_xml(self, id):
+        context = {'model': model, 'session': model.Session,
+                   'user': c.user, 'for_view': True,
+                   'auth_user_obj': c.userobj}
+        data_dict = {'id': id}
+
+        try:
+            toolkit.check_access('package_update', context, data_dict)
+        except toolkit.ObjectNotFound:
+            toolkit.abort(404, _('Dataset not found'))
+        except toolkit.NotAuthorized:
+            toolkit.abort(403, _('User %r not authorized to view datacite xml for %s') % (c.user, id))
+
         pkg = toolkit.get_action('package_show')(data_dict={'id': id})
-        return base.render('package/datacite.html', extra_vars={'pkg_dict':pkg})
+        return base.render('package/datacite.html', extra_vars={'pkg_dict': pkg})
