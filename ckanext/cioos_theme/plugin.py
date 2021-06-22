@@ -168,6 +168,9 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
     def before_map(self, route_map):
         with routes.mapper.SubMapper(route_map, controller='ckanext.cioos_theme.plugin:CIOOSController') as m:
             m.connect('schemamap', '/schemamap', action='schemamap')
+            m.connect('datacite_xml', '/dataset/{id}.{format}',
+                      action='datacite_xml',
+                      requirements={'format': 'dcxml'})
         return route_map
 
     def after_map(self, route_map):
@@ -270,7 +273,12 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             'cioos_get_eovs': cioos_helpers.cioos_get_eovs,
             'cioos_get_locale_url': self.get_locale_url,
             'cioos_schema_field_map': cioos_helpers.cioos_schema_field_map,
-            'cioos_get_additional_css_path': self.get_additional_css_path
+            'cioos_get_additional_css_path': self.get_additional_css_path,
+            'cioos_generate_doi_suffix': cioos_helpers.generate_doi_suffix,
+            'cioos_get_doi_authority_url': cioos_helpers.get_doi_authority_url,
+            'cioos_get_doi_prefix': cioos_helpers.get_doi_prefix,
+            'cioos_get_datacite_org': cioos_helpers.get_datacite_org,
+            'cioos_get_datacite_test_mode': cioos_helpers.get_datacite_test_mode
         }
 
     def get_validators(self):
@@ -549,8 +557,8 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                         result['organization'] = organization
                 else:
                     log.warn('No org details for owner_org %s', result.get('org_descriptionid'))
-            else:
-                log.warn('No owner_org for dataset %s: %s: %s', result.get('id'), result.get('name'), result.get('title'))
+            # else:
+            #    log.warn('No owner_org for dataset %s: %s: %s', result.get('id'), result.get('name'), result.get('title'))
 
         return search_results
 
@@ -614,3 +622,7 @@ class CIOOSController(base.BaseController):
 
     def schemamap(self):
         return base.render('schemamap.html')
+
+    def datacite_xml(self, id):
+        pkg = toolkit.get_action('package_show')(data_dict={'id': id})
+        return base.render('package/datacite.html', extra_vars={'pkg_dict':pkg})
