@@ -274,7 +274,6 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             'cioos_get_locale_url': self.get_locale_url,
             'cioos_schema_field_map': cioos_helpers.cioos_schema_field_map,
             'cioos_get_additional_css_path': self.get_additional_css_path,
-            'cioos_generate_doi_suffix': cioos_helpers.generate_doi_suffix,
             'cioos_get_doi_authority_url': cioos_helpers.get_doi_authority_url,
             'cioos_get_doi_prefix': cioos_helpers.get_doi_prefix,
             'cioos_get_datacite_org': cioos_helpers.get_datacite_org,
