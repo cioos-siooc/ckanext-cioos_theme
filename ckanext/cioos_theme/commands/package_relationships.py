@@ -83,7 +83,7 @@ class PackageRelationships(CkanCommand):
             to_add = []
             existing_rels = []
 
-            rels_from_schema = get_relationships_from_schema(load_json(package_dict.get('aggregation-info', [])))
+            rels_from_schema = get_relationships_from_schema(load_json(package_dict.get('aggregation-info', [])), package_dict['name'])
 
             # get existing package relationships where this package is the
             # subject (from)

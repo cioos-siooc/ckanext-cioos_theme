@@ -8,7 +8,7 @@ from ckanext.cioos_theme.helpers import load_json
 
 log = logging.getLogger(__name__)
 
-def get_relationships_from_schema(rel_json):
+def get_relationships_from_schema(rel_json, subject_name):
     # compare schema field, here called aggregation-info and
     # package relationships.
     rels_from_schema = []
@@ -32,11 +32,12 @@ def get_relationships_from_schema(rel_json):
             type = 'derives_from'
         if x['aggregate-dataset-identifier']:
             rels_from_schema.append({
-                "subject": package_dict['name'],
+                "subject": subject_name,
                 "type": type,
                 "object": x['aggregate-dataset-identifier'],
                 "comment": comment
             })
+    return rels_from_schema
 
 def update_package_relationships(context, package_dict, is_create):
     to_delete = []
@@ -50,7 +51,7 @@ def update_package_relationships(context, package_dict, is_create):
         # skip for now.
         return
 
-    rels_from_schema = get_relationships_from_schema(load_json(package_dict.get('aggregation-info', [])))
+    rels_from_schema = get_relationships_from_schema(load_json(package_dict.get('aggregation-info', [])), package_dict['name'])
     existing_rels = []
     # get existing package relationships where this package is the subject (from)
     existing_rels = toolkit.get_action('package_relationships_list')(
