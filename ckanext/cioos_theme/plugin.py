@@ -2,8 +2,11 @@
 
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
+import ckan.model as model
 import ckanext.cioos_theme.helpers as cioos_helpers
+import ckanext.cioos_theme.package_relationships as pr
 from ckanext.scheming.validation import scheming_validator
+from ckan.logic import NotFound
 from ckan.lib.plugins import DefaultTranslation
 import ckan.model as model
 import json
@@ -17,10 +20,24 @@ from ckan.common import _
 import routes.mapper
 import ckan.lib.base as base
 import re
+import time
 
 Invalid = df.Invalid
 
 log = logging.getLogger(__name__)
+
+# import debugpy
+
+StopOnError = df.StopOnError
+missing = df.missing
+log = logging.getLogger(__name__)
+
+# debugpy.listen(('0.0.0.0', 5678))
+# log.debug("Waiting for debugger attach")
+# debugpy.wait_for_client()
+
+
+
 
 show_responsible_organizations = toolkit.asbool(
     toolkit.config.get('cioos.show_responsible_organizations_facet', "True"))
@@ -35,12 +52,7 @@ organizations_info_text = toolkit.config.get(
 )
 
 
-def load_json(j):
-    try:
-        new_val = json.loads(j)
-    except Exception:
-        new_val = j
-    return new_val
+
 
 
 def geojson_to_bbox(o):
@@ -148,7 +160,7 @@ def cioos_tag_name_validator(field, schema):
 def cioos_is_valid_range(field, schema):
 
     def validator(value, context):
-        range = load_json(value)
+        range = cioos_helpers.load_json(value)
         if (not range.get('begin') and range.get('end')) or (range.get('end') and range['end'] < range['begin']):
             raise Invalid(_('Invalid value "%r". Valid ranges must contain begin <= end values') % (value))
         return value
@@ -258,7 +270,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         return {
             'cioos_organizations_info_text': lambda: organizations_info_text,
             'cioos_contact_email': lambda: contact_email,
-            'cioos_load_json': load_json,
+            'cioos_load_json': cioos_helpers.load_json,
             'cioos_geojson_to_bbox': geojson_to_bbox,
             # 'cioos_most_popular_groups': most_popular_groups,
             # 'cioos_groups': groups,
@@ -269,6 +281,10 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             # 'cioos_get_organization_list': cioos_helpers.get_organization_list,
             # 'cioos_get_organization_dict': cioos_helpers.get_organization_dict,
             # 'cioos_get_organization_dict_extra': cioos_helpers.get_organization_dict_extra
+            'cioos_get_package_title': cioos_helpers.get_package_title,
+            'cioos_get_package_relationships': cioos_helpers.get_package_relationships,
+            'cioos_print_package_relationship_type': cioos_helpers.print_package_relationship_type,
+            'cioos_get_package_relationship_reverse_type': cioos_helpers.get_package_relationship_reverse_type,
             'cioos_datasets': cioos_helpers.cioos_datasets,
             'cioos_count_datasets': cioos_helpers.cioos_count_datasets,
             'cioos_get_eovs': cioos_helpers.cioos_get_eovs,
@@ -392,13 +408,19 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             resp_org_roles = json.loads(toolkit.config.get('ckan.responsible_organization_roles', '["owner", "originator", "custodian", "author", "principalInvestigator"]'))
             resp_orgs = [x.get('organisation-name', '').strip() for x in json.loads(parties) if x.get('role') in resp_org_roles]
             resp_orgs = list(dict.fromkeys(resp_orgs))  # remove duplicates
-            resp_orgs = list(filter(None, resp_orgs)) # remove empty elements (in a python 2 and 3 friendly way)
+            resp_orgs = list(filter(None, resp_orgs))  # remove empty elements (in a python 2 and 3 friendly way)
         return resp_orgs
 
     def _get_extra_value(self, key, package_dict):
         for extra in package_dict.get('extras', []):
             if extra['key'] == key:
                 return extra['value']
+
+    def after_create(self, context, data_dict):
+        pr.update_package_relationships(context, data_dict, is_create=True)
+
+    def after_update(self, context, data_dict):
+        pr.update_package_relationships(context, data_dict, is_create=False)
 
     # modfiey tags, keywords, and eov fields so that they properly index
     def before_index(self, data_dict):
@@ -407,14 +429,14 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             return data_dict
 
         try:
-            tags_dict = load_json(data_dict.get('keywords', '{}'))
+            tags_dict = cioos_helpers.load_json(data_dict.get('keywords', '{}'))
         except Exception as err:
             log.error(data_dict.get('id', 'NO ID'))
             log.error(type(err))
             log.error("error:%s, keywords:%r", err, data_dict.get('keywords', '{}'))
             tags_dict = {"en": [], "fr": []}
 
-        force_resp_org = load_json(data_dict.get('force_responsible_organization', '[]'))
+        force_resp_org = cioos_helpers.load_json(data_dict.get('force_responsible_organization', '[]'))
         data_dict['responsible_organizations'] = self._cited_responsible_party_to_responsible_organizations(data_dict.get('cited-responsible-party', '{}'), force_resp_org)
 
         # update tag list by language
@@ -442,7 +464,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             data_dict['organization_fr'] = org_title.get('fr', '')
 
         try:
-            title = load_json(data_dict.get('title_translated', '{}'))
+            title = cioos_helpers.load_json(data_dict.get('title_translated', '{}'))
             data_dict['title_en'] = title.get('en', [])
             data_dict['title_fr'] = title.get('fr', [])
         except Exception as err:
@@ -451,7 +473,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         # create temporal extent index.
         te = data_dict.get('temporal-extent', '{}')
         if te:
-            temporal_extent = load_json(te)
+            temporal_extent = cioos_helpers.load_json(te)
             temporal_extent_begin = temporal_extent.get('begin')
             temporal_extent_end = temporal_extent.get('end')
             if(temporal_extent_begin):
@@ -464,7 +486,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         # create vertical extent index
         ve = data_dict.get('vertical-extent', '{}')
         if ve:
-            vertical_extent = load_json(ve)
+            vertical_extent = cioos_helpers.load_json(ve)
             vertical_extent_min = vertical_extent.get('min')
             vertical_extent_max = vertical_extent.get('max')
             if(vertical_extent_min):
@@ -474,7 +496,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
 
         # eov is multi select so it is a json list rather then a python list
         if(data_dict.get('eov')):
-            data_dict['eov'] = load_json(data_dict['eov'])
+            data_dict['eov'] = cioos_helpers.load_json(data_dict['eov'])
 
         return data_dict
 
@@ -521,20 +543,20 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         # by the package_show and package_search end points whout filters applied
         for result in search_results.get('results', []):
 
-            force_resp_org = load_json(self._get_extra_value('force_responsible_organization', result))
+            force_resp_org = cioos_helpers.load_json(self._get_extra_value('force_responsible_organization', result))
             cited_responsible_party = result.get('cited-responsible-party')
             if((cited_responsible_party or force_resp_org) and not result.get('responsible_organizations')):
                 result['responsible_organizations'] = self._cited_responsible_party_to_responsible_organizations(cited_responsible_party, force_resp_org)
 
             title = result.get('title_translated')
             if(title):
-                result['title_translated'] = load_json(title)
+                result['title_translated'] = cioos_helpers.load_json(title)
             notes = result.get('notes_translated')
             if(notes):
-                result['notes_translated'] = load_json(notes)
+                result['notes_translated'] = cioos_helpers.load_json(notes)
             keywords = result.get('keywords')
             if(keywords):
-                result['keywords'] = load_json(keywords)
+                result['keywords'] = cioos_helpers.load_json(keywords)
 
             # update organization object while we are at it
             org_id = result.get('owner_org')
@@ -595,10 +617,41 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             if org_image_url:
                 package_dict['organization']['image_url_translated'] = org_image_url
 
-        force_resp_org = load_json(self._get_extra_value('force_responsible_organization', package_dict))
+        force_resp_org = cioos_helpers.load_json(self._get_extra_value('force_responsible_organization', package_dict))
         cited_responsible_party = package_dict.get('cited-responsible-party')
         if((cited_responsible_party or force_resp_org) and not package_dict.get('responsible_organizations')):
             package_dict['responsible_organizations'] = self._cited_responsible_party_to_responsible_organizations(cited_responsible_party, force_resp_org)
+
+        # Update package relationships with package name
+        ras = package_dict['relationships_as_subject']
+        for rel in ras:
+            if rel.get('__extras'):
+                id = rel['__extras']['object_package_id']
+                result = toolkit.get_action('package_search')(context, data_dict={'q': 'id:%s' % id, 'fl': 'name'})
+                if result['results']:
+                    rel['__extras']['object_package_name'] = result['results'][0]['name']
+                rel['__extras']['subject_package_name'] = package_dict['name']
+            else:
+                id = rel['object_package_id']
+                result = toolkit.get_action('package_search')(context, data_dict={'q': 'id:%s' % id, 'fl': 'name'})
+                if result['results']:
+                    rel['object_package_name'] = result['results'][0]['name']
+                rel['subject_package_name'] = package_dict['name']
+
+        rao = package_dict['relationships_as_object']
+        for rel in rao:
+            if rel.get('__extras'):
+                rel['__extras']['object_package_name'] = package_dict['name']
+                id = rel['__extras']['subject_package_id']
+                result = toolkit.get_action('package_search')(context, data_dict={'q': 'id:%s' % id, 'fl': 'name'})
+                if result['results']:
+                    rel['__extras']['subject_package_name'] = result['results'][0]['name']
+            else:
+                rel['object_package_name'] = package_dict['name']
+                id = rel['subject_package_id']
+                result = toolkit.get_action('package_search')(context, data_dict={'q': 'id:%s' % id, 'fl': 'name'})
+                if result['results']:
+                    rel['subject_package_name'] = result['results'][0]['name']
 
         return package_dict
 
