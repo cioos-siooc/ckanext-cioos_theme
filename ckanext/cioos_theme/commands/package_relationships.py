@@ -2,11 +2,11 @@ from ckan import model
 from ckan.logic import get_action, ValidationError
 import ckan.lib.search
 from ckan.lib.cli import CkanCommand
-
+from ckanext.cioos_theme.package_relationships import get_relationships_from_schema
 import re
 
 from ckanext.cioos_theme.helpers import load_json
-import debugpy
+# import debugpy
 import logging
 log = logging.getLogger(__name__)
 
@@ -22,6 +22,10 @@ class PackageRelationships(CkanCommand):
             relationships for a dataset_name if given, if not then rebuild
             package relationships for all datasets
 
+        package_relationships clear [dataset_name]  - remove package
+            relationships for a dataset_name if given, if not then remove
+            package relationships for all datasets
+
     '''
 
     summary = __doc__.split('\n')[0]
@@ -34,7 +38,6 @@ class PackageRelationships(CkanCommand):
 
     def _load_config(self):
         super(PackageRelationships, self)._load_config()
-
 
     def command(self):
         if not self.args:
@@ -78,35 +81,9 @@ class PackageRelationships(CkanCommand):
         for package_dict in query['results']:
             to_delete = []
             to_add = []
-            # compare schema field, here called aggregation-info and
-            # package relationships. This block should be split off
-            # into it's own function so it can be overridden
             existing_rels = []
-            rels_from_schema = []
-            for x in load_json(package_dict.get('aggregation-info', [])):
-                comment = '/'.join([x['initiative-type'], x['association-type']])
-                comment = re.sub(r'([A-Z])', r' \1', comment)
-                comment = comment.title()
 
-                type = 'links_to'
-                if x['association-type'] == 'largerWorkCitation':
-                    type = 'child_of'
-                if x['association-type'] == 'crossReference':
-                    type = 'links_to'
-                if x['association-type'] == 'dependency':
-                    type = 'depends_on'
-                if x['association-type'] == 'revisionOf':
-                    type = 'derives_from'
-                if x['association-type'] == 'series':
-                    type = 'links_to'
-                if x['association-type'] == 'isComposedOf':
-                    type = 'derives_from'
-                rels_from_schema.append({
-                    "subject": package_dict['name'],
-                    "type": type,
-                    "object": x['aggregate-dataset-identifier'],
-                    "comment": comment
-                })
+            rels_from_schema = get_relationships_from_schema(load_json(package_dict.get('aggregation-info', [])))
 
             # get existing package relationships where this package is the
             # subject (from)
@@ -125,10 +102,14 @@ class PackageRelationships(CkanCommand):
                 to_delete = existing_rels
                 to_add = []
             else:
+                # existing_rels - rels_from_schema
+                # do not delete inbound relationships, ie where this dataset is the object/target
                 to_delete = to_delete + [x for x in existing_rels
-                                         if x not in rels_from_schema]  # existing_rels - rels_from_schema
+                                         if x not in rels_from_schema and
+                                         x['type'] not in ['linked_from', 'parent_of', 'has_derivation', 'dependency_of']]
+                # rels_from_schema - existing_rels
                 to_add = to_add + [x for x in rels_from_schema
-                                   if x not in existing_rels]  # rels_from_schema - existing_rels
+                                   if x not in existing_rels]
 
             # delete relationships
             for d in to_delete:
@@ -140,8 +121,8 @@ class PackageRelationships(CkanCommand):
                 except Exception as e:
                     print('Failed to delete package relationship for dataset %s: %r' % (package_dict['id'], e))
 
-            if clear:
-                # we have to purge relationships flaged as deleted otherwise we
+            if to_delete:
+                # we have to purge relationships flagged as deleted otherwise we
                 # will get a detachedinstanceerror when trying to re-add the
                 # relationship later
                 for r in model.Session.query(model.PackageRelationship).filter(
@@ -164,6 +145,6 @@ class PackageRelationships(CkanCommand):
         print('Indexing datasets: %r' % to_index)
         # remove duplicates
         to_index = list(dict.fromkeys(to_index))
-        # trigger indexing of datasets invovled in relationships
+        # trigger indexing of datasets involved in relationships
         for target_package_id in to_index:
             ckan.lib.search.rebuild(target_package_id)
