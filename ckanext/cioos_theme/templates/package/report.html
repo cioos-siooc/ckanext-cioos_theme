@@ -1,0 +1,127 @@
+{% extends "package/read.html" %}
+{% set pkg = c.pkg_dict %}
+{%- set schema = h.scheming_get_dataset_schema(dataset_type) -%}
+
+{% set gns = namespace() %}
+{% set gns.site_logo =  h.scheming_language_text(h.cioos_load_json(g.site_logo_translated or g.site_logo or '{"fr": "/base/images/ckan-logo.png", "en": "/base/images/ckan-logo.png"}' )) %}
+{% set gns.site_title = h.scheming_language_text(h.cioos_load_json(g.site_title)) %}
+{% set gns.site_description = h.render_markdown(h.scheming_language_text(h.cioos_load_json(g.site_description))) %}
+
+
+{% if h.is_url(gns.site_logo) %}
+  {% set logo_url = gns.site_logo %}
+{% else %}
+  {% set logo_url = h.url_for_static_or_external(gns.site_logo) %}
+{% endif %}
+
+
+{%- block header %}
+<div id="header-container">
+  <div id="header" class="nav main-nav" style="margin:0;">
+    <div id="header-core">
+      <div id="logo">
+        {% block header_logo %}
+        <img src="{{ logo_url }}" alt="Logo">
+        {% endblock %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock -%}
+{% block skip %}
+{% endblock -%}
+
+
+
+{% block toolbar %}
+{% endblock %}
+{% block secondary %}
+{% endblock %}
+
+
+
+{% block primary %}
+<div class="primary col-sm-12 col-xs-12">
+  {% block primary_content %}
+  <article class="module">
+
+    {% block page_header %}
+    {% endblock %}
+
+    {% block primary_content_inner %}
+
+    {% block package_description %}
+    {% if pkg.private %}
+    <span class="dataset-private label label-inverse pull-right">
+      <i class="fa fa-lock"></i>
+      {{ _('Private') }}
+    </span>
+    {% endif %}
+    <h1>
+      {% block page_heading %}
+      {{ h.dataset_display_name(pkg) }}
+      {% if pkg.state.startswith('draft') %}
+      [{{ _('Draft') }}]
+      {% endif %}
+      {% if pkg.state == 'deleted' %}
+      [{{ _('Deleted') }}]
+      {% endif %}
+      {% endblock %}
+    </h1>
+
+    {% block package_notes %}
+    {%- if not dataset_type -%}
+    <p>
+      dataset_type not passed to template. your version of CKAN
+      might not be compatible with ckanext-scheming
+    </p>
+    {%- endif -%}
+    {% if ( h.scheming_field_by_name(schema.dataset_fields, 'notes') or h.scheming_field_by_name(schema.dataset_fields, 'notes_translated') ) and h.get_translated(pkg, 'notes') %}
+    <div class="notes embedded-content">
+      {{ h.render_markdown(h.get_translated(pkg, 'notes')) }}
+    </div>
+    {% endif %}
+    {% endblock %}
+    {% endblock %}
+
+    {% block package_access %}
+    {% snippet "package/snippets/access.html", pkg_dict=pkg %}
+    {% endblock %}
+
+    {% block package_resources %}
+    {% snippet "package/snippets/resources_list.html", pkg=pkg, resources=pkg.resources %}
+    {% endblock %}
+
+    {% block package_dates %}
+    {% snippet "package/snippets/dates.html", pkg_dict=pkg %}
+    {% endblock %}
+
+    {% block package_citation %}
+    {% if pkg.citation %}
+    {% snippet "package/snippets/package_citation.html", pkg_dict=pkg %}
+    {% endif %}
+    {% endblock %}
+
+    {% block package_img_preview %}
+    {% snippet "package/snippets/preview.html", pkg_dict=pkg %}
+    {% endblock %}
+
+    {% block package_tags %}
+    {% snippet "package/snippets/tags.html", tags=h.cioos_load_json(pkg.get('keywords', {}))[h.lang()] %}
+    {% endblock %}
+
+    {% set dataset_extent = h.get_pkg_dict_extra(pkg, 'spatial') or pkg.get('spatial') %}
+    {% if dataset_extent %}
+    {% snippet "spatial/snippets/dataset_map.html", extent=dataset_extent, max_zoom=h.spatial_get_map_initial_max_zoom(pkg) %}
+    {% endif %}
+
+    {% block package_additional_info %}
+    {% snippet "scheming/package/snippets/additional_info.html", pkg_dict=pkg, dataset_type=dataset_type, schema=schema %}
+    {% endblock %}
+
+    {% endblock %}
+  {% endblock %}
+{% endblock %}
+
+{%- block footer %}
+{% endblock %}

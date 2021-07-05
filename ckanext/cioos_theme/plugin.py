@@ -168,6 +168,9 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
     def before_map(self, route_map):
         with routes.mapper.SubMapper(route_map, controller='ckanext.cioos_theme.plugin:CIOOSController') as m:
             m.connect('schemamap', '/schemamap', action='schemamap')
+            m.connect('html_report', '/dataset/{id}.{format}',
+                      action='html_report',
+                      requirements={'format': 'rhtml'})
         return route_map
 
     def after_map(self, route_map):
@@ -614,3 +617,7 @@ class CIOOSController(base.BaseController):
 
     def schemamap(self):
         return base.render('schemamap.html')
+
+    def html_report(self, id):
+        pkg = toolkit.get_action('package_show')(data_dict={'id': id, 'include_tracking':True})
+        return base.render('package/report.html', extra_vars={'pkg_dict': pkg, 'dataset_type': pkg['type']})
