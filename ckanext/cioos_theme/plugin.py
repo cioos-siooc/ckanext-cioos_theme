@@ -367,7 +367,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                 # Should check for all translated fields.
                 # Should check translation exists.
                 if key == 'tags' or key == 'organization':
-                    facets_dict[key + '_' + self.lang()] = value
+                    facets_dict[key + '_' + toolkit.h.lang()] = value
                 else:
                     facets_dict[key] = value
         return facets_dict
@@ -430,13 +430,13 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                 }
             )
             org_title = org_details.get('title_translated', {})
-            data_dict['organization_en'] = org_title.get('en', '')
-            data_dict['organization_fr'] = org_title.get('fr', '')
+            data_dict['organization_en'] = org_title.get('en', '') # I don't think this is used for anything
+            data_dict['organization_fr'] = org_title.get('fr', '') # I don't think this is used for anything
 
         try:
             title = load_json(data_dict.get('title_translated', '{}'))
-            data_dict['title_en'] = title.get('en', [])
-            data_dict['title_fr'] = title.get('fr', [])
+            data_dict['title_en'] = title.get('en', []) # I don't think this is used for anything
+            data_dict['title_fr'] = title.get('fr', []) # I don't think this is used for anything
         except Exception as err:
             log.error(err)
 
@@ -524,6 +524,14 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             notes = result.get('notes_translated')
             if(notes):
                 result['notes_translated'] = load_json(notes)
+
+            base_title = load_json(result.get('title'))
+            if isinstance(base_title, dict):
+                result['title'] = base_title.get(toolkit.h.lang())
+            base_notes = load_json(result.get('notes'))
+            if isinstance(base_notes, dict):
+                result['notes'] = base_notes.get(toolkit.h.lang())
+
             keywords = result.get('keywords')
             if(keywords):
                 result['keywords'] = load_json(keywords)
@@ -559,6 +567,13 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
     def after_show(self, context, package_dict):
         org_id = package_dict.get('owner_org')
         data_type = package_dict.get('type')
+
+        base_title = load_json(package_dict['title'])
+        if isinstance(base_title, dict):
+            package_dict['title'] = base_title.get(toolkit.h.lang())
+        base_notes = load_json(package_dict['notes'])
+        if isinstance(base_notes, dict):
+            package_dict['notes'] = base_notes.get(toolkit.h.lang())
 
         if org_id and data_type == 'dataset':
             # need to turn off dataset_count, usersand groups here as it causes a recursive loop
