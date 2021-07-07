@@ -547,12 +547,18 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                         organization = {}
                     if org_title:
                         organization['title_translated'] = org_title
+                        if not organization['title']:
+                            organization['title'] = org_title[toolkit.h.lang()]
                     org_description = org_details.get('description_translated', {})
                     if org_description:
                         organization['description_translated'] = org_description
+                        if not organization['description']:
+                            organization['description'] = org_description[toolkit.h.lang()]
                     org_image_url = org_details.get('image_url_translated', {})
                     if org_image_url:
                         organization['image_url_translated'] = org_image_url
+                        if not organization['image_url']:
+                            organization['image_url'] = org_image_url[toolkit.h.lang()]
                     if organization:
                         result['organization'] = organization
                 else:
@@ -593,14 +599,20 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             org_title = org_details.get('title_translated', {})
             if org_title:
                 package_dict['organization']['title_translated'] = org_title
+                if not package_dict['organization']['title']:
+                    package_dict['organization']['title'] = org_title[toolkit.h.lang()]
 
             org_description = org_details.get('description_translated', {})
             if org_description:
                 package_dict['organization']['description_translated'] = org_description
+                if not package_dict['organization']['description']:
+                    package_dict['organization']['description'] = org_description[toolkit.h.lang()]
 
             org_image_url = org_details.get('image_url_translated', {})
             if org_image_url:
                 package_dict['organization']['image_url_translated'] = org_image_url
+                if not package_dict['organization']['image_url']:
+                    package_dict['organization']['image_url'] = org_image_url[toolkit.h.lang()]
 
         force_resp_org = load_json(self._get_extra_value('force_responsible_organization', package_dict))
         cited_responsible_party = package_dict.get('cited-responsible-party')
