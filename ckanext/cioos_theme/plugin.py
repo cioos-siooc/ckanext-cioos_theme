@@ -620,4 +620,4 @@ class CIOOSController(base.BaseController):
 
     def html_report(self, id):
         pkg = toolkit.get_action('package_show')(data_dict={'id': id, 'include_tracking':True})
-        return base.render('package/report.html', extra_vars={'pkg_dict': pkg, 'dataset_type': pkg['type']})
+        return base.render('package/report2.html', extra_vars={'pkg_dict': pkg, 'dataset_type': pkg['type']})

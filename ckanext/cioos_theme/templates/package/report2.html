@@ -1,0 +1,817 @@
+{# extends "package/read.html" #}
+
+{# Allows the DOCTYPE to be set on a page by page basis #}
+{%- block doctype %}
+<!DOCTYPE html>{% endblock -%}
+{# Allows custom attributes to be added to the <html> tag #}
+{%- block htmltag -%}
+{% set lang = h.lang() %}
+<!--[if IE 9]> <html lang="{{ lang }}" class="ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html lang="{{ lang }}">
+<!--<![endif]-->
+{%- endblock -%}
+
+  <head>
+    <style>
+    /*! CSS Used from: http://localdev1.local/fanstatic/css/:version:2021-07-05T19:06:18.27/main.css */
+    body {
+      margin: 0;
+    }
+
+    article,
+    section {
+      display: block;
+    }
+
+    a {
+      background-color: transparent;
+    }
+
+    a:active,
+    a:hover {
+      outline: 0;
+    }
+
+    b,
+    strong {
+      font-weight: bold;
+    }
+
+    h1 {
+      font-size: 2em;
+      margin: 0.67em 0;
+    }
+
+    table {
+      border-collapse: collapse;
+      border-spacing: 0;
+    }
+
+    td,
+    th {
+      padding: 0;
+    }
+    @media print {
+      *,
+      *:after,
+      *:before {
+        color: #000!important;
+        text-shadow: none!important;
+        background: transparent!important;
+        box-shadow: none!important;
+      }
+
+      a,
+      a:visited {
+        text-decoration: underline;
+      }
+
+      a[href]:after {
+        content: " (" attr(href) ")";
+      }
+
+      thead {
+        display: table-header-group;
+      }
+
+      tr {
+        page-break-inside: avoid;
+      }
+
+      h3,
+      p {
+        orphans: 3;
+        widows: 3;
+      }
+
+      h3 {
+        page-break-after: avoid;
+      }
+
+      .table {
+        border-collapse: collapse!important;
+      }
+
+      .table td,
+      .table th {
+        background-color: #fff!important;
+      }
+
+      .table-bordered td,
+      .table-bordered th {
+        border: 1px solid #ddd!important;
+      }
+    }
+
+    * {
+      -webkit-box-sizing: border-box;
+      -moz-box-sizing: border-box;
+      box-sizing: border-box;
+    }
+
+    *:after,
+    *:before {
+      -webkit-box-sizing: border-box;
+      -moz-box-sizing: border-box;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-size: 14px;
+      line-height: 1.42857143;
+      color: #333333;
+      background-color: #fff;
+    }
+
+    a {
+      color: #206b82;
+      text-decoration: none;
+    }
+
+    a:focus,
+    a:hover {
+      color: #113845;
+      text-decoration: underline;
+    }
+
+    a:focus {
+      outline: 5px auto -webkit-focus-ring-color;
+      outline-offset: -2px;
+    }
+
+    h1,
+    h3 {
+      font-family: inherit;
+      font-weight: 700;
+      line-height: 1.1;
+      color: inherit;
+    }
+
+    h1,
+    h3 {
+      margin-top: 20px;
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      font-size: 36px;
+    }
+
+    h3 {
+      font-size: 24px;
+    }
+
+    p {
+      margin: 0 0 10px;
+    }
+
+    ul {
+      margin-top: 0;
+      margin-bottom: 10px;
+    }
+
+    .col-sm-12,
+    .col-xs-12 {
+      position: relative;
+      min-height: 1px;
+      padding-right: 15px;
+      padding-left: 15px;
+    }
+
+    .col-xs-12 {
+      float: left;
+    }
+
+    .col-xs-12 {
+      width: 100%;
+    }
+    @media (min-width: 768px) {
+      .col-sm-12 {
+        float: left;
+      }
+
+      .col-sm-12 {
+        width: 100%;
+      }
+    }
+
+    table {
+      background-color: transparent;
+    }
+
+    th {
+      text-align: left;
+    }
+
+    .table {
+      width: 100%;
+      max-width: 100%;
+      margin-bottom: 20px;
+    }
+
+    .table > tbody > tr > td,
+    .table > tbody > tr > th,
+    .table > thead > tr > th {
+      padding: 8px;
+      line-height: 1.42857143;
+      vertical-align: top;
+      border-top: 1px solid #ddd;
+    }
+
+    .table > thead > tr > th {
+      vertical-align: bottom;
+      border-bottom: 2px solid #ddd;
+    }
+
+    .table > thead:first-child > tr:first-child > th {
+      border-top: 0;
+    }
+
+    .table-condensed > tbody > tr > td,
+    .table-condensed > tbody > tr > th,
+    .table-condensed > thead > tr > th {
+      padding: 5px;
+    }
+
+    .table-bordered {
+      border: 1px solid #ddd;
+    }
+
+    .table-bordered > tbody > tr > td,
+    .table-bordered > tbody > tr > th,
+    .table-bordered > thead > tr > th {
+      border: 1px solid #ddd;
+    }
+
+    .table-bordered > thead > tr > th {
+      border-bottom-width: 2px;
+    }
+
+    .table-striped > tbody > tr:nth-of-type(odd) {
+      background-color: #f9f9f9;
+    }
+
+    .module h1 {
+      margin-top: 0;
+      margin-bottom: 20px;
+    }
+
+    .resource-list {
+      padding-left: 0;
+      margin: 0;
+      list-style: none;
+      margin: -10px -10px 10px;
+    }
+
+    .resource-item {
+      position: relative;
+      padding: 10px 10px 10px 60px;
+      margin-bottom: 0;
+      border-radius: 3px;
+    }
+
+    .resource-item:hover {
+      background-color: #eee;
+    }
+
+    .resource-item .description {
+      font-size: 12px;
+      margin-bottom: 0;
+      min-height: 12px;
+    }
+
+    .additional-info td,
+    .additional-info th {
+      width: 50%;
+    }
+
+    h1 {
+      font-size: 28px;
+    }
+
+    h3 {
+      font-size: 18px;
+    }
+
+    h1,
+    h3 {
+      line-height: 1.5;
+    }
+
+    .table-striped tbody tr:nth-child(odd) td,
+    .table-striped tbody tr:nth-child(odd) th {
+      background-color: transparent;
+    }
+
+    .table-striped tbody tr:nth-child(even) td,
+    .table-striped tbody tr:nth-child(even) th {
+      background-color: #f2f2f2;
+    }
+
+    body {
+      background: #005d7a url("http://localdev1.local/base/images/bg.png");
+    }
+
+    table {
+      table-layout: fixed;
+    }
+
+    thead th {
+      vertical-align: top;
+    }
+
+    td,
+    th {
+      word-wrap: break-word;
+    }
+    /*! CSS Used from: http://localdev1.local/cioos_theme.css */
+    body {
+      background: #ffffff;
+      font-family: Raleway,Helvetica,Arial;
+    }
+    @media only screen and (max-width: 770px) {
+      ul {
+        margin: 0;
+        padding: 0;
+      }
+    }
+
+    .additional-info tr th:first-child {
+      width: 25%;
+    }
+
+    .dates tr th:first-child {
+      width: 25%;
+    }
+    /*! CSS Used from: http://localdev1.local/cioos_atlantic.css */
+    body {
+      font-family: Raleway,Helvetica,Arial;
+    }
+    /*! CSS Used fontfaces */
+    @font-face {
+      font-family: 'Raleway';
+      font-style: normal;
+      font-weight: 400;
+      src: url("https://fonts.gstatic.com/s/raleway/v22/1Ptxg8zYS_SKggPN4iEgvnHyvveLxVvaorCFPrcVIT9d0c-dYA.woff") format('woff');
+      unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+    }
+    @font-face {
+      font-family: 'Raleway';
+      font-style: normal;
+      font-weight: 400;
+      src: url("https://fonts.gstatic.com/s/raleway/v22/1Ptxg8zYS_SKggPN4iEgvnHyvveLxVvaorCMPrcVIT9d0c-dYA.woff") format('woff');
+      unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+    }
+    @font-face {
+      font-family: 'Raleway';
+      font-style: normal;
+      font-weight: 400;
+      src: url("https://fonts.gstatic.com/s/raleway/v22/1Ptxg8zYS_SKggPN4iEgvnHyvveLxVvaorCHPrcVIT9d0c-dYA.woff") format('woff');
+      unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+1EA0-1EF9, U+20AB;
+    }
+    @font-face {
+      font-family: 'Raleway';
+      font-style: normal;
+      font-weight: 400;
+      src: url("https://fonts.gstatic.com/s/raleway/v22/1Ptxg8zYS_SKggPN4iEgvnHyvveLxVvaorCGPrcVIT9d0c-dYA.woff") format('woff');
+      unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+    }
+    @font-face {
+      font-family: 'Raleway';
+      font-style: normal;
+      font-weight: 400;
+      src: url("https://fonts.gstatic.com/s/raleway/v22/1Ptxg8zYS_SKggPN4iEgvnHyvveLxVvaorCIPrcVIT9d0c8.woff") format('woff');
+      unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+    }
+    @font-face {
+      font-family: 'Raleway';
+      font-style: normal;
+      font-weight: 400;
+      font-display: swap;
+      src: url("https://fonts.gstatic.com/s/raleway/v22/1Ptxg8zYS_SKggPN4iEgvnHyvveLxVvaorCFPrcVIT9d0c-dYA.woff") format('woff');
+      unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+    }
+    @font-face {
+      font-family: 'Raleway';
+      font-style: normal;
+      font-weight: 400;
+      font-display: swap;
+      src: url("https://fonts.gstatic.com/s/raleway/v22/1Ptxg8zYS_SKggPN4iEgvnHyvveLxVvaorCMPrcVIT9d0c-dYA.woff") format('woff');
+      unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+    }
+    @font-face {
+      font-family: 'Raleway';
+      font-style: normal;
+      font-weight: 400;
+      font-display: swap;
+      src: url("https://fonts.gstatic.com/s/raleway/v22/1Ptxg8zYS_SKggPN4iEgvnHyvveLxVvaorCHPrcVIT9d0c-dYA.woff") format('woff');
+      unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+1EA0-1EF9, U+20AB;
+    }
+    @font-face {
+      font-family: 'Raleway';
+      font-style: normal;
+      font-weight: 400;
+      font-display: swap;
+      src: url("https://fonts.gstatic.com/s/raleway/v22/1Ptxg8zYS_SKggPN4iEgvnHyvveLxVvaorCGPrcVIT9d0c-dYA.woff") format('woff');
+      unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+    }
+    @font-face {
+      font-family: 'Raleway';
+      font-style: normal;
+      font-weight: 400;
+      font-display: swap;
+      src: url("https://fonts.gstatic.com/s/raleway/v22/1Ptxg8zYS_SKggPN4iEgvnHyvveLxVvaorCIPrcVIT9d0c8.woff") format('woff');
+      unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+    }
+    </style>
+  </head>
+  <body>
+
+{% set pkg = pkg_dict %}
+
+{% block primary %}
+  <div class="primary col-sm-12 col-xs-12">
+  {% block primary_content %}
+    <article class="module">
+
+    {% block primary_content_inner %}
+      {% block package_description %}
+        {% if pkg.private %}
+        <span class="dataset-private label label-inverse pull-right">
+          <i class="fa fa-lock"></i>
+          {{ _('Private') }}
+        </span>
+        {% endif %}
+        <h1>
+          {% block page_heading %}
+          {{ pkg.title_translated[h.lang()] }}
+          {% if pkg.state.startswith('draft') %}
+          [{{ _('Draft') }}]
+          {% endif %}
+          {% if pkg.state == 'deleted' %}
+          [{{ _('Deleted') }}]
+          {% endif %}
+          {% endblock %}
+        </h1>
+
+        {% block package_notes %}
+          <div class="notes embedded-content">
+            {{ h.render_markdown(h.get_translated(pkg, 'notes')) }}
+          </div>
+        {% endblock %}
+      {% endblock %}
+
+      {% block package_access %}
+        <section class="access">
+          <h3>{{ _('Access and Use') }}</h3>
+          <table class="table table-bordered">
+            <tbody>
+              <tr>
+                <td>
+                  {% set licence_extras = [] %}
+                  {% for extra in pkg_dict.extras %}
+                  {% if 'licence' == extra.key %}
+                  {% set _ = licence_extras.append( ''.join(h.cioos_load_json(extra.value)) ) %}
+                  {% endif %}
+                  {% endfor %}
+
+                  {% set licence = pkg_dict.license_title or pkg_dict.license_id or licence_extras or 'Not Specified'%}
+                  {% set use_constraints = pkg_dict.extras | selectattr("key","equalto","use-constraints") | map(attribute="value") | join('')%}
+                  {% set access_constraints = pkg_dict.extras | selectattr("key","equalto","access-constraints") | map(attribute="value") | join('')%}
+                  {% set other_constraints = pkg_dict.extras | selectattr("key","equalto","limitations-on-public-access") | map(attribute="value") | join('')%}
+
+                  <span>
+                    <strong>Licence: </strong>
+                    {%- if pkg_dict.license_url -%}
+                    <a href="{{pkg_dict.license_url}}">{{ licence }}</a>
+                    {%- else -%}
+                    {{ licence }}
+                    {%- endif -%}
+                  </span>
+                  <br />
+
+                  {# no need to do this if just printing licence because use-constraints
+                     is used to populate it in the first place #}
+                  {% if use_constraints and pkg_dict.license_url %}
+                  <span>
+                    <strong>Limitations: </strong>
+                    {{ h.cioos_load_json(use_constraints) }}
+                  </span>
+                  <br />
+                  {% endif %}
+
+                  {% if access_constraints%}
+                  <span>
+                    <strong>Access: </strong>
+                    {{ '\n'.join(h.cioos_load_json(access_constraints))|title }}
+                    {% if other_constraints %}
+                    {{ '\u2014' }} {{ '\n'.join(h.cioos_load_json(other_constraints)) }}
+                    {% endif %}
+                  </span>
+                  <br />
+                  {% endif %}
+
+
+
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+      {% endblock %}
+
+      {% block package_resources %}
+        {% set resources=h.cioos_load_json(pkg.resources|trim) %}
+        <section id="dataset-resources" class="resources">
+          <h3>{{ _('Data and Resources') }}</h3>
+          {% block resource_list %}
+              <ul class="resource-list">
+                {% block resource_list_inner %}
+                  {% for res in pkg.resources %}
+                    <li class="resource-item" data-id="{{ res.id }}">
+                      {{ res.name }}
+                      <p class="description">
+                        {% if res.description %}
+                          {{ res.description }}
+                        {% endif %}
+                      </p>
+                      <p class="description">
+                      URL: {{res.url}}
+                      </p>
+                    </li>
+                  {% endfor %}
+                {% endblock %}
+              </ul>
+          {% endblock %}
+        </section>
+      {% endblock %}
+
+      {% block package_dates %}
+        <section class="dates">
+          <h3>{{ _('Dates') }}</h3>
+          <table class="table table-bordered table-condensed">
+            <tbody>
+                {% set metadata_created_source = pkg_dict.extras |
+                    selectattr("key","equalto","metadata_created_source") |
+                    map(attribute="value") | join('')%}
+                {% set metadata_modified_source = pkg_dict.extras |
+                    selectattr("key","equalto","metadata_modified_source") |
+                    map(attribute="value") | join('')%}
+
+                {% set extras_metadata_reference_date = pkg_dict.extras |
+                    selectattr("key","equalto","metadata-reference-date") |
+                    map(attribute="value") | join('') %}
+
+                {% set metadata_reference_date = pkg_dict['metadata-reference-date']
+                    or extras_metadata_reference_date
+                    or [{"type":"Creation","value":metadata_created_source or pkg_dict.metadata_created},
+                        {"type":"Revision","value":metadata_modified_source or pkg_dict.metadata_modified} ]%}
+
+                {% set extras_dataset_reference_date = pkg_dict.extras |
+                    selectattr("key","equalto","dataset-reference-date") %}
+                {% set dataset_reference_date = pkg_dict['dataset-reference-date']
+                    or extras_dataset_reference_date %}
+
+                {% set extras_frequency_of_update = pkg_dict.extras |
+                    selectattr("key","equalto","frequency-of-update") %}
+                {% set frequency_of_update = pkg_dict.get('frequency-of-update') or extras_frequency_of_update %}
+
+                {% if metadata_reference_date %}
+                  <tr>
+                    <th scope="row" class="dataset-label">{{ _("Metadata Reference Date(s)") }}</th>
+                    <td class="dataset-details">
+                      {% for d in h.cioos_load_json(metadata_reference_date) %}
+                        {% if d['value']| length == 10 %}
+                          {{ h.render_datetime(d['value'], '%B %d, %Y') }} ({{_(d['type'].title())}})</br>
+                        {% else %}
+                          {% snippet 'snippets/local_friendly_datetime.html',
+                              datetime_obj=d['value'] %} ({{_(d['type'].title())}})</br>
+                        {% endif %}
+                      {% endfor %}
+                    </td>
+                  </tr>
+                {% endif %}
+
+                {% if dataset_reference_date and h.cioos_load_json(dataset_reference_date) | list | length > 0 %}
+                  <tr>
+                    <th scope="row" class="dataset-label">{{ _("Dataset Reference Date(s)") }}</th>
+                    <td class="dataset-details">
+                      {% for d in h.cioos_load_json(dataset_reference_date) %}
+                        {% if d['value']| length == 10 %}
+                          {{ h.render_datetime(d['value'], '%B %d, %Y') }} ({{_(d['type'].title())}})</br>
+                        {% else %}
+                          {% snippet 'snippets/local_friendly_datetime.html', datetime_obj=d['value'] %}
+                            ({{_(d['type'].title())}})</br>
+                        {% endif %}
+                      {% endfor %}
+                    </td>
+                  </tr>
+                {% endif %}
+
+                {% if frequency_of_update%}
+                  <tr>
+                    <th scope="row" class="dataset-label">{{ _("Frequency of Update") }}</th>
+                    <td class="dataset-details">
+                      {{ frequency_of_update }}
+                    </td>
+                  </tr>
+                {% endif %}
+            </tbody>
+          </table>
+        </section>
+
+      {% endblock %}
+
+      {% block package_citation %}
+      {% if pkg.citation %}
+      {% block citation %}
+        <section class="citation">
+
+          <h3>{{ _('Citation') }}</h3>
+
+          <table class="table table-bordered">
+            <tbody>
+              <tr>
+                <td>
+                  <p id=cite_output></p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <script src="/js/citation.min.js" type="text/javascript"></script>
+
+        <script>
+          const Cite = require('citation-js');
+
+          function parseHtmlEnteties(str) {
+              return str.replace(/&#([0-9]{1,3});/gi, function(match, numStr) {
+                  var num = parseInt(numStr, 10); // read num as normal number
+                  return String.fromCharCode(num);
+              });
+          }
+
+          async function loadCite(template_style = 'apa', output_type = 'html', cite_format = 'bibliography', download = false){
+            let pkg_citation = `{{pkg_dict.get('citation').get(h.lang())|replace('\\n',' ')|replace('\\r',' ')}}`
+            pkg_citation = parseHtmlEnteties(pkg_citation)
+
+            let cite_data = await Cite.async(pkg_citation)
+
+            let output_options = {
+              format: output_type,
+              type: output_type,
+              template: template_style,
+              lang: 'en-US'
+            }
+
+            let output = cite_data.format(cite_format, output_options)
+
+            if (typeof output === 'object'){
+              output = Object.values(output)[0]
+            }
+
+            document.getElementById("cite_output").innerHTML=output;
+          }
+          var cite_template = 'apa';
+          loadCite();
+        </script>
+
+      {% endblock %}
+      {% endif %}
+      {% endblock %}
+
+      {% block package_img_preview %}
+        <section class="preview">
+            {% for extra in pkg_dict.extras %}
+              {% set key, value = extra %}
+              {% if 'graphic-preview-file' == key %}
+                <h3>{{ _('Graphic Preview') }}</h3>
+                <table class="table table-bordered table-condensed">
+                  <tbody>
+                    <tr>
+                      <td>
+                        <img src="{{ value }}" style="max-width: 773px;"/>
+              	      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              {% endif %}
+            {% endfor %}
+        </section>
+      {% endblock %}
+
+      {% block package_tags %}
+        {% set keywords = pkg.get('keywords') %}
+        {% set tags = h.cioos_load_json(keywords).get(lang) %}
+        {% if tags %}
+          <section class="tags">
+            <h3>{{ _('Keywords') }}</h3>
+              <ul class="tag-list well">
+                {% for tag in tags %}
+                  <li>
+                    {{ tag }}
+                  </li>
+                {% endfor %}
+              </ul>
+          </section>
+        {% endif %}
+      {% endblock %}
+
+      {% block package_additional_info %}
+
+        {%- set exclude_fields = [
+            'id',
+            'title',
+            'title_translated',
+            'name',
+            'notes',
+            'notes_translated',
+            'tag_string',
+            'keywords',
+            'license_title',
+            'license_id',
+            'owner_org',
+            'citation',
+            'resource-type',
+            'num_tags',
+            'maintainer',
+            'author',
+            'author_email',
+            'groups',
+            'harvest_document_content',
+            'organization',
+            'relationships_as_object',
+            'relationships_as_subject',
+            'revision_id',
+            'tags',
+            'tracking_summary',
+            'url',
+            'creator_user_id',
+            'frequency-of-update',
+            'resources',
+            'num_resources',
+            'extras',
+            ] -%}
+
+        <section class="additional-info">
+          <h3>{{ _('Additional Info') }}</h3>
+          <table class="table table-striped table-bordered table-condensed">
+            <thead>
+              <tr>
+                <th scope="col">{{ _('Field') }}</th>
+                <th scope="col">{{ _('Value') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+          {%- for key, value in pkg | dictsort -%}
+            {%- if key not in exclude_fields -%}
+              <tr>
+                <th scope="row" class="dataset-label">
+                  {{ _(key | replace("-", " ") | replace("_", " ") | title) }}</th>
+                <td class="dataset-details">
+                  {% set val = h.cioos_load_json(value) %}
+                  {% if val is string %}
+                    {{- val -}}
+                  {% elif val is mapping %}
+                    {% for m_key, m_value in val | dictsort %}
+                      <b>{{ m_key | replace("-", " ") | replace("_", " ") | title }}:</b> {{ m_value }}</br>
+                    {% endfor %}
+                  {% elif val is iterable %}
+                    <ul>
+                    {% for v in val %}
+                      {% if v is string %}
+                        <li>{{- v -}}</li>
+                      {% elif v is mapping %}
+                        <li>
+                        {% for m_k, m_v in v | dictsort %}
+                        <b>{{ m_k | replace("-", " ") | replace("_", " ") | title }}:</b> {{ m_v }}</br>
+                        {% endfor %}
+                        </li>
+                      {% else %}
+                        <li>{{- v -}}</li>
+                      {% endif %}
+                    {% endfor %}
+                    </ul>
+                    {% else %}
+                      {{- val -}}
+                  {% endif %}
+                </td>
+              </tr>
+            {%- endif -%}
+          {%- endfor -%}
+          </tbody>
+        </table>
+      </section>
+      {% endblock %}
+    {% endblock %}
+  {% endblock %}
+{% endblock %}
+
+{%- block footer %}
+{% endblock %}
+
+</body>
+</html>
