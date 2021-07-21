@@ -5,17 +5,19 @@ import ckan.plugins.toolkit as toolkit
 import ckanext.cioos_theme.helpers as cioos_helpers
 from ckanext.scheming.validation import scheming_validator
 from ckan.lib.plugins import DefaultTranslation
+from flask import Blueprint
 import json
 from shapely.geometry import shape
 import logging
 import ckan.lib.navl.dictization_functions as df
-from ckan.common import c
+from ckantoolkit import g
 from six.moves.urllib.parse import urlparse
 import string
-from ckan.common import _
-import routes.mapper
+from ckantoolkit import _
 import ckan.lib.base as base
 import re
+
+
 
 Invalid = df.Invalid
 
@@ -72,7 +74,7 @@ def clean_and_populate_eovs(field, schema):
 
         d = json.loads(data.get(key, '[]'))
         for x in eov_data:
-            if isinstance(x, basestring):  # TODO: change basestring to str when moving to python 3
+            if isinstance(x, str):  # TODO: change basestring to str when moving to python 3
                 val = eov_list.get(x.lower(), '')
             else:
                 val = eov_list.get(x, '')
@@ -153,6 +155,10 @@ def cioos_is_valid_range(field, schema):
         return value
     return validator
 
+
+def render_schemamap(self):
+    return toolkit.render('schemamap.html')
+
 class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
     plugins.implements(plugins.ITranslation)
     plugins.implements(plugins.IConfigurer)
@@ -161,17 +167,18 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
     plugins.implements(plugins.IPackageController, inherit=True)
     plugins.implements(plugins.IValidators)
     plugins.implements(plugins.IAuthenticator)
-    plugins.implements(plugins.IRoutes)
+    plugins.implements(plugins.IBlueprint)
 
-    # IRoute
+    #IBlueprint
+    def get_blueprint(self):
+        blueprint = Blueprint('foo', self.__module__)
+        rules = [
+            ('/schemamap', 'schemamap', render_schemamap),
+        ]
+        for rule in rules:
+            blueprint.add_url_rule(*rule)
 
-    def before_map(self, route_map):
-        with routes.mapper.SubMapper(route_map, controller='ckanext.cioos_theme.plugin:CIOOSController') as m:
-            m.connect('schemamap', '/schemamap', action='schemamap')
-        return route_map
-
-    def after_map(self, route_map):
-        return route_map
+        return blueprint
 
     # IAuthenticator
 
@@ -182,8 +189,8 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             remote_addr = toolkit.request.remote_addr
 
         log.info('Request by %s for %s from %s', toolkit.request.remote_user, toolkit.request.url, remote_addr)
-        c.user = None
-        c.userobj = None
+        g.user = None
+        g.userobj = None
         return
 
     def login(self, error=None):
@@ -608,9 +615,3 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         if base_url.endswith('/'):
             return base_url + locale_urls.get(lang)
         return base_url + '/' + locale_urls.get(lang)
-
-
-class CIOOSController(base.BaseController):
-
-    def schemamap(self):
-        return base.render('schemamap.html')

@@ -8,12 +8,11 @@
 
 import ckan.plugins.toolkit as toolkit
 import ckan.plugins as p
-from ckan.common import OrderedDict, _, c
+from collections import OrderedDict
+from ckantoolkit import  _, c, config
 # from ckantoolkit import h
 import ckan.logic as logic
 import ckan.model as model
-from ckan.common import config
-from paste.deploy.converters import asbool
 import copy
 import logging
 import json
@@ -368,7 +367,7 @@ def cioos_get_facets(package_type='dataset'):
     data_dict = {
         'facet.field': facets.keys(),
         'rows': 0,
-        'include_private': asbool(config.get(
+        'include_private': toolkit.asbool(config.get(
             'ckan.search.default_include_private', True)),
     }
 
