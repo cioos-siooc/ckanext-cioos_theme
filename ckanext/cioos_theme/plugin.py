@@ -5,6 +5,7 @@ import ckan.plugins.toolkit as toolkit
 import ckanext.cioos_theme.helpers as cioos_helpers
 from ckanext.scheming.validation import scheming_validator
 from ckan.lib.plugins import DefaultTranslation
+import ckan.model as model
 import json
 from shapely.geometry import shape
 import logging
@@ -168,6 +169,9 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
     def before_map(self, route_map):
         with routes.mapper.SubMapper(route_map, controller='ckanext.cioos_theme.plugin:CIOOSController') as m:
             m.connect('schemamap', '/schemamap', action='schemamap')
+            m.connect('datacite_xml', '/dataset/{id}.{format}',
+                      action='datacite_xml',
+                      requirements={'format': 'dcxml'})
         return route_map
 
     def after_map(self, route_map):
@@ -270,7 +274,11 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             'cioos_get_eovs': cioos_helpers.cioos_get_eovs,
             'cioos_get_locale_url': self.get_locale_url,
             'cioos_schema_field_map': cioos_helpers.cioos_schema_field_map,
-            'cioos_get_additional_css_path': self.get_additional_css_path
+            'cioos_get_additional_css_path': self.get_additional_css_path,
+            'cioos_get_doi_authority_url': cioos_helpers.get_doi_authority_url,
+            'cioos_get_doi_prefix': cioos_helpers.get_doi_prefix,
+            'cioos_get_datacite_org': cioos_helpers.get_datacite_org,
+            'cioos_get_datacite_test_mode': cioos_helpers.get_datacite_test_mode
         }
 
     def get_validators(self):
@@ -549,8 +557,8 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                         result['organization'] = organization
                 else:
                     log.warn('No org details for owner_org %s', result.get('org_descriptionid'))
-            else:
-                log.warn('No owner_org for dataset %s: %s: %s', result.get('id'), result.get('name'), result.get('title'))
+            # else:
+            #    log.warn('No owner_org for dataset %s: %s: %s', result.get('id'), result.get('name'), result.get('title'))
 
         return search_results
 
@@ -610,7 +618,23 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         return base_url + '/' + locale_urls.get(lang)
 
 
-class CIOOSController(base.BaseController):
+class CIOOSController(toolkit.BaseController):
 
     def schemamap(self):
         return base.render('schemamap.html')
+
+    def datacite_xml(self, id):
+        context = {'model': model, 'session': model.Session,
+                   'user': c.user, 'for_view': True,
+                   'auth_user_obj': c.userobj}
+        data_dict = {'id': id}
+
+        try:
+            toolkit.check_access('package_update', context, data_dict)
+        except toolkit.ObjectNotFound:
+            toolkit.abort(404, _('Dataset not found'))
+        except toolkit.NotAuthorized:
+            toolkit.abort(403, _('User %r not authorized to view datacite xml for %s') % (c.user, id))
+
+        pkg = toolkit.get_action('package_show')(data_dict={'id': id})
+        return base.render('package/datacite.html', extra_vars={'pkg_dict': pkg})
