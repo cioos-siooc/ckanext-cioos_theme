@@ -365,7 +365,7 @@ def cioos_get_facets(package_type='dataset'):
     c.facet_titles = facets
 
     data_dict = {
-        'facet.field': facets.keys(),
+        'facet.field': list(facets.keys()),
         'rows': 0,
         'include_private': toolkit.asbool(config.get(
             'ckan.search.default_include_private', True)),

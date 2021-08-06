@@ -13,7 +13,7 @@
           {% if code[0] == "404" %}
               <h1>{{ gettext('404 - Page not found') }}</h1>
               <p>{{ gettext('Sorry, we could not find the page you are looking for.') }}</p>
-              <p>{{ gettext('Follow this link to explore our datasets ') }} <a href="{{h.url_for(controller='package', action='search')}}">{{ g.site_url }}{{h.url_for(controller='package', action='search')}}</a></p>
+              <p>{{ gettext('Follow this link to explore our datasets ') }} <a href="{{h.url_for(controller='dataset', action='search')}}">{{ g.site_url }}{{h.url_for(controller='dataset', action='search')}}</a></p>
               <p>{{ gettext('Or contact us at ') }}{{ h.cioos_contact_email() }}</p>
           {% else %}
             {{ content}}

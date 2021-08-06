@@ -1,6 +1,6 @@
 {% extends "package/base.html" %}
 
-{% block subtitle %}{{ h.dataset_display_name(pkg) }} - {{ super() }}{% endblock %}
+{% block subtitle %}{{ h.dataset_display_name(pkg) }} {{ g.template_title_delimiter or '-'}} {{ super() }}{% endblock %}
 
 {% block head_extras -%}
   {{ super() }}
@@ -10,23 +10,26 @@
 {% endblock -%}
 
 {% block content_action %}
+  {% if not is_activity_archive %}
   {% if h.check_access('package_update', {'id':pkg.id }) %}
-    {% link_for _('Manage'), controller='package', action='edit', id=pkg.name, class_='btn btn-default', icon='wrench' %}
+    {% link_for _('Manage'), named_route=pkg.type ~ '.edit', id=pkg.name, class_='btn btn-default', icon='wrench' %}
   {% endif %}
+    {% endif %}
 {% endblock %}
 
 {% block content_primary_nav %}
-  {{ h.build_nav_icon('dataset_read', _('Dataset'), id=pkg.name) }}
-  {{ h.build_nav_icon('dataset_activity', _('Activity Stream'), id=pkg.name) }}
+  {{ h.build_nav_icon(dataset_type ~ '.read', _('Dataset'), id=pkg.name) }}
+  {# h.build_nav_icon(dataset_type ~ '.groups', _('Groups'), id=pkg.id if is_activity_archive else pkg.name, icon='users') #}
+  {{ h.build_nav_icon(dataset_type ~ '.activity', _('Activity Stream'), id=pkg.name) }}
 {% endblock %}
 
-{% block primary_content_inner %}
+{# block primary_content_inner %}
     {% block package_revision_info %}
       {% if c.revision_date %}
         <div class="module info alert alert-info">
           <p class="module-content">
             {% set timestamp = h.render_datetime(c.revision_date, with_hours=True) %}
-            {% set url = h.url_for(controller='package', action='read', id=pkg.name) %}
+            {% set url = h.url_for(controller='dataset', action='read', id=pkg.name) %}
 
             {% trans timestamp=timestamp, url=url %}This is an old revision of this dataset, as edited at {{ timestamp }}. It may differ significantly from the <a href="{{ url }}">current revision</a>.{% endtrans %}
           </p>
@@ -34,7 +37,7 @@
       {% endif %}
     {% endblock %}
 
-{% endblock %}
+{% endblock #}
 
 {% block secondary_content %}
 
@@ -77,7 +80,7 @@
       <nav>
         <ul class="{{ nav_class or 'list-unstyled nav nav-simple nav-facet' }}">
           {% for item in items %}
-            {% set href = h.add_url_param(new_params={'responsible_organizations': item}, controller='package', action='search') %}
+            {% set href = h.add_url_param(new_params={'responsible_organizations': item}, controller='dataset', action='search') %}
             {% set label = item %}
             {% set label_truncated = h.truncate(label, 30) %}
               <li class="nav-item">

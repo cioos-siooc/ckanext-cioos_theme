@@ -389,7 +389,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                 resp_orgs = [force_responsible_organization]
         else:
             resp_org_roles = json.loads(toolkit.config.get('ckan.responsible_organization_roles', '["owner", "originator", "custodian", "author", "principalInvestigator"]'))
-            resp_orgs = [x.get('organisation-name', '').strip() for x in json.loads(parties) if x.get('role') in resp_org_roles]
+            resp_orgs = [x.get('organisation-name', '').strip() for x in load_json(parties) if x.get('role') in resp_org_roles]
             resp_orgs = list(dict.fromkeys(resp_orgs))  # remove duplicates
             resp_orgs = list(filter(None, resp_orgs)) # remove empty elements (in a python 2 and 3 friendly way)
         return resp_orgs
@@ -474,6 +474,20 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         # eov is multi select so it is a json list rather then a python list
         if(data_dict.get('eov')):
             data_dict['eov'] = load_json(data_dict['eov'])
+
+        # nerf index
+
+        schemas = toolkit.h.scheming_dataset_schemas()
+        if data_dict['type'] not in schemas:
+            return data_dict
+
+        for d in schemas[data_dict['type']]['dataset_fields']:
+            if d['field_name'] not in data_dict:
+                continue
+            if 'repeating_subfields' in d:
+                data_dict[d['field_name']] = json.dumps(data_dict[d['field_name']])
+            if 'simple_subfields' in d:
+                data_dict[d['field_name']] = json.dumps(data_dict[d['field_name']])
 
         return data_dict
 
