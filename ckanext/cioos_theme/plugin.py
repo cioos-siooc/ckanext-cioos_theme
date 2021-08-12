@@ -545,9 +545,23 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             notes = result.get('notes_translated')
             if(notes):
                 result['notes_translated'] = load_json(notes)
-            keywords = result.get('keywords')
-            if(keywords):
-                result['keywords'] = load_json(keywords)
+
+            # convert the rest of the strings to json
+            for field in [
+                    "keywords",
+                    "spatial",
+                    "temporal-extent",
+                    "unique-resource-identifier-full",
+                    "notes",
+                    "vertical-extent",
+                    "dataset-reference-date",
+                    "metadata-reference-date",
+                    "metadata-point-of-contact",
+                    "cited-responsible-party"]:
+                tmp = result.get(field)
+                if tmp:
+                    result[field] = load_json(tmp)
+
 
             # update organization object while we are at it
             org_id = result.get('owner_org')
@@ -613,6 +627,31 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         if((cited_responsible_party or force_resp_org) and not package_dict.get('responsible_organizations')):
             package_dict['responsible_organizations'] = self._cited_responsible_party_to_responsible_organizations(cited_responsible_party, force_resp_org)
 
+        result = package_dict
+        title = result.get('title_translated')
+        if(title):
+            result['title_translated'] = load_json(title)
+        notes = result.get('notes_translated')
+        if(notes):
+            result['notes_translated'] = load_json(notes)
+
+        # convert the rest of the strings to json
+        for field in [
+                "keywords",
+                "spatial",
+                "temporal-extent",
+                "unique-resource-identifier-full",
+                "notes",
+                "vertical-extent",
+                "dataset-reference-date",
+                "metadata-reference-date",
+                "metadata-point-of-contact",
+                "cited-responsible-party"]:
+            tmp = result.get(field)
+            if tmp:
+                result[field] = load_json(tmp)
+        package_dict = result
+        
         return package_dict
 
     # Custom section

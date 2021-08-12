@@ -1125,7 +1125,34 @@ i.fa.translation_icon {
   tr th:first-child, tr td:first-child {
     width: 25%;
   }
+
+  .panel-default .panel-heading {
+  display: none;
+  }
+
+  dl.scheming-subfield-list dt {
+      float: left;
+      clear: left;
+      width: 70px;
+      text-align: left;
+      font-weight: 700;
+      color: #333;
+  }
+
+  dl.scheming-subfield-list dt::after {
+    content: ":";
+  }
+
+  dl.scheming-subfield-list dd {
+      padding: 0 0 0.5em 0;
+      float: left;
+      min-width: 150px;
+      width: auto;
+      max-width: 395px;
+  }
 }
+
+
 
 .dates {
   tr th:first-child, tr td:first-child {
