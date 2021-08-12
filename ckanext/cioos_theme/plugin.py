@@ -549,7 +549,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             # convert the rest of the strings to json
             for field in [
                     "keywords",
-                    "spatial",
+                    # "spatial", removed as making the field json brakes the dataset_map template
                     "temporal-extent",
                     "unique-resource-identifier-full",
                     "notes",
@@ -638,7 +638,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         # convert the rest of the strings to json
         for field in [
                 "keywords",
-                "spatial",
+                # "spatial", removed as making the field json brakes the dataset_map template
                 "temporal-extent",
                 "unique-resource-identifier-full",
                 "notes",
@@ -651,7 +651,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             if tmp:
                 result[field] = load_json(tmp)
         package_dict = result
-        
+
         return package_dict
 
     # Custom section
