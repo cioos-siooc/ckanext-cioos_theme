@@ -1130,6 +1130,19 @@ i.fa.translation_icon {
   display: none;
   }
 
+  .panel-default:last-of-type, .panel-simple-composite{
+    margin-bottom: 0;
+  }
+
+  .panel-simple-composite {
+    background-color: inherit;
+    border: None;
+
+    .panel-body {
+      padding: 0px;
+    }
+  }
+
   dl.scheming-subfield-list dt {
       float: left;
       clear: left;
@@ -1144,7 +1157,6 @@ i.fa.translation_icon {
   }
 
   dl.scheming-subfield-list dd {
-      padding: 0 0 0.5em 0;
       float: left;
       min-width: 150px;
       width: auto;

@@ -475,20 +475,6 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         if(data_dict.get('eov')):
             data_dict['eov'] = load_json(data_dict['eov'])
 
-        # nerf index
-
-        schemas = toolkit.h.scheming_dataset_schemas()
-        if data_dict['type'] not in schemas:
-            return data_dict
-
-        for d in schemas[data_dict['type']]['dataset_fields']:
-            if d['field_name'] not in data_dict:
-                continue
-            if 'repeating_subfields' in d:
-                data_dict[d['field_name']] = json.dumps(data_dict[d['field_name']])
-            if 'simple_subfields' in d:
-                data_dict[d['field_name']] = json.dumps(data_dict[d['field_name']])
-
         return data_dict
 
     # update eov search facets with keys from choices list in the scheming extension schema
@@ -652,6 +638,25 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                 result[field] = load_json(tmp)
         package_dict = result
 
+
+        # title and notes must be a string or the index process errors
+        if isinstance(package_dict.get('title'), dict):
+            package_dict['title'] = json.dumps(package_dict.get('title'))
+        if isinstance(package_dict.get('notes'), dict):
+            package_dict['notes'] = json.dumps(package_dict.get('notes'))
+
+        # if(package_dict.get('title') and re.search(r'\\\\u[0-9a-fA-F]{4}', package_dict.get('title'))):
+        #     if isinstance(package_dict.get('title'), str):
+        #         package_dict['title'] = package_dict.get('title').encode().decode('unicode-escape')
+        #     else:  # we have bytes
+        #         package_dict['title'] = package_dict.get('title').decode('unicode-escape')
+        #
+        # if(package_dict.get('notes') and re.search(r'\\\\u[0-9a-fA-F]{4}', package_dict.get('notes'))):
+        #     if isinstance(package_dict.get('notes'), str):
+        #         package_dict['notes'] = package_dict.get('notes').encode().decode('unicode-escape')
+        #     else:  # we have bytes
+        #         package_dict['notes'] = package_dict.get('notes').decode('unicode-escape')
+
         return package_dict
 
     # Custom section
@@ -659,8 +664,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         return 'package/read.html'
 
     def lang(self):
-        from ckantoolkit import h
-        return h.lang()
+        return toolkit.h.lang()
 
     def get_locale_url(self, base_url, locale_urls):
         default_locale = toolkit.config.get('ckan.locale_default', toolkit.config.get('ckan.locales_offered', ['en'])[0])
