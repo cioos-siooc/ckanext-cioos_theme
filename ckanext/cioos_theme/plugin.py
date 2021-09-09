@@ -160,6 +160,22 @@ def cioos_is_valid_range(field, schema):
 def render_schemamap(self):
     return toolkit.render('schemamap.html')
 
+def render_datacite_xml(self, id):
+    context = {'model': model, 'session': model.Session,
+               'user': c.user, 'for_view': True,
+               'auth_user_obj': c.userobj}
+    data_dict = {'id': id}
+
+    try:
+        toolkit.check_access('package_update', context, data_dict)
+    except toolkit.ObjectNotFound:
+        toolkit.abort(404, _('Dataset not found'))
+    except toolkit.NotAuthorized:
+        toolkit.abort(403, _('User %r not authorized to view datacite xml for %s') % (c.user, id))
+
+    pkg = toolkit.get_action('package_show')(data_dict={'id': id})
+    return toolkit.render('package/datacite.html', extra_vars={'pkg_dict': pkg})
+
 class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
     plugins.implements(plugins.ITranslation)
     plugins.implements(plugins.IConfigurer)
@@ -175,25 +191,13 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         blueprint = Blueprint('foo', self.__module__)
         rules = [
             ('/schemamap', 'schemamap', render_schemamap),
+            ('/dataset/{id}.{format}', 'datacite_xml', render_datacite_xml),
         ]
         for rule in rules:
             blueprint.add_url_rule(*rule)
 
         return blueprint
- 
-    # IRoute
 
-    def before_map(self, route_map):
-        with routes.mapper.SubMapper(route_map, controller='ckanext.cioos_theme.plugin:CIOOSController') as m:
-            m.connect('schemamap', '/schemamap', action='schemamap')
-            m.connect('datacite_xml', '/dataset/{id}.{format}',
-                      action='datacite_xml',
-                      requirements={'format': 'dcxml'})
-        return route_map
-
-    def after_map(self, route_map):
-        return route_map
-        
     # IAuthenticator
 
     def identify(self):
@@ -690,25 +694,3 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         if base_url.endswith('/'):
             return base_url + locale_urls.get(lang)
         return base_url + '/' + locale_urls.get(lang)
-
-
-class CIOOSController(toolkit.BaseController):
-
-    def schemamap(self):
-        return base.render('schemamap.html')
-
-    def datacite_xml(self, id):
-        context = {'model': model, 'session': model.Session,
-                   'user': c.user, 'for_view': True,
-                   'auth_user_obj': c.userobj}
-        data_dict = {'id': id}
-
-        try:
-            toolkit.check_access('package_update', context, data_dict)
-        except toolkit.ObjectNotFound:
-            toolkit.abort(404, _('Dataset not found'))
-        except toolkit.NotAuthorized:
-            toolkit.abort(403, _('User %r not authorized to view datacite xml for %s') % (c.user, id))
-
-        pkg = toolkit.get_action('package_show')(data_dict={'id': id})
-        return base.render('package/datacite.html', extra_vars={'pkg_dict': pkg})
