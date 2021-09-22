@@ -126,7 +126,7 @@ def url_validator_with_port(key, data, errors, context):
     try:
         pieces = urlparse(url)
         if all([pieces.scheme, pieces.netloc]) and \
-           set(pieces.netloc) <= set(string.letters + string.digits + '-.:') and \
+           set(pieces.netloc) <= set(string.ascii_letters + string.digits + '-.:') and \
            pieces.scheme in ['http', 'https']:
             return
     except ValueError:
