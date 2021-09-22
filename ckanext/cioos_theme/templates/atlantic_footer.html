@@ -1,0 +1,78 @@
+{% macro include_site_footer() %}
+  {% block footer_core %}
+			<div id="footer-col1" class="widget-area one_sixth">
+				<aside class="widget_text widget widget_custom_html">
+					<h3 class="footer-widget-title">
+						<span>CONTACT US</span>
+					</h3>
+					<div class="textwidget custom-html-widget">
+						<a href="https://twitter.com/cioos_siooc">Twitter</a><br>
+						<a href="https://www.linkedin.com/company/cioosatlantic/">LinkedIn</a><br>
+						<a href="mailto:info@cioosatlantic.ca">Contact Us</a><br>
+					</div>
+				</aside>
+			</div>
+
+			<div id="footer-col2" class="widget-area one_sixth">
+				<aside class="widget widget_text">
+					<h3 class="footer-widget-title">
+						<span>CIOOS</span>
+					</h3>
+					<div class="textwidget">
+						<div class="widget-area width_auto">
+							<aside class="widget_text widget widget_custom_html">
+								<div>
+									<a href="https://www.cioos.ca/">CIOOS National</a>
+								</div>
+								<div class="textwidget custom-html-widget">
+									<a href="https://cioospacific.ca">Pacific Region</a>
+									<br>
+									<a href="https://ogsl.ca/en/">St. Lawrence Region</a>
+									<br>
+									<a href="https://cioosatlantic.ca">Atlantic Region</a>
+								</div>
+							</aside>
+						</div>
+					</div>
+				</aside>
+			</div>
+			<div id="footer-col3" class="widget-area one_sixth"><aside class="widget_text widget widget_custom_html">
+			<h3 class="footer-widget-title"><span>DATA</span></h3>
+			<div class="textwidget custom-html-widget"><a href="https://catalogue.dev.cioosatlantic.ca">Catalogue</a><br>
+			<a href="https://dev.cioosatlantic.ca/">Asset Map</a></div></aside>
+			</div>
+
+			<div id="footer-col4" class="widget-area last one_half">
+				<aside class="widget_text widget widget_custom_html">
+					<h3 class="footer-widget-title">
+						<span>SUBSCRIBE TO CIOOS VIA EMAIL</span>
+					</h3>
+					<div class="textwidget custom-html-widget">
+						<!-- Begin Mailchimp Signup Form -->
+						<div id="mc_embed_signup">
+    							<form action="https://cioosatlantic.us19.list-manage.com/subscribe/post?u=70e43ded9ed1212de9f9d02fc&amp;id=b6549cddce" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+        							<div class="mc-input-fields">
+            								<div class="mc-field-group">
+                								<label for="mce-FNAME">First Name</label>
+                								<input type="text" value="" name="FNAME" class="" id="mce-FNAME">
+            								</div>
+            							<div class="mc-field-group">
+                							<label for="mce-EMAIL">Email Address <span class="mc-required">(required)</span></label>
+                							<input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL">
+            							</div>
+        						</div>
+        						<div id="mce-responses" class="clear">
+            							<div class="response" id="mce-error-response" style="display:none"></div>
+            							<div class="response" id="mce-success-response" style="display:none"></div>
+        						</div>
+        						<!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+        						<div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_70e43ded9ed1212de9f9d02fc_b6549cddce" tabindex="-1" value=""></div>
+        						<input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button">
+    							</form>
+						</div>
+						<!--End mc_embed_signup-->
+					</div>
+				</aside>
+			</div>
+  {% endblock %}
+{% endmacro %}

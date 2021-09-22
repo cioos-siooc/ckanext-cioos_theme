@@ -6,17 +6,19 @@ import ckanext.cioos_theme.helpers as cioos_helpers
 from ckanext.scheming.validation import scheming_validator
 from ckan.lib.plugins import DefaultTranslation
 import ckan.model as model
+from flask import Blueprint
 import json
 from shapely.geometry import shape
 import logging
 import ckan.lib.navl.dictization_functions as df
-from ckan.common import c
+from ckantoolkit import g
 from six.moves.urllib.parse import urlparse
 import string
-from ckan.common import _
-import routes.mapper
+from ckantoolkit import _
 import ckan.lib.base as base
 import re
+
+
 
 Invalid = df.Invalid
 
@@ -73,7 +75,7 @@ def clean_and_populate_eovs(field, schema):
 
         d = json.loads(data.get(key, '[]'))
         for x in eov_data:
-            if isinstance(x, basestring):  # TODO: change basestring to str when moving to python 3
+            if isinstance(x, str):  # TODO: change basestring to str when moving to python 3
                 val = eov_list.get(x.lower(), '')
             else:
                 val = eov_list.get(x, '')
@@ -154,6 +156,26 @@ def cioos_is_valid_range(field, schema):
         return value
     return validator
 
+
+def render_schemamap(self):
+    return toolkit.render('schemamap.html')
+
+def render_datacite_xml(self, id):
+    context = {'model': model, 'session': model.Session,
+               'user': c.user, 'for_view': True,
+               'auth_user_obj': c.userobj}
+    data_dict = {'id': id}
+
+    try:
+        toolkit.check_access('package_update', context, data_dict)
+    except toolkit.ObjectNotFound:
+        toolkit.abort(404, _('Dataset not found'))
+    except toolkit.NotAuthorized:
+        toolkit.abort(403, _('User %r not authorized to view datacite xml for %s') % (c.user, id))
+
+    pkg = toolkit.get_action('package_show')(data_dict={'id': id})
+    return toolkit.render('package/datacite.html', extra_vars={'pkg_dict': pkg})
+
 class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
     plugins.implements(plugins.ITranslation)
     plugins.implements(plugins.IConfigurer)
@@ -162,20 +184,19 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
     plugins.implements(plugins.IPackageController, inherit=True)
     plugins.implements(plugins.IValidators)
     plugins.implements(plugins.IAuthenticator)
-    plugins.implements(plugins.IRoutes)
+    plugins.implements(plugins.IBlueprint)
 
-    # IRoute
+    #IBlueprint
+    def get_blueprint(self):
+        blueprint = Blueprint('foo', self.__module__)
+        rules = [
+            ('/schemamap', 'schemamap', render_schemamap),
+            ('/dataset/{id}.{format}', 'datacite_xml', render_datacite_xml),
+        ]
+        for rule in rules:
+            blueprint.add_url_rule(*rule)
 
-    def before_map(self, route_map):
-        with routes.mapper.SubMapper(route_map, controller='ckanext.cioos_theme.plugin:CIOOSController') as m:
-            m.connect('schemamap', '/schemamap', action='schemamap')
-            m.connect('datacite_xml', '/dataset/{id}.{format}',
-                      action='datacite_xml',
-                      requirements={'format': 'dcxml'})
-        return route_map
-
-    def after_map(self, route_map):
-        return route_map
+        return blueprint
 
     # IAuthenticator
 
@@ -186,8 +207,8 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             remote_addr = toolkit.request.remote_addr
 
         log.info('Request by %s for %s from %s', toolkit.request.remote_user, toolkit.request.url, remote_addr)
-        c.user = None
-        c.userobj = None
+        g.user = None
+        g.userobj = None
         return
 
     def login(self, error=None):
@@ -390,7 +411,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                 resp_orgs = [force_responsible_organization]
         else:
             resp_org_roles = json.loads(toolkit.config.get('ckan.responsible_organization_roles', '["owner", "originator", "custodian", "author", "principalInvestigator"]'))
-            resp_orgs = [x.get('organisation-name', '').strip() for x in json.loads(parties) if x.get('role') in resp_org_roles]
+            resp_orgs = [x.get('organisation-name', '').strip() for x in load_json(parties) if x.get('role') in resp_org_roles]
             resp_orgs = list(dict.fromkeys(resp_orgs))  # remove duplicates
             resp_orgs = list(filter(None, resp_orgs)) # remove empty elements (in a python 2 and 3 friendly way)
         return resp_orgs
@@ -532,9 +553,23 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             notes = result.get('notes_translated')
             if(notes):
                 result['notes_translated'] = load_json(notes)
-            keywords = result.get('keywords')
-            if(keywords):
-                result['keywords'] = load_json(keywords)
+
+            # convert the rest of the strings to json
+            for field in [
+                    "keywords",
+                    # "spatial", removed as making the field json brakes the dataset_map template
+                    "temporal-extent",
+                    "unique-resource-identifier-full",
+                    "notes",
+                    "vertical-extent",
+                    "dataset-reference-date",
+                    "metadata-reference-date",
+                    "metadata-point-of-contact",
+                    "cited-responsible-party"]:
+                tmp = result.get(field)
+                if tmp:
+                    result[field] = load_json(tmp)
+
 
             # update organization object while we are at it
             org_id = result.get('owner_org')
@@ -600,6 +635,50 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         if((cited_responsible_party or force_resp_org) and not package_dict.get('responsible_organizations')):
             package_dict['responsible_organizations'] = self._cited_responsible_party_to_responsible_organizations(cited_responsible_party, force_resp_org)
 
+        result = package_dict
+        title = result.get('title_translated')
+        if(title):
+            result['title_translated'] = load_json(title)
+        notes = result.get('notes_translated')
+        if(notes):
+            result['notes_translated'] = load_json(notes)
+
+        # convert the rest of the strings to json
+        for field in [
+                "keywords",
+                # "spatial", removed as making the field json brakes the dataset_map template
+                "temporal-extent",
+                "unique-resource-identifier-full",
+                "notes",
+                "vertical-extent",
+                "dataset-reference-date",
+                "metadata-reference-date",
+                "metadata-point-of-contact",
+                "cited-responsible-party"]:
+            tmp = result.get(field)
+            if tmp:
+                result[field] = load_json(tmp)
+        package_dict = result
+
+
+        # title and notes must be a string or the index process errors
+        if isinstance(package_dict.get('title'), dict):
+            package_dict['title'] = json.dumps(package_dict.get('title'))
+        if isinstance(package_dict.get('notes'), dict):
+            package_dict['notes'] = json.dumps(package_dict.get('notes'))
+
+        # if(package_dict.get('title') and re.search(r'\\\\u[0-9a-fA-F]{4}', package_dict.get('title'))):
+        #     if isinstance(package_dict.get('title'), str):
+        #         package_dict['title'] = package_dict.get('title').encode().decode('unicode-escape')
+        #     else:  # we have bytes
+        #         package_dict['title'] = package_dict.get('title').decode('unicode-escape')
+        #
+        # if(package_dict.get('notes') and re.search(r'\\\\u[0-9a-fA-F]{4}', package_dict.get('notes'))):
+        #     if isinstance(package_dict.get('notes'), str):
+        #         package_dict['notes'] = package_dict.get('notes').encode().decode('unicode-escape')
+        #     else:  # we have bytes
+        #         package_dict['notes'] = package_dict.get('notes').decode('unicode-escape')
+
         return package_dict
 
     # Custom section
@@ -607,8 +686,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         return 'package/read.html'
 
     def lang(self):
-        from ckantoolkit import h
-        return h.lang()
+        return toolkit.h.lang()
 
     def get_locale_url(self, base_url, locale_urls):
         default_locale = toolkit.config.get('ckan.locale_default', toolkit.config.get('ckan.locales_offered', ['en'])[0])
@@ -616,25 +694,3 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         if base_url.endswith('/'):
             return base_url + locale_urls.get(lang)
         return base_url + '/' + locale_urls.get(lang)
-
-
-class CIOOSController(toolkit.BaseController):
-
-    def schemamap(self):
-        return base.render('schemamap.html')
-
-    def datacite_xml(self, id):
-        context = {'model': model, 'session': model.Session,
-                   'user': c.user, 'for_view': True,
-                   'auth_user_obj': c.userobj}
-        data_dict = {'id': id}
-
-        try:
-            toolkit.check_access('package_update', context, data_dict)
-        except toolkit.ObjectNotFound:
-            toolkit.abort(404, _('Dataset not found'))
-        except toolkit.NotAuthorized:
-            toolkit.abort(403, _('User %r not authorized to view datacite xml for %s') % (c.user, id))
-
-        pkg = toolkit.get_action('package_show')(data_dict={'id': id})
-        return base.render('package/datacite.html', extra_vars={'pkg_dict': pkg})

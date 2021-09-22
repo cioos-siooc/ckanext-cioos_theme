@@ -1,0 +1,120 @@
+{% macro include_mobile_header() %}
+  {% block header_mobilesite_navigation2 %}
+  <nav>
+    <ul id="menu-mobile-menu" class="menu">
+      {%- if h.lang() == 'en' -%}
+      <li id="menu-item-921" class="menu-item  menu-item-home"><a href="{{ g.site_home_url }}"><span>HOME</span></a></li>
+      <li id="menu-item-920" class="menu-item  menu-item-has-children menu-parent"><a href="{{ g.site_home_url }}about/"><span>ABOUT</span></a>
+      {%- else -%}
+      <li id="menu-item-921" class="menu-item  menu-item-home"><a href="{{ g.site_home_url }}fr/"><span>Accueil</span></a></li>
+      <li id="menu-item-920" class="menu-item  menu-item-has-children menu-parent"><a href="{{ g.site_home_url }}fr/apropos/"><span>À Propos</span></a>
+      {%- endif -%}
+        <ul class="sub-menu">
+          {%- if h.lang() == 'en' -%}
+          <li id="menu-item-1870" class="menu-item "><a href="{{ g.site_home_url }}about/">About CIOOS Atlantic</a></li>
+          <li id="menu-item-1871" class="menu-item "><a href="{{ g.site_home_url }}meet-our-team/">Meet Our Team</a></li>
+          <li id="menu-item-1872" class="menu-item "><a href="{{ g.site_home_url }}our-partners/">Our Partners</a></li>
+          <li id="menu-item-1873" class="menu-item "><a href="{{ g.site_home_url }}eovs/">Essential Ocean Variables</a></li>
+          <li id="menu-item-1934" class="menu-item "><a href="{{ g.site_home_url }}data-management-overview/">Data Management</a></li>
+          {%- else -%}
+          <li id="menu-item-1870" class="menu-item "><a href="{{ g.site_home_url }}fr/apropos/">À Propos de CIOOS Atlantique</a></li>
+          <li id="menu-item-1871" class="menu-item "><a href="{{ g.site_home_url }}fr/equipe/">Notre Équipe</a></li>
+          <li id="menu-item-1872" class="menu-item "><a href="{{ g.site_home_url }}fr/partenaires/">Nos Partenaires</a></li>
+          <li id="menu-item-1873" class="menu-item "><a href="{{ g.site_home_url }}fr/variables/">Variables de Base</a></li>
+          <li id="menu-item-1934" class="menu-item "><a href="{{ g.site_home_url }}fr/gestiondedonnees/">Gestion de Données</a></li>
+          {%- endif -%}
+        </ul>
+      </li>
+      {%- if h.lang() == 'en' -%}
+      <li id="menu-item-1359" class="menu-item "><a href="{{ g.site_home_url }}data-tools/"><span>DATA TOOLS</span></a></li>
+      <li id="menu-item-1652" class="menu-item menu-item-has-children menu-parent current-menu-item current_page_item"><a href="{{ h.url_for('home.index') }}"><span>DATA CATALOGUE</span></a>
+        <ul class="sub-menu">
+          <li id="menu-item-1999" class="menu-item"><a href="{{ h.url_for('home.index') }}dataset">Datasets</a></li>
+          <li id="menu-item-2001" class="menu-item"><a href="{{ h.url_for('home.index') }}organization">Organizations</a></li>
+        </ul>
+      </li>
+      <li id="menu-item-2002" class="menu-item"><a href="{{ g.site_home_url }}resources/"><span>RESOURCES</span></a>
+      </li>
+      {%- else -%}
+      <li id="menu-item-1359" class="menu-item "><a href="{{ g.site_home_url }}fr/outils/"><span>Outils de Données</span></a></li>
+      <li id="menu-item-1652" class="menu-item menu-item-has-children menu-parent current-menu-item current_page_item"><a href="{{ h.url_for('home.index') }}"><span>Catalogue de Données</span></a>
+        <ul class="sub-menu">
+          <li id="menu-item-1999" class="menu-item"><a href="{{ h.url_for('home.index') }}dataset">Jeux de données</a></li>
+          <li id="menu-item-2001" class="menu-item"><a href="{{ h.url_for('home.index') }}organization">Organisations</a></li>
+        </ul>
+      </li>
+      <li id="menu-item-2002" class="menu-item"><a href="{{ g.site_home_url }}fr/ressources/"><span>Ressources</span></a>
+      </li>
+      {%- endif -%}
+      <ul class="shareicons">
+        {{ include_site_social() }}
+        <li>
+          {%- if h.lang() == 'en' -%}
+            <a href="{% url_for h.current_url(), locale='fr' %}" tabindex="0" aria-label="French/English">FR</a>
+          {%- else -%}
+            <a href="{% url_for h.current_url(), locale='en' %}" tabindex="0" aria-label="French/English">EN</a>
+          {%- endif -%}
+        </li>
+      </ul>
+    </ul>
+  </nav>
+  {% endblock %}
+{% endmacro %}
+
+
+{% macro include_site_header() %}
+  {% block header_main %}
+  <ul id="menu-main-menu-en" class="menu">
+    {%- if h.lang() == 'en' -%}
+    <li id="menu-item-921" class="menu-item  menu-item-home"><a href="{{ g.site_home_url }}"><span>Home</span></a></li>
+    <li id="menu-item-920" class="menu-item  menu-item-has-children menu-parent"><a href="{{ g.site_home_url }}about/"><span class="mega-indicator">About</span></a>
+    {%- else -%}
+    <li id="menu-item-921" class="menu-item  menu-item-home"><a href="{{ g.site_home_url }}fr/"><span>Accueil</span></a></li>
+    <li id="menu-item-920" class="menu-item  menu-item-has-children menu-parent"><a href="{{ g.site_home_url }}fr/apropos/"><span class="mega-indicator">À Propos</span></a>
+    {%- endif -%}
+      <ul class="sub-menu" style=" min-width: 94px;">
+        {%- if h.lang() == 'en' -%}
+        <li id="menu-item-1870" class="menu-item "><a href="{{ g.site_home_url }}about/">About CIOOS Atlantic</a></li>
+        <li id="menu-item-1871" class="menu-item "><a href="{{ g.site_home_url }}meet-our-team/">Meet Our Team</a></li>
+        <li id="menu-item-1872" class="menu-item "><a href="{{ g.site_home_url }}our-partners/">Our Partners</a></li>
+        <li id="menu-item-1873" class="menu-item "><a href="{{ g.site_home_url }}eovs/">Essential Ocean Variables</a></li>
+        <li id="menu-item-1934" class="menu-item "><a href="{{ g.site_home_url }}data-management-overview/">Data Management</a></li>
+        {%- else -%}
+        <li id="menu-item-1870" class="menu-item "><a href="{{ g.site_home_url }}fr/apropos/">À Propos de CIOOS Atlantique</a></li>
+        <li id="menu-item-1871" class="menu-item "><a href="{{ g.site_home_url }}fr/equipe/">Notre Équipe</a></li>
+        <li id="menu-item-1872" class="menu-item "><a href="{{ g.site_home_url }}fr/partenaires/">Nos Partenaires</a></li>
+        <li id="menu-item-1873" class="menu-item "><a href="{{ g.site_home_url }}fr/variables/">Variables de Base</a></li>
+        <li id="menu-item-1934" class="menu-item "><a href="{{ g.site_home_url }}fr/gestiondedonnees/">Gestion de Données</a></li>
+        {%- endif -%}
+      </ul>
+    </li>
+    {%- if h.lang() == 'en' -%}
+    <li id="menu-item-1359" class="menu-item "><a href="{{ g.site_home_url }}data-tools/"><span>Data Tools</span></a></li>
+    <li id="menu-item-1652" class="menu-item menu-item-has-children menu-parent current-menu-item current_page_item"><a href="{{ h.url_for('home.index') }}"><span class="mega-indicator">Data Catalogue</span></a>
+      <ul class="sub-menu" style=" min-width: 161px;">
+        <li id="menu-item-1999" class="menu-item"><a href="{{ h.url_for('home.index') }}dataset">Datasets</a></li>
+        <li id="menu-item-2001" class="menu-item"><a href="{{ h.url_for('home.index') }}organization">Organizations</a></li>
+      </ul>
+    </li>
+    <li id="menu-item-2002" class="menu-item"><a href="{{ g.site_home_url }}resources/"><span class="mega-indicator">Resources</span></a>
+    </li>
+    {%- else -%}
+    <li id="menu-item-1359" class="menu-item "><a href="{{ g.site_home_url }}fr/outils/"><span>Outils de Données</span></a></li>
+    <li id="menu-item-1652" class="menu-item menu-item-has-children menu-parent current-menu-item current_page_item"><a href="{{ h.url_for('home.index') }}"><span class="mega-indicator">Catalogue de Données</span></a>
+      <ul class="sub-menu" style=" min-width: 161px;">
+        <li id="menu-item-1999" class="menu-item"><a href="{{ h.url_for('home.index') }}dataset">Jeux de données</a></li>
+        <li id="menu-item-2001" class="menu-item"><a href="{{ h.url_for('home.index') }}organization">Organisations</a></li>
+      </ul>
+    </li>
+    <li id="menu-item-2002" class="menu-item"><a href="{{ g.site_home_url }}fr/ressources/"><span class="mega-indicator">Ressources</span></a>
+    </li>
+    {%- endif -%}
+  </ul>
+  {% endblock %}
+{% endmacro %}
+
+{% macro include_site_social() %}
+  {% block header_social_list %}
+    <li><a href="http://twitter.com/cioos_siooc" tabindex="0" aria-label="Twitter"><i class="fa fa-twitter"></i></a></li>
+  {% endblock %}
+{% endmacro %}
