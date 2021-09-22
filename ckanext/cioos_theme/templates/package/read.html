@@ -39,7 +39,7 @@
     {% endblock %}
 
     {% if c.userobj %}
-    <a href="{{ h.url_for(controller='datasete', action='read', id=pkg.id) }}.dcxml" class="btn"><i class="fa fa-icon fa-link"></i>{{ _(' DataCite XML')}}</a>
+    <a href="{{ h.url_for(controller='dataset', action='read', id=pkg.id) }}.dcxml" class="btn"><i class="fa fa-icon fa-link"></i>{{ _(' DataCite XML')}}</a>
     {% endif %}
     <a href="{{ h.url_for(controller='dataset', action='read', id=pkg.id) }}" class="btn"><i class="fa fa-icon fa-link"></i>{{ _('Show Permalink')}}</a>
 
