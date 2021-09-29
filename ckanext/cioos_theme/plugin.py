@@ -7,6 +7,7 @@ from ckanext.scheming.validation import scheming_validator
 from ckan.lib.plugins import DefaultTranslation
 import ckan.model as model
 from flask import Blueprint
+from flask import render_template, render_template_string
 import json
 from shapely.geometry import shape
 import logging
@@ -17,7 +18,6 @@ import string
 from ckantoolkit import _
 import ckan.lib.base as base
 import re
-
 
 
 Invalid = df.Invalid
@@ -157,25 +157,6 @@ def cioos_is_valid_range(field, schema):
     return validator
 
 
-def render_schemamap(self):
-    return toolkit.render('schemamap.html')
-
-def render_datacite_xml(self, id):
-    context = {'model': model, 'session': model.Session,
-               'user': c.user, 'for_view': True,
-               'auth_user_obj': c.userobj}
-    data_dict = {'id': id}
-
-    try:
-        toolkit.check_access('package_update', context, data_dict)
-    except toolkit.ObjectNotFound:
-        toolkit.abort(404, _('Dataset not found'))
-    except toolkit.NotAuthorized:
-        toolkit.abort(403, _('User %r not authorized to view datacite xml for %s') % (c.user, id))
-
-    pkg = toolkit.get_action('package_show')(data_dict={'id': id})
-    return toolkit.render('package/datacite.html', extra_vars={'pkg_dict': pkg})
-
 class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
     plugins.implements(plugins.ITranslation)
     plugins.implements(plugins.IConfigurer)
@@ -186,17 +167,35 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
     plugins.implements(plugins.IAuthenticator)
     plugins.implements(plugins.IBlueprint)
 
-    #IBlueprint
-    def get_blueprint(self):
-        blueprint = Blueprint('foo', self.__module__)
-        rules = [
-            ('/schemamap', 'schemamap', render_schemamap),
-            ('/dataset/{id}.{format}', 'datacite_xml', render_datacite_xml),
-        ]
-        for rule in rules:
-            blueprint.add_url_rule(*rule)
+    # IBlueprint
+    cioos_theme_bp = Blueprint('cioos_theme', __module__)
 
-        return blueprint
+    @cioos_theme_bp.route('/schemamap', endpoint='schemamap')
+    def render_schemamap():
+        return toolkit.render('schemamap.html')
+
+    @cioos_theme_bp.route('/dataset/<string:id>.dcxml', endpoint='datacite_xml')
+    def render_datacite_xml(id):
+
+        # context = {'model': model, 'session': model.Session,
+        #            'user': g.user, 'for_view': True,
+        #            'auth_user_obj': g.userobj}
+        # data_dict = {'id': id}
+        #
+        # try:
+        #     toolkit.check_access('package_update', None, data_dict)
+        # except toolkit.ObjectNotFound as e:
+        #     toolkit.abort(404, _('Dataset not found'))
+        # except toolkit.NotAuthorized:
+        #     toolkit.abort(403, _('User %r not authorized to view datacite xml for %s') % (c.user, id))
+
+        log.debug('ID: %s', id)
+        pkg = toolkit.get_action('package_show')(data_dict={'id': id})
+        log.debug('PKG: %r', pkg)
+        return toolkit.render('package/datacite.html', extra_vars={'pkg_dict': pkg})
+
+    def get_blueprint(self):
+        return self.cioos_theme_bp
 
     # IAuthenticator
 
@@ -299,7 +298,8 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             'cioos_get_doi_authority_url': cioos_helpers.get_doi_authority_url,
             'cioos_get_doi_prefix': cioos_helpers.get_doi_prefix,
             'cioos_get_datacite_org': cioos_helpers.get_datacite_org,
-            'cioos_get_datacite_test_mode': cioos_helpers.get_datacite_test_mode
+            'cioos_get_datacite_test_mode': cioos_helpers.get_datacite_test_mode,
+            'cioos_generate_datacite_dict': cioos_helpers.generate_datacite_dict
         }
 
     def get_validators(self):

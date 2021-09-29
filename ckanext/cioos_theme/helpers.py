@@ -9,7 +9,7 @@
 import ckan.plugins.toolkit as toolkit
 import ckan.plugins as p
 from collections import OrderedDict
-from ckantoolkit import  _, c, config
+from ckantoolkit import _, c, config
 # from ckantoolkit import h
 import ckan.logic as logic
 import ckan.model as model
@@ -68,17 +68,94 @@ def generate_doi_suffix():
     str2 = ''.join(random.SystemRandom().choice(chars) for _ in range(4))
     return str1 + '-' + str2
 
+
 def get_doi_authority_url():
     return toolkit.config.get('ckan.cioos.doi_authority_url', 'https://doi.org/')
+
 
 def get_doi_prefix():
     return toolkit.config.get('ckan.cioos.doi_prefix')
 
+
 def get_datacite_org():
     return toolkit.config.get('ckan.cioos.datacite_org')
 
+
 def get_datacite_test_mode():
     return toolkit.config.get('ckan.cioos.datacite_test_mode', 'True')
+
+
+def generate_datacite_dict(pkg):
+    dc = {}
+    dc['title_en'] = pkg['title_translated']['en']
+    dc['title_fr'] = pkg['title_translated']['fr']
+
+    parties = [
+        {
+          'individual-name': i['individual-name'],
+          'organisation-name': i.get('organisation-name'),
+        } for i in toolkit.h.cioos_load_json(pkg['cited-responsible-party']) if i.get('individual-name')]
+    seen = set()
+    new_parties = []
+    for d in parties:
+        t = tuple(d.items())
+        if t not in seen:
+            seen.add(t)
+            new_parties.append(d)
+    dc['creators'] = new_parties
+
+    parties = [i['organisation-name'] for i in toolkit.h.cioos_load_json(pkg['cited-responsible-party']) if i.get('organisation-name') and i['role'] == 'publisher']
+    dc['publishers'] = list(dict.fromkeys(parties))
+
+    distributor = [p['value'] for p in pkg['extras'] if p['key'] == 'distributor']
+    if distributor:
+        distributor = toolkit.h.cioos_load_json(distributor[0])
+    parties = [
+        {
+          'individual-name': i.get('individual-name'),
+          'organisation-name': i.get('organisation-name'),
+        } for i in distributor if i.get('individual-name') or i.get('organisation-name')]
+    seen = set()
+    new_parties = []
+    for d in parties:
+        t = tuple(d.items())
+        if t not in seen:
+            seen.add(t)
+            new_parties.append(d)
+    dc['distributor'] = new_parties
+
+    dates = [i['value'] for i in toolkit.h.cioos_load_json(pkg['dataset-reference-date']) if i.get('value') and i.get('type') == 'publication']
+    dc['publicationDates'] = list(dict.fromkeys(dates))
+
+    dc['keywords_en'] = pkg.get('keywords', {}).get('en', [])
+    dc['keywords_fr'] = pkg.get('keywords', {}).get('fr', [])
+
+    dc['version'] = pkg.get('version', '1.0')
+    dc['license'] = {}
+    dc['license']['title'] = pkg['license_title']
+    dc['license']['id'] = pkg['license_id']
+    dc['license']['url'] = pkg['license_url']
+
+
+    dc['metadata-language'] = pkg['metadata-language']
+    dc['resource-type'] = pkg['resource-type'].title()
+
+    dc['description_en'] = pkg['notes_translated']['en']
+    dc['description_fr'] = pkg['notes_translated']['fr']
+
+    dc['bbox'] = {}
+    dc['bbox']['west'] = pkg['bbox-west-long']
+    dc['bbox']['east'] = pkg['bbox-east-long']
+    dc['bbox']['north'] = pkg['bbox-north-lat']
+    dc['bbox']['south'] = pkg['bbox-south-lat']
+
+    spatial = toolkit.h.cioos_load_json(pkg['spatial'])
+    dc['spatial'] = {}
+    if spatial and spatial['type'] == 'Polygon':
+        dc['spatial']['type'] = 'Polygon'
+        dc['spatial']['coords'] = spatial['coordinates'][0]
+
+    return dc
 
 
 def _merge_lists(key, list1, list2):
