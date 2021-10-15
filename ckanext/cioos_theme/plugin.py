@@ -701,6 +701,37 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         #     else:  # we have bytes
         #         package_dict['notes'] = package_dict.get('notes').decode('unicode-escape')
 
+        # Update package relationships with package name
+        ras = package_dict['relationships_as_subject']
+        for rel in ras:
+            if rel.get('__extras'):
+                id = rel['__extras']['object_package_id']
+                result = toolkit.get_action('package_search')(context, data_dict={'q': 'id:%s' % id, 'fl': 'name'})
+                if result['results']:
+                    rel['__extras']['object_package_name'] = result['results'][0]['name']
+                rel['__extras']['subject_package_name'] = package_dict['name']
+            else:
+                id = rel['object_package_id']
+                result = toolkit.get_action('package_search')(context, data_dict={'q': 'id:%s' % id, 'fl': 'name'})
+                if result['results']:
+                    rel['object_package_name'] = result['results'][0]['name']
+                rel['subject_package_name'] = package_dict['name']
+
+        rao = package_dict['relationships_as_object']
+        for rel in rao:
+            if rel.get('__extras'):
+                rel['__extras']['object_package_name'] = package_dict['name']
+                id = rel['__extras']['subject_package_id']
+                result = toolkit.get_action('package_search')(context, data_dict={'q': 'id:%s' % id, 'fl': 'name'})
+                if result['results']:
+                    rel['__extras']['subject_package_name'] = result['results'][0]['name']
+            else:
+                rel['object_package_name'] = package_dict['name']
+                id = rel['subject_package_id']
+                result = toolkit.get_action('package_search')(context, data_dict={'q': 'id:%s' % id, 'fl': 'name'})
+                if result['results']:
+                    rel['subject_package_name'] = result['results'][0]['name']
+
         return package_dict
 
     # Custom section
