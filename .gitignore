@@ -47,3 +47,5 @@ ckanext/cioos_theme/public/.sass-cache/
 ckanext/cioos_theme/public/sass/.sass-cache/
 
 ckanext/cioos_theme/public/base/.DS_Store
+
+.DS_Store

@@ -30,13 +30,20 @@
     {% endblock -%}
 
     {%- block styles %}
-      {% resource g.main_css[6:] %}
-      {# <link rel="stylesheet" type="text/css" href="{{h.url_for_static('/cioos_theme.css')}}" /> #}
-      {# {% if h.cioos_get_additional_css_path() %}
-      <link rel="stylesheet" type="text/css" href="{{h.url_for_static(h.cioos_get_additional_css_path())}}" />
-      {% endif %} #}
-      <link href="https://fonts.googleapis.com/css?family=Montserrat:400,600,700,800,900|Quicksand:300,400,600|PT+Sans:400|Raleway:400&display=swap" rel="stylesheet">
+      {# TODO: store just name of asset instead of path to it. #}
+      {% set main_css = h.get_rtl_css() if h.is_rtl_language() else g.main_css %}
+      {# strip '/base/' prefix and '.css' suffix #}
+      {% asset main_css[6:-4] %}
     {% endblock %}
+
+    {# render all assets included in styles block #}
+    {{ h.render_assets('style') }}
+
+    <link rel="stylesheet" type="text/css" href="{{h.url_for_static('/cioos_theme.css')}}" />
+    {% if h.cioos_get_additional_css_path() %}
+    <link rel="stylesheet" type="text/css" href="{{h.url_for_static(h.cioos_get_additional_css_path())}}" />
+    {% endif %}
+    {# <link href="https://fonts.googleapis.com/css?family=Montserrat:400,600,700,800,900|Quicksand:300,400,600|PT+Sans:400|Raleway:400&display=swap" rel="stylesheet"> #}
 
     {% block head_extras %}
       {# defined in the config.ini under "ckan.template_head_end" #}
@@ -51,15 +58,21 @@
       {%- endif %}
     {% endblock %}
   </head>
+
   <body {% block bodytag %} data-site-root="{{ h.url_for('/', locale='default', qualified=true) }}" data-locale-root="{{ h.url_for('/', qualified=true) }}" {% endblock %}>
 
     {%- block page %}{% endblock -%}
 
-    {%- block scripts %}{% endblock -%}
+    {%- block scripts %}
+    {% endblock -%}
     {% block body_extras -%}
       {# defined in the config.ini under "ckan.template_footer_end" #}
       {{ g.template_footer_end | safe }}
     {%- endblock %}
-  </body>
 
+    {# render all assets included in scripts block and everywhere else #}
+    {# make sure there are no calls to `asset` tag after this point #}
+    {{ h.render_assets('style') }}
+    {{ h.render_assets('script') }}
+  </body>
 </html>

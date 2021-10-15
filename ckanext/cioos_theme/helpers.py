@@ -8,13 +8,11 @@
 
 import ckan.plugins.toolkit as toolkit
 import ckan.plugins as p
-from ckan.common import OrderedDict, _, c
+from collections import OrderedDict
+from ckantoolkit import  _, c, config
 # from ckantoolkit import h
 import ckan.logic as logic
 import ckan.model as model
-from ckan.model import PackageRelationship
-from ckan.common import config
-from paste.deploy.converters import asbool
 import copy
 import logging
 import json
@@ -88,47 +86,6 @@ def get_datacite_org():
 
 def get_datacite_test_mode():
     return toolkit.config.get('ckan.cioos.datacite_test_mode', 'True')
-
-
-def get_package_relationships(pkg):
-    '''Returns the relationships of a package.
-
-    :param id: the id or name of the package
-    '''
-    rel = pkg.get('relationships_as_subject') + pkg.get('relationships_as_object')
-    b = []
-    for x in rel:
-        if x not in b:
-            b.append(x)
-    return b
-
-
-def print_package_relationship_type(type):
-    out = 'depends on'
-    if 'child' in type:
-        out = 'parent'
-    elif 'parent' in type:
-        out = 'child'
-    elif 'link' in type:
-        out = 'cross link'
-    return out
-    #return PackageRelationship.make_type_printable(type)
-
-
-def get_package_relationship_reverse_type(type):
-    return PackageRelationship.reverse_type(type)
-
-
-def get_package_title(id):
-    '''Returns the title of a package.
-
-    :param id: the id or name of the package
-    '''
-    try:
-        pkg = toolkit.get_action('package_show')(None, data_dict={'id': id})
-    except Exception as e:
-        return None
-    return toolkit.h.get_translated(pkg, 'title')
 
 
 def _merge_lists(key, list1, list2):
@@ -436,9 +393,9 @@ def cioos_get_facets(package_type='dataset'):
     c.facet_titles = facets
 
     data_dict = {
-        'facet.field': facets.keys(),
+        'facet.field': list(facets.keys()),
         'rows': 0,
-        'include_private': asbool(config.get(
+        'include_private': toolkit.asbool(config.get(
             'ckan.search.default_include_private', True)),
     }
 
