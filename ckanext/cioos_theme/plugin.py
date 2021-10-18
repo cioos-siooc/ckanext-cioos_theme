@@ -426,8 +426,8 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             else:
                 resp_orgs = [force_responsible_organization]
         else:
-            resp_org_roles = json.loads(toolkit.config.get('ckan.responsible_organization_roles', '["owner", "originator", "custodian", "author", "principalInvestigator"]'))
-            resp_orgs = [x.get('organisation-name', '').strip() for x in load_json(parties) if x.get('role') in resp_org_roles]
+            resp_org_roles = cioos_helpers.load_json(toolkit.config.get('ckan.responsible_organization_roles', '["owner", "originator", "custodian", "author", "principalInvestigator"]'))
+            resp_orgs = [x.get('organisation-name', '').strip() for x in cioos_helpers.load_json(parties) if x.get('role') in resp_org_roles]
             resp_orgs = list(dict.fromkeys(resp_orgs))  # remove duplicates
             resp_orgs = list(filter(None, resp_orgs))  # remove empty elements (in a python 2 and 3 friendly way)
         return resp_orgs
@@ -574,7 +574,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                 result['title_translated'] = cioos_helpers.load_json(title)
             notes = result.get('notes_translated')
             if(notes):
-                result['notes_translated'] = load_json(notes)
+                result['notes_translated'] = cioos_helpers.load_json(notes)
 
             # convert the rest of the strings to json
             for field in [
@@ -590,7 +590,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                     "cited-responsible-party"]:
                 tmp = result.get(field)
                 if tmp:
-                    result[field] = load_json(tmp)
+                    result[field] = cioos_helpers.load_json(tmp)
 
 
             # update organization object while we are at it
@@ -660,10 +660,10 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         result = package_dict
         title = result.get('title_translated')
         if(title):
-            result['title_translated'] = load_json(title)
+            result['title_translated'] = cioos_helpers.load_json(title)
         notes = result.get('notes_translated')
         if(notes):
-            result['notes_translated'] = load_json(notes)
+            result['notes_translated'] = cioos_helpers.load_json(notes)
 
         # convert the rest of the strings to json
         for field in [
@@ -679,7 +679,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                 "cited-responsible-party"]:
             tmp = result.get(field)
             if tmp:
-                result[field] = load_json(tmp)
+                result[field] = cioos_helpers.load_json(tmp)
         package_dict = result
 
 
