@@ -1,6 +1,6 @@
 {% macro include_site_footer() %}
   {% block footer_core %}
-			<div id="footer-col1" class="widget-area one_sixth">
+			<div id="footer-col1" class="widget-area">
 				<aside class="widget_text widget widget_custom_html">
 					<h3 class="footer-widget-title">
                         {%- if h.lang() == 'en' -%}
@@ -21,7 +21,7 @@
 				</aside>
 			</div>
 
-			<div id="footer-col2" class="widget-area one_sixth">
+			<div id="footer-col2" class="widget-area">
 				<aside class="widget widget_text">
 					<h3 class="footer-widget-title">
                         {%- if h.lang() == 'en' -%}
@@ -61,7 +61,7 @@
 					</div>
 				</aside>
 			</div>
-			<div id="footer-col3" class="widget-area one_sixth"><aside class="widget_text widget widget_custom_html">
+			<div id="footer-col3" class="widget-area col"><aside class="widget_text widget widget_custom_html">
             {%- if h.lang() == 'en' -%}
 			<h3 class="footer-widget-title"><span>DATA</span></h3>
 			<div class="textwidget custom-html-widget"><a href="{{ h.url_for('home.index') }}">Catalogue</a><br>
@@ -74,7 +74,7 @@
 			</div>
             {%- endif -%}
 
-			<div id="footer-col4" class="widget-area last one_half">
+			<div id="footer-col4" class="widget-area col">
 				<aside class="widget_text widget widget_custom_html">
 					<h3 class="footer-widget-title">
                         {%- if h.lang() == 'en' -%}
@@ -87,25 +87,16 @@
 						<!-- Begin Mailchimp Signup Form -->
 						<div id="mc_embed_signup">
     							<form action="https://cioosatlantic.us19.list-manage.com/subscribe/post?u=70e43ded9ed1212de9f9d02fc&amp;id=b6549cddce" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
-        							<div class="mc-input-fields">
-            								<div class="mc-field-group">
-                                                {%- if h.lang() == 'en' -%}
-                								<label for="mce-FNAME">First Name</label>
-                                                {%- else -%}
-                                                <label for="mce-FNAME">Prénom</label>
-                                                {%- endif -%}
-                								<input type="text" value="" name="FNAME" class="" id="mce-FNAME">
-            								</div>
-            							<div class="mc-field-group">
-                                            {%- if h.lang() == 'en' -%}
-                							<label for="mce-EMAIL">Email Address <span class="mc-required">(required)</span></label>
-                                            <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL">
-                                            {%- else -%}
-                                            <label for="mce-EMAIL">Courriel <span class="mc-required">(champ requis)</span></label>
-                                            <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL">
-                                            {%- endif -%}
-            							</div>
-        						</div>
+                                                        {%- if h.lang() == 'en' -%}
+                                                        <input id="mce-FNAME" class="newsletter-field" name="FNAME" type="text" value="" placeholder="First name">
+                                                        <br>
+                                                        <input id="mce-EMAIL" class="required email newsletter-field" name="EMAIL" type="email" value="" placeholder="Email address">
+                                                        {%- else -%}
+                                                        <input id="mce-FNAME" class="newsletter-field" name="FNAME" type="text" value="" placeholder="Prénom">
+                                                        <br>
+                                                        <input id="mce-EMAIL" class="required email newsletter-field" name="EMAIL" type="email" value="" placeholder="Courriel">
+                                                        {%- endif -%}
+                                                        <p></p>
         						<div id="mce-responses" class="clear">
             							<div class="response" id="mce-error-response" style="display:none"></div>
             							<div class="response" id="mce-success-response" style="display:none"></div>
