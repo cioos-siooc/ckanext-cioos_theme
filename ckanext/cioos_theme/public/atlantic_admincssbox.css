@@ -1,0 +1,122 @@
+/* Remove this import statement later re: Lighthouse recommendations. */
+@import url('https://cioosatlantic.ca/wp-content/themes/cioos-siooc-wordpress-theme/ra_custom.css?ver=5.6.1');
+#topmenu.nav.main-nav nav{padding:0 !important}
+#header{margin:3em 0}
+#header-container #header .menu>li>a:hover{color:#e55162 !important}
+#header-container #header .menu>li>a::after{content:"";display:block;width:0;height:2px;background:#e55162 !important;transition:width .5s}
+#header-container #header .menu>li.current-menu-item>a{color:#e55162 !important}
+#header-container #header .menu>li.current-menu-item>a span{color:#e55162;font-weight:400}
+#header-container #header .menu>li.menu-item-has-children>a span:after{color:#404041 !important;font-size:12px;margin-top:3px;font-weight:700}
+#header-container #header .menu>li.current-menu-item>a span{color:#e55162 !important;font-weight:400}
+#header-container #header .header-links .sub-menu{box-shadow:#e55162 0 -4px 0 0px,rgba(0,0,0,.15) 1px 1px 2px 0}
+#header-container #header .header-links .sub-menu a{font-size:14px;line-height:40px;color:#404041 !important}
+#header-container #header .header-links .sub-menu a:hover{color:#e55162 !important;transition:color .3s ease}
+#header-container #header .header-links>ul>li{font-size:15px}
+#header-container #header .header-links>ul>li:last-child{padding-right:10px}
+#header-container #header .header-links>ul>li a{color:#404041 !important;font-family:"Montserrat",sans-serif;font-size:15px}
+#header-container #header-sticky .menu>li>a:hover{color:#e55162;background:#fff}
+.title{letter-spacing:-1px}
+.title h1{font-size:36px;color:#404041;margin-bottom:5px}
+.title h1 span{font-weight:600}
+.title h2{font-size:24px;margin-top:0px}
+.title h2 span a{color:#404041}
+h3.heading{font-size:16px;margin-bottom:4px}
+.homepage .module-content-end{margin-bottom:50px}
+.homepage .box{border-color:#e55162}
+.form-control{border-color:#b5b5b5}
+.form-control:focus,.form-control:hover{border-color:#e55162}
+.search-form .search-input.search-giant button{background:#e55162;top:18px;right:3px;width:48px;height:48px}
+.cioos-module-search .module-content{padding:0;background:none}
+.cioos-module-search .box{background:none;border:none}
+.cioos-module-search .col-md-6{width:100%;padding:0}
+.cioos-search{margin-left:15px}
+#footer{padding:40px}
+#footer .col-md-6{padding:0}
+#footer a{font-weight:700}
+#footer a:hover{text-decoration:none}
+.account-masthead{border-top:none;background-color:#e55162}
+.account-masthead .account{border:none}
+.account-masthead .account ul li{border:none}
+.account-masthead .account ul li a{color:#fff;padding:0}
+.account-masthead .account ul li a:hover{background-color:#e55162}
+#debug-toggle{bottom:5px;color:#404041;opacity:1 !important;font-weight:700}
+/*# sourceMappingURL=cioos_atlantic.css.map */
+/* Originally in custom CSS box on production CKAN admin */
+#mainmenu img {
+    width: auto;
+    max-height: 85px;
+    padding: 0 !important;
+}
+#topmenu {
+    /*background: #e55162;*/
+    background: url("https://dev.cioosatlantic.ca/wp-content/uploads/background-colour.jpg") repeat;
+}
+#mainmenu {
+    /*border: 1px solid #e55162;*/
+    /*border: 1px solid #10171d;*/
+    border: none;
+    /*border-width: 0 0 1px 0;*/
+}
+#footer {
+    /*background-color: #e55162;*/
+    background: url("https://dev.cioosatlantic.ca/wp-content/uploads/background-colour.jpg") repeat;
+}
+#footer a {
+    /*color: black;*/
+    color: white;
+}
+.toggle-menu label {
+    /*background: #e55162;*/
+    background: url("https://dev.cioosatlantic.ca/wp-content/uploads/background-colour.jpg") repeat;
+}
+.toggle-menu > a > img {
+    width: auto;
+    max-height: 85px;
+}
+.mobile-nav {
+    /*background: #e55162;*/
+    background: #292929;
+}
+.mobile-nav ul.menu li a {
+    /*border: 1px solid #e23b4e;*/
+    border: 1px dotted #505050;
+}
+.mobile-nav ul.menu ul.shareicons {
+    /*background: #e1283d*/
+   background: #292929;
+}
+.lang-select label {
+    color: white;
+}
+#mainmenu .container {
+    margin: 3em auto;
+    max-width: 1140px;
+}
+#topmenu {
+    height: 45px;
+}
+#topmenu nav {
+    padding: 0.5em 2em 0 0 !important;
+}
+#header-container #header .menu>li:not(.last) {
+    margin: 0;
+    margin-left: 20px;
+}
+/* New Stuff - Odum March 15, 2021 */
+#topmenu #language_picker { padding: 0 10px; }
+#header-container #header .menu>li>a::after { margin-top:0px; }
+@media screen and (max-width: 1110px) and (min-width: 769px) {
+#header-container #logo { float: none; }
+#header { text-align: center; }
+#header-container #header .header-links { float: none; margin: 0 auto; }
+}
+#footer #mc_embed_signup input[type="submit"] { padding: 11px 24px; text-transform: uppercase; }
+#footer #mc_embed_signup label { margin-bottom: 0; }
+#footer #mc_embed_signup label:after { display: none; }
+#footer #mc_embed_signup .mc-field-group .mc-required { margin-left: 0.125rem; }
+#footer .widget_text .textwidget { font-family: "Montserrat", sans-serif; }
+#footer .widget_text a { font-weight: 300; }
+footer #footer #footer-core h3 span { font-family: "Montserrat", sans-serif; font-size: 14px; }
+@media screen and (max-width: 920px) {
+footer #footer #footer-core div { width: 100%; }
+}
