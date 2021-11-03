@@ -2,24 +2,44 @@
 
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
+import ckan.model as model
 import ckanext.cioos_theme.helpers as cioos_helpers
+import ckanext.cioos_theme.package_relationships as pr
 from ckanext.scheming.validation import scheming_validator
+from ckan.logic import NotFound
 from ckan.lib.plugins import DefaultTranslation
+import ckan.model as model
+from flask import Blueprint
 import json
 from shapely.geometry import shape
 import logging
 import ckan.lib.navl.dictization_functions as df
-from ckan.common import c
+from ckantoolkit import g
 from six.moves.urllib.parse import urlparse
 import string
-from ckan.common import _
-import routes.mapper
+from ckantoolkit import _
 import ckan.lib.base as base
 import re
+import time
+
+
 
 Invalid = df.Invalid
 
 log = logging.getLogger(__name__)
+
+# import debugpy
+
+StopOnError = df.StopOnError
+missing = df.missing
+log = logging.getLogger(__name__)
+
+# debugpy.listen(('0.0.0.0', 5678))
+# log.debug("Waiting for debugger attach")
+# debugpy.wait_for_client()
+
+
+
 
 show_responsible_organizations = toolkit.asbool(
     toolkit.config.get('cioos.show_responsible_organizations_facet', "True"))
@@ -34,12 +54,7 @@ organizations_info_text = toolkit.config.get(
 )
 
 
-def load_json(j):
-    try:
-        new_val = json.loads(j)
-    except Exception:
-        new_val = j
-    return new_val
+
 
 
 def geojson_to_bbox(o):
@@ -72,7 +87,7 @@ def clean_and_populate_eovs(field, schema):
 
         d = json.loads(data.get(key, '[]'))
         for x in eov_data:
-            if isinstance(x, basestring):  # TODO: change basestring to str when moving to python 3
+            if isinstance(x, str):  # TODO: change basestring to str when moving to python 3
                 val = eov_list.get(x.lower(), '')
             else:
                 val = eov_list.get(x, '')
@@ -123,7 +138,7 @@ def url_validator_with_port(key, data, errors, context):
     try:
         pieces = urlparse(url)
         if all([pieces.scheme, pieces.netloc]) and \
-           set(pieces.netloc) <= set(string.letters + string.digits + '-.:') and \
+           set(pieces.netloc) <= set(string.ascii_letters + string.digits + '-.:') and \
            pieces.scheme in ['http', 'https']:
             return
     except ValueError:
@@ -147,11 +162,31 @@ def cioos_tag_name_validator(field, schema):
 def cioos_is_valid_range(field, schema):
 
     def validator(value, context):
-        range = load_json(value)
+        range = cioos_helpers.load_json(value)
         if (not range.get('begin') and range.get('end')) or (range.get('end') and range['end'] < range['begin']):
             raise Invalid(_('Invalid value "%r". Valid ranges must contain begin <= end values') % (value))
         return value
     return validator
+
+
+def render_schemamap(self):
+    return toolkit.render('schemamap.html')
+
+def render_datacite_xml(self, id):
+    context = {'model': model, 'session': model.Session,
+               'user': c.user, 'for_view': True,
+               'auth_user_obj': c.userobj}
+    data_dict = {'id': id}
+
+    try:
+        toolkit.check_access('package_update', context, data_dict)
+    except toolkit.ObjectNotFound:
+        toolkit.abort(404, _('Dataset not found'))
+    except toolkit.NotAuthorized:
+        toolkit.abort(403, _('User %r not authorized to view datacite xml for %s') % (c.user, id))
+
+    pkg = toolkit.get_action('package_show')(data_dict={'id': id})
+    return toolkit.render('package/datacite.html', extra_vars={'pkg_dict': pkg})
 
 class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
     plugins.implements(plugins.ITranslation)
@@ -161,17 +196,19 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
     plugins.implements(plugins.IPackageController, inherit=True)
     plugins.implements(plugins.IValidators)
     plugins.implements(plugins.IAuthenticator)
-    plugins.implements(plugins.IRoutes)
+    plugins.implements(plugins.IBlueprint)
 
-    # IRoute
+    #IBlueprint
+    def get_blueprint(self):
+        blueprint = Blueprint('foo', self.__module__)
+        rules = [
+            ('/schemamap', 'schemamap', render_schemamap),
+            ('/dataset/{id}.{format}', 'datacite_xml', render_datacite_xml),
+        ]
+        for rule in rules:
+            blueprint.add_url_rule(*rule)
 
-    def before_map(self, route_map):
-        with routes.mapper.SubMapper(route_map, controller='ckanext.cioos_theme.plugin:CIOOSController') as m:
-            m.connect('schemamap', '/schemamap', action='schemamap')
-        return route_map
-
-    def after_map(self, route_map):
-        return route_map
+        return blueprint
 
     # IAuthenticator
 
@@ -182,8 +219,8 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             remote_addr = toolkit.request.remote_addr
 
         log.info('Request by %s for %s from %s', toolkit.request.remote_user, toolkit.request.url, remote_addr)
-        c.user = None
-        c.userobj = None
+        g.user = None
+        g.userobj = None
         return
 
     def login(self, error=None):
@@ -254,7 +291,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         return {
             'cioos_organizations_info_text': lambda: organizations_info_text,
             'cioos_contact_email': lambda: contact_email,
-            'cioos_load_json': load_json,
+            'cioos_load_json': cioos_helpers.load_json,
             'cioos_geojson_to_bbox': geojson_to_bbox,
             # 'cioos_most_popular_groups': most_popular_groups,
             # 'cioos_groups': groups,
@@ -265,12 +302,20 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             # 'cioos_get_organization_list': cioos_helpers.get_organization_list,
             # 'cioos_get_organization_dict': cioos_helpers.get_organization_dict,
             # 'cioos_get_organization_dict_extra': cioos_helpers.get_organization_dict_extra
+            'cioos_get_package_title': cioos_helpers.get_package_title,
+            'cioos_get_package_relationships': cioos_helpers.get_package_relationships,
+            'cioos_print_package_relationship_type': cioos_helpers.print_package_relationship_type,
+            'cioos_get_package_relationship_reverse_type': cioos_helpers.get_package_relationship_reverse_type,
             'cioos_datasets': cioos_helpers.cioos_datasets,
             'cioos_count_datasets': cioos_helpers.cioos_count_datasets,
             'cioos_get_eovs': cioos_helpers.cioos_get_eovs,
             'cioos_get_locale_url': self.get_locale_url,
             'cioos_schema_field_map': cioos_helpers.cioos_schema_field_map,
-            'cioos_get_additional_css_path': self.get_additional_css_path
+            'cioos_get_additional_css_path': self.get_additional_css_path,
+            'cioos_get_doi_authority_url': cioos_helpers.get_doi_authority_url,
+            'cioos_get_doi_prefix': cioos_helpers.get_doi_prefix,
+            'cioos_get_datacite_org': cioos_helpers.get_datacite_org,
+            'cioos_get_datacite_test_mode': cioos_helpers.get_datacite_test_mode
         }
 
     def get_validators(self):
@@ -381,16 +426,22 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             else:
                 resp_orgs = [force_responsible_organization]
         else:
-            resp_org_roles = json.loads(toolkit.config.get('ckan.responsible_organization_roles', '["owner", "originator", "custodian", "author", "principalInvestigator"]'))
-            resp_orgs = [x.get('organisation-name', '').strip() for x in json.loads(parties) if x.get('role') in resp_org_roles]
+            resp_org_roles = cioos_helpers.load_json(toolkit.config.get('ckan.responsible_organization_roles', '["owner", "originator", "custodian", "author", "principalInvestigator"]'))
+            resp_orgs = [x.get('organisation-name', '').strip() for x in cioos_helpers.load_json(parties) if x.get('role') in resp_org_roles]
             resp_orgs = list(dict.fromkeys(resp_orgs))  # remove duplicates
-            resp_orgs = list(filter(None, resp_orgs)) # remove empty elements (in a python 2 and 3 friendly way)
+            resp_orgs = list(filter(None, resp_orgs))  # remove empty elements (in a python 2 and 3 friendly way)
         return resp_orgs
 
     def _get_extra_value(self, key, package_dict):
         for extra in package_dict.get('extras', []):
             if extra['key'] == key:
                 return extra['value']
+
+    def after_create(self, context, data_dict):
+        pr.update_package_relationships(context, data_dict, is_create=True)
+
+    def after_update(self, context, data_dict):
+        pr.update_package_relationships(context, data_dict, is_create=False)
 
     # modfiey tags, keywords, and eov fields so that they properly index
     def before_index(self, data_dict):
@@ -399,14 +450,14 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             return data_dict
 
         try:
-            tags_dict = load_json(data_dict.get('keywords', '{}'))
+            tags_dict = cioos_helpers.load_json(data_dict.get('keywords', '{}'))
         except Exception as err:
             log.error(data_dict.get('id', 'NO ID'))
             log.error(type(err))
             log.error("error:%s, keywords:%r", err, data_dict.get('keywords', '{}'))
             tags_dict = {"en": [], "fr": []}
 
-        force_resp_org = load_json(data_dict.get('force_responsible_organization', '[]'))
+        force_resp_org = cioos_helpers.load_json(data_dict.get('force_responsible_organization', '[]'))
         data_dict['responsible_organizations'] = self._cited_responsible_party_to_responsible_organizations(data_dict.get('cited-responsible-party', '{}'), force_resp_org)
 
         # update tag list by language
@@ -434,7 +485,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             data_dict['organization_fr'] = org_title.get('fr', '')
 
         try:
-            title = load_json(data_dict.get('title_translated', '{}'))
+            title = cioos_helpers.load_json(data_dict.get('title_translated', '{}'))
             data_dict['title_en'] = title.get('en', [])
             data_dict['title_fr'] = title.get('fr', [])
         except Exception as err:
@@ -443,7 +494,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         # create temporal extent index.
         te = data_dict.get('temporal-extent', '{}')
         if te:
-            temporal_extent = load_json(te)
+            temporal_extent = cioos_helpers.load_json(te)
             temporal_extent_begin = temporal_extent.get('begin')
             temporal_extent_end = temporal_extent.get('end')
             if(temporal_extent_begin):
@@ -456,7 +507,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         # create vertical extent index
         ve = data_dict.get('vertical-extent', '{}')
         if ve:
-            vertical_extent = load_json(ve)
+            vertical_extent = cioos_helpers.load_json(ve)
             vertical_extent_min = vertical_extent.get('min')
             vertical_extent_max = vertical_extent.get('max')
             if(vertical_extent_min):
@@ -466,7 +517,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
 
         # eov is multi select so it is a json list rather then a python list
         if(data_dict.get('eov')):
-            data_dict['eov'] = load_json(data_dict['eov'])
+            data_dict['eov'] = cioos_helpers.load_json(data_dict['eov'])
 
         return data_dict
 
@@ -513,20 +564,34 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         # by the package_show and package_search end points whout filters applied
         for result in search_results.get('results', []):
 
-            force_resp_org = load_json(self._get_extra_value('force_responsible_organization', result))
+            force_resp_org = cioos_helpers.load_json(self._get_extra_value('force_responsible_organization', result))
             cited_responsible_party = result.get('cited-responsible-party')
             if((cited_responsible_party or force_resp_org) and not result.get('responsible_organizations')):
                 result['responsible_organizations'] = self._cited_responsible_party_to_responsible_organizations(cited_responsible_party, force_resp_org)
 
             title = result.get('title_translated')
             if(title):
-                result['title_translated'] = load_json(title)
+                result['title_translated'] = cioos_helpers.load_json(title)
             notes = result.get('notes_translated')
             if(notes):
-                result['notes_translated'] = load_json(notes)
-            keywords = result.get('keywords')
-            if(keywords):
-                result['keywords'] = load_json(keywords)
+                result['notes_translated'] = cioos_helpers.load_json(notes)
+
+            # convert the rest of the strings to json
+            for field in [
+                    "keywords",
+                    # "spatial", removed as making the field json brakes the dataset_map template
+                    "temporal-extent",
+                    "unique-resource-identifier-full",
+                    "notes",
+                    "vertical-extent",
+                    "dataset-reference-date",
+                    "metadata-reference-date",
+                    "metadata-point-of-contact",
+                    "cited-responsible-party"]:
+                tmp = result.get(field)
+                if tmp:
+                    result[field] = cioos_helpers.load_json(tmp)
+
 
             # update organization object while we are at it
             org_id = result.get('owner_org')
@@ -549,8 +614,8 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                         result['organization'] = organization
                 else:
                     log.warn('No org details for owner_org %s', result.get('org_descriptionid'))
-            else:
-                log.warn('No owner_org for dataset %s: %s: %s', result.get('id'), result.get('name'), result.get('title'))
+            # else:
+            #    log.warn('No owner_org for dataset %s: %s: %s', result.get('id'), result.get('name'), result.get('title'))
 
         return search_results
 
@@ -587,10 +652,85 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             if org_image_url:
                 package_dict['organization']['image_url_translated'] = org_image_url
 
-        force_resp_org = load_json(self._get_extra_value('force_responsible_organization', package_dict))
+        force_resp_org = cioos_helpers.load_json(self._get_extra_value('force_responsible_organization', package_dict))
         cited_responsible_party = package_dict.get('cited-responsible-party')
         if((cited_responsible_party or force_resp_org) and not package_dict.get('responsible_organizations')):
             package_dict['responsible_organizations'] = self._cited_responsible_party_to_responsible_organizations(cited_responsible_party, force_resp_org)
+
+        result = package_dict
+        title = result.get('title_translated')
+        if(title):
+            result['title_translated'] = cioos_helpers.load_json(title)
+        notes = result.get('notes_translated')
+        if(notes):
+            result['notes_translated'] = cioos_helpers.load_json(notes)
+
+        # convert the rest of the strings to json
+        for field in [
+                "keywords",
+                # "spatial", removed as making the field json brakes the dataset_map template
+                "temporal-extent",
+                "unique-resource-identifier-full",
+                "notes",
+                "vertical-extent",
+                "dataset-reference-date",
+                "metadata-reference-date",
+                "metadata-point-of-contact",
+                "cited-responsible-party"]:
+            tmp = result.get(field)
+            if tmp:
+                result[field] = cioos_helpers.load_json(tmp)
+        package_dict = result
+
+
+        # title and notes must be a string or the index process errors
+        if isinstance(package_dict.get('title'), dict):
+            package_dict['title'] = json.dumps(package_dict.get('title'))
+        if isinstance(package_dict.get('notes'), dict):
+            package_dict['notes'] = json.dumps(package_dict.get('notes'))
+
+        # if(package_dict.get('title') and re.search(r'\\\\u[0-9a-fA-F]{4}', package_dict.get('title'))):
+        #     if isinstance(package_dict.get('title'), str):
+        #         package_dict['title'] = package_dict.get('title').encode().decode('unicode-escape')
+        #     else:  # we have bytes
+        #         package_dict['title'] = package_dict.get('title').decode('unicode-escape')
+        #
+        # if(package_dict.get('notes') and re.search(r'\\\\u[0-9a-fA-F]{4}', package_dict.get('notes'))):
+        #     if isinstance(package_dict.get('notes'), str):
+        #         package_dict['notes'] = package_dict.get('notes').encode().decode('unicode-escape')
+        #     else:  # we have bytes
+        #         package_dict['notes'] = package_dict.get('notes').decode('unicode-escape')
+
+        # Update package relationships with package name
+        ras = package_dict['relationships_as_subject']
+        for rel in ras:
+            if rel.get('__extras'):
+                id = rel['__extras']['object_package_id']
+                result = toolkit.get_action('package_search')(context, data_dict={'q': 'id:%s' % id, 'fl': 'name'})
+                if result['results']:
+                    rel['__extras']['object_package_name'] = result['results'][0]['name']
+                rel['__extras']['subject_package_name'] = package_dict['name']
+            else:
+                id = rel['object_package_id']
+                result = toolkit.get_action('package_search')(context, data_dict={'q': 'id:%s' % id, 'fl': 'name'})
+                if result['results']:
+                    rel['object_package_name'] = result['results'][0]['name']
+                rel['subject_package_name'] = package_dict['name']
+
+        rao = package_dict['relationships_as_object']
+        for rel in rao:
+            if rel.get('__extras'):
+                rel['__extras']['object_package_name'] = package_dict['name']
+                id = rel['__extras']['subject_package_id']
+                result = toolkit.get_action('package_search')(context, data_dict={'q': 'id:%s' % id, 'fl': 'name'})
+                if result['results']:
+                    rel['__extras']['subject_package_name'] = result['results'][0]['name']
+            else:
+                rel['object_package_name'] = package_dict['name']
+                id = rel['subject_package_id']
+                result = toolkit.get_action('package_search')(context, data_dict={'q': 'id:%s' % id, 'fl': 'name'})
+                if result['results']:
+                    rel['subject_package_name'] = result['results'][0]['name']
 
         return package_dict
 
@@ -599,8 +739,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         return 'package/read.html'
 
     def lang(self):
-        from ckantoolkit import h
-        return h.lang()
+        return toolkit.h.lang()
 
     def get_locale_url(self, base_url, locale_urls):
         default_locale = toolkit.config.get('ckan.locale_default', toolkit.config.get('ckan.locales_offered', ['en'])[0])
@@ -608,9 +747,3 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         if base_url.endswith('/'):
             return base_url + locale_urls.get(lang)
         return base_url + '/' + locale_urls.get(lang)
-
-
-class CIOOSController(base.BaseController):
-
-    def schemamap(self):
-        return base.render('schemamap.html')

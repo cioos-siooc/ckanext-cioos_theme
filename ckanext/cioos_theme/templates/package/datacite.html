@@ -1,0 +1,150 @@
+{% extends "page.html" %}
+
+{% set pkg = c.pkg_dict or pkg_dict %}
+{% block subtitle %}{{ _('Schema Map') }}{% endblock %}
+
+{% block breadcrumb_content %}
+<li class="active">{% link_for _('Schema Map'), controller='ckanext.cioos_theme.plugin:CIOOSController', action='schemamap' %}</li>
+{% endblock %}
+
+{% block primary %}
+<section class="module">
+  <div class="module-content">
+    <div class="col-sm-12">
+      <table>
+        {% set doi = h.cioos_load_json(pkg['unique-resource-identifier-full']) %}
+        {% if doi %}
+        {% set doi = doi['code'] %}
+        {% endif %}
+        {% if h.is_url(doi) %}
+        {% set doi = doi.replace(h.cioos_get_doi_authority_url(), '') %}
+        {% endif %}
+        <tr>
+          <th>DOI:</th>
+          <td>{{doi or 'Will be set later, during upload'}}</td>
+        </tr>
+        <tr>
+          <th>URL:</th>
+          <td>{{h.url_for(controller='package', action='read', id=pkg['name'], _external=True)}}</td>
+        </tr>
+        {% if h.cioos_get_datacite_test_mode() == 'True' %}
+        <tr>
+          <th>DateCite:</th>
+          <td><a href="https://doi.test.datacite.org/repositories/{{ h.cioos_get_datacite_org() or '*NOT SET*'}}/dois/upload" target="_blank">Test Upload Link</a></td>
+        </tr>
+        {% else %}
+        <tr>
+          <th>DateCite:</th>
+          <td><a href="https://doi.datacite.org/repositories/{{ h.cioos_get_datacite_org() or '*NOT SET*'}}/dois/upload" target="_blank">Live Upload Link</a></td>
+        </tr>
+        {% endif %}
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="module">
+  <div class="module-content">
+    <div class="col-sm-10">
+      <h3>XML</h3>
+    </div>
+    <div class="col-sm-2">
+      <button type="button" style="margin-top: 20px; margin-bottom: 10px; float: right;" onclick="saveXML(name='{{pkg['name']}}')">Save</button>
+    </div>
+
+    <textarea id='xml' style="width: 100%; height: 600px;">
+  <?xml version="1.0" encoding="UTF-8"?>
+  <resource xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://datacite.org/schema/kernel-4" xsi:schemaLocation="http://datacite.org/schema/kernel-4 http://schema.datacite.org/meta/kernel-4.1/metadata.xsd">
+    {% if doi -%}
+    <identifier identifierType="DOI">10.5072/example-full</identifier>
+    {%- endif -%}
+    <creators>
+      {%- for party in h.cioos_load_json(pkg['cited-responsible-party']) -%}
+        {%- if party['individual-name'] -%}
+        <creator>
+          {% set names = party['individual-name'].split(' ') %}
+          <creatorName nameType="Personal">{{ names[-1], ' '.join(names[:-1]) }}</creatorName>
+          <givenName>{{ ' '.join(names[:-1]) }}</givenName>
+          <familyName>{{ names[-1] }}</familyName>
+        </creator>
+        {%- endif -%}
+      {%- endfor -%}
+    </creators>
+    <titles>
+      <title xml:lang="en">{{ pkg['title_translated']['en'] }}</title>
+      <title xml:lang="fr">{{ pkg['title_translated']['fr'] }}</title>
+    </titles>
+    {%- for party in h.cioos_load_json(pkg['cited-responsible-party']) -%}
+      {% if party['role'] == 'publisher' %}
+    <publisher>party['organization-name']</publisher>
+      {% endif %}
+    {%- endfor -%}
+
+    {%- for date in h.cioos_load_json(pkg['dataset-reference-date']) -%}
+      {% if date['type'] == 'publication' %}
+    <publicationYear>{{ date['value'] }}</publicationYear>
+      {% endif %}
+    {%- endfor -%}
+    <subjects>
+      {%- for kw in pkg['keywords']['en'] %}
+      <subject xml:lang="en">{{ kw }}</subject>
+      {%- endfor %}
+      {%- for kw in pkg['keywords']['fr'] %}
+      <subject xml:lang="fr">{{ kw }}</subject>
+      {%- endfor %}
+    </subjects>
+    <language>{{ pkg['metadata-language'] }}</language>
+    <resourceType resourceTypeGeneral="{{ pkg['resource-type'].title() }}">{{ pkg['resource-type'].title() }}</resourceType>
+    <version>{{pkg['version'] or '1.0' }}</version>
+    <descriptions>
+      <description xml:lang="en" descriptionType="Abstract">
+        {{ pkg['notes_translated']['en'] }}
+      </description>
+      <description xml:lang="fr" descriptionType="Abstract">
+        {{ pkg['notes_translated']['fr'] }}
+      </description>
+    </descriptions>
+
+    <geoLocations>
+      <geoLocation>
+        <geoLocationBox>
+          <westBoundLongitude>{{pkg['bbox-west-long']}}</westBoundLongitude>
+          <eastBoundLongitude>{{pkg['bbox-east-long']}}</eastBoundLongitude>
+          <southBoundLatitude>{{pkg['bbox-south-lat']}}</southBoundLatitude>
+          <northBoundLatitude>{{pkg['bbox-north-lat']}}</northBoundLatitude>
+        </geoLocationBox>
+        {% set spatial = h.cioos_load_json(pkg['spatial']) %}
+        {%- if  spatial and spatial['type'] == 'Polygon' %}
+        <geoLocationPolygon>
+          {%- for coord in spatial['coordinates'][0] %}
+          <polygonPoint>
+            <pointLatitude>{{coord[1]}}</pointLatitude>
+            <pointLongitude>{{coord[0]}}</pointLongitude>
+          </polygonPoint>
+          {%- endfor %}
+        </geoLocationPolygon>
+        {%- endif %}
+      </geoLocation>
+    </geoLocations>
+
+  </resource>
+  </textarea>
+  </div>
+</section>
+
+<script src="{{h.url_for_static('/js/FileSaver.min.js')}}" type="text/javascript"></script>
+
+<script>
+  function saveXML() {
+
+    let el = document.querySelectorAll("#xml");
+    var textProperty = 'textContent' in document ? 'textContent' : 'innerText';
+    let blob = new Blob([el[0][textProperty]], {
+      type: "text/xml;charset=utf-8"
+    });
+    saveAs(blob, "metadata.xml");
+  }
+</script>
+{% endblock %}
+
+{% block secondary %}{% endblock %}

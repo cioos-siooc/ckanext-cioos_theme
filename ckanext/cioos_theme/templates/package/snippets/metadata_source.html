@@ -35,14 +35,14 @@
           {% if url %}
           <p style="margin-left:20px;margin-bottom: 0px;">
             {% if url is iterable and url is not string %}
-            <span> {{ _("Access full metadata ") }} </span>
+            <span> {{ _("Access full metadata") }} </span>
             <ul>
               {% for item in url %}
               <li><a href="{{item}}">{{ item.rsplit('/', 1)[-1] }}</a></li>
               {% endfor %}
             </ul>
             {% elif h.is_url(url) %}
-            <span> {{ _("Access full metadata ") }} </span><b><a href="{{url}}">here</a></b>
+            <span> {{ _("Access full metadata") }} </span><b><a href="{{url}}">{{ _("here") }}</a></b>
             {% else %}
             <span> {{ url }}{{ guid }} </span>
             {% endif %}
@@ -56,7 +56,7 @@
           {% endif %}
           {% if source_id %}
           <p style="margin-left:20px;margin-bottom: 0px;">
-            <span> {{ _("Other records harvested from") }} </span><a href="{{h.url_for('harvest_read', id = source_id)}}">{{ title }}</a>
+            <span> {{ _("Other records harvested from") }} </span><a href="{{h.url_for('harvest.read', id = source_id)}}">{{ title }}</a>
           </p>
           {% endif %}
 

@@ -8,10 +8,12 @@
 
 import ckan.plugins.toolkit as toolkit
 import ckan.plugins as p
-from ckan.common import OrderedDict, _, c
+from collections import OrderedDict
+from ckantoolkit import  _, c, config
 # from ckantoolkit import h
 import ckan.logic as logic
 import ckan.model as model
+from ckan.model import PackageRelationship
 from ckan.common import config
 from paste.deploy.converters import asbool
 import copy
@@ -21,6 +23,13 @@ import jsonpickle
 log = logging.getLogger(__name__)
 
 get_action = logic.get_action
+
+def load_json(j):
+    try:
+        new_val = json.loads(j)
+    except Exception:
+        new_val = j
+    return new_val
 
 # def get_organization_list(data_dict):
 #     '''Returns a list of organizations.
@@ -59,6 +68,68 @@ get_action = logic.get_action
 #             return extra['value']
 #
 #     return default
+
+
+def generate_doi_suffix():
+    import random
+    chars = ['a','b','c','d','e','f','g','h','j','k','m','n','p','q','r','s',
+             't','u','v','w','x','y','z','0','1','2','3','4','5','6','7','8','9']
+    str1 = ''.join(random.SystemRandom().choice(chars) for _ in range(4))
+    str2 = ''.join(random.SystemRandom().choice(chars) for _ in range(4))
+    return str1 + '-' + str2
+
+def get_doi_authority_url():
+    return toolkit.config.get('ckan.cioos.doi_authority_url', 'https://doi.org/')
+
+def get_doi_prefix():
+    return toolkit.config.get('ckan.cioos.doi_prefix')
+
+def get_datacite_org():
+    return toolkit.config.get('ckan.cioos.datacite_org')
+
+def get_datacite_test_mode():
+    return toolkit.config.get('ckan.cioos.datacite_test_mode', 'True')
+
+
+def get_package_relationships(pkg):
+    '''Returns the relationships of a package.
+
+    :param id: the id or name of the package
+    '''
+    rel = pkg.get('relationships_as_subject') + pkg.get('relationships_as_object')
+    b = []
+    for x in rel:
+        if x not in b:
+            b.append(x)
+    return b
+
+
+def print_package_relationship_type(type):
+    out = 'depends on'
+    if 'child' in type:
+        out = 'parent'
+    elif 'parent' in type:
+        out = 'child'
+    elif 'link' in type:
+        out = 'cross link'
+    return out
+    #return PackageRelationship.make_type_printable(type)
+
+
+def get_package_relationship_reverse_type(type):
+    return PackageRelationship.reverse_type(type)
+
+
+def get_package_title(id):
+    '''Returns the title of a package.
+
+    :param id: the id or name of the package
+    '''
+    try:
+        pkg = toolkit.get_action('package_show')(None, data_dict={'id': id})
+    except Exception as e:
+        return None
+    return toolkit.h.get_translated(pkg, 'title')
 
 
 def _merge_lists(key, list1, list2):
@@ -366,9 +437,9 @@ def cioos_get_facets(package_type='dataset'):
     c.facet_titles = facets
 
     data_dict = {
-        'facet.field': facets.keys(),
+        'facet.field': list(facets.keys()),
         'rows': 0,
-        'include_private': asbool(config.get(
+        'include_private': toolkit.asbool(config.get(
             'ckan.search.default_include_private', True)),
     }
 

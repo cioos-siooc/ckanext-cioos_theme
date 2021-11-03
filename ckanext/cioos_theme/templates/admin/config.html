@@ -21,6 +21,8 @@
       {# default page has an image upload input here. TODO: create custom image_upload snippet based on the image_upload macro in /ckan/ckan/templates/macros/form.html #}
       {{ form.input('ckan.site_logo_translated', id='field-ckan-site-logo', label=_('Site logo'), value=data['ckan.site_logo_translated'], error=error, classes=['control-medium']) }}
 
+      {{ form.image_upload(data, errors, is_upload_enabled=h.uploads_enabled(), is_url=is_url, is_upload=is_upload, upload_label = _("Site logo Don't USE"), url_label=_("Site logo Don't Use"),  field_url=field_url, field_upload='logo_upload', field_clear='clear_logo_upload' )}}
+
       {{ form.markdown('ckan.site_about', id='field-ckan-site-about', label=_('About'), value=data['ckan.site_about'], error=error, placeholder=_('About page text')) }}
 
       {{ form.markdown('ckan.site_intro_text', id='field-ckan-site-intro-text', label=_('Intro Text'), value=data['ckan.site_intro_text'], error=error, placeholder=_('Text on home page')) }}
