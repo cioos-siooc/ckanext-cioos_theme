@@ -42,6 +42,10 @@ coverage.xml
 docs/_build/
 ckanext/cioos_theme/public/grunt/yarn.lock
 
+
+# Ignore PyCharm/PhpStorm env
+.idea
+
 ckanext/cioos_theme/public/.sass-cache/
 
 ckanext/cioos_theme/public/sass/.sass-cache/

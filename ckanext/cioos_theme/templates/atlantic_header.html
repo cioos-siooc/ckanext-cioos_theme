@@ -3,47 +3,73 @@
   <nav>
     <ul id="menu-mobile-menu" class="menu">
       {%- if h.lang() == 'en' -%}
-      <li id="menu-item-921" class="menu-item  menu-item-home"><a href="{{ g.site_home_url }}"><span>HOME</span></a></li>
-      <li id="menu-item-920" class="menu-item  menu-item-has-children menu-parent"><a href="{{ g.site_home_url }}about/"><span>ABOUT</span></a>
+      <li id="menu-item-921" class="menu-item  menu-item-home"><a href="{{ g.site_home_url }}"><span>Home</span></a></li>
+      <li id="menu-item-920" class="menu-item  menu-item-has-children menu-parent"><a href="{{ g.site_home_url }}about/"><span>About</span></a>
       {%- else -%}
       <li id="menu-item-921" class="menu-item  menu-item-home"><a href="{{ g.site_home_url }}fr/"><span>Accueil</span></a></li>
-      <li id="menu-item-920" class="menu-item  menu-item-has-children menu-parent"><a href="{{ g.site_home_url }}fr/apropos/"><span>À Propos</span></a>
+      <li id="menu-item-920" class="menu-item  menu-item-has-children menu-parent"><a href="{{ g.site_home_url }}fr/a-propos/"><span>À Propos</span></a>
       {%- endif -%}
         <ul class="sub-menu">
           {%- if h.lang() == 'en' -%}
-          <li id="menu-item-1870" class="menu-item "><a href="{{ g.site_home_url }}about/">About CIOOS Atlantic</a></li>
-          <li id="menu-item-1871" class="menu-item "><a href="{{ g.site_home_url }}meet-our-team/">Meet Our Team</a></li>
-          <li id="menu-item-1872" class="menu-item "><a href="{{ g.site_home_url }}our-partners/">Our Partners</a></li>
-          <li id="menu-item-1873" class="menu-item "><a href="{{ g.site_home_url }}eovs/">Essential Ocean Variables</a></li>
-          <li id="menu-item-1934" class="menu-item "><a href="{{ g.site_home_url }}data-management-overview/">Data Management</a></li>
+          <li id="menu-item-1473" class="menu-item"><a href="{{ g.site_home_url }}about/">About CIOOS Atlantic</a></li>
+          <li id="menu-item-2811" class="menu-item"><a href="{{ g.site_home_url }}cioos-atlantic-team/">Meet Our Team</a></li>
+          <li id="menu-item-2830" class="menu-item"><a href="{{ g.site_home_url }}our-partners/">Our Partners</a></li>
+          <li id="menu-item-1468" class="menu-item"><a href="{{ g.site_home_url }}partnership-profiles/">Partnership Profiles</a></li>
+          <li id="menu-item-1485" class="menu-item"><a href="{{ g.site_home_url }}essential-ocean-variables/">Essential Ocean Variables</a></li>
+          <li id="menu-item-2825" class="menu-item"><a href="{{ g.site_home_url }}data-management/">Data Management</a></li>
+          <li id="menu-item-2833" class="menu-item"><a href="{{ g.site_home_url }}opportunities/">Opportunities</a></li>
           {%- else -%}
-          <li id="menu-item-1870" class="menu-item "><a href="{{ g.site_home_url }}fr/apropos/">À Propos de CIOOS Atlantique</a></li>
-          <li id="menu-item-1871" class="menu-item "><a href="{{ g.site_home_url }}fr/equipe/">Notre Équipe</a></li>
-          <li id="menu-item-1872" class="menu-item "><a href="{{ g.site_home_url }}fr/partenaires/">Nos Partenaires</a></li>
-          <li id="menu-item-1873" class="menu-item "><a href="{{ g.site_home_url }}fr/variables/">Variables de Base</a></li>
-          <li id="menu-item-1934" class="menu-item "><a href="{{ g.site_home_url }}fr/gestiondedonnees/">Gestion de Données</a></li>
+          <li id="menu-item-2821" class="menu-item"><a href="{{ g.site_home_url }}fr/a-propos/">À propos de CIOOS Atlantique</a></li>
+          <li id="menu-item-2814" class="menu-item"><a href="{{ g.site_home_url }}fr/equipe-de-siooc-atlantique/">Notre équipe</a></li>
+          <li id="menu-item-2851" class="menu-item"><a href="{{ g.site_home_url }}fr/nos-partenaires/">Nos partenaires</a></li>
+          <li id="menu-item-2896" class="menu-item"><a href="{{ g.site_home_url }}fr/profils-de-partenariat/">Profils de Partenariat</a></li>
+          <li id="menu-item-1497" class="menu-item"><a href="{{ g.site_home_url }}fr/variables-oceaniques-essentielles/">Variables de base</a></li>
+          <li id="menu-item-2850" class="menu-item"><a href="{{ g.site_home_url }}fr/gestion-des-donnees/">Gestion des données</a></li>
+          <li id="menu-item-2897" class="menu-item"><a href="{{ g.site_home_url }}fr/opportunites/">Opportunités</a></li>
           {%- endif -%}
         </ul>
       </li>
       {%- if h.lang() == 'en' -%}
-      <li id="menu-item-1359" class="menu-item "><a href="{{ g.site_home_url }}data-tools/"><span>DATA TOOLS</span></a></li>
-      <li id="menu-item-1652" class="menu-item menu-item-has-children menu-parent current-menu-item current_page_item"><a href="{{ h.url_for('home.index') }}"><span>DATA CATALOGUE</span></a>
+      <li id="menu-item-1359" class="menu-item menu-item-has-children menu-parent"><a href="{{ g.site_home_url }}data-tools/"><span>Data Tools</span></a>
+        <ul class="sub-menu">
+          <li id="menu-item-2866" class="menu-item"><a href="https://assetmap.cioosatlantic.ca">Asset Map</a></li>
+          <li id="menu-item-3263" class="menu-item"><a href="{{ g.site_home_url }}cmar/BirchyHead/">CMAR Birchy Head Visualization</a></li>
+          <li id="menu-item-3264" class="menu-item"><a href="{{ g.site_home_url }}cmar/ShipHarbour/">CMAR Ship Harbour Visualization</a></li>
+          <li id="menu-item-3265" class="menu-item"><a href="{{ g.site_home_url }}erddap">ERDDAP Data Access</a></li>
+        </ul>
+      </li>
+      <li id="menu-item-1652" class="menu-item menu-item-has-children menu-parent current-menu-item current_page_item"><a href="{{ h.url_for('home.index') }}"><span>Data Catalogue</span></a>
         <ul class="sub-menu">
           <li id="menu-item-1999" class="menu-item"><a href="{{ h.url_for('home.index') }}dataset">Datasets</a></li>
           <li id="menu-item-2001" class="menu-item"><a href="{{ h.url_for('home.index') }}organization">Organizations</a></li>
         </ul>
       </li>
-      <li id="menu-item-2002" class="menu-item"><a href="{{ g.site_home_url }}resources/"><span>RESOURCES</span></a>
+      <li id="menu-item-2002" class="menu-item menu-item-has-children menu-parent"><a href="{{ g.site_home_url }}resources/"><span>Resources</span></a>
+        <ul class="sub-menu">
+          <li id="menu-item-1511" class="menu-item"><a href="{{ g.site_home_url }}resources/">Resources</a></li>
+          <li id="menu-item-2836" class="menu-item"><a href="{{ g.site_home_url }}webinars-and-discussions/">Webinars and Discussions</a></li>
+        </ul>
       </li>
       {%- else -%}
-      <li id="menu-item-1359" class="menu-item "><a href="{{ g.site_home_url }}fr/outils/"><span>Outils de Données</span></a></li>
+      <li id="menu-item-1359" class="menu-item menu-item-has-children menu-parent"><a href="{{ g.site_home_url }}fr/outils/"><span>Outils de Données</span></a>
+        <ul class="sub-menu">
+          <li id="menu-item-2865" class="menu-item"><a href="https://assetmap.cioosatlantic.ca/?lg=fr">Asset Map</a></li>
+          <li id="menu-item-3266" class="menu-item"><a href="{{ g.site_home_url }}cmar/BirchyHead/">CMAR Visualisation Birchy Head</a></li>
+          <li id="menu-item-3267" class="menu-item"><a href="{{ g.site_home_url }}cmar/ShipHarbour/">CMAR Visualisation Ship Harbour</a></li>
+          <li id="menu-item-3268" class="menu-item"><a href="{{ g.site_home_url }}erddap">ERDDAP Accès aux Données</a></li>
+        </ul>
+      </li>
       <li id="menu-item-1652" class="menu-item menu-item-has-children menu-parent current-menu-item current_page_item"><a href="{{ h.url_for('home.index') }}"><span>Catalogue de Données</span></a>
         <ul class="sub-menu">
           <li id="menu-item-1999" class="menu-item"><a href="{{ h.url_for('home.index') }}dataset">Jeux de données</a></li>
           <li id="menu-item-2001" class="menu-item"><a href="{{ h.url_for('home.index') }}organization">Organisations</a></li>
         </ul>
       </li>
-      <li id="menu-item-2002" class="menu-item"><a href="{{ g.site_home_url }}fr/ressources/"><span>Ressources</span></a>
+      <li id="menu-item-2002" class="menu-item menu-item-has-children menu-parent"><a href="{{ g.site_home_url }}fr/ressources/"><span>Ressources</span></a>
+        <ul class="sub-menu">
+          <li id="menu-item-2853" class="menu-item"><a href="{{ g.site_home_url }}fr/ressources/">Ressources</a></li>
+          <li id="menu-item-2881" class="menu-item"><a href="{{ g.site_home_url }}fr/webinaires-et-discussions/">Webinaires et Discussions</a></li>
+        </ul>
       </li>
       {%- endif -%}
       <ul class="shareicons">
@@ -70,43 +96,69 @@
     <li id="menu-item-920" class="menu-item  menu-item-has-children menu-parent"><a href="{{ g.site_home_url }}about/"><span class="mega-indicator">About</span></a>
     {%- else -%}
     <li id="menu-item-921" class="menu-item  menu-item-home"><a href="{{ g.site_home_url }}fr/"><span>Accueil</span></a></li>
-    <li id="menu-item-920" class="menu-item  menu-item-has-children menu-parent"><a href="{{ g.site_home_url }}fr/apropos/"><span class="mega-indicator">À Propos</span></a>
+    <li id="menu-item-920" class="menu-item  menu-item-has-children menu-parent"><a href="{{ g.site_home_url }}fr/a-propos/"><span class="mega-indicator">À Propos</span></a>
     {%- endif -%}
       <ul class="sub-menu" style=" min-width: 94px;">
         {%- if h.lang() == 'en' -%}
-        <li id="menu-item-1870" class="menu-item "><a href="{{ g.site_home_url }}about/">About CIOOS Atlantic</a></li>
-        <li id="menu-item-1871" class="menu-item "><a href="{{ g.site_home_url }}meet-our-team/">Meet Our Team</a></li>
-        <li id="menu-item-1872" class="menu-item "><a href="{{ g.site_home_url }}our-partners/">Our Partners</a></li>
-        <li id="menu-item-1873" class="menu-item "><a href="{{ g.site_home_url }}eovs/">Essential Ocean Variables</a></li>
-        <li id="menu-item-1934" class="menu-item "><a href="{{ g.site_home_url }}data-management-overview/">Data Management</a></li>
+        <li id="menu-item-1473" class="menu-item"><a href="{{ g.site_home_url }}about/">About CIOOS Atlantic</a></li>
+        <li id="menu-item-2811" class="menu-item"><a href="{{ g.site_home_url }}cioos-atlantic-team/">Meet Our Team</a></li>
+        <li id="menu-item-2830" class="menu-item"><a href="{{ g.site_home_url }}our-partners/">Our Partners</a></li>
+        <li id="menu-item-1468" class="menu-item"><a href="{{ g.site_home_url }}partnership-profiles/">Partnership Profiles</a></li>
+        <li id="menu-item-1485" class="menu-item"><a href="{{ g.site_home_url }}essential-ocean-variables/">Essential Ocean Variables</a></li>
+        <li id="menu-item-2825" class="menu-item"><a href="{{ g.site_home_url }}data-management/">Data Management</a></li>
+        <li id="menu-item-2833" class="menu-item"><a href="{{ g.site_home_url }}opportunities/">Opportunities</a></li>
         {%- else -%}
-        <li id="menu-item-1870" class="menu-item "><a href="{{ g.site_home_url }}fr/apropos/">À Propos de CIOOS Atlantique</a></li>
-        <li id="menu-item-1871" class="menu-item "><a href="{{ g.site_home_url }}fr/equipe/">Notre Équipe</a></li>
-        <li id="menu-item-1872" class="menu-item "><a href="{{ g.site_home_url }}fr/partenaires/">Nos Partenaires</a></li>
-        <li id="menu-item-1873" class="menu-item "><a href="{{ g.site_home_url }}fr/variables/">Variables de Base</a></li>
-        <li id="menu-item-1934" class="menu-item "><a href="{{ g.site_home_url }}fr/gestiondedonnees/">Gestion de Données</a></li>
+        <li id="menu-item-2821" class="menu-item"><a href="{{ g.site_home_url }}fr/a-propos/">À propos de CIOOS Atlantique</a></li>
+        <li id="menu-item-2814" class="menu-item"><a href="{{ g.site_home_url }}fr/equipe-de-siooc-atlantique/">Notre équipe</a></li>
+        <li id="menu-item-2851" class="menu-item"><a href="{{ g.site_home_url }}fr/nos-partenaires/">Nos partenaires</a></li>
+        <li id="menu-item-2896" class="menu-item"><a href="{{ g.site_home_url }}fr/profils-de-partenariat/">Profils de Partenariat</a></li>
+        <li id="menu-item-1497" class="menu-item"><a href="{{ g.site_home_url }}fr/variables-oceaniques-essentielles/">Variables de base</a></li>
+        <li id="menu-item-2850" class="menu-item"><a href="{{ g.site_home_url }}fr/gestion-des-donnees/">Gestion des données</a></li>
+        <li id="menu-item-2897" class="menu-item"><a href="{{ g.site_home_url }}fr/opportunites/">Opportunités</a></li>
         {%- endif -%}
       </ul>
     </li>
     {%- if h.lang() == 'en' -%}
-    <li id="menu-item-1359" class="menu-item "><a href="{{ g.site_home_url }}data-tools/"><span>Data Tools</span></a></li>
+    <li id="menu-item-1359" class="menu-item menu-item-has-children menu-parent"><a href="{{ g.site_home_url }}data-tools/"><span class="mega-indicator">Data Tools</span></a>
+      <ul class="sub-menu">
+        <li id="menu-item-2866" class="menu-item"><a href="https://assetmap.cioosatlantic.ca">Asset Map</a></li>
+        <li id="menu-item-3263" class="menu-item"><a href="{{ g.site_home_url }}cmar/BirchyHead/">CMAR Birchy Head Visualization</a></li>
+        <li id="menu-item-3264" class="menu-item"><a href="{{ g.site_home_url }}cmar/ShipHarbour/">CMAR Ship Harbour Visualization</a></li>
+        <li id="menu-item-3265" class="menu-item"><a href="{{ g.site_home_url }}erddap">ERDDAP Data Access</a></li>
+      </ul>
+    </li>
     <li id="menu-item-1652" class="menu-item menu-item-has-children menu-parent current-menu-item current_page_item"><a href="{{ h.url_for('home.index') }}"><span class="mega-indicator">Data Catalogue</span></a>
       <ul class="sub-menu" style=" min-width: 161px;">
         <li id="menu-item-1999" class="menu-item"><a href="{{ h.url_for('home.index') }}dataset">Datasets</a></li>
         <li id="menu-item-2001" class="menu-item"><a href="{{ h.url_for('home.index') }}organization">Organizations</a></li>
       </ul>
     </li>
-    <li id="menu-item-2002" class="menu-item"><a href="{{ g.site_home_url }}resources/"><span class="mega-indicator">Resources</span></a>
+    <li id="menu-item-2002" class="menu-item menu-item-has-children menu-parent"><a href="{{ g.site_home_url }}resources/"><span class="mega-indicator">Resources</span></a>
+      <ul class="sub-menu">
+        <li id="menu-item-1511" class="menu-item"><a href="{{ g.site_home_url }}resources/">Resources</a></li>
+        <li id="menu-item-2836" class="menu-item"><a href="{{ g.site_home_url }}webinars-and-discussions/">Webinars and Discussions</a></li>
+      </ul>
     </li>
     {%- else -%}
-    <li id="menu-item-1359" class="menu-item "><a href="{{ g.site_home_url }}fr/outils/"><span>Outils de Données</span></a></li>
+    <li id="menu-item-1359" class="menu-item menu-item-has-children menu-parent"><a href="{{ g.site_home_url }}fr/outils/"><span class="mega-indicator">Outils de Données</span></a>
+      <ul class="sub-menu">
+        <li id="menu-item-2865" class="menu-item"><a href="https://assetmap.cioosatlantic.ca/?lg=fr">Asset Map</a></li>
+        <li id="menu-item-3266" class="menu-item"><a href="{{ g.site_home_url }}cmar/BirchyHead/">CMAR Visualisation Birchy Head</a></li>
+        <li id="menu-item-3267" class="menu-item"><a href="{{ g.site_home_url }}cmar/ShipHarbour/">CMAR Visualisation Ship Harbour</a></li>
+        <li id="menu-item-3268" class="menu-item"><a href="{{ g.site_home_url }}erddap">ERDDAP Accès aux Données</a></li>
+      </ul>
+    </li>
     <li id="menu-item-1652" class="menu-item menu-item-has-children menu-parent current-menu-item current_page_item"><a href="{{ h.url_for('home.index') }}"><span class="mega-indicator">Catalogue de Données</span></a>
       <ul class="sub-menu" style=" min-width: 161px;">
         <li id="menu-item-1999" class="menu-item"><a href="{{ h.url_for('home.index') }}dataset">Jeux de données</a></li>
         <li id="menu-item-2001" class="menu-item"><a href="{{ h.url_for('home.index') }}organization">Organisations</a></li>
       </ul>
     </li>
-    <li id="menu-item-2002" class="menu-item"><a href="{{ g.site_home_url }}fr/ressources/"><span class="mega-indicator">Ressources</span></a>
+    <li id="menu-item-2002" class="menu-item menu-item-has-children menu-parent"><a href="{{ g.site_home_url }}fr/ressources/"><span class="mega-indicator">Ressources</span></a>
+      <ul class="sub-menu">
+        <li id="menu-item-2853" class="menu-item"><a href="{{ g.site_home_url }}fr/ressources/">Ressources</a></li>
+        <li id="menu-item-2881" class="menu-item"><a href="{{ g.site_home_url }}fr/webinaires-et-discussions/">Webinaires et Discussions</a></li>
+      </ul>
     </li>
     {%- endif -%}
   </ul>
