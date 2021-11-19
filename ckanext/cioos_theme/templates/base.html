@@ -39,7 +39,7 @@
     {# render all assets included in styles block #}
     {{ h.render_assets('style') }}
 
-    <link rel="stylesheet" type="text/css" href="{{h.url_for_static('/cioos_theme.css')}}" />
+    <!-- <link rel="stylesheet" type="text/css" href="{{h.url_for_static('/cioos_theme.css')}}" /> -->
     {% if h.cioos_get_additional_css_path() %}
     <link rel="stylesheet" type="text/css" href="{{h.url_for_static(h.cioos_get_additional_css_path())}}" />
     {% endif %}
