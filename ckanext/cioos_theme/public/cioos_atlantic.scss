@@ -1,0 +1,374 @@
+//--  Atlantic --//
+$primary-color: #e55162;
+$secondary-color: #e55162;
+$header-footer-bg-img: url(/base/images/atlantic-background-colour.jpg);
+
+//--  National --//
+// $primary-color: #52a79b;
+// $secondary-color: #fa7268;
+// $header-footer-bg-img: none !important;
+
+//-- Pacific --//
+// $primary-color: #006e90;
+// $secondary-color: #ff6b35;
+// $header-footer-bg-img: none !important;
+
+$text-dark: #404041;
+$defaultfont: Raleway, Helvetica, Arial;
+$header-footer-font: 'Montserrat', sans-serif;
+
+body {
+  font-family: $defaultfont;
+}
+
+// add box shadown on search button and fix input field spacing on dataset
+// search page to make room for button and box shadow
+.themebutton, button, html input[type="button"], input[type="reset"], input[type="submit"], .themebutton2, .button.style2, .button.style3:hover, .button.style4:hover {
+    -webkit-box-shadow: 0 0 0 3px rgb(17 81 114 / 20%);
+    -moz-box-shadow: 0 0 0 3px rgba( 17, 81, 114, 0.2 );
+    -ms-box-shadow: 0 0 0 3px rgba( 17, 81, 114, 0.2 );
+    -o-box-shadow: 0 0 0 3px rgba( 17, 81, 114, 0.2 );
+    box-shadow: 0 0 0 3px rgb(17 81 114 / 20%);
+}
+.search-input-group #field-giant-search {
+    border-radius: 30px;
+    padding: 15px;
+    height: auto;
+    font-size: 16px;
+}
+.search-input-group .btn {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    border-color: $secondary-color;
+    background: $secondary-color;
+    border-radius: 23px;
+    width: 46px;
+    height: 46px;
+}
+
+// this fixes the search button disapering issue when the search field is
+// clicked on the dataset search page
+.search-input-group .form-control:focus {
+    z-index: 0;
+}
+
+#scrollUp:after {
+    background: #2fb8da;
+    height: 30px;
+    width: 30px;
+    border-radius: 30px;
+    line-height: 30px;
+    font-size: 1em;
+}
+
+// Header
+#topmenu{
+  background: $primary-color;
+  background-image: $header-footer-bg-img;
+  background-repeat: repeat;
+}
+
+#topmenu.nav.main-nav nav {
+    padding: 0 ;
+}
+
+// remove spave between language picker and other items on top bar
+#topmenu #language_picker {
+    padding: 0 10px;
+}
+
+#header {
+    margin: 3em 0;
+}
+
+#header-container #header .menu>li:not(.last){
+  margin-top: 0px;
+  margin-right: 0;
+  margin-bottom: 0px;
+  margin-left: 20px;
+}
+
+#header-container #header {
+    .menu {
+        > li {
+            > a {
+                &:hover {
+                    color: $primary-color;
+                }
+                &::after {
+                    margin-top: 0px;
+                    content:"";
+                    display:block;
+                    width:0;
+                    height:2px;
+                    background: $primary-color;
+                    transition:width .5s
+                }
+            }
+            margin-top: 0px;
+            margin-right: 0;
+            margin-bottom: 0px;
+            margin-left: 20px;
+
+            &.current-menu-item > a {
+                color: $primary-color;
+                span {
+                    color: $primary-color;
+                    font-weight: 400;
+                }
+            }
+            &.menu-item-has-children > a span:after {
+                color: $text-dark;
+                font-size: 12px;
+                margin-top: 3px;
+                font-weight: 700;
+            }
+            &.current-menu-item>a span {
+                color: $primary-color;
+                font-weight: 400;
+            }
+        }
+    }
+
+    .header-links {
+        .sub-menu {
+            box-shadow: $primary-color 0 -4px 0 0px, rgba(0,0,0,0.15) 1px 1px 2px 0;
+            a {
+                font-size: 14px;
+                line-height: 40px;
+                padding: 5px 10px;
+                color: $text-dark;
+                &:hover {
+                    color: $primary-color;
+                    transition: color 0.3s ease;
+                }
+            }
+        }
+        > ul > li {
+            font-size: 15px;
+            &:last-child {
+                padding-right: 10px;
+            }
+            a {
+                color: $text-dark;
+                font-family: $header-footer-font;
+                font-size: 15px;
+                padding: 50px 0 5px 0;
+            }
+        }
+    }
+}
+
+#header-container #header-sticky {
+  .menu {
+      > li {
+          > a:hover {
+              color: $primary-color;
+              background: #fff;
+          }
+      }
+  }
+}
+
+// Titles & Headings
+.title {
+    letter-spacing: -1px;
+    h1 {
+        font-size: 36px;
+        color: $text-dark;
+        margin-bottom: 5px;
+        span {
+            font-weight: 600;
+        }
+    }
+    h2 {
+        font-size: 24px;
+        margin-top: 0px;
+        span a {
+            color: $text-dark;
+        }
+    }
+}
+h3.heading {
+    font-size: 16px;
+    margin-bottom: 4px;
+}
+
+// Layout/Style on Home Page
+.homepage .module-content-end {
+    margin-bottom: 50px;
+}
+.homepage .box {
+    border-color: $primary-color;
+}
+
+// Search
+.form-control {
+    border-color: #b5b5b5;
+    &:focus, &:hover {
+        border-color: $primary-color;
+    }
+}
+.search-form .search-input.search-giant button {
+    background: $secondary-color;
+    top: 18px;
+    right: 3px;
+    width: 48px;
+    height: 48px;
+}
+.cioos-module-search {
+    .module-content {
+        padding: 0;
+        background: none;
+    }
+    .box {
+        background: none;
+        border: none;
+    }
+    .col-md-6 {
+        width: 100%;
+        padding: 0;
+    }
+}
+.cioos-search {
+    margin-left: 15px;
+}
+
+// Footer
+#footer {
+    padding: 40px;
+    background-color: $primary-color;
+    background-image: $header-footer-bg-img;
+    background-repeat: repeat;
+
+    .col-md-6 {
+        padding: 0;
+    }
+    a {
+        font-weight: 300;
+        &:hover {
+            //text-decoration: none;
+        }
+    }
+
+    .textwidget,
+    button,
+    input,
+    select,
+    textarea {
+      font-family: $header-footer-font;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      font-family: $header-footer-font;
+    }
+
+    h3 {
+      margin-bottom: 10px;
+    }
+    h3 span{
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .mc-field-group .mc-required {
+        font-size: 1rem;
+        font-style: italic;
+        margin-left: 0.5rem;
+        //color: $secondary-color;
+    }
+
+    #mc-embedded-subscribe.button {
+      background-color: $secondary-color;
+      text-transform: uppercase;
+      font-size: 14px;
+      height: auto;
+      line-height: 2rem;
+      margin: 0.75rem 0 0 0;
+      padding: 11px 24px;
+      text-align: center;
+      text-decoration: none;
+      vertical-align: top;
+      white-space: nowrap;
+      width: auto;
+      font-weight: normal;
+      border: 0 none;
+      //border-radius: 4px;
+      transition: all 0.23s ease-in-out 0s;
+      color: #ffffff;
+      cursor: pointer;
+      text-transform: uppercase;
+      display: inline-block;
+      clear: both;
+      font-weight: 700;
+    }
+
+
+
+    #mc-embedded-subscribe.button:hover {
+        color: #115172;
+        background: rgba(17,81,114,0.2);
+    }
+
+    #mc_embed_signup .mc-field-group, .mc-field-group {
+    width: 47.5%;
+    margin-right: 0;
+    }
+
+    .mc-field-group > label {
+    color: #fff;
+    font-weight: 700;
+    display: block;
+    }
+
+    .mc-field-group > label:after {
+        content: none;
+    }
+
+    .mc-input-fields {
+    display: flex;
+    justify-content: space-between;
+    }
+
+
+    input[type="text"], input[type="email"] {
+      background: #fff;
+      padding: 0.5em 1em;
+      border: none;
+      width: 100%;
+      color: #000;
+    }
+
+    input {
+        box-shadow: none;
+    }
+
+    label { margin-bottom: 0; }
+
+}
+.account-masthead {
+    border-top: none;
+    background-color: $primary-color;
+    .account {
+        border: none;
+        ul li {
+            border: none;
+            a {
+                color: #fff;
+                padding: 0 5px;
+                &:hover {
+                    background-color: $primary-color;
+                }
+            }
+        }
+    }
+}
+
+// Debug
+#debug-toggle {
+    bottom: 5px;
+    color: $text-dark;
+    opacity: 1;
+    font-weight: 700;
+}
