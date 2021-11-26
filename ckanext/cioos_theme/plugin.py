@@ -22,24 +22,11 @@ import ckan.lib.base as base
 import re
 import time
 
-
-
 Invalid = df.Invalid
 
 log = logging.getLogger(__name__)
 
 # import debugpy
-
-StopOnError = df.StopOnError
-missing = df.missing
-log = logging.getLogger(__name__)
-
-# debugpy.listen(('0.0.0.0', 5678))
-# log.debug("Waiting for debugger attach")
-# debugpy.wait_for_client()
-
-
-
 
 show_responsible_organizations = toolkit.asbool(
     toolkit.config.get('cioos.show_responsible_organizations_facet', "True"))
@@ -281,7 +268,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         return schema
 
     def get_additional_css_path(self):
-        return toolkit.config.get('ckan.cioos.ra_css_path', '/ra.css')
+        return toolkit.config.get('ckan.cioos.ra_css_path')
 
     def get_helpers(self):
         """Register the most_popular_groups() function above as a template helper function."""
