@@ -1,0 +1,25 @@
+User-Agent: *
+Disallow: /dataset/*?
+Disallow: /organization/*?
+Disallow: /group/*?
+Disallow: /dataset/rate/
+Disallow: /revision/
+Disallow: /dataset/*/history
+Disallow: /api/
+
+Disallow: /en/dataset/*?
+Disallow: /en/organization/*?
+Disallow: /en/group/*?
+Disallow: /en/dataset/rate/
+Disallow: /en/revision/
+Disallow: /en/dataset/*/history
+Disallow: /en/api/
+
+Disallow: /fr/dataset/*?
+Disallow: /fr/organization/*?
+Disallow: /fr/group/*?
+Disallow: /fr/dataset/rate/
+Disallow: /fr/revision/
+Disallow: /fr/dataset/*/history
+Disallow: /fr/api/
+Crawl-Delay: 10

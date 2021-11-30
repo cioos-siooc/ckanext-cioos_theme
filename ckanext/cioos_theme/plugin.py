@@ -281,7 +281,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         return schema
 
     def get_additional_css_path(self):
-        return toolkit.config.get('ckan.cioos.ra_css_path', '/ra.css')
+        return toolkit.config.get('ckan.cioos.ra_css_path')
 
     def get_helpers(self):
         """Register the most_popular_groups() function above as a template helper function."""
