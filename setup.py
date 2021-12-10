@@ -90,6 +90,7 @@ setup(
 
         [paste.paster_command]
         package_relationships=ckanext.cioos_theme.commands.package_relationships:PackageRelationships
+        sitemap=ckanext.cioos_theme.commands.sitemap:SiteMap
     ''',
 
     # If you are changing from the default layout of your extension, you may

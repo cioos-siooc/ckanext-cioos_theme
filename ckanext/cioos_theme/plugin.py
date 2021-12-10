@@ -4,7 +4,8 @@ import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
 import ckan.model as model
 import ckanext.cioos_theme.helpers as cioos_helpers
-import ckanext.cioos_theme.package_relationships as pr
+import ckanext.cioos_theme.cli as cli
+import ckanext.cioos_theme.util.package_relationships as pr
 from ckanext.scheming.validation import scheming_validator
 from ckan.logic import NotFound
 from ckan.lib.plugins import DefaultTranslation
@@ -183,9 +184,14 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
     plugins.implements(plugins.IPackageController, inherit=True)
     plugins.implements(plugins.IValidators)
     plugins.implements(plugins.IAuthenticator)
+    plugins.implements(plugins.IClick)
     plugins.implements(plugins.IBlueprint)
 
-    #IBlueprint
+    # IClick
+    def get_commands(self):
+        return cli.get_commands()
+
+    # IBlueprint
     def get_blueprint(self):
         blueprint = Blueprint('foo', self.__module__)
         rules = [
