@@ -523,7 +523,9 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         dict_out = {}
 
         for d in dict_list:
-            group_value = d['individual-name'] or d['organisation-name']
+            group_value = d.get('individual-name') or d.get('organisation-name')
+            if not group_value:
+                continue
             if not dict_out.get(group_value):
                 dict_out[group_value] = defaultdict(list)
             for key, value in d.items():
@@ -532,7 +534,9 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                 else:
                     dict_out[group_value][key].append(value)
         for d in dict_list:
-            group_value = d['individual-name'] or d['organisation-name']
+            group_value = d.get('individual-name') or d.get('organisation-name')
+            if not group_value:
+                continue
             dict_out[group_value] = dict(dict_out[group_value])
 
         for k1, v1 in dict_out.items():
