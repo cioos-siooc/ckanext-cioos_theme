@@ -508,6 +508,35 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
 
         return data_dict
 
+
+    # group a list of dictionaries based on individual-name or organization-name keys
+    def group_by_ind_or_org(self, dict_list):
+        from collections import defaultdict
+        from collections import OrderedDict
+        out = []
+        dict_out = {}
+
+        for d in dict_list:
+            group_value = d['individual-name'] or d['organisation-name']
+            if not dict_out.get(group_value):
+                dict_out[group_value] = defaultdict(list)
+            for key, value in d.items():
+                if isinstance(value, list):
+                    dict_out[group_value][key] = dict_out[group_value][key] + value
+                else:
+                    dict_out[group_value][key].append(value)
+        for d in dict_list:
+            group_value = d['individual-name'] or d['organisation-name']
+            dict_out[group_value] = dict(dict_out[group_value])
+
+        for k1, v1 in dict_out.items():
+            for k, v in v1.items():
+                v1[k] = list(OrderedDict.fromkeys(v))
+                if len(v1[k]) == 1:
+                    v1[k] = v1[k][0]
+            out.append(v1)
+        return out
+
     # update eov search facets with keys from choices list in the scheming extension schema
     # format search results for consistant json output
     # add organization extra fields to results
@@ -555,6 +584,11 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             cited_responsible_party = result.get('cited-responsible-party')
             if((cited_responsible_party or force_resp_org) and not result.get('responsible_organizations')):
                 result['responsible_organizations'] = self._cited_responsible_party_to_responsible_organizations(cited_responsible_party, force_resp_org)
+
+            if result.get('cited-responsible-party'):
+                result['cited-responsible-party'] = self.group_by_ind_or_org(result.get('cited-responsible-party'))
+            if result.get('metadata-point-of-contact'):
+                result['metadata-point-of-contact'] = self.group_by_ind_or_org(result.get('metadata-point-of-contact'))
 
             title = result.get('title_translated')
             if(title):
@@ -643,6 +677,11 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         cited_responsible_party = package_dict.get('cited-responsible-party')
         if((cited_responsible_party or force_resp_org) and not package_dict.get('responsible_organizations')):
             package_dict['responsible_organizations'] = self._cited_responsible_party_to_responsible_organizations(cited_responsible_party, force_resp_org)
+
+        if package_dict.get('cited-responsible-party'):
+            package_dict['cited-responsible-party'] = self.group_by_ind_or_org(package_dict.get('cited-responsible-party'))
+        if package_dict.get('metadata-point-of-contact'):
+            package_dict['metadata-point-of-contact'] = self.group_by_ind_or_org(package_dict.get('metadata-point-of-contact'))
 
         result = package_dict
         title = result.get('title_translated')
