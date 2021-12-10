@@ -7,6 +7,7 @@ Disallow: /revision/
 Disallow: /dataset/*/history
 Disallow: /api/
 Disallow: /harvest
+Disallow: /_tracking
 
 Disallow: /en/dataset*?
 Disallow: /en/organization*?
@@ -25,5 +26,5 @@ Disallow: /fr/revision/
 Disallow: /fr/dataset/*/history
 Disallow: /fr/api/
 Disallow: /fr/harvest
-
+Sitemap: /sitemap/sitemap.xml
 Crawl-Delay: 10
