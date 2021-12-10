@@ -157,13 +157,13 @@ def cioos_is_valid_range(field, schema):
     return validator
 
 
-def render_schemamap(self):
+def render_schemamap():
     return toolkit.render('schemamap.html')
 
-def render_datacite_xml(self, id):
+def render_datacite_xml(id, format):
     context = {'model': model, 'session': model.Session,
-               'user': c.user, 'for_view': True,
-               'auth_user_obj': c.userobj}
+               'user': g.user, 'for_view': True,
+               'auth_user_obj': g.userobj}
     data_dict = {'id': id}
 
     try:
@@ -171,7 +171,7 @@ def render_datacite_xml(self, id):
     except toolkit.ObjectNotFound:
         toolkit.abort(404, _('Dataset not found'))
     except toolkit.NotAuthorized:
-        toolkit.abort(403, _('User %r not authorized to view datacite xml for %s') % (c.user, id))
+        toolkit.abort(403, _('User %r not authorized to view datacite xml for %s') % (g.user, id))
 
     pkg = toolkit.get_action('package_show')(data_dict={'id': id})
     return toolkit.render('package/datacite.html', extra_vars={'pkg_dict': pkg})
@@ -193,10 +193,10 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
 
     # IBlueprint
     def get_blueprint(self):
-        blueprint = Blueprint('foo', self.__module__)
+        blueprint = Blueprint('cioos', self.__module__)
         rules = [
             ('/schemamap', 'schemamap', render_schemamap),
-            ('/dataset/{id}.{format}', 'datacite_xml', render_datacite_xml),
+            ('/dataset/<id>.<format>', 'datacite_xml', render_datacite_xml),
         ]
         for rule in rules:
             blueprint.add_url_rule(*rule)

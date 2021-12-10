@@ -2,9 +2,13 @@
 
 {% set pkg = c.pkg_dict or pkg_dict %}
 {% block subtitle %}{{ _('Schema Map') }}{% endblock %}
+{% set dataset_type = dataset_type or pkg.type or 'dataset' %}
+{% set dataset = h.dataset_display_name(pkg) %}
 
 {% block breadcrumb_content %}
-<li class="active">{% link_for _('Schema Map'), controller='ckanext.cioos_theme.plugin:CIOOSController', action='schemamap' %}</li>
+<li>{% link_for _(dataset_type.title()), named_route=dataset_type ~ '.search' %}</li>
+<li>{% link_for dataset|truncate(30), named_route=pkg.type ~ '.read', id=pkg.id if is_activity_archive else pkg.name %}</li>
+<li class="active">{% link_for _('DataCite XML'), controller='cioos', action='schemamap' %}</li>
 {% endblock %}
 
 {% block primary %}
@@ -25,7 +29,7 @@
         </tr>
         <tr>
           <th>URL:</th>
-          <td>{{h.url_for(controller='package', action='read', id=pkg['name'], _external=True)}}</td>
+          <td>{{h.url_for(controller='dataset', action='read', id=pkg['name'], _external=True)}}</td>
         </tr>
         {% if h.cioos_get_datacite_test_mode() == 'True' %}
         <tr>

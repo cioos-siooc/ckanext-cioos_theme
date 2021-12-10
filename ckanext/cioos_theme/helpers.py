@@ -248,7 +248,7 @@ def cioos_schema_field_map():
     output = cioos_schema_field_map_parent(fields, isodoc_dict, class_dict, map, 'Dataset Fields')
 
     # Resources
-    resource_fields_schema = [{'field_name': 'resource_fields', 'subfields': schema['resource_fields']}]
+    resource_fields_schema = [{'field_name': 'resource_fields', 'simple_subfields': schema['resource_fields']}]
     j = jsonpickle.encode([x for x in doc.elements if isinstance(x, spatial_model.ISOResourceLocator)], unpicklable=False)
     isodoc_dict = json.loads(j)
     resource_locator = [x for x in isodoc_dict if x['name'] == 'resource-locator']
@@ -323,7 +323,7 @@ def cioos_schema_field_map_parent(fields, isodoc_dict, class_dict, mapkey, capti
             schema_name = field['field_name']
             schema_label = ' (' + toolkit.h.scheming_language_text(field.get('label', '')) + ')'
             schema_help = field.get('help_text', '')
-            subfields = field.get('subfields')
+            subfields = field.get('simple_subfields') or field.get('repeating_subfields')
             if field.get('required'):
                 required = '<span class="required">*</span>'
             matched_schema_fields.append(schema_name)
@@ -378,7 +378,7 @@ def cioos_schema_field_map_child(schema_subfields, schema_parentfields, harvest_
             schema_name = field['field_name']
             schema_label = ' (' + toolkit.h.scheming_language_text(field.get('label', '')) + ')'
             schema_help = field.get('help_text', '')
-            subfields = field.get('subfields')
+            subfields = field.get('simple_subfields') or field.get('repeating_subfields')
             matched_schema_fields.append(schema_name)
             schema_name = '<i class="fa fa-angle-right"></i>' + schema_name
             if field.get('required'):
