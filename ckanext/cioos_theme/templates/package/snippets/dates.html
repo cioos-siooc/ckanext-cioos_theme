@@ -36,7 +36,7 @@
             <td class="dataset-details">
               {% for d in h.cioos_load_json(metadata_reference_date) %}
                 {% if d['value']| length == 10 %}
-                  {{ h.render_datetime(d['value'], '%B %d, %Y') }} ({{_(d['type'].title())}})</br>
+                  {{ h.render_datetime(d['value'], 'MMMM dd, YYYY') }} ({{_(d['type'].title())}})</br>
                 {% else %}
                   {% snippet 'snippets/local_friendly_datetime.html',
                       datetime_obj=d['value'] %} ({{_(d['type'].title())}})</br>
@@ -53,7 +53,7 @@
               <th scope="row" class="dataset-label">{{ _("Temporal Extent Begin") }}</th>
               <td class="dataset-details">
                 {% if te.begin | length == 10 %}
-                  {{ h.render_datetime(te.begin, '%B %d, %Y') }}
+                  {{ h.render_datetime(te.begin, 'MMMM dd, YYYY') }}
                 {% else %}
                   {% snippet 'snippets/local_friendly_datetime.html', datetime_obj=te.begin %}
                 {% endif %}
@@ -66,7 +66,7 @@
               <th scope="row" class="dataset-label">{{ _("Temporal Extent End") }}</th>
               <td class="dataset-details">
                 {% if te.end | length == 10 %}
-                  {{ h.render_datetime(te.end, '%B %d, %Y') }}
+                  {{ h.render_datetime(te.end, 'MMMM dd, YYYY') }}
                 {% else %}
                   {% snippet 'snippets/local_friendly_datetime.html', datetime_obj=te.end %}
                 {% endif %}
@@ -81,7 +81,7 @@
             <td class="dataset-details">
               {% for d in h.cioos_load_json(dataset_reference_date) %}
                 {% if d['value']| length == 10 %}
-                  {{ h.render_datetime(d['value'], '%B %d, %Y') }} ({{_(d['type'].title())}})</br>
+                  {{ h.render_datetime(d['value'], 'MMMM dd, YYYY') }} ({{_(d['type'].title())}})</br>
                 {% else %}
                   {% snippet 'snippets/local_friendly_datetime.html', datetime_obj=d['value'] %}
                     ({{_(d['type'].title())}})</br>
