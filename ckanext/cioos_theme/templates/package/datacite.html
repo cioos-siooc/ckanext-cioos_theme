@@ -8,7 +8,7 @@
 {% block breadcrumb_content %}
 <li>{% link_for _(dataset_type.title()), named_route=dataset_type ~ '.search' %}</li>
 <li>{% link_for dataset|truncate(30), named_route=pkg.type ~ '.read', id=pkg.id if is_activity_archive else pkg.name %}</li>
-<li class="active">{% link_for _('DataCite XML'), controller='cioos', action='schemamap' %}</li>
+<li class="active">{% link_for _('DataCite XML'), controller='cioos', action='datacite_xml', id=pkg['name'] %}</li>
 {% endblock %}
 
 {% block primary %}
