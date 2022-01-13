@@ -52,7 +52,7 @@ class CIOOSDCATProfile(SchemaOrgProfile):
                 email = responsible_party.get('contact-info_email')
                 url = responsible_party.get('contact-info_online-resource_url')
                 identifier = responsible_party.get('organisation-uri', {})
-                if isinstance(identifier, basestring):
+                if isinstance(identifier, str):
                     uri = identifier
                 else:
                     code = identifier.get('code')
