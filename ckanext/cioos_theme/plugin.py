@@ -173,7 +173,7 @@ def cioos_is_valid_range(field, schema):
 def render_schemamap():
     return toolkit.render('schemamap.html')
 
-def render_datacite_xml(id, format):
+def render_datacite_xml(id):
     context = {'model': model, 'session': model.Session,
                'user': g.user, 'for_view': True,
                'auth_user_obj': g.userobj}
@@ -209,7 +209,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         blueprint = Blueprint('cioos', self.__module__)
         rules = [
             ('/schemamap', 'schemamap', render_schemamap),
-            ('/dataset/<id>.<format>', 'datacite_xml', render_datacite_xml),
+            ('/dataset/<id>.dcxml', 'datacite_xml', render_datacite_xml),
         ]
         for rule in rules:
             blueprint.add_url_rule(*rule)

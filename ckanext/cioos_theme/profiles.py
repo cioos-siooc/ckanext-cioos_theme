@@ -1,10 +1,11 @@
 from rdflib.namespace import Namespace, RDF, SKOS, RDFS
 from ckanext.dcat.profiles import SchemaOrgProfile, CleanedURIRef, URIRefOrLiteral
 from rdflib import URIRef, BNode, Literal
-from ckanext.cioos_theme.plugin import load_json
+from ckanext.cioos_theme.helpers import load_json
 from ckan.plugins import toolkit
 from shapely.geometry import shape
 import json
+import re
 import logging
 log = logging.getLogger(__name__)
 
@@ -51,7 +52,7 @@ class CIOOSDCATProfile(SchemaOrgProfile):
                 email = responsible_party.get('contact-info_email')
                 url = responsible_party.get('contact-info_online-resource_url')
                 identifier = responsible_party.get('organisation-uri', {})
-                if isinstance(identifier, basestring):
+                if isinstance(identifier, str):
                     uri = identifier
                 else:
                     code = identifier.get('code')
@@ -242,9 +243,26 @@ class CIOOSDCATProfile(SchemaOrgProfile):
         self.infer_publisher(dataset_dict)
         self._publisher_graph(dataset_ref, dataset_dict)
 
+        # Identifier
+        unique_identifiers = dataset_dict.get('unique-resource-identifier-full', {})
+        if unique_identifiers:
+            self.g.remove((dataset_ref, SCHEMA.identifier, None))
+            for unique_identifier in unique_identifiers:
+                if 'doi.org' in unique_identifier.get('authority', '') or not unique_identifier.get('authority'):
+                    doi = re.sub(r'^http.*doi\.org/', '', unique_identifier['code'], flags=re.IGNORECASE)  # strip https://doi.org/ and the like
+                    if doi and re.match(r'^10.\d{4,9}\/[-._;()/:A-Z0-9]+$', doi, re.IGNORECASE):
+                        identifier = BNode()
+                        g.add((dataset_ref, SCHEMA.identifier, identifier))
+                        self.g.add((identifier, RDF.type, SCHEMA.PropertyValue))
+                        self.g.add((identifier, SCHEMA.propertyID, Literal("https://registry.identifiers.org/registry/doi")))
+                        self.g.add((identifier, SCHEMA.name, Literal("DOI: %s" % doi)))
+                        self.g.add((identifier, SCHEMA.value, Literal("doi:%s" % doi)))
+                        self.g.add((identifier, SCHEMA.url, Literal("https://doi.org/%s" % doi)))
 
         # Temporal
         temporal_extent = load_json(dataset_dict.get('temporal-extent', {}))
+        if (isinstance(temporal_extent, list)):
+            temporal_extent = temporal_extent[0]
         start = temporal_extent.get('begin')
         end = temporal_extent.get('end')
         if start or end:
