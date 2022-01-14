@@ -18,8 +18,8 @@
 
         {% set metadata_reference_date = pkg_dict['metadata-reference-date']
             or extras_metadata_reference_date
-            or [{"type":"Creation","value":metadata_created_source or pkg_dict.metadata_created},
-                {"type":"Revision","value":metadata_modified_source or pkg_dict.metadata_modified} ]%}
+            or [{"type":"Creation","value":metadata_created_source or pkg_dict.metadata_created[:10]},
+                {"type":"Revision","value":metadata_modified_source or pkg_dict.metadata_modified[:10]} ]%}
 
         {% set extras_dataset_reference_date = pkg_dict.extras |
             selectattr("key","equalto","dataset-reference-date") %}

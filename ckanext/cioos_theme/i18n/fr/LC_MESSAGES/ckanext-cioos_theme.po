@@ -562,3 +562,12 @@ msgstr "Ex. température"
 #: ckan/templates/user/read_base.html:20
 msgid "Activity Stream"
 msgstr "Flux d'Activités"
+
+msgid "Custodian"
+msgstr "Dépositaire"
+
+msgid "Name"
+msgstr "Nom"
+
+msgid "Email"
+msgstr "Courriel"

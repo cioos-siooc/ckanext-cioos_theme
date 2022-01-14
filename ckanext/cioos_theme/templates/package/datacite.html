@@ -8,7 +8,7 @@
 {% block breadcrumb_content %}
 <li>{% link_for _(dataset_type.title()), named_route=dataset_type ~ '.search' %}</li>
 <li>{% link_for dataset|truncate(30), named_route=pkg.type ~ '.read', id=pkg.id if is_activity_archive else pkg.name %}</li>
-<li class="active">{% link_for _('DataCite XML'), controller='cioos', action='schemamap' %}</li>
+<li class="active">{% link_for _('DataCite XML'), controller='cioos', action='datacite_xml', id=pkg['name'] %}</li>
 {% endblock %}
 
 {% block primary %}
@@ -63,15 +63,18 @@
     <identifier identifierType="DOI">10.5072/example-full</identifier>
     {%- endif -%}
     <creators>
-      {%- for party in h.cioos_load_json(pkg['cited-responsible-party']) -%}
+      {% for party in h.cioos_load_json(pkg['cited-responsible-party']) %}
         {%- if party['individual-name'] -%}
         <creator>
-          {% set names = party['individual-name'].split(' ') %}
+          {% set names = party['individual-name'].split(' ') -%}
           <creatorName nameType="Personal">{{ names[-1], ' '.join(names[:-1]) }}</creatorName>
           <givenName>{{ ' '.join(names[:-1]) }}</givenName>
           <familyName>{{ names[-1] }}</familyName>
+          {% if party['organisation-name'] -%}
+          <affiliation>{{party['organisation-name']}}</affiliation>
+          {%- endif %}
         </creator>
-        {%- endif -%}
+        {% endif %}
       {%- endfor -%}
     </creators>
     <titles>
@@ -79,14 +82,14 @@
       <title xml:lang="fr">{{ pkg['title_translated']['fr'] }}</title>
     </titles>
     {%- for party in h.cioos_load_json(pkg['cited-responsible-party']) -%}
-      {% if party['role'] == 'publisher' %}
-    <publisher>party['organization-name']</publisher>
+      {% if 'publisher' in party['role'] %}
+    <publisher>{{ party['organisation-name'] or party['individual-name'] }}</publisher>
       {% endif %}
     {%- endfor -%}
 
     {%- for date in h.cioos_load_json(pkg['dataset-reference-date']) -%}
       {% if date['type'] == 'publication' %}
-    <publicationYear>{{ date['value'] }}</publicationYear>
+    <publicationYear>{{ date['value'][0:4] }}</publicationYear>
       {% endif %}
     {%- endfor -%}
     <subjects>
@@ -97,9 +100,35 @@
       <subject xml:lang="fr">{{ kw }}</subject>
       {%- endfor %}
     </subjects>
+
+    {%- if pkg['distributor'] %}
+    <contributors>
+      {%- for party in h.cioos_load_json(pkg['distributor']) %}
+      <contributor contributorType="{{party['role'][0]|title}}">
+        {%- if party['individual-name'] -%}
+          {% set names = party['individual-name'].split(' ') -%}
+        {% else %}
+          {% set names = party['organisation-name'].split(' ') -%}
+        {%- endif %}
+        <contributorName>{{ names[-1], ' '.join(names[:-1]) }}</contributorName>
+        <givenName>{{ ' '.join(names[:-1]) }}</givenName>
+        <familyName>{{ names[-1] }}</familyName>
+        {% if party['organisation-name'] and party['individual-name']-%}
+        <affiliation>{{party['organisation-name']}}</affiliation>
+        {%- endif %}
+      </contributor>
+      {%- endfor %}
+    </contributors>
+    {% endif -%}
+
     <language>{{ pkg['metadata-language'] }}</language>
     <resourceType resourceTypeGeneral="{{ pkg['resource-type'].title() }}">{{ pkg['resource-type'].title() }}</resourceType>
     <version>{{pkg['version'] or '1.0' }}</version>
+    {%- if pkg['license_url'] and  pkg['license_title'] %}
+    <rightsList>
+      <rights xml:lang="en-US" rightsURI="{{ pkg['license_url'] }}">{{ pkg['license_title'] }}</rights>
+    </rightsList>
+    {% endif -%}
     <descriptions>
       <description xml:lang="en" descriptionType="Abstract">
         {{ pkg['notes_translated']['en'] }}
