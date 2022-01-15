@@ -288,9 +288,6 @@ class CIOOSDCATProfile(SchemaOrgProfile):
                 # Add bounding box element
                 g.add((spatial_ref, SCHEMA.geo, geo_shape))
 
-        #### TODO: Remove schema:description and replace with this plus translation
-        #('notes', SCHEMA.description, None, Literal),
-
         # Basic fields
         self._basic_fields_graph(dataset_ref, dataset_dict)
 
@@ -301,8 +298,7 @@ class CIOOSDCATProfile(SchemaOrgProfile):
         self.infer_publisher(dataset_dict)
         self._publisher_graph(dataset_ref, dataset_dict)
 
-        # Distribution
-        # add contentUrl
+        # Add contentUrl to Distribution
         for s, p, o in self.g.triples((None, RDF.type, SCHEMA.DataDownload)):
             url = self.g.value(s, SCHEMA.url, None)
             g.add((s, SCHEMA.contentUrl, Literal(url)))
