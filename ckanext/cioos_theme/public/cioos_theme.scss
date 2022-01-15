@@ -572,6 +572,27 @@ body {
   line-height: 1.42857143;
   border-radius: 20px;
 }
+
+ul.formats{
+  padding-inline-start: 0px;
+
+  li {
+      display: inline;
+      border: solid #dddddd 1px;
+      border-radius: 9px;
+      color: #111;
+      background-color: #f6f6f6;
+      padding: 4px;
+      margin-right: 3px;
+  }
+
+  li a.btn {
+    font-size: 12px;
+    padding: 0 3px;
+    font-weight: bold;
+    color: #111;
+  }
+}
 /* ===========================================
    News widget
    =========================================== */
