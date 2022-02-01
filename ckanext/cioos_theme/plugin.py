@@ -23,17 +23,14 @@ import ckan.lib.base as base
 import re
 import time
 
-
-
 Invalid = df.Invalid
-
-log = logging.getLogger(__name__)
 
 # import debugpy
 
 StopOnError = df.StopOnError
 missing = df.missing
 log = logging.getLogger(__name__)
+log_auth = logging.getLogger(__name__ + '.auth')
 
 # debugpy.listen(('0.0.0.0', 5678))
 # log.debug("Waiting for debugger attach")
@@ -224,7 +221,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         except KeyError:
             remote_addr = toolkit.request.remote_addr
 
-        log.info('Request by %s for %s from %s', toolkit.request.remote_user, toolkit.request.url, remote_addr)
+        log_auth.info('Request by %s for %s from %s', toolkit.request.remote_user, toolkit.request.url, remote_addr)
         g.user = None
         g.userobj = None
         return
@@ -234,7 +231,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             remote_addr = toolkit.request.headers['X-Forwarded-For']
         except KeyError:
             remote_addr = toolkit.request.remote_addr
-        log.info('Login attempt from %s', remote_addr)
+        log_auth.info('Login attempt from %s', remote_addr)
         return
 
     def logout(self):
@@ -242,7 +239,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             remote_addr = toolkit.request.headers['X-Forwarded-For']
         except KeyError:
             remote_addr = toolkit.request.remote_addr
-        log.info('Logout by %s from %s', toolkit.request.remote_user, remote_addr)
+        log_auth.info('Logout by %s from %s', toolkit.request.remote_user, remote_addr)
         return
 
     def abort(self, status_code, detail, headers, comment):
@@ -251,7 +248,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             remote_addr = toolkit.request.headers['X-Forwarded-For']
         except KeyError:
             remote_addr = toolkit.request.remote_addr
-        log.info('Blocked request to %s with status %s becouse "%s" from %s', toolkit.request.url, status_code, detail, remote_addr)
+        log_auth.info('Blocked request to %s with status %s becouse "%s" from %s', toolkit.request.url, status_code, detail, remote_addr)
         return (status_code, detail, headers, comment)
 
     # IConfigurer
@@ -260,6 +257,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         toolkit.add_template_directory(config_, 'templates')
         toolkit.add_public_directory(config_, 'public')
         toolkit.add_resource('fanstatic', 'cioos_theme')
+        toolkit.add_resource('public', 'ckanext-cioos_theme')
 
     def update_config_schema(self, schema):
 
@@ -321,7 +319,8 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             'cioos_get_doi_authority_url': cioos_helpers.get_doi_authority_url,
             'cioos_get_doi_prefix': cioos_helpers.get_doi_prefix,
             'cioos_get_datacite_org': cioos_helpers.get_datacite_org,
-            'cioos_get_datacite_test_mode': cioos_helpers.get_datacite_test_mode
+            'cioos_get_datacite_test_mode': cioos_helpers.get_datacite_test_mode,
+            'cioos_helper_available': cioos_helpers.helper_available
         }
 
     def get_validators(self):
@@ -395,6 +394,14 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         :param facets_dict:
         :return:
         """
+
+        # populate search_extras global if any were used
+        search_extras = {}
+        for (param, value) in toolkit.request.params.items():
+            if param not in ['q', 'page', 'sort'] \
+                    and len(value) and param.startswith('ext_'):
+                search_extras[param] = value
+        toolkit.c.search_extras = search_extras
 
         # remove groups facet
         if 'groups' in facets_dict:
@@ -555,6 +562,24 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                     v1[k] = v1[k][0]
             out.append(v1)
         return out
+
+    # handle custom temporal range search facet
+    def before_search(self, search_params):
+
+        if 'dataset_type:dataset' not in search_params.get('fq', {}):
+            return search_params
+
+        begin = '*'
+        end = '*'
+        if search_params.get('extras', None) and search_params['extras'].get('ext_year_begin', None):
+            begin = search_params['extras']['ext_year_begin']
+        if search_params.get('extras', None) and search_params['extras'].get('ext_year_end', None):
+            end = search_params['extras']['ext_year_end']
+
+        search_params['fq_list'] = search_params.get('fq_list', [])
+        search_params['fq_list'].append('+temporal-extent-range:[{begin} TO {end}]'
+                                        .format(begin=begin, end=end))
+        return search_params
 
     # update eov search facets with keys from choices list in the scheming extension schema
     # format search results for consistant json output

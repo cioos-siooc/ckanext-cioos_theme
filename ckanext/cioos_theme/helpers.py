@@ -9,7 +9,7 @@
 import ckan.plugins.toolkit as toolkit
 import ckan.plugins as p
 from collections import OrderedDict
-from ckantoolkit import  _, c, config
+from ckantoolkit import _, c, config
 # from ckantoolkit import h
 import ckan.logic as logic
 import ckan.model as model
@@ -21,6 +21,14 @@ import logging
 import json
 import jsonpickle
 log = logging.getLogger(__name__)
+
+try:
+    # CKAN >= 2.6
+    from ckan.exceptions import HelperError
+except ImportError:
+    # CKAN < 2.6
+    class HelperError(Exception):
+        pass
 
 get_action = logic.get_action
 
@@ -69,6 +77,16 @@ def load_json(j):
 #
 #     return default
 
+# copied from dcat extension
+def helper_available(helper_name):
+    '''
+    Checks if a given helper name is available on `h`
+    '''
+    try:
+        getattr(toolkit.h, helper_name)
+    except (AttributeError, HelperError):
+        return False
+    return True
 
 def generate_doi_suffix():
     import random

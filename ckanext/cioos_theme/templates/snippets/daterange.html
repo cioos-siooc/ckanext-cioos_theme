@@ -1,0 +1,25 @@
+<section id="daterange" class="module module-narrow module-shallow">
+    <h2 class="module-heading">
+    <i class="fa fa-filter icon-medium icon-globe"></i>
+        {{ _('Year') }}
+    </h2>
+
+
+    <div id="year_search_container" data-module="date-query">
+      <div class='input-group input-daterange'
+            data-provide="datepicker"
+            data-date-format="yyyy"
+            data-date-clear-btn="true"
+            data-date-min-view-mode="2"
+            data-date-autoclose="true"
+            data-date-end-date="+0d">
+         <input type='text' id='datepickerbegin' class="form-control datepicker"/>
+         <div class="input-group-addon">to</div>
+         <input type='text' id='datepickerend' class="form-control datepicker" />
+      </div>
+    </div>
+</section>
+
+
+{% asset 'ckanext-cioos_theme/bootstrap_datepicker_js' %}
+{% asset 'ckanext-cioos_theme/bootstrap_datepicker_css' %}

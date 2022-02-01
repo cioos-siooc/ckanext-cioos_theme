@@ -68,6 +68,33 @@
             </span>
           {% endfor %}
         {% endfor %}
+        {% if facets.extras %}
+          {% if facets.extras.get('ext_bbox') %}
+            <span class="facet">Location:</span>
+            <span class="filtered pill">
+              bbox
+              <a href="{{ facets.remove_field(['ext_bbox','ext_prev_extent','ext_location'] ) }}" class="remove" title="{{ _('Remove') }}"><i class="fa fa-times"></i></a>
+            </span>
+          {% endif %}
+
+          {% if facets.extras.get('ext_year_begin') or facets.extras.get('ext_year_end') %}
+            <span class="facet">Year:</span>
+            <span class="filtered pill">
+            {% if facets.extras.get('ext_year_begin') %}
+              {{facets.extras.get('ext_year_begin')}}
+            {% else %}
+            <i class="fa fa-asterisk"></i>
+            {% endif %}
+              to
+            {% if facets.extras.get('ext_year_end') %}
+              {{facets.extras.get('ext_year_end')}}
+            {% else %}
+             <i class="fa fa-asterisk"></i>
+            {% endif %}
+              <a href="{{ facets.remove_field(['ext_year_begin','ext_year_end'] ) }}" class="remove" title="{{ _('Remove') }}"><i class="fa fa-times"></i></a>
+            </span>
+        {% endif %}
+        {% endif %}
       </p>
       <a class="show-filters btn btn-default">{{ _('Filter Results') }}</a>
     {% endif %}
