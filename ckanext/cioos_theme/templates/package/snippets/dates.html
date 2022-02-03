@@ -39,7 +39,7 @@
                   {{ h.render_datetime(d['value'], 'MMMM dd, YYYY') }} ({{_(d.get('type','').title())}})</br>
                 {% else %}
                   {% snippet 'snippets/local_friendly_datetime.html',
-                      datetime_obj=d['value'] %} ({{_(d.get('type,'').title())}})</br>
+                      datetime_obj=d['value'] %} ({{_(d.get('type','').title())}})</br>
                 {% endif %}
               {% endfor %}
             </td>
@@ -81,10 +81,10 @@
             <td class="dataset-details">
               {% for d in h.cioos_load_json(dataset_reference_date) %}
                 {% if d['value']| length == 10 %}
-                  {{ h.render_datetime(d['value'], 'MMMM dd, YYYY') }} ({{_(d.get('type,'').title())}})</br>
+                  {{ h.render_datetime(d['value'], 'MMMM dd, YYYY') }} ({{_(d.get('type','').title())}})</br>
                 {% else %}
                   {% snippet 'snippets/local_friendly_datetime.html', datetime_obj=d['value'] %}
-                    ({{_(d.get('type,'').title())}})</br>
+                    ({{_(d.get('type','').title())}})</br>
                 {% endif %}
               {% endfor %}
             </td>
