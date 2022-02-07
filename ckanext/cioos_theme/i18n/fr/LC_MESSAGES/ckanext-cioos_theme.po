@@ -673,3 +673,15 @@ msgstr "Flux de chaleur océanique de surface"
 
 msgid "English"
 msgstr "Anglais"
+
+msgid "Marine debris"
+msgstr "Débris marins"
+
+msgid "Ocean color"
+msgstr "Couleur des océans"
+
+msgid "Ocean sound"
+msgstr "Paysage acoustique des océans"
+
+msgid "Cross-disciplinary"
+msgstr "Interdisciplinaire"
