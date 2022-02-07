@@ -670,3 +670,6 @@ msgstr "Courants sous-marins"
 
 msgid "Ocean surface heat flux"
 msgstr "Flux de chaleur océanique de surface"
+
+msgid "English"
+msgstr "Anglais"
