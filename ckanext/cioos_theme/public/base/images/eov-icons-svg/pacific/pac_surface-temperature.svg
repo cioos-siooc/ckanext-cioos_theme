@@ -5,8 +5,8 @@
 <style type="text/css">
 	.st0{fill:#006E90;}
 	.st1{fill:#FFFFFF;}
-	.st2{fill:#FFFFFF;stroke:#51A79A;stroke-width:3.0485;stroke-miterlimit:10;}
-	.st3{fill:none;stroke:#51A79A;stroke-width:4.5727;stroke-miterlimit:10;}
+	.st2{fill:#FFFFFF;stroke:#006E90;stroke-width:3.0485;stroke-miterlimit:10;}
+	.st3{fill:none;stroke:#006E90;stroke-width:4.5727;stroke-miterlimit:10;}
 </style>
 <path class="st0" d="M100,50.9c-4.5,2.1-6.3,6.5-13.4,6.5c-9.4,0-9.4-7.6-18.8-7.6c-9.4,0-9.4,7.6-18.8,7.6s-9.4-7.6-18.8-7.6
 	c-9.4,0-9.4,7.6-18.8,7.6c-5.9,0-8.1-2.9-11.2-5.2v47.7H100V50.9z"/>
@@ -33,11 +33,11 @@
 	<rect x="49.8" y="73.3" transform="matrix(0.4999 -0.8661 0.8661 0.4999 -32.3289 93.7185)" class="st1" width="30.3" height="3"/>
 </g>
 <g>
-	
+
 		<rect x="58.6" y="73.3" transform="matrix(0.4999 -0.8661 0.8661 0.4999 -27.9544 101.2945)" class="st1" width="30.3" height="3"/>
 </g>
 <g>
-	
+
 		<rect x="67.3" y="73.3" transform="matrix(0.4999 -0.8661 0.8661 0.4999 -23.5801 108.8702)" class="st1" width="30.3" height="3"/>
 </g>
 <polygon class="st1" points="100,62.4 97.5,61 82.3,87.2 85,88.7 100,62.7 "/>
