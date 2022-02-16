@@ -19,7 +19,6 @@
         <div class="module-content box">
           {% block eov_list %}
           {% set eov = h.cioos_get_eovs(show_all=True) %}
-          {% for grouper, list in eov|groupby('category') %}
           {% for grouper, list in eov|selectattr('active', 'undefined')|groupby('category') %}
           {% if grouper and grouper not in g.exclude_eov_category %}
           <h4>{{ _(grouper) }}</h4>
