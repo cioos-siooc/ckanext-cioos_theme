@@ -23,7 +23,7 @@
           {% if grouper and grouper not in g.exclude_eov_category %}
           <h4>{{ _(grouper) }}</h4>
           <ul class="media-grid" data-module="media-grid">
-            {% for item in list %}
+            {% for item in list|sort(attribute='name') %}
             {% if item.name not in g.exclude_eov %}
             {% set href = h.url_for(controller='dataset', action='search', eov=item.name) %}
             {% set label = label_function(item) if label_function else item.display_name %}

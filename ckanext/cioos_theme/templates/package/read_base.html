@@ -116,7 +116,7 @@
     More information about structured data:
     https://developers.google.com/search/docs/guides/intro-structured-data
     #}
-      {% if h.helper_available('structured_data') %}
+      {% if h.cioos_helper_available('structured_data') %}
           <script type="application/ld+json">
            {{ h.structured_data(pkg.id, profiles=['schemaorg','cioos_dcat'])|safe }}
           </script>
