@@ -38,10 +38,18 @@
       {% endif %}
     {% endblock %}
 
+    <ul class='formats'>
     {% if c.userobj %}
-    <a href="{{ h.url_for(controller='dataset', action='read', id=pkg.get('name') or pkg.id) }}.dcxml" class="btn"><i class="fa fa-icon fa-link"></i>{{ _(' DataCite XML')}}</a>
+    <li><a href="{{ h.url_for(controller='dataset', action='read', id=pkg.get('name') or pkg.id) }}.dcxml" class="btn"><i class="fa fa-icon fa-link"></i>{{ _(' DataCite XML')}}</a></li>
     {% endif %}
-    <a href="{{ h.url_for(controller='dataset', action='read', id=pkg.get('name') or pkg.id) }}" class="btn"><i class="fa fa-icon fa-link"></i>{{ _('Show Permalink')}}</a>
+    {% if h.cioos_helper_available('structured_data') %}
+    <li><a href="{{ h.url_for(controller='dataset', action='read', id=pkg.get('name') or pkg.id) }}.xml" class="btn"><i class="fa fa-icon fa-link"></i>{{ _('RDF/XML')}}</a></li>
+    <li><a href="{{ h.url_for(controller='dataset', action='read', id=pkg.get('name') or pkg.id) }}.ttl" class="btn"><i class="fa fa-icon fa-link"></i>{{ _('Turtle')}}</a></li>
+    <li><a href="{{ h.url_for(controller='dataset', action='read', id=pkg.get('name') or pkg.id) }}.n3" class="btn"><i class="fa fa-icon fa-link"></i>{{ _('Notation3')}}</a></li>
+    <li><a href="{{ h.url_for(controller='dataset', action='read', id=pkg.get('name') or pkg.id) }}.jsonld" class="btn"><i class="fa fa-icon fa-link"></i>{{ _('JSON-LD')}}</a></li>
+    {% endif %}
+    <li><a href="{{ h.url_for(controller='dataset', action='read', id=pkg.get('name') or pkg.id) }}" class="btn"><i class="fa fa-icon fa-link"></i>{{ _('Show Permalink')}}</a></li>
+    </ul>
 
   {% endblock %}
 

@@ -5,7 +5,7 @@
 {% block subtitle %}{{ _("Datasets") }}{% endblock %}
 
 {% block breadcrumb_content %}
-  <li class="active">{{ h.nav_link(_(dataset_type.title() + 's'), controller='dataset', action='search', named_route=dataset_type + '_search', highlight_actions = 'new index') }}</li>
+  <li class="active">{% link_for _(dataset_type.title() + 's'), named_route=dataset_type + '_search' %}</li>
 {% endblock %}
 
 {% block primary_content %}
@@ -24,6 +24,7 @@
           'search': c.search_facets,
           'titles': c.facet_titles,
           'translated_fields': c.translated_fields,
+          'extras': c.search_extras,
           'remove_field': c.remove_field }
         %}
         {% set sorting = [
@@ -76,8 +77,9 @@
 <div class="filters">
   <div>
     {% snippet "spatial/snippets/spatial_query.html" , default_extent= h.spatial_default_extent() %}
+    {% snippet "snippets/daterange.html" %}
     {% for facet in c.facet_titles %}
-      {{ h.snippet('snippets/facet_list.html', title=c.facet_titles[facet], name=facet) }}
+      {{ h.snippet('snippets/facet_list.html', title=c.facet_titles[facet], name=facet, hide_empty='true') }}
     {% endfor %}
   </div>
   <a class="close no-text hide-filters"><i class="fa fa-times-circle"></i><span class="text">close</span></a>

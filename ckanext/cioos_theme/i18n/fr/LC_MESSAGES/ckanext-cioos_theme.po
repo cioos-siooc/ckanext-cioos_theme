@@ -188,10 +188,10 @@ msgid "Maintenance Note"
 msgstr "Note de maintenance"
 
 msgid "Point of Contact"
-msgstr "Point de Contact"
+msgstr "Point de contact"
 
 msgid "Spatial Extent"
-msgstr "Étendue Spatiale"
+msgstr "Étendue spatiale"
 
 msgid "North Bounding Latitude"
 msgstr "Latitude limite Nord"
@@ -209,7 +209,7 @@ msgid "Temporal Extent"
 msgstr "Étendue temporelle"
 
 msgid "Vertical Extent"
-msgstr "Étendue Verticale"
+msgstr "Étendue verticale"
 
 msgid "Default Locale"
 msgstr "Langue par défaut"
@@ -227,7 +227,7 @@ msgstr "partie-responsable"
 
 #: ckanext/cioos_theme/templates/package/snippets/additional_info.html:104
 msgid "Responsible Party"
-msgstr "Partie Responsable"
+msgstr "Partie responsable"
 
 #: ckanext/cioos_theme/templates/package/snippets/additional_info.html:128
 msgid "spatial"
@@ -317,8 +317,11 @@ msgstr "Recherche, trouve, et télécharge - nos"
 msgid "SEARCH BY KEYWORD"
 msgstr "RECHERCHE PAR MOTS-CLÉS"
 
+msgid "Search By Keyword:"
+msgstr "Recherche par mots-clés:"
+
 msgid "Ocean Variables"
-msgstr "Variables Océaniques"
+msgstr "Variables océaniques"
 
 msgid "SEARCH BY OCEAN VARIABLE"
 msgstr "RECHERCHE PAR VARIABLE OCÉANIQUE"
@@ -562,3 +565,123 @@ msgstr "Ex. température"
 #: ckan/templates/user/read_base.html:20
 msgid "Activity Stream"
 msgstr "Flux d'Activités"
+
+msgid "Custodian"
+msgstr "Dépositaire"
+
+msgid "Name"
+msgstr "Nom"
+
+msgid "Email"
+msgstr "Courriel"
+
+msgid "Co Author"
+msgstr "Co-auteur"
+
+msgid "Rights Holder"
+msgstr "Ayant droit"
+
+msgid "Originator"
+msgstr "Initiateur"
+
+msgid "Distributor"
+msgstr "Distributeur"
+
+msgid "Collaborator"
+msgstr "Collaborateur"
+
+msgid "Contributor"
+msgstr "Contributeur"
+
+msgid "Editor"
+msgstr "Éditeur"
+
+msgid "Funder"
+msgstr "Fondateur"
+
+msgid "Mediator"
+msgstr "Médiateur"
+
+msgid "Processor"
+msgstr "transformateur"
+
+msgid "Publisher"
+msgstr "Éditeur"
+
+msgid "Publisher"
+msgstr "Éditeur"
+
+msgid "Resource Provider"
+msgstr "Fournisseur de ressources"
+
+msgid "Sponsor"
+msgstr "Commanditaire"
+
+msgid "Stakeholder"
+msgstr "Actionnaire"
+
+msgid "Trancient tracers"
+msgstr "Traceurs transitoire"
+
+msgid "Particulate matter"
+msgstr "Matière particulaire"
+
+msgid "Nitrous oxide"
+msgstr "Protoxyde d'azote"
+
+msgid "Stable carbon isotopes"
+msgstr "Carbone organique dissous"
+
+msgid "BioEcosystems"
+msgstr "Biologie et écosystèmes"
+
+msgid "Fish abundance and distribution"
+msgstr "Abondance et distribution de poissons"
+
+msgid "Invertebrate abundance and distribution"
+msgstr "Abondance et distribution d'invertébrés"
+
+msgid "Marine turtles, birds, mammals abundance and distribution"
+msgstr "Abondance et distribution de tortues marines, oiseaux et mammifères"
+
+msgid "Phytoplankton biomass and diversity"
+msgstr "Biomasse et diversité de phytoplancton"
+
+msgid "Zooplankton biomass and diversity"
+msgstr "Biomasse et diversité de zooplancton"
+
+msgid "Hard coral cover and composition"
+msgstr "Composition et couverture des coraux durs"
+
+msgid "Macroalgal canopy cover and composition"
+msgstr "Composition et couverture de la canopée de macroalgues"
+
+msgid "Microbe biomass and diversity"
+msgstr "Biomasse et diversité microbienne"
+
+msgid "Seagrass cover and composition"
+msgstr "Composition et couverture des herbiers marins"
+
+msgid "Ocean surface stress"
+msgstr "Contraintes sur la surface océanique"
+
+msgid "Subsurface currents"
+msgstr "Courants sous-marins"
+
+msgid "Ocean surface heat flux"
+msgstr "Flux de chaleur océanique de surface"
+
+msgid "English"
+msgstr "Anglais"
+
+msgid "Marine debris"
+msgstr "Débris marins"
+
+msgid "Ocean color"
+msgstr "Couleur des océans"
+
+msgid "Ocean sound"
+msgstr "Paysage acoustique des océans"
+
+msgid "Cross-disciplinary"
+msgstr "Interdisciplinaire"
