@@ -1,0 +1,13 @@
+{% for ident in uri or [] %}
+  {% set code = ident.get('code') %}
+  <div>
+  <a href="{{ code }}" class="">
+  {% if 'ror.org' in code %}
+    <img src="/base/images/ror-logo-small.png" class="identifier_icon_list">
+  {% elif 'wikidata' in code %}
+    <img src="/base/images/wikidata.png" class="identifier_icon_list">
+  {% else %}
+    <label>Id</label>
+  {% endif %}
+  {{ code.rsplit('/', 1)[-1] }}</a></div>
+{% endfor %}
