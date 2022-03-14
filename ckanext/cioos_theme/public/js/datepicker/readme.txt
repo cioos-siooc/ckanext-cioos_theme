@@ -1,0 +1,1 @@
+https://github.com/uxsolutions/bootstrap-datepicker/releases/tag/v1.9.0
