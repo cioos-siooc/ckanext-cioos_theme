@@ -515,9 +515,9 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                 data_dict['temporal-extent-begin'] = temporal_extent_begin
             if(temporal_extent_end):
                 data_dict['temporal-extent-end'] = temporal_extent_end
-            # If nether begin or end is set then we will still include these dataset in temporal searches by giving then an infinit time span
-            # if(temporal_extent_begin):
-            data_dict['temporal-extent-range'] = '[' + (temporal_extent_end or '*') + ' TO ' + (temporal_extent_end or '*') + ']'
+            # If end is not set then we will still include these dataset in temporal searches by giving them an end time of 'NOW'
+            if(temporal_extent_begin):
+                data_dict['temporal-extent-range'] = '[' + temporal_extent_begin + ' TO ' + (temporal_extent_end or '*') + ']'
 
         # create vertical extent index
         ve = data_dict.get('vertical-extent', '{}')
