@@ -571,16 +571,21 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         if '-dataset_type:harvest' not in search_params.get('fq', {}):
             return search_params
 
-        begin = '*'
-        end = '*'
-        if search_params.get('extras', None) and search_params['extras'].get('ext_year_begin', None):
-            begin = search_params['extras']['ext_year_begin']
-        if search_params.get('extras', None) and search_params['extras'].get('ext_year_end', None):
-            end = search_params['extras']['ext_year_end']
+        begin = search_params.get('extras', {}).get('ext_year_begin', '*')
+        end = search_params.get('extras', {}).get('ext_year_end', '*')
+        if begin == end == '*':
+            return search_params
 
         search_params['fq_list'] = search_params.get('fq_list', [])
-        search_params['fq_list'].append('+temporal-extent-range:[{begin} TO {end}]'
-                                        .format(begin=begin, end=end))
+
+        show_null_range = search_params.get('extras', {}).get('ext_show_empty_range', 'false')
+
+        if show_null_range == 'true':
+            search_params['fq_list'].append('+(temporal-extent-range:[{begin} TO {end}] OR (*:* NOT temporal-extent-range:[* TO *]))'
+                                            .format(begin=begin, end=end))
+        else:
+            search_params['fq_list'].append('+temporal-extent-range:[{begin} TO {end}]'
+                                            .format(begin=begin, end=end))
         return search_params
 
     # update eov search facets with keys from choices list in the scheming extension schema
