@@ -280,11 +280,14 @@ def menu():
 
 
 @menu.command()
-@click.argument(u"url", default='https://wordpress-742964-2495609.cloudwaysapps.com/wp-json/ra/menu/')
-@click.argument(u"template", default='ckanext-cioos_theme/ckanext/cioos_theme/templates/pacific_header_template.html')
-@click.argument(u"output", default='ckanext-cioos_theme/ckanext/cioos_theme/templates/pacific_header.html')
-@click.argument(u"echo", default=False)
+# 'https://wordpress-742964-2495609.cloudwaysapps.com/wp-json/ra/menu/'
+@click.option(u"--url", default=lambda: (config.get('ckan.site_home_url', config.get('ckan.site_home')) + '/wp-json/ra/menu/').replace("//", "/"), help="[ckan.site_home_url|ckan.site_home]/wp-json/ra/menu/")
+@click.option(u"--template", default='ckanext-cioos_theme/ckanext/cioos_theme/templates/ra_template.html', help="path to header template file")
+@click.option(u"--output", default='ckanext-cioos_theme/ckanext/cioos_theme/templates/ra_header.html', help="path to header output file")
+@click.option(u"--echo", default=False, help="echo file output to stdout")
 def create(url, template, output, echo):
+    '''create menu file from wordpress site'''
+
     import requests
 
     def process_list_item(menu_item, indent=2, parent_class=''):
