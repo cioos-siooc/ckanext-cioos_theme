@@ -280,12 +280,10 @@ def menu():
 
 
 @menu.command()
-# 'https://wordpress-742964-2495609.cloudwaysapps.com/wp-json/ra/menu/'
 @click.option(u"--url", default=lambda: (config.get('ckan.site_home_url', config.get('ckan.site_home')) + '/wp-json/ra/menu/').replace("//", "/"), help="[ckan.site_home_url|ckan.site_home]/wp-json/ra/menu/")
-@click.option(u"--template", default='ckanext-cioos_theme/ckanext/cioos_theme/templates/ra_template.html', help="path to header template file")
-@click.option(u"--output", default='ckanext-cioos_theme/ckanext/cioos_theme/templates/ra_header.html', help="path to header output file")
+@click.option(u"--output", default='/menu/menu_list.html', help="path to menu list output file")
 @click.option(u"--echo", default=False, help="echo file output to stdout")
-def create(url, template, output, echo):
+def create(url, output, echo):
     '''create menu file from wordpress site'''
 
     import requests
@@ -324,15 +322,9 @@ def create(url, template, output, echo):
     content += out_fr
     content += "  {% endif %}\n"
 
-    # Read in the file
-    with open(template, 'r') as file:
-        templatedata = file.read()
+    # Write the file to disk
+    with open('ckanext-cioos_theme/ckanext/cioos_theme/templates' + output, 'w') as file:
+        file.write(content)
 
-    # Replace the target string
-    templatedata = templatedata.replace('[MENU ITEMS]', content)
-
-    # Write the file out again
-    with open(output, 'w') as file:
-        file.write(templatedata)
-
-    print(templatedata)
+    if echo:
+        print(content)
