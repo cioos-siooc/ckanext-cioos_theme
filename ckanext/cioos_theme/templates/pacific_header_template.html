@@ -1,0 +1,34 @@
+{% macro include_mobile_header() %}
+{% block header_mobilesite_navigation2 %}
+<nav>
+  <ul id="menu-mobile-menu" class="menu">
+    [MENU ITEMS]
+    <ul class="shareicons">
+      {{ include_site_social() }}
+      <li>
+        {%- if h.lang() == 'en' -%}
+        <a href="{% url_for h.current_url(), locale='fr' %}" tabindex="0" aria-label="French/English">FR</a>
+        {%- else -%}
+        <a href="{% url_for h.current_url(), locale='en' %}" tabindex="0" aria-label="French/English">EN</a>
+        {%- endif -%}
+      </li>
+    </ul>
+  </ul>
+</nav>
+{% endblock %}
+{% endmacro %}
+
+{% macro include_site_header() %}
+{% block header_main %}
+<ul id="menu-main-menu" class="menu">
+  [MENU ITEMS]
+</ul>
+{% endblock %}
+{% endmacro %}
+
+{% macro include_site_social() %}
+  {% block header_social_list %}
+    <li><a href="https://www.facebook.com/CIOOSPacific/" tabindex="0" aria-label="Facebook"><i class="fa fa-facebook"></i></a></li>
+    <li><a href="http://twitter.com/cioos_siooc" tabindex="0" aria-label="Twitter"><i class="fa fa-twitter"></i></a></li>
+  {% endblock %}
+{% endmacro %}
