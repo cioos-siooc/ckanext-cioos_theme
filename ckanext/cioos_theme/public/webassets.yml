@@ -15,3 +15,13 @@ bootstrap_datepicker_css:
   output: ckanext-cioos_theme/%(version)s_bootstrap_datepicker.css
   contents:
     - js/datepicker/bootstrap-datepicker3.css
+
+truncate_js:
+  filter: rjsmin
+  output: ckanext-cioos_theme/%(version)s_truncate.js
+  extra:
+    preload:
+      - base/main
+      - vendor/jquery
+  contents:
+    - js/modules/truncate.js
