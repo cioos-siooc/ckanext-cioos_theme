@@ -82,6 +82,29 @@
     {% snippet "package/snippets/metadata_source.html", pkg_dict=pkg %}
   {% endblock %}
 
+  <section id="dataset-contacts" class="additional-info">
+    <h3>
+      <a class="section_hide_controle collapsed" data-toggle="collapse" href="#contacts-container" role="button" aria-expanded="false" aria-controls="contacts_info_list">
+      {{ _('Contacts') }}<i class="fa"></i>
+      </a>
+    </h3>
+    <div id="contacts-container" class="flex-panels collapse">
+
+      {% set field = h.scheming_field_by_name(schema.dataset_fields, 'cited-responsible-party') %}
+      {% set cpkg = pkg.copy() %}
+      {%- set _ = cpkg.update({"cited-responsible-party": h.cioos_group_contacts(cpkg.get('cited-responsible-party') + cpkg.get('metadata-point-of-contact') + cpkg.get('distributor'))}) -%}
+      {%- snippet "scheming/display_snippets/repeating_subfields.html",
+        field=field,
+        data=cpkg,
+        errors=errors,
+        entity_type=entity_type,
+        object_type=object_type
+      -%}
+
+    </div>
+  </section>
+
+
   {% block package_additional_info %}
     {% snippet "scheming/package/snippets/additional_info.html", pkg_dict=pkg, dataset_type=dataset_type, schema=schema %}
   {% endblock %}
