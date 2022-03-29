@@ -130,9 +130,9 @@
           <li class="nav-item"><a href="{{ h.url_for(controller='dataset', action='read', id=pkg.get('name') or pkg.id) }}.n3"><span class="item-label">{{ _('Notation3')}}</span></a></li>
           <li class="nav-item"><a href="{{ h.url_for(controller='dataset', action='read', id=pkg.get('name') or pkg.id) }}.jsonld"><span class="item-label">{{ _('JSON-LD')}}</span></a></li>
         {% endif %}
-          <li><a href="{{ h.url_for(controller='api',
+          <li class="nav-item"><a href="{{ h.url_for(controller='api',
                               logic_function='package_show',
-                              action='action', ver=3, id=pkg.get('name') or pkg.id) }}" class="btn"><i class="fa fa-icon fa-link"></i>{{ _('JSON')}}</a></li>
+                              action='action', ver=3, id=pkg.get('name') or pkg.id) }}"><span class="item-label">{{ _('JSON')}}</span></a></li>
           <li class="nav-item"><a href="{{ h.url_for(controller='dataset', action='read', id=pkg.get('name') or pkg.id) }}"><span class="item-label">{{ _('Show Permalink')}}</span></a></li>
         </ul>
       </nav>
