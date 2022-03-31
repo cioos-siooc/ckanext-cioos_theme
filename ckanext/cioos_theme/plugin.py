@@ -7,6 +7,7 @@ import ckanext.cioos_theme.helpers as cioos_helpers
 import ckanext.cioos_theme.cli as cli
 import ckanext.cioos_theme.util.package_relationships as pr
 from ckanext.scheming.validation import scheming_validator
+from ckanext.scheming.helpers import scheming_language_text
 from ckan.logic import NotFound
 from ckan.lib.plugins import DefaultTranslation
 import ckan.model as model
@@ -186,6 +187,10 @@ def render_datacite_xml(id):
     pkg = toolkit.get_action('package_show')(data_dict={'id': id})
     return toolkit.render('package/datacite.html', extra_vars={'pkg_dict': pkg})
 
+def render_basic_package_view(id):
+    pkg = toolkit.get_action('package_show')(data_dict={'id': id})
+    return toolkit.render('package/basic.html', extra_vars={'pkg_dict': pkg})
+
 class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
     plugins.implements(plugins.ITranslation)
     plugins.implements(plugins.IConfigurer)
@@ -207,6 +212,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         rules = [
             ('/schemamap', 'schemamap', render_schemamap),
             ('/dataset/<id>.dcxml', 'datacite_xml', render_datacite_xml),
+            ('/dataset/<id>.basic', 'package_basic', render_basic_package_view),
         ]
         for rule in rules:
             blueprint.add_url_rule(*rule)
@@ -641,20 +647,24 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             if result.get('metadata-point-of-contact'):
                 result['metadata-point-of-contact'] = self.group_by_ind_or_org(result.get('metadata-point-of-contact'))
 
+            # fluent output validators set title and notes to the default language on package_show
+            # doing the same here so the output is consistent
             title = result.get('title_translated')
             if(title):
                 result['title_translated'] = cioos_helpers.load_json(title)
+                if isinstance(result['title_translated'], dict):
+                    result['title'] = scheming_language_text(result['title_translated'], toolkit.config.get('ckan.locale_default', 'en'))
             notes = result.get('notes_translated')
             if(notes):
                 result['notes_translated'] = cioos_helpers.load_json(notes)
+                if isinstance(result['notes_translated'], dict):
+                    result['notes'] = scheming_language_text(result['notes_translated'], toolkit.config.get('ckan.locale_default', 'en'))
 
             # convert the rest of the strings to json
             for field in [
                     "keywords",
-                    # "spatial", removed as making the field json brakes the dataset_map template
                     "temporal-extent",
                     "unique-resource-identifier-full",
-                    "notes",
                     "vertical-extent",
                     "dataset-reference-date",
                     "metadata-reference-date",
@@ -686,8 +696,6 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                         result['organization'] = organization
                 else:
                     log.warn('No org details for owner_org %s', result.get('org_descriptionid'))
-            # else:
-            #    log.warn('No owner_org for dataset %s: %s: %s', result.get('id'), result.get('name'), result.get('title'))
 
         return search_results
 
@@ -745,10 +753,8 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         # convert the rest of the strings to json
         for field in [
                 "keywords",
-                # "spatial", removed as making the field json brakes the dataset_map template
                 "temporal-extent",
                 "unique-resource-identifier-full",
-                "notes",
                 "vertical-extent",
                 "dataset-reference-date",
                 "metadata-reference-date",
@@ -758,25 +764,6 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             if tmp:
                 result[field] = cioos_helpers.load_json(tmp)
         package_dict = result
-
-
-        # title and notes must be a string or the index process errors
-        if isinstance(package_dict.get('title'), dict):
-            package_dict['title'] = json.dumps(package_dict.get('title'))
-        if isinstance(package_dict.get('notes'), dict):
-            package_dict['notes'] = json.dumps(package_dict.get('notes'))
-
-        # if(package_dict.get('title') and re.search(r'\\\\u[0-9a-fA-F]{4}', package_dict.get('title'))):
-        #     if isinstance(package_dict.get('title'), str):
-        #         package_dict['title'] = package_dict.get('title').encode().decode('unicode-escape')
-        #     else:  # we have bytes
-        #         package_dict['title'] = package_dict.get('title').decode('unicode-escape')
-        #
-        # if(package_dict.get('notes') and re.search(r'\\\\u[0-9a-fA-F]{4}', package_dict.get('notes'))):
-        #     if isinstance(package_dict.get('notes'), str):
-        #         package_dict['notes'] = package_dict.get('notes').encode().decode('unicode-escape')
-        #     else:  # we have bytes
-        #         package_dict['notes'] = package_dict.get('notes').decode('unicode-escape')
 
         # Update package relationships with package name
         ras = package_dict['relationships_as_subject']
