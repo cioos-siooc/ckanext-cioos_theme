@@ -105,6 +105,30 @@ def clean_and_populate_eovs(field, schema):
 
 
 @scheming_validator
+def clean_and_populate_projects(field, schema):
+
+    def validator(key, data, errors, context):
+
+        keywords_main = data.get(('keyword-project',), {})
+        if keywords_main:
+            project_data = keywords_main.get('en', [])
+        else:
+            extras = data.get(("__extras", ), {})
+            project_data = extras.get('keyword-project-en', '').split(',')
+
+        d = json.loads(data.get(key, '[]'))
+        for x in project_data:
+            if x not in d:
+                d.append(x)
+
+        data[key] = json.dumps(d)
+        return data
+
+    return validator
+
+
+
+@scheming_validator
 def fluent_field_default(field, schema):
 
     def validator(key, data, errors, context):
@@ -333,6 +357,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         return {
             # 'cioos_if_empty_same_as__extras': if_empty_same_as__extras,
             'cioos_clean_and_populate_eovs': clean_and_populate_eovs,
+            'cioos_clean_and_populate_projects': clean_and_populate_projects,
             'cioos_fluent_field_default': fluent_field_default,
             'cioos_url_validator_with_port': url_validator_with_port,
             'cioos_tag_name_validator': cioos_tag_name_validator,
