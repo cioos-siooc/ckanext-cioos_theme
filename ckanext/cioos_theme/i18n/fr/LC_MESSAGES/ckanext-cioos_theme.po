@@ -685,3 +685,12 @@ msgstr "Paysage acoustique des océans"
 
 msgid "Cross-disciplinary"
 msgstr "Interdisciplinaire"
+
+msgid "Year"
+msgstr "Année"
+
+msgid " to "
+msgstr " à "
+
+msgid "Show blank range"
+msgstr "Afficher étendue vide"
