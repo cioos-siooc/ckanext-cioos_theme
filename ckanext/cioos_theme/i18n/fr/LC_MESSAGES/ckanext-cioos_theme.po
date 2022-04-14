@@ -677,7 +677,7 @@ msgstr "Anglais"
 msgid "Marine debris"
 msgstr "Débris marins"
 
-msgid "Ocean color"
+msgid "Ocean colour"
 msgstr "Couleur des océans"
 
 msgid "Ocean sound"
