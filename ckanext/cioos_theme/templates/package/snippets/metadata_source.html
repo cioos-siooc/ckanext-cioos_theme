@@ -13,8 +13,8 @@
         <td style="width:76px;"><img src='{{ image_url }}' style="max-height:50px; max-width: 50px;" /></td>
         {% endif %}
         <td>
-          {% set xml_location_extras = pkg_dict.extras | selectattr("key","equalto","xml_location_url") | map(attribute="value") | join('')%}
-          {% set xml_modified_date = pkg_dict.extras | selectattr("key","equalto","xml_modified_date") | map(attribute="value") | join('')%}
+          {% set xml_location_extras = pkg_dict.extras | selectattr("key","equalto","xml_location_url") | map(attribute="value") | join('') %}
+          {% set xml_modified_date = pkg_dict.extras | selectattr("key","equalto","xml_modified_date") | map(attribute="value") | join('') | replace(' ','T') %}
           {% set h_source_url = pkg_dict.extras | selectattr("key","equalto","h_source_url") | map(attribute="value") | join('') %}
           {% set remote_ckan_base_url = pkg_dict.extras | selectattr("key","equalto","remote_ckan_base_url") | map(attribute="value") | join('') %}
           {% set source_guid = pkg_dict.extras | selectattr("key","equalto","guid") | map(attribute="value") | join('') %}
@@ -49,7 +49,8 @@
           </p>
 
           {% if xml_modified_date %}
-          <p style="margin-left:50px;font-size:small;line-height: 1;margin-bottom: 2.5px;"><span>{{ _("Source last modified") }} </span> {% snippet 'snippets/local_friendly_datetime.html', datetime_obj=xml_modified_date %}</p>
+          <p style="margin-left:50px;font-size:small;line-height: 1;margin-bottom: 2.5px;"><span>{{ _("Source last modified") }} </span>
+          {{- h.render_datetime(h.date_str_to_datetime(xml_modified_date), "MMMM dd, YYYY 'at' hh:mm", with_hours=true) -}}</p>
           {% else %}
           {% endif %}
 

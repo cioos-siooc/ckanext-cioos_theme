@@ -4,7 +4,8 @@ import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
 import ckan.model as model
 import ckanext.cioos_theme.helpers as cioos_helpers
-import ckanext.cioos_theme.package_relationships as pr
+import ckanext.cioos_theme.cli as cli
+import ckanext.cioos_theme.util.package_relationships as pr
 from ckanext.scheming.validation import scheming_validator
 from ckan.logic import NotFound
 from ckan.lib.plugins import DefaultTranslation
@@ -22,17 +23,14 @@ import ckan.lib.base as base
 import re
 import time
 
-
-
 Invalid = df.Invalid
-
-log = logging.getLogger(__name__)
 
 # import debugpy
 
 StopOnError = df.StopOnError
 missing = df.missing
 log = logging.getLogger(__name__)
+log_auth = logging.getLogger(__name__ + '.auth')
 
 # debugpy.listen(('0.0.0.0', 5678))
 # log.debug("Waiting for debugger attach")
@@ -169,13 +167,13 @@ def cioos_is_valid_range(field, schema):
     return validator
 
 
-def render_schemamap(self):
+def render_schemamap():
     return toolkit.render('schemamap.html')
 
-def render_datacite_xml(self, id):
+def render_datacite_xml(id):
     context = {'model': model, 'session': model.Session,
-               'user': c.user, 'for_view': True,
-               'auth_user_obj': c.userobj}
+               'user': g.user, 'for_view': True,
+               'auth_user_obj': g.userobj}
     data_dict = {'id': id}
 
     try:
@@ -183,7 +181,7 @@ def render_datacite_xml(self, id):
     except toolkit.ObjectNotFound:
         toolkit.abort(404, _('Dataset not found'))
     except toolkit.NotAuthorized:
-        toolkit.abort(403, _('User %r not authorized to view datacite xml for %s') % (c.user, id))
+        toolkit.abort(403, _('User %r not authorized to view datacite xml for %s') % (g.user, id))
 
     pkg = toolkit.get_action('package_show')(data_dict={'id': id})
     return toolkit.render('package/datacite.html', extra_vars={'pkg_dict': pkg})
@@ -196,14 +194,19 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
     plugins.implements(plugins.IPackageController, inherit=True)
     plugins.implements(plugins.IValidators)
     plugins.implements(plugins.IAuthenticator)
+    plugins.implements(plugins.IClick)
     plugins.implements(plugins.IBlueprint)
 
-    #IBlueprint
+    # IClick
+    def get_commands(self):
+        return cli.get_commands()
+
+    # IBlueprint
     def get_blueprint(self):
-        blueprint = Blueprint('foo', self.__module__)
+        blueprint = Blueprint('cioos', self.__module__)
         rules = [
             ('/schemamap', 'schemamap', render_schemamap),
-            ('/dataset/{id}.{format}', 'datacite_xml', render_datacite_xml),
+            ('/dataset/<id>.dcxml', 'datacite_xml', render_datacite_xml),
         ]
         for rule in rules:
             blueprint.add_url_rule(*rule)
@@ -218,7 +221,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         except KeyError:
             remote_addr = toolkit.request.remote_addr
 
-        log.info('Request by %s for %s from %s', toolkit.request.remote_user, toolkit.request.url, remote_addr)
+        log_auth.info('Request by %s for %s from %s', toolkit.request.remote_user, toolkit.request.url, remote_addr)
         g.user = None
         g.userobj = None
         return
@@ -228,7 +231,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             remote_addr = toolkit.request.headers['X-Forwarded-For']
         except KeyError:
             remote_addr = toolkit.request.remote_addr
-        log.info('Login attempt from %s', remote_addr)
+        log_auth.info('Login attempt from %s', remote_addr)
         return
 
     def logout(self):
@@ -236,7 +239,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             remote_addr = toolkit.request.headers['X-Forwarded-For']
         except KeyError:
             remote_addr = toolkit.request.remote_addr
-        log.info('Logout by %s from %s', toolkit.request.remote_user, remote_addr)
+        log_auth.info('Logout by %s from %s', toolkit.request.remote_user, remote_addr)
         return
 
     def abort(self, status_code, detail, headers, comment):
@@ -245,7 +248,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             remote_addr = toolkit.request.headers['X-Forwarded-For']
         except KeyError:
             remote_addr = toolkit.request.remote_addr
-        log.info('Blocked request to %s with status %s becouse "%s" from %s', toolkit.request.url, status_code, detail, remote_addr)
+        log_auth.info('Blocked request to %s with status %s becouse "%s" from %s', toolkit.request.url, status_code, detail, remote_addr)
         return (status_code, detail, headers, comment)
 
     # IConfigurer
@@ -254,6 +257,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         toolkit.add_template_directory(config_, 'templates')
         toolkit.add_public_directory(config_, 'public')
         toolkit.add_resource('fanstatic', 'cioos_theme')
+        toolkit.add_resource('public', 'ckanext-cioos_theme')
 
     def update_config_schema(self, schema):
 
@@ -281,7 +285,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         return schema
 
     def get_additional_css_path(self):
-        return toolkit.config.get('ckan.cioos.ra_css_path', '/ra.css')
+        return toolkit.config.get('ckan.cioos.ra_css_path')
 
     def get_helpers(self):
         """Register the most_popular_groups() function above as a template helper function."""
@@ -315,7 +319,8 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             'cioos_get_doi_authority_url': cioos_helpers.get_doi_authority_url,
             'cioos_get_doi_prefix': cioos_helpers.get_doi_prefix,
             'cioos_get_datacite_org': cioos_helpers.get_datacite_org,
-            'cioos_get_datacite_test_mode': cioos_helpers.get_datacite_test_mode
+            'cioos_get_datacite_test_mode': cioos_helpers.get_datacite_test_mode,
+            'cioos_helper_available': cioos_helpers.helper_available
         }
 
     def get_validators(self):
@@ -390,6 +395,14 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         :return:
         """
 
+        # populate search_extras global if any were used
+        search_extras = {}
+        for (param, value) in toolkit.request.params.items():
+            if param not in ['q', 'page', 'sort'] \
+                    and len(value) and param.startswith('ext_'):
+                search_extras[param] = value
+        toolkit.c.search_extras = search_extras
+
         # remove groups facet
         if 'groups' in facets_dict:
             facets_dict.pop('groups')
@@ -427,9 +440,10 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                 resp_orgs = [force_responsible_organization]
         else:
             resp_org_roles = cioos_helpers.load_json(toolkit.config.get('ckan.responsible_organization_roles', '["owner", "originator", "custodian", "author", "principalInvestigator"]'))
-            resp_orgs = [x.get('organisation-name', '').strip() for x in cioos_helpers.load_json(parties) if x.get('role') in resp_org_roles]
+            resp_orgs = [x.get('organisation-name', '').strip() for x in cioos_helpers.load_json(parties) if not set(cioos_helpers.load_json(x.get('role'))).isdisjoint(resp_org_roles)]
             resp_orgs = list(dict.fromkeys(resp_orgs))  # remove duplicates
             resp_orgs = list(filter(None, resp_orgs))  # remove empty elements (in a python 2 and 3 friendly way)
+
         return resp_orgs
 
     def _get_extra_value(self, key, package_dict):
@@ -501,8 +515,9 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                 data_dict['temporal-extent-begin'] = temporal_extent_begin
             if(temporal_extent_end):
                 data_dict['temporal-extent-end'] = temporal_extent_end
-            if(temporal_extent_begin and temporal_extent_end):
-                data_dict['temporal-extent-range'] = '[' + temporal_extent_begin + ' TO ' + temporal_extent_end + ']'
+            # If end is not set then we will still include these dataset in temporal searches by giving them an end time of 'NOW'
+            if(temporal_extent_begin):
+                data_dict['temporal-extent-range'] = '[' + temporal_extent_begin + ' TO ' + (temporal_extent_end or '*') + ']'
 
         # create vertical extent index
         ve = data_dict.get('vertical-extent', '{}')
@@ -520,6 +535,58 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             data_dict['eov'] = cioos_helpers.load_json(data_dict['eov'])
 
         return data_dict
+
+
+    # group a list of dictionaries based on individual-name or organization-name keys
+    def group_by_ind_or_org(self, dict_list):
+        from collections import defaultdict
+        from collections import OrderedDict
+        out = []
+        dict_out = {}
+
+        for d in dict_list:
+            group_value = d.get('individual-name') or d.get('organisation-name')
+            if not dict_out.get(group_value):
+                dict_out[group_value] = defaultdict(list)
+            for key, value in d.items():
+                if isinstance(value, list):
+                    dict_out[group_value][key] = dict_out[group_value][key] + value
+                else:
+                    dict_out[group_value][key].append(value)
+        for d in dict_list:
+            group_value = d.get('individual-name') or d.get('organisation-name')
+            dict_out[group_value] = dict(dict_out[group_value])
+
+        for k1, v1 in dict_out.items():
+            for k, v in v1.items():
+                v1[k] = list(OrderedDict.fromkeys(v))
+                if len(v1[k]) == 1:
+                    v1[k] = v1[k][0]
+            out.append(v1)
+        return out
+
+    # handle custom temporal range search facet
+    def before_search(self, search_params):
+
+        if '-dataset_type:harvest' not in search_params.get('fq', {}):
+            return search_params
+
+        begin = search_params.get('extras', {}).get('ext_year_begin', '*')
+        end = search_params.get('extras', {}).get('ext_year_end', '*')
+        if begin == end == '*':
+            return search_params
+
+        search_params['fq_list'] = search_params.get('fq_list', [])
+
+        show_null_range = search_params.get('extras', {}).get('ext_show_empty_range', 'false')
+
+        if show_null_range == 'true':
+            search_params['fq_list'].append('+(temporal-extent-range:[{begin} TO {end}] OR (*:* NOT temporal-extent-range:[* TO *]))'
+                                            .format(begin=begin, end=end))
+        else:
+            search_params['fq_list'].append('+temporal-extent-range:[{begin} TO {end}]'
+                                            .format(begin=begin, end=end))
+        return search_params
 
     # update eov search facets with keys from choices list in the scheming extension schema
     # format search results for consistant json output
@@ -568,6 +635,11 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             cited_responsible_party = result.get('cited-responsible-party')
             if((cited_responsible_party or force_resp_org) and not result.get('responsible_organizations')):
                 result['responsible_organizations'] = self._cited_responsible_party_to_responsible_organizations(cited_responsible_party, force_resp_org)
+
+            if result.get('cited-responsible-party'):
+                result['cited-responsible-party'] = self.group_by_ind_or_org(result.get('cited-responsible-party'))
+            if result.get('metadata-point-of-contact'):
+                result['metadata-point-of-contact'] = self.group_by_ind_or_org(result.get('metadata-point-of-contact'))
 
             title = result.get('title_translated')
             if(title):
@@ -656,6 +728,11 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         cited_responsible_party = package_dict.get('cited-responsible-party')
         if((cited_responsible_party or force_resp_org) and not package_dict.get('responsible_organizations')):
             package_dict['responsible_organizations'] = self._cited_responsible_party_to_responsible_organizations(cited_responsible_party, force_resp_org)
+
+        if package_dict.get('cited-responsible-party'):
+            package_dict['cited-responsible-party'] = self.group_by_ind_or_org(package_dict.get('cited-responsible-party'))
+        if package_dict.get('metadata-point-of-contact'):
+            package_dict['metadata-point-of-contact'] = self.group_by_ind_or_org(package_dict.get('metadata-point-of-contact'))
 
         result = package_dict
         title = result.get('title_translated')
