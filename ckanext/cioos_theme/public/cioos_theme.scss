@@ -751,9 +751,13 @@ ul.formats{
   margin-bottom: 10px;
 }
 
-.media-item-disabled {
+.media-item-disabled:active {
   pointer-events: none;
-  opacity: 0.6;
+}
+
+.media-item-disabled {
+  pointer-events: auto;
+  opacity: .6;
 }
 
 div.search-input-group {
