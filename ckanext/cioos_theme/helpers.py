@@ -15,7 +15,6 @@ import ckan.logic as logic
 import ckan.model as model
 from ckan.model import PackageRelationship
 from ckan.common import config
-from paste.deploy.converters import asbool
 import copy
 import logging
 import json
@@ -240,6 +239,49 @@ def cioos_schema_field_map():
     schema = toolkit.h.scheming_get_dataset_schema('dataset')
     doc = spatial_model.ISODocument('<xml></xml>')
 
+    # Datacite
+    fields = schema['dataset_fields']
+    # build blank dic
+
+    def build_dict(fields, name=None):
+        out = {}
+        for f in fields:
+            if "repeating_subfields" in f:
+                out[f["field_name"]] = [build_dict(f["repeating_subfields"], '|'.join([name, f["field_name"]]) if name else f["field_name"])]
+            elif "simple_subfields" in f:
+                out[f["field_name"]] = build_dict(f["simple_subfields"], '|'.join([name, f["field_name"]]) if name else f["field_name"])
+            else:
+                out[f["field_name"]] = '|'.join([name, f["field_name"]]) if name else f["field_name"]
+        return out
+
+    field_dict = build_dict(fields)
+    log.debug('FIELD DICT: %r', field_dict)
+
+    import lxml
+    import re
+
+    dcxml = toolkit.render_snippet('package/snippets/datacite_xml.html', data={"pkg": field_dict})
+    dcxml = re.sub("(?=<!--)([\s\S]*?)-->\s*", "", dcxml)
+    dcxml = dcxml.strip()
+    log.debug('DC XML: %r', dcxml)
+
+    root = lxml.etree.fromstring(dcxml.encode())
+    tree = lxml.etree.ElementTree(root)
+    # for e in root.iter():
+    #     log.debug(tree.getelementpath(e))
+
+    find_text = tree.xpath("//text()")
+    # paths = {node.text: tree.getelementpath(node.getparent()) for node in find_text(tree)}
+    # log.debug(paths)
+
+    for node in find_text:
+        log.debug(node)
+        #path = tree.getpath(node.getparent())
+        #newpath = [str(s) for s in path]
+        #log.debug(newpath)
+
+    #log.debug('%r', [tree.getpath(node.getparent()) for node in find_text])
+
     # load classes, we have to pre load class defenitions and later update them
     # vecouse pickle dosn't do it properly. Might be becouse our isodocument
     # class is so large
@@ -303,7 +345,6 @@ def cioos_schema_field_map_parent(fields, isodoc_dict, class_dict, mapkey, capti
         # update class with pre determined definition if appropreit
         if objtype != 'ISOElement' and item.get('elements') and objtype.startswith('ISO'):
             class_json_def = json.loads(class_dict.get(objtype, {}).get('class', '{}'))
-            log.debug(class_json_def)
             elem = class_json_def.get('elements', [])
             item['elements'] = elem
 
