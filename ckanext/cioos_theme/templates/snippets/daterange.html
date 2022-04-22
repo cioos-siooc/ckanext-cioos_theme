@@ -13,13 +13,14 @@
             data-date-min-view-mode="2"
             data-date-autoclose="true"
             data-date-end-date="+0d"
-            data-date-keep-empty-values="true">
+            data-date-keep-empty-values="true"
+            data-date-language="{{ h.lang() }}">
          <input type='text' id='datepickerbegin' class="form-control datepicker"/>
-         <div class="input-group-addon">to</div>
+         <div class="input-group-addon">{{ _(' to ')}}</div>
          <input type='text' id='datepickerend' class="form-control datepicker" />
       </div>
       <input class="form-check-input module-content" type="checkbox" value="true" id="datepickernullrange">
-      <label id="datepickernullrangelabel" for="datepickernullrange">Show blank range</label>
+      <label id="datepickernullrangelabel" for="datepickernullrange">{{ _('Show blank range') }}</label>
     </div>
 </section>
 
