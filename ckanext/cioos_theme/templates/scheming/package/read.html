@@ -12,8 +12,8 @@
 
   {% if ( h.scheming_field_by_name(schema.dataset_fields, 'notes') or h.scheming_field_by_name(schema.dataset_fields, 'notes_translated') ) and h.get_translated(pkg, 'notes') %}
     <div class="notes embedded-content">
-      {{ h.render_markdown(h.get_translated(pkg, 'notes')) }}
+      {{ h.markdown_extract(h.get_translated(pkg, 'notes'), extract_length=200) }}
     </div>
   {% endif %}
-
+  {% asset 'ckanext-cioos_theme/truncate_js' %}
 {% endblock %}
