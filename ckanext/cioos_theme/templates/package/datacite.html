@@ -66,10 +66,17 @@
       {% for party in h.cioos_load_json(pkg['cited-responsible-party']) %}
         {%- if party['individual-name'] -%}
         <creator>
-          {% set names = party['individual-name'].split(' ') -%}
-          <creatorName nameType="Personal">{{ names[-1], ' '.join(names[:-1]) }}</creatorName>
-          <givenName>{{ ' '.join(names[:-1]) }}</givenName>
-          <familyName>{{ names[-1] }}</familyName>
+          {% if ',' in party['individual-name'] %}
+            {% set names = party['individual-name'].split(',') -%}
+            <creatorName nameType="Personal">{{ party['individual-name'] }}</creatorName>
+            <givenName>{{ names[1].strip() }}</givenName>
+            <familyName>{{ names[0] }}</familyName>
+          {% else %}
+            {% set names = party['individual-name'].split(' ') -%}
+            <creatorName nameType="Personal">{{ names[-1], ' '.join(names[:-1]) }}</creatorName>
+            <givenName>{{ ' '.join(names[:-1]) }}</givenName>
+            <familyName>{{ names[-1] }}</familyName>
+          {% endif %}
           {% if party['organisation-name'] -%}
           <affiliation>{{party['organisation-name']}}</affiliation>
           {%- endif %}
@@ -105,7 +112,12 @@
     <contributors>
       {%- for party in h.cioos_load_json(pkg['distributor']) %}
       <contributor contributorType="{{party['role'][0]|title}}">
-        {%- if party['individual-name'] -%}
+        {% if ',' in party['individual-name'] %}
+          {% set names = party['individual-name'].split(',') -%}
+          <creatorName nameType="Personal">{{ party['individual-name'] }}</creatorName>
+          <givenName>{{ names[1].strip() }}</givenName>
+          <familyName>{{ names[0] }}</familyName>
+        {% elif party['individual-name'] -%}
           {% set names = party['individual-name'].split(' ') -%}
         {% else %}
           {% set names = party['organisation-name'].split(' ') -%}
