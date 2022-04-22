@@ -8,6 +8,7 @@ bootstrap_datepicker_js:
       - vendor/jquery
   contents:
     - js/datepicker/bootstrap-datepicker.min.js
+    - js/datepicker/bootstrap-datepicker.fr.min.js
     - js/modules/date-query.js
 
 bootstrap_datepicker_css:

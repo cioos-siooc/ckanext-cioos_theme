@@ -1,7 +1,7 @@
 {% extends "page.html" %}
 
 {% set pkg = c.pkg_dict or pkg_dict %}
-{% block subtitle %}{{ _('Schema Map') }}{% endblock %}
+{% block subtitle %}{{ _('DataCite XML') }}{% endblock %}
 {% set dataset_type = dataset_type or pkg.type or 'dataset' %}
 {% set dataset = h.dataset_display_name(pkg) %}
 
