@@ -1,6 +1,8 @@
 <section class="metadata_source">
-  <h3>{{ _('Metadata Source') }}</h3>
-  <table class="table table-bordered table-condensed">
+  <h3><a class="section_hide_controle collapsed" data-toggle="collapse" href="#metadata_source_info_table" role="button" aria-expanded="false" aria-controls="metadata_source_info_table">
+  {{ _('Metadata Source') }}<i class="fa"></i>
+  </a></h3>
+  <table id="metadata_source_info_table" class="table table-bordered table-condensed collapse">
     <tbody>
       {% block package_metadata_source %}
       <tr>

@@ -7,6 +7,7 @@ import ckanext.cioos_theme.helpers as cioos_helpers
 import ckanext.cioos_theme.cli as cli
 import ckanext.cioos_theme.util.package_relationships as pr
 from ckanext.scheming.validation import scheming_validator
+from ckanext.scheming.helpers import scheming_language_text
 from ckan.logic import NotFound
 from ckan.lib.plugins import DefaultTranslation
 import ckan.model as model
@@ -104,6 +105,30 @@ def clean_and_populate_eovs(field, schema):
 
 
 @scheming_validator
+def clean_and_populate_projects(field, schema):
+
+    def validator(key, data, errors, context):
+
+        keywords_main = data.get(('keyword-project',), {})
+        if keywords_main:
+            project_data = keywords_main.get('en', [])
+        else:
+            extras = data.get(("__extras", ), {})
+            project_data = extras.get('keyword-project-en', '').split(',')
+
+        d = json.loads(data.get(key, '[]'))
+        for x in project_data:
+            if x not in d:
+                d.append(x)
+
+        data[key] = json.dumps(d)
+        return data
+
+    return validator
+
+
+
+@scheming_validator
 def fluent_field_default(field, schema):
 
     def validator(key, data, errors, context):
@@ -149,9 +174,9 @@ def url_validator_with_port(key, data, errors, context):
 def cioos_tag_name_validator(field, schema):
 
     def validator(value, context):
-        tagname_match = re.compile('[\w \-.\']*$', re.UNICODE)
+        tagname_match = re.compile('[\w \-.\',;]*$', re.UNICODE)
         if not tagname_match.match(value):
-            raise Invalid(_('Tag "%s" must be alphanumeric characters or symbols: -_.\'') % (value))
+            raise Invalid(_('Tag "%s" must be alphanumeric characters or symbols: -_.,;\'') % (value))
         return value
     return validator
 
@@ -186,6 +211,10 @@ def render_datacite_xml(id):
     pkg = toolkit.get_action('package_show')(data_dict={'id': id})
     return toolkit.render('package/datacite.html', extra_vars={'pkg_dict': pkg})
 
+def render_basic_package_view(id):
+    pkg = toolkit.get_action('package_show')(data_dict={'id': id})
+    return toolkit.render('package/basic.html', extra_vars={'pkg_dict': pkg})
+
 class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
     plugins.implements(plugins.ITranslation)
     plugins.implements(plugins.IConfigurer)
@@ -207,6 +236,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         rules = [
             ('/schemamap', 'schemamap', render_schemamap),
             ('/dataset/<id>.dcxml', 'datacite_xml', render_datacite_xml),
+            ('/dataset/<id>.basic', 'package_basic', render_basic_package_view),
         ]
         for rule in rules:
             blueprint.add_url_rule(*rule)
@@ -288,24 +318,12 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         return toolkit.config.get('ckan.cioos.ra_css_path')
 
     def get_helpers(self):
-        """Register the most_popular_groups() function above as a template helper function."""
-        # Template helper function names should begin with the name of the
-        # extension they belong to, to avoid clashing with functions from
-        # other extensions.
         return {
             'cioos_organizations_info_text': lambda: organizations_info_text,
             'cioos_contact_email': lambda: contact_email,
             'cioos_load_json': cioos_helpers.load_json,
             'cioos_geojson_to_bbox': geojson_to_bbox,
-            # 'cioos_most_popular_groups': most_popular_groups,
-            # 'cioos_groups': groups,
-            # 'cioos_most_popular_datasets': most_popular_datasets,
-            # 'cioos_most_popular_resources': most_popular_resources,
-            # 'cioos_recent_packages_html': recent_packages_html,
             'cioos_get_facets': cioos_helpers.cioos_get_facets,
-            # 'cioos_get_organization_list': cioos_helpers.get_organization_list,
-            # 'cioos_get_organization_dict': cioos_helpers.get_organization_dict,
-            # 'cioos_get_organization_dict_extra': cioos_helpers.get_organization_dict_extra
             'cioos_get_package_title': cioos_helpers.get_package_title,
             'cioos_get_package_relationships': cioos_helpers.get_package_relationships,
             'cioos_print_package_relationship_type': cioos_helpers.print_package_relationship_type,
@@ -320,13 +338,15 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             'cioos_get_doi_prefix': cioos_helpers.get_doi_prefix,
             'cioos_get_datacite_org': cioos_helpers.get_datacite_org,
             'cioos_get_datacite_test_mode': cioos_helpers.get_datacite_test_mode,
-            'cioos_helper_available': cioos_helpers.helper_available
+            'cioos_helper_available': cioos_helpers.helper_available,
+            'cioos_group_contacts': self.group_by_ind_or_org
         }
 
     def get_validators(self):
         return {
             # 'cioos_if_empty_same_as__extras': if_empty_same_as__extras,
             'cioos_clean_and_populate_eovs': clean_and_populate_eovs,
+            'cioos_clean_and_populate_projects': clean_and_populate_projects,
             'cioos_fluent_field_default': fluent_field_default,
             'cioos_url_validator_with_port': url_validator_with_port,
             'cioos_tag_name_validator': cioos_tag_name_validator,
@@ -515,8 +535,9 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                 data_dict['temporal-extent-begin'] = temporal_extent_begin
             if(temporal_extent_end):
                 data_dict['temporal-extent-end'] = temporal_extent_end
-            if(temporal_extent_begin and temporal_extent_end):
-                data_dict['temporal-extent-range'] = '[' + temporal_extent_begin + ' TO ' + temporal_extent_end + ']'
+            # If end is not set then we will still include these dataset in temporal searches by giving them an end time of 'NOW'
+            if(temporal_extent_begin):
+                data_dict['temporal-extent-range'] = '[' + temporal_extent_begin + ' TO ' + (temporal_extent_end or '*') + ']'
 
         # create vertical extent index
         ve = data_dict.get('vertical-extent', '{}')
@@ -567,19 +588,24 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
     # handle custom temporal range search facet
     def before_search(self, search_params):
 
-        if 'dataset_type:dataset' not in search_params.get('fq', {}):
+        if '-dataset_type:harvest' not in search_params.get('fq', {}):
             return search_params
 
-        begin = '*'
-        end = '*'
-        if search_params.get('extras', None) and search_params['extras'].get('ext_year_begin', None):
-            begin = search_params['extras']['ext_year_begin']
-        if search_params.get('extras', None) and search_params['extras'].get('ext_year_end', None):
-            end = search_params['extras']['ext_year_end']
+        begin = search_params.get('extras', {}).get('ext_year_begin', '*')
+        end = search_params.get('extras', {}).get('ext_year_end', '*')
+        if begin == end == '*':
+            return search_params
 
         search_params['fq_list'] = search_params.get('fq_list', [])
-        search_params['fq_list'].append('+temporal-extent-range:[{begin} TO {end}]'
-                                        .format(begin=begin, end=end))
+
+        show_null_range = search_params.get('extras', {}).get('ext_show_empty_range', 'false')
+
+        if show_null_range == 'true':
+            search_params['fq_list'].append('+(temporal-extent-range:[{begin} TO {end}] OR (*:* NOT temporal-extent-range:[* TO *]))'
+                                            .format(begin=begin, end=end))
+        else:
+            search_params['fq_list'].append('+temporal-extent-range:[{begin} TO {end}]'
+                                            .format(begin=begin, end=end))
         return search_params
 
     # update eov search facets with keys from choices list in the scheming extension schema
@@ -635,20 +661,24 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             if result.get('metadata-point-of-contact'):
                 result['metadata-point-of-contact'] = self.group_by_ind_or_org(result.get('metadata-point-of-contact'))
 
+            # fluent output validators set title and notes to the default language on package_show
+            # doing the same here so the output is consistent
             title = result.get('title_translated')
             if(title):
                 result['title_translated'] = cioos_helpers.load_json(title)
+                if isinstance(result['title_translated'], dict):
+                    result['title'] = scheming_language_text(result['title_translated'], toolkit.config.get('ckan.locale_default', 'en'))
             notes = result.get('notes_translated')
             if(notes):
                 result['notes_translated'] = cioos_helpers.load_json(notes)
+                if isinstance(result['notes_translated'], dict):
+                    result['notes'] = scheming_language_text(result['notes_translated'], toolkit.config.get('ckan.locale_default', 'en'))
 
             # convert the rest of the strings to json
             for field in [
                     "keywords",
-                    # "spatial", removed as making the field json brakes the dataset_map template
                     "temporal-extent",
                     "unique-resource-identifier-full",
-                    "notes",
                     "vertical-extent",
                     "dataset-reference-date",
                     "metadata-reference-date",
@@ -680,8 +710,6 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                         result['organization'] = organization
                 else:
                     log.warn('No org details for owner_org %s', result.get('org_descriptionid'))
-            # else:
-            #    log.warn('No owner_org for dataset %s: %s: %s', result.get('id'), result.get('name'), result.get('title'))
 
         return search_results
 
@@ -739,10 +767,8 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         # convert the rest of the strings to json
         for field in [
                 "keywords",
-                # "spatial", removed as making the field json brakes the dataset_map template
                 "temporal-extent",
                 "unique-resource-identifier-full",
-                "notes",
                 "vertical-extent",
                 "dataset-reference-date",
                 "metadata-reference-date",
@@ -752,25 +778,6 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             if tmp:
                 result[field] = cioos_helpers.load_json(tmp)
         package_dict = result
-
-
-        # title and notes must be a string or the index process errors
-        if isinstance(package_dict.get('title'), dict):
-            package_dict['title'] = json.dumps(package_dict.get('title'))
-        if isinstance(package_dict.get('notes'), dict):
-            package_dict['notes'] = json.dumps(package_dict.get('notes'))
-
-        # if(package_dict.get('title') and re.search(r'\\\\u[0-9a-fA-F]{4}', package_dict.get('title'))):
-        #     if isinstance(package_dict.get('title'), str):
-        #         package_dict['title'] = package_dict.get('title').encode().decode('unicode-escape')
-        #     else:  # we have bytes
-        #         package_dict['title'] = package_dict.get('title').decode('unicode-escape')
-        #
-        # if(package_dict.get('notes') and re.search(r'\\\\u[0-9a-fA-F]{4}', package_dict.get('notes'))):
-        #     if isinstance(package_dict.get('notes'), str):
-        #         package_dict['notes'] = package_dict.get('notes').encode().decode('unicode-escape')
-        #     else:  # we have bytes
-        #         package_dict['notes'] = package_dict.get('notes').decode('unicode-escape')
 
         # Update package relationships with package name
         ras = package_dict['relationships_as_subject']
