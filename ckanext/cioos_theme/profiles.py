@@ -3,9 +3,11 @@ from ckanext.dcat.profiles import SchemaOrgProfile, CleanedURIRef, URIRefOrLiter
 from rdflib import URIRef, BNode, Literal
 from ckanext.cioos_theme.helpers import load_json
 from ckan.plugins import toolkit
+from ckanext.dcat.utils import catalog_uri
 from shapely.geometry import shape
 import json
 import re
+import hashlib
 import logging
 log = logging.getLogger(__name__)
 
@@ -27,6 +29,20 @@ SCHEMA = Namespace('http://schema.org/')
 
 GEOJSON_IMT = 'https://www.iana.org/assignments/media-types/application/vnd.geo+json'
 
+def dataset_uri(dataset_dict):
+    uri = dataset_dict.get("uri")
+    if not uri:
+        uri = catalog_uri().rstrip('/') + '/dataset/' + dataset_dict['name']
+    return uri
+
+def resource_uri(resource_dict, dataset_dict):
+    uri = resource_dict.get('uri')
+    if not uri or uri == 'None':
+        uri = '{0}/resource/{1}'.format(dataset_uri(dataset_dict).rstrip('/'),
+                                        'ca-cioos-resource_' + hashlib.md5((resource_dict['name'] + ' ' + resource_dict['url']).encode('utf-8')).hexdigest())
+
+    return uri
+
 class CIOOSDCATProfile(SchemaOrgProfile):
     '''
     CIOOS extensions to DCAT profile to add standard names and spatial to DCAT output based on the same extension by IOOS
@@ -41,10 +57,10 @@ class CIOOSDCATProfile(SchemaOrgProfile):
         url = ''
         parties = []
 
-        if isinstance(load_json(values['metadata-point-of-contact']), dict):
-            parties = load_json(values['cited-responsible-party']) + [(load_json(values['metadata-point-of-contact']))]
+        if isinstance(load_json(values.get('metadata-point-of-contact')), dict):
+            parties = load_json(values.get('cited-responsible-party', '[]')) + [(load_json(values.get('metadata-point-of-contact', '{}')))]
         else:
-            parties = load_json(values['cited-responsible-party']) + load_json(values['metadata-point-of-contact'])
+            parties = load_json(values.get('cited-responsible-party', '[]')) + load_json(values.get('metadata-point-of-contact', '[]'))
 
         for responsible_party in parties:
             if 'publisher' in responsible_party['role']:
@@ -123,10 +139,6 @@ class CIOOSDCATProfile(SchemaOrgProfile):
                 # No organization nor publisher_uri
                 publisher_details = BNode()
 
-            # remove all previous contact points set by base profile as it is garbage.
-            for s, p, o in self.g.triples((None, SCHEMA.contactType, Literal('customer service'))):
-                self.g.remove((s, None, None))
-
             self.g.remove((dataset_ref, SCHEMA.publisher, None))
             self.g.remove((publisher_details, SCHEMA.name, None))
             self.g.remove((publisher_details, SCHEMA.contactPoint, None))
@@ -147,18 +159,54 @@ class CIOOSDCATProfile(SchemaOrgProfile):
 
             publisher_url = dataset_dict.get('publisher_url')
             self.g.add((contact_point, SCHEMA.url, Literal(publisher_url)))
-            # items = [
-            #     ('publisher_email', SCHEMA.email, ['contact_email', 'maintainer_email', 'author_email'], Literal),
-            #     ('publisher_name', SCHEMA.name, ['contact_name', 'maintainer', 'author'], Literal),
-            # ]
-            #
-            # self._add_triples_from_dict(dataset_dict, contact_point, items)
+
+    def _resources_graph(self, dataset_ref, dataset_dict):
+        g = self.g
+        for resource_dict in dataset_dict.get('resources', []):
+            distribution = URIRef(resource_uri(resource_dict, dataset_dict))
+            g.add((dataset_ref, SCHEMA.distribution, distribution))
+            g.add((distribution, RDF.type, SCHEMA.DataDownload))
+            self._distribution_graph(distribution, resource_dict)
 
     def graph_from_dataset(self, dataset_dict, dataset_ref):
         g = self.g
 
+        # remove all previous contact points set by base profile as it is garbage.
+        for s, p, o in self.g.triples((None, SCHEMA.contactPoint, None)):
+            self.g.remove((s, None, None))
+        for s, p, o in g.triples((None, RDF.type, SCHEMA.ContactPoint)):
+            self.g.remove((s, None, None))
+
+        for mp in load_json(dataset_dict.get('metadata-point-of-contact','[]')):
+            name = mp.get('individual-name')
+            org = mp.get('organisation-name')
+            email = mp.get('contact-info_email')
+            roles = mp.get('role')
+            url = mp.get('contact-info_online-resource_url')
+            ind_identifier = mp.get('individual-uri', {}).get('code')
+            org_identifier = mp.get('organisation-uri', {}).get('code')
+            uri = ind_identifier or org_identifier
+            if uri:
+                contact_details = CleanedURIRef(uri)
+            else:
+                contact_details = BNode()
+
+            if name:
+                self.g.add((contact_details, RDF.type, VCARD.Individual))
+                self.g.add((dataset_ref, DCAT.contactPoint, contact_details))
+                self.g.add((contact_details, VCARD.fn, Literal(name)))
+                self.g.add((contact_details, VCARD.hasEmail, Literal('mailto:' + email)))
+                self.g.add((contact_details, VCARD.role, Literal(roles)))
+                self.g.add((contact_details, VCARD.org, Literal(org)))
+            else:
+                self.g.add((contact_details, RDF.type, VCARD.Organization))
+                self.g.add((dataset_ref, DCAT.contactPoint, contact_details))
+                self.g.add((contact_details, VCARD.fn, Literal(org)))
+                self.g.add((contact_details, VCARD.hasEmail, Literal('mailto:' + email)))
+                self.g.add((contact_details, VCARD.role, Literal(roles)))
+
         # Creators
-        for responsible_party in load_json(dataset_dict['cited-responsible-party']):
+        for responsible_party in load_json(dataset_dict.get('cited-responsible-party','[]')):
             if 'publisher' in responsible_party['role']:
                 continue
 
@@ -298,6 +346,13 @@ class CIOOSDCATProfile(SchemaOrgProfile):
         self.infer_publisher(dataset_dict)
         self._publisher_graph(dataset_ref, dataset_dict)
 
+        # Resources
+        if dataset_dict.get('resources'):
+            for s, p, o in g.triples((None, RDF.type, SCHEMA.DataDownload)):
+                self.g.remove((s,None,None))
+            self.g.remove((dataset_ref, SCHEMA.distribution, None))
+        self._resources_graph(dataset_ref, dataset_dict)
+
         # Add contentUrl to Distribution
         for s, p, o in self.g.triples((None, RDF.type, SCHEMA.DataDownload)):
             url = self.g.value(s, SCHEMA.url, None)
@@ -318,6 +373,12 @@ class CIOOSDCATProfile(SchemaOrgProfile):
                         self.g.add((identifier, SCHEMA.name, Literal("DOI: %s" % doi)))
                         self.g.add((identifier, SCHEMA.value, Literal("doi:%s" % doi)))
                         self.g.add((identifier, SCHEMA.url, Literal("https://doi.org/%s" % doi)))
+        else:
+            uri = dataset_uri(dataset_dict)
+            g.add((dataset_ref, SCHEMA.identifier, Literal('%s' % uri)))
+
+        # Add version
+        g.add((dataset_ref, SCHEMA.version, Literal('%s' % dataset_dict.get('version', '1')))),
 
         # Temporal
         temporal_extent = load_json(dataset_dict.get('temporal-extent', {}))
