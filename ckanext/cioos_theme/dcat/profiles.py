@@ -265,11 +265,6 @@ class CIOOSDCATProfile(SchemaOrgProfile):
 
         return dataset_dict
 
-
-
-
-
-
     '''
     CIOOS extensions to DCAT profile to add standard names and spatial to DCAT output based on the same extension by IOOS
     TODO: review https://www.w3.org/2015/spatial/wiki/ISO_19115_-_DCAT_-_Schema.org_mapping#Metadata_.28ISO_19115.29_-_Catalog_record_.28DCAT.29
@@ -283,10 +278,10 @@ class CIOOSDCATProfile(SchemaOrgProfile):
         url = ''
         parties = []
 
-        if isinstance(load_json(values['metadata-point-of-contact']), dict):
-            parties = load_json(values['cited-responsible-party']) + [(load_json(values['metadata-point-of-contact']))]
+        if isinstance(load_json(values.get('metadata-point-of-contact')), dict):
+            parties = load_json(values.get('cited-responsible-party', '[]')) + [(load_json(values.get('metadata-point-of-contact', '{}')))]
         else:
-            parties = load_json(values['cited-responsible-party']) + load_json(values['metadata-point-of-contact'])
+            parties = load_json(values.get('cited-responsible-party', '[]')) + load_json(values.get('metadata-point-of-contact', '[]'))
 
         for responsible_party in parties:
             if 'publisher' in responsible_party['role']:
@@ -403,7 +398,7 @@ class CIOOSDCATProfile(SchemaOrgProfile):
         for s, p, o in g.triples((None, RDF.type, SCHEMA.ContactPoint)):
             self.g.remove((s, None, None))
 
-        for mp in load_json(dataset_dict['metadata-point-of-contact']):
+        for mp in load_json(dataset_dict.get('metadata-point-of-contact','[]')):
             name = mp.get('individual-name')
             org = mp.get('organisation-name')
             email = mp.get('contact-info_email')
@@ -432,7 +427,7 @@ class CIOOSDCATProfile(SchemaOrgProfile):
                 self.g.add((contact_details, VCARD.role, Literal(roles)))
 
         # Creators
-        for responsible_party in load_json(dataset_dict['cited-responsible-party']):
+        for responsible_party in load_json(dataset_dict.get('cited-responsible-party','[]')):
             if 'publisher' in responsible_party['role']:
                 continue
 
@@ -610,6 +605,12 @@ class CIOOSDCATProfile(SchemaOrgProfile):
                         self.g.add((identifier, SCHEMA.name, Literal("DOI: %s" % doi)))
                         self.g.add((identifier, SCHEMA.value, Literal("doi:%s" % doi)))
                         self.g.add((identifier, SCHEMA.url, Literal("https://doi.org/%s" % doi)))
+        else:
+            uri = dataset_uri(dataset_dict)
+            g.add((dataset_ref, SCHEMA.identifier, Literal('%s' % uri)))
+
+        # Add version
+        g.add((dataset_ref, SCHEMA.version, Literal('%s' % dataset_dict.get('version', '1')))),
 
         # Temporal
         temporal_extent = load_json(dataset_dict.get('temporal-extent', {}))
