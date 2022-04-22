@@ -1,14 +1,43 @@
 {% extends "page.html" %}
+
+{% set pkg = c.pkg_dict or pkg_dict %}
+{% set dataset_type = dataset_type or pkg.type or 'dataset' %}
+{% set dataset = h.dataset_display_name(pkg) %}
+{%- set schema = h.scheming_get_dataset_schema(dataset_type) -%}
+
+{% block breadcrumb_content %}
+<li>{% link_for _(dataset_type.title()), named_route=dataset_type ~ '.search' %}</li>
+<li>{% link_for dataset|truncate(30), named_route=pkg.type ~ '.read', id=pkg.id if is_activity_archive else pkg.name %}</li>
+<li class="active">{% link_for _('Basic View'), controller='cioos', action='package_basic', id=pkg['name'] %}</li>
+{% endblock %}
+
 {% block primary %}
 <section class="module">
   <div class="module-content">
-    <div class="col-sm-12">
+    <div>
       {% set pkg = c.pkg_dict or pkg_dict %}
-      <table>
-        {% for key, value in pkg.items() %}
+      <table class="table table-striped table-bordered table-condensed table-auto">
+        {%- for field in schema.dataset_fields -%}
+        {%- if not field.display_snippet -%}
+          {%- if field.repeating_subfields -%}
+            {%- set _ = field.update({"display_snippet":"repeating_subfields.html"}) -%}
+          {%- elif field.simple_subfields -%}
+            {%- set _ = field.update({"display_snippet":"simple_subfields.html"}) -%}
+          {%- elif h.scheming_field_choices(field) -%}
+            {%- set _ = field.update({"display_snippet":"select.html"}) -%}
+          {%- elif field.preset == 'fluent_core_translated' -%}
+            {%- set _ = field.update({"display_snippet": "fluent_text.html"}) -%}
+          {%- elif 'fluent_' in field.preset -%}
+            {%- set _ = field.update({"display_snippet":field.preset + ".html"}) -%}
+          {%- else -%}
+            {%- set _ = field.update({"display_snippet":"text.html"}) -%}
+          {%- endif -%}
+        {%- endif -%}
+        {%- set _ = pkg.update({"citation": h.scheming_language_text(pkg.citation)}) -%}
         <tr>
-          <th>{{key}}</th>
-          <td>{{value}}</td>
+          <th class="dataset-label no-wrap">{{ h.scheming_language_text(field.label) }}</th>
+          <td>{%- snippet 'scheming/snippets/display_field.html',
+          field=field, data=pkg, schema=schema -%}</td>
         </tr>
         {% endfor %}
       </table>
@@ -16,3 +45,6 @@
   </div>
 </section>
 {% endblock %}
+
+
+{% block secondary %}{% endblock %}
