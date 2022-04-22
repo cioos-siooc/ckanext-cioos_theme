@@ -105,6 +105,30 @@ def clean_and_populate_eovs(field, schema):
 
 
 @scheming_validator
+def clean_and_populate_projects(field, schema):
+
+    def validator(key, data, errors, context):
+
+        keywords_main = data.get(('keyword-project',), {})
+        if keywords_main:
+            project_data = keywords_main.get('en', [])
+        else:
+            extras = data.get(("__extras", ), {})
+            project_data = extras.get('keyword-project-en', '').split(',')
+
+        d = json.loads(data.get(key, '[]'))
+        for x in project_data:
+            if x not in d:
+                d.append(x)
+
+        data[key] = json.dumps(d)
+        return data
+
+    return validator
+
+
+
+@scheming_validator
 def fluent_field_default(field, schema):
 
     def validator(key, data, errors, context):
@@ -150,9 +174,9 @@ def url_validator_with_port(key, data, errors, context):
 def cioos_tag_name_validator(field, schema):
 
     def validator(value, context):
-        tagname_match = re.compile('[\w \-.\']*$', re.UNICODE)
+        tagname_match = re.compile('[\w \-.\',;]*$', re.UNICODE)
         if not tagname_match.match(value):
-            raise Invalid(_('Tag "%s" must be alphanumeric characters or symbols: -_.\'') % (value))
+            raise Invalid(_('Tag "%s" must be alphanumeric characters or symbols: -_.,;\'') % (value))
         return value
     return validator
 
@@ -187,6 +211,10 @@ def render_datacite_xml(id):
     pkg = toolkit.get_action('package_show')(data_dict={'id': id})
     return toolkit.render('package/datacite.html', extra_vars={'pkg_dict': pkg})
 
+def render_basic_package_view(id):
+    pkg = toolkit.get_action('package_show')(data_dict={'id': id})
+    return toolkit.render('package/basic.html', extra_vars={'pkg_dict': pkg})
+
 class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
     plugins.implements(plugins.ITranslation)
     plugins.implements(plugins.IConfigurer)
@@ -208,6 +236,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         rules = [
             ('/schemamap', 'schemamap', render_schemamap),
             ('/dataset/<id>.dcxml', 'datacite_xml', render_datacite_xml),
+            ('/dataset/<id>.basic', 'package_basic', render_basic_package_view),
         ]
         for rule in rules:
             blueprint.add_url_rule(*rule)
@@ -317,6 +346,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         return {
             # 'cioos_if_empty_same_as__extras': if_empty_same_as__extras,
             'cioos_clean_and_populate_eovs': clean_and_populate_eovs,
+            'cioos_clean_and_populate_projects': clean_and_populate_projects,
             'cioos_fluent_field_default': fluent_field_default,
             'cioos_url_validator_with_port': url_validator_with_port,
             'cioos_tag_name_validator': cioos_tag_name_validator,
