@@ -15,9 +15,13 @@
 {% set url_action = pkg.type ~ ('_resource.edit' if url_is_edit and can_edit else '_resource.read') %}
 {% set url = h.url_for(url_action, id=pkg.id if is_activity_archive else pkg.name, resource_id=res.id, **({'activity_id': request.args['activity_id']} if 'activity_id' in request.args else {})) %}
 
-<div class="list-group-item resource-item row" data-id="{{ res.id }}">
+<div class="list-group-item resource-item col-xs-12" data-id="{{ res.id }}">
   {% block resource_item_title %}
+  {% if res.url and h.is_url(res.url) %}
+  <a class="heading col-xs-10" href="{{ res.url }}" title="{{ res.name or res.description }}">
+  {% else %}
   <a class="heading col-xs-10" href="{{ url }}" title="{{ res.name or res.description }}">
+  {% endif %}
   <div>
     {{ h.resource_display_name(res) | truncate(50) }}<span class="format-label" property="dc:format" data-format="{{ res.format.lower() or 'data' }}">{{ h.get_translated(res, 'format') }}</span>
     {{ h.popular('views', res.tracking_summary.total, min=10) if res.tracking_summary }}

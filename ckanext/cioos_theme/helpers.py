@@ -15,7 +15,6 @@ import ckan.logic as logic
 import ckan.model as model
 from ckan.model import PackageRelationship
 from ckan.common import config
-from paste.deploy.converters import asbool
 import copy
 import logging
 import json

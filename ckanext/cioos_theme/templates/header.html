@@ -30,7 +30,7 @@
               {% block mobile_social_list %}
                 {% snippet "menu/social_list.html" %}
               {% endblock %}
-              <li>
+              <li class="lang-item">
                 {%- if h.lang() == 'en' -%}
                 <a href="{% url_for h.current_url(), locale='fr' %}" tabindex="0" aria-label="French/English">FR</a>
                 {%- else -%}
@@ -85,7 +85,7 @@
         <div id="header-links-inner" class="header-links">
         <ul id="menu-main-menu" class="menu desktop-menu">
           {% snippet '%s' % g.header_file_name or "/menu/menu_list.html" %}
-          <li>
+          <li class="lang-item">
             {%- if h.lang() == 'en' -%}
             <a href="{% url_for h.current_url(), locale='fr' %}" tabindex="0" aria-label="French/English">FR</a>
             {%- else -%}

@@ -897,6 +897,11 @@ div.search-input-group {
     transition: all 0.3s ease;
   }
 
+  #header .menu>li.lang-item a {
+    color: #616970;
+    font-size: 0.8em;
+  }
+
   #header .menu>li.menu-item-has-children>a span:after {
     content: '\f107';
     font-family: fontawesome;
@@ -1269,6 +1274,9 @@ section{
   }
 }
 
+.table.collapse.in {
+    display: table;
+}
 
 .resource-list {
   margin: 0;
@@ -1315,6 +1323,14 @@ section{
     padding: unset !important;
   }
 }
+
+.basic-view {
+  table tbody > tr > :first-child {
+      width: 150px;
+      white-space: pre-wrap;
+  }
+}
+
 
 
 @import url(//fonts.googleapis.com/css?family=Montserrat:400,600,700,800,900|Quicksand:300,400,600,700|PT+Sans:400|Raleway:400);
