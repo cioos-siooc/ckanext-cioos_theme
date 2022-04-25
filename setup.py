@@ -86,7 +86,7 @@ setup(
         ckan = ckan.lib.extract:extract_ckan
 
         [ckan.rdf.profiles]
-        cioos_dcat=ckanext.cioos_theme.profiles:CIOOSDCATProfile
+        cioos_dcat=ckanext.cioos_theme.dcat.profiles:CIOOSDCATProfile
 
         [paste.paster_command]
         package_relationships=ckanext.cioos_theme.commands.package_relationships:PackageRelationships

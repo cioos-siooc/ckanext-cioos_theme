@@ -14,9 +14,9 @@
 {% block primary %}
 <section class="module">
   <div class="module-content">
-    <div>
+    <div class="basic-view">
       {% set pkg = c.pkg_dict or pkg_dict %}
-      <table class="table table-striped table-bordered table-condensed table-auto">
+      <table class="table table-striped table-bordered table-condensed">
         {%- for field in schema.dataset_fields -%}
         {%- if not field.display_snippet -%}
           {%- if field.repeating_subfields -%}
@@ -35,7 +35,7 @@
         {%- endif -%}
         {%- set _ = pkg.update({"citation": h.scheming_language_text(pkg.citation)}) -%}
         <tr>
-          <th class="dataset-label no-wrap">{{ h.scheming_language_text(field.label) }}</th>
+          <th class="dataset-label">{{ h.scheming_language_text(field.label) }}</th>
           <td>{%- snippet 'scheming/snippets/display_field.html',
           field=field, data=pkg, schema=schema -%}</td>
         </tr>

@@ -9,13 +9,6 @@
   {% set logo_url = h.url_for_static_or_external(gns.site_logo) %}
 {% endif %}
 
-{# import macros from ra header file #}
-{% if self._TemplateReference__context.name != g.header_file_name %}
-  {% from '%s' % g.header_file_name or 'header_wp.html' import include_site_header, include_mobile_header, include_site_social with context %}
-{% else %}
-  {% from 'header_wp.html' import include_site_header, include_mobile_header, include_site_social with context %}
-{% endif %}
-
 <div id="header-container">
   {% block header_wrapper %}
   {# mobile header menu #}
@@ -30,7 +23,23 @@
     <h4 class="invis">Mobile Navigation</h4>
     <div id="menu-mobile" class="menu">
       <div class="menu-mobile-menu-container">
-        {{ include_mobile_header() }}
+        <nav>
+          <ul class="menu mobile-menu">
+            {% snippet '%s' % g.header_file_name or "/menu/menu_list.html" %}
+            <ul class="shareicons">
+              {% block mobile_social_list %}
+                {% snippet "menu/social_list.html" %}
+              {% endblock %}
+              <li class="lang-item">
+                {%- if h.lang() == 'en' -%}
+                <a href="{% url_for h.current_url(), locale='fr' %}" tabindex="0" aria-label="French/English">FR</a>
+                {%- else -%}
+                <a href="{% url_for h.current_url(), locale='en' %}" tabindex="0" aria-label="French/English">EN</a>
+                {%- endif -%}
+              </li>
+            </ul>
+          </ul>
+        </nav>
       </div>
     </div>
   </nav>
@@ -43,7 +52,9 @@
       {% block header_topmenu %}
       <nav>
         <ul>
-          {{ include_site_social() }}
+          {% block social_list %}
+            {% snippet "menu/social_list.html" %}
+          {% endblock %}
           <li id="language_picker">
             {%- if h.lang() == 'en' -%}
               <a href="{% url_for h.current_url(), locale='fr' %}" tabindex="0" aria-label="French/English">FR</a>
@@ -72,7 +83,16 @@
       </div>
       <div id="header-links" class="main-navigation">
         <div id="header-links-inner" class="header-links">
-          {{ include_site_header() }}
+        <ul id="menu-main-menu" class="menu desktop-menu">
+          {% snippet '%s' % g.header_file_name or "/menu/menu_list.html" %}
+          <li class="lang-item">
+            {%- if h.lang() == 'en' -%}
+            <a href="{% url_for h.current_url(), locale='fr' %}" tabindex="0" aria-label="French/English">FR</a>
+            {%- else -%}
+            <a href="{% url_for h.current_url(), locale='en' %}" tabindex="0" aria-label="French/English">EN</a>
+            {%- endif -%}
+          </li>
+        </ul>
         </div>
       </div>
     </div>
