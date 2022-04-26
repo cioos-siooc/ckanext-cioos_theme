@@ -19,6 +19,9 @@ import copy
 import logging
 import json
 import jsonpickle
+import lxml
+import re
+
 log = logging.getLogger(__name__)
 
 try:
@@ -234,7 +237,7 @@ def cioos_schema_field_map():
         'keywords': ['keywords', 'eov'],
         'bbox': ['bbox-north-lat', 'bbox-south-lat', 'bbox-east-long', 'bbox-west-long'],
         'license_id': 'use-constraints'
-        }
+    }
 
     schema = toolkit.h.scheming_get_dataset_schema('dataset')
     doc = spatial_model.ISODocument('<xml></xml>')
@@ -250,40 +253,46 @@ def cioos_schema_field_map():
                 out[f["field_name"]] = [build_dict(f["repeating_subfields"], '|'.join([name, f["field_name"]]) if name else f["field_name"])]
             elif "simple_subfields" in f:
                 out[f["field_name"]] = build_dict(f["simple_subfields"], '|'.join([name, f["field_name"]]) if name else f["field_name"])
+            elif "tags" in f.get('preset', ''):
+                out[f["field_name"]] = ['|'.join([name, f["field_name"]]) if name else f["field_name"]]
             else:
                 out[f["field_name"]] = '|'.join([name, f["field_name"]]) if name else f["field_name"]
         return out
 
     field_dict = build_dict(fields)
-    log.debug('FIELD DICT: %r', field_dict)
-
-    import lxml
-    import re
 
     dcxml = toolkit.render_snippet('package/snippets/datacite_xml.html', data={"pkg": field_dict})
     dcxml = re.sub("(?=<!--)([\s\S]*?)-->\s*", "", dcxml)
     dcxml = dcxml.strip()
-    log.debug('DC XML: %r', dcxml)
 
     root = lxml.etree.fromstring(dcxml.encode())
     tree = lxml.etree.ElementTree(root)
-    # for e in root.iter():
-    #     log.debug(tree.getelementpath(e))
+    find_text = tree.xpath("//text()[normalize-space(.)]")
 
-    find_text = tree.xpath("//text()")
-    # paths = {node.text: tree.getelementpath(node.getparent()) for node in find_text(tree)}
-    # log.debug(paths)
-
+    dc_paths = {}
     for node in find_text:
-        log.debug(node)
-        #path = tree.getpath(node.getparent())
-        #newpath = [str(s) for s in path]
-        #log.debug(newpath)
+        path = tree.getelementpath(node.getparent())
+        path = re.sub("{http:\/\/datacite.org\/schema\/kernel-4}", "", path)
+        node_text = str(node).lower()
+        if dc_paths.get(node_text):
+            dc_paths[node_text].append(path)
+        else:
+            dc_paths[node_text] = [path]
 
-    #log.debug('%r', [tree.getpath(node.getparent()) for node in find_text])
+    # # convert flat dictinary to nested
+    # def stack(paths, path_tree={}):
+    #
+    #     for k, v in paths.items():
+    #         key_list = k.split('|')
+    #         if len(key_list) > 1:
+    #             path_tree[key_list[0]] = stack({'|'.join(key_list[1:]): v}, path_tree)
+    #         else:
+    #             path_tree[key_list[0]] = v
+    #     return path_tree
+    # dc_tree = stack(dc_paths)
 
     # load classes, we have to pre load class defenitions and later update them
-    # vecouse pickle dosn't do it properly. Might be becouse our isodocument
+    # becouse pickle dosn't do it properly. Might be becouse our isodocument
     # class is so large
     classes = inspect.getmembers(spatial_model, inspect.isclass)
     classes_pickled = json.loads(jsonpickle.encode(classes, unpicklable=False))
@@ -299,13 +308,13 @@ def cioos_schema_field_map():
             except Exception:
                 instanse = class_('<xml></xml>')
 
-        class_dict[x[0]]['class'] = jsonpickle.encode(instanse)
+        class_dict[x[0]]['class'] = jsonpickle.encode(instanse, unpicklable=False)
 
     # Dataset
     fields = schema['dataset_fields']
     j = jsonpickle.encode(doc.elements)
     isodoc_dict = json.loads(j)
-    output = cioos_schema_field_map_parent(fields, isodoc_dict, class_dict, map, 'Dataset Fields')
+    output = cioos_schema_field_map_parent(fields, dc_paths, isodoc_dict, class_dict, map, 'Dataset Fields')
 
     # Resources
     resource_fields_schema = [{'field_name': 'resource_fields', 'simple_subfields': schema['resource_fields']}]
@@ -315,14 +324,14 @@ def cioos_schema_field_map():
 
     map = {
         'resource-locator': 'resource_fields'
-        }
+    }
 
-    output = output + cioos_schema_field_map_parent(resource_fields_schema, resource_locator, class_dict, map, 'Resource Fields')
+    output = output + cioos_schema_field_map_parent(resource_fields_schema, dc_paths, resource_locator, class_dict, map, 'Resource Fields')
     return jinja2.Markup(output)
 
 
 # process any first level fields in the isodocument
-def cioos_schema_field_map_parent(fields, isodoc_dict, class_dict, mapkey, caption):
+def cioos_schema_field_map_parent(fields, dc_paths, isodoc_dict, class_dict, mapkey, caption):
     output = '''<table class="table table-bordered table-condensed">
         <caption>''' + caption + '''</caption>
         <thead>
@@ -333,6 +342,7 @@ def cioos_schema_field_map_parent(fields, isodoc_dict, class_dict, mapkey, capti
                 <th style="width:40px;">N</th>
                 <th style="width:100px;">Description</th>
                 <th>XML Path</th>
+                <th>DataCite Path</th>
 
             </tr>
         </thead><tbody>'''
@@ -358,25 +368,45 @@ def cioos_schema_field_map_parent(fields, isodoc_dict, class_dict, mapkey, capti
 
         # get ckan schema field with the same name, if it exists
         field = toolkit.h.scheming_field_by_name(fields, search_item)
+
+        # get the datacite paths for the current item
+
+        dcp = ''
+        if field and dc_paths:
+            dcp = dc_paths.get(field['field_name'], '')
+            if isinstance(dcp, list):
+                dcp = '<br/>'.join(dcp)
+            elif isinstance(dcp, dict):
+                dcp = ''
+
+
         # the mapkey fields could be a list as sometimes more then one ckan
         # schema field maps to a spatial harvest field
         if isinstance(search_item, list):
             fn = []
             fl = []
+            dcpl = []
             for x in search_item:
                 field = toolkit.h.scheming_field_by_name(fields, x)
                 fn.append(field['field_name'])
                 fl.append(toolkit.h.scheming_language_text(field.get('label', '')))
+                dcp = dc_paths.get(field['field_name'])
+                if isinstance(dcp, list):
+                    dcp = '<br/>'.join(dcp)
+                if dcp:
+                    dcpl.append(dcp)
                 matched_schema_fields.append(field['field_name'])
             field = {}
             field['field_name'] = ',<br/>'.join(fn)
             field['label'] = ',<br/>'.join(fl)
+            dcp = ',<br/>'.join(dcpl)
 
         schema_name = ''
         schema_label = ''
         schema_help = ''
         subfields = None
         required = ''
+        item_schemapath = ''
 
         if field:
             schema_name = field['field_name']
@@ -385,31 +415,44 @@ def cioos_schema_field_map_parent(fields, isodoc_dict, class_dict, mapkey, capti
             subfields = field.get('simple_subfields') or field.get('repeating_subfields')
             if field.get('required'):
                 required = '<span class="required">*</span>'
-            matched_schema_fields.append(schema_name)
+            item_schemapath = field['field_name']
+            matched_schema_fields.append(item_schemapath)
 
-        output = output + '<tr><td>' + required + '</td><td>' + schema_name + schema_label + '</td><td>' + item['name'] + '</td><td>' + item['multiplicity'] + '</td><td>' + schema_help +'</td><td>' + sp + '</td></tr>'
-        (output_new, matched_schema_fields) = cioos_schema_field_map_child(subfields, None, item.get('elements'), "", 1, matched_schema_fields)
+        output = output + '<tr><td>' + required + '</td><td>' + schema_name + schema_label + '</td><td>' + item['name'] + '</td><td>' + item['multiplicity'] + '</td><td>' + schema_help + '</td><td>' + sp + '</td><td>' + dcp + '</td></tr>'
+        (output_new, matched_schema_fields) = cioos_schema_field_map_child(subfields, dc_paths, None, item.get('elements'), "", item_schemapath, 1, matched_schema_fields)
         output = output + output_new
 
     # add any fields in schema that have not found a match in spatial harvest
     for field in fields:
-        if field['field_name'] not in matched_schema_fields:
+        item_schemapath = field['field_name']
+        if item_schemapath not in matched_schema_fields:
             schema_name = field['field_name']
             schema_label = ' (' + toolkit.h.scheming_language_text(field.get('label', '')) + ')'
-            matched_schema_fields.append(schema_name)
+            matched_schema_fields.append(item_schemapath)
             required = ''
             if field.get('required'):
                 required = '<span class="required">*</span>'
-            output = output + '<tr><td>' + required + '</td><td>' + schema_name + schema_label + '</td><td></td><td></td><td></td><td></td></tr>'
+
+            dcp = ''
+            if dc_paths:
+                dcp = dc_paths.get(item_schemapath, '')
+                if isinstance(dcp, list):
+                    dcp = '<br/>'.join(dcp)
+                elif isinstance(dcp, dict):
+                    dcp = ''
+            output = output + '<tr><td>' + required + '</td><td>' + schema_name + schema_label + '</td><td></td><td></td><td></td><td></td><td>' + dcp + '</td></tr>'
+
     return output + '</tbody></table>'
 
+
 # process any child elements of first level or lower isodocument fields.
-def cioos_schema_field_map_child(schema_subfields, schema_parentfields, harvest_elements, path, indent, matched_schema_fields):
+def cioos_schema_field_map_child(schema_subfields, dc_paths, schema_parentfields, harvest_elements, isopath, schemapath, indent, matched_schema_fields):
     output = ''
     if not harvest_elements:
         return output, matched_schema_fields
     if not isinstance(harvest_elements, list):
         return output, matched_schema_fields
+
 
     for item in harvest_elements:
         if not item or not item.get('name'):
@@ -421,10 +464,10 @@ def cioos_schema_field_map_child(schema_subfields, schema_parentfields, harvest_
         field = None
         if schema_subfields:
             field = toolkit.h.scheming_field_by_name(schema_subfields, item['name']) or \
-                toolkit.h.scheming_field_by_name(schema_subfields, path + item['name'])
+                toolkit.h.scheming_field_by_name(schema_subfields, isopath + item['name'])
         if not field and schema_parentfields:
             field = toolkit.h.scheming_field_by_name(schema_parentfields, item['name']) or \
-                toolkit.h.scheming_field_by_name(schema_parentfields, path + item['name'])
+                toolkit.h.scheming_field_by_name(schema_parentfields, isopath + item['name'])
 
         schema_name = ''
         schema_label = ''
@@ -432,36 +475,49 @@ def cioos_schema_field_map_child(schema_subfields, schema_parentfields, harvest_
         subfields = None
         parentfields = schema_subfields
         required = ''
+        item_schemapath = schemapath
+        dcp = ''
 
         if field:
             schema_name = field['field_name']
             schema_label = ' (' + toolkit.h.scheming_language_text(field.get('label', '')) + ')'
             schema_help = field.get('help_text', '')
             subfields = field.get('simple_subfields') or field.get('repeating_subfields')
-            matched_schema_fields.append(schema_name)
+            item_schemapath = '|'.join([schemapath, schema_name])
+            matched_schema_fields.append(item_schemapath)
             schema_name = '<i class="fa fa-angle-right"></i>' + schema_name
             if field.get('required'):
                 required = '<span class="required">*</span>'
+            # get the datacite paths for the current item
+            if item_schemapath:
+                dcp = dc_paths.get(item_schemapath, '')
+                if isinstance(dcp, list):
+                    dcp = '<br/>'.join(dcp)
+                elif isinstance(dcp, dict):
+                    dcp = ''
 
         harvest_name = ''
         if item['name']:
             harvest_name = '<i class="fa fa-angle-right"></i>' + item['name']
 
-        output = output + '<tr class="child' + str(indent) + '"><td>' + required + '</td><td>' + schema_name + schema_label + '</td><td>' + harvest_name + '</td><td>' + item['multiplicity'] + '</td><td>' + schema_help +'</td><td>' + sp + '</td></tr>'
-        (output_new, matched_schema_fields) = cioos_schema_field_map_child(subfields, parentfields, item.get('elements'), path + item['name'] + '_', indent + 1, matched_schema_fields)
+        output = output + '<tr class="child' + str(indent) + '"><td>' + required + '</td><td>' + schema_name + schema_label + '</td><td>' + harvest_name + '</td><td>' + item['multiplicity'] + '</td><td>' + schema_help + '</td><td>' + sp + '</td><td>' + dcp + '</td></tr>'
+        (output_new, matched_schema_fields) = cioos_schema_field_map_child(subfields, dc_paths, parentfields, item.get('elements'), isopath + item['name'] + '_', item_schemapath, indent + 1, matched_schema_fields)
         output = output + output_new
 
     # outout any schema fields at this sublevel which do not have a match.
     if schema_subfields:
         for field in schema_subfields:
-            if field['field_name'] not in matched_schema_fields:
+            item_schemapath = '|'.join([schemapath, field['field_name']])
+            if item_schemapath not in matched_schema_fields:
                 schema_name = field['field_name']
                 schema_label = ' (' + toolkit.h.scheming_language_text(field.get('label', '')) + ')'
-                matched_schema_fields.append(schema_name)
+                matched_schema_fields.append(item_schemapath)
+                schema_name = '<i class="fa fa-angle-right"></i>' + schema_name
                 required = ''
                 if field.get('required'):
                     required = '<span class="required">*</span>'
-                output = output + '<tr><td>' + required + '</td><td>' + schema_name + schema_label + '</td><td></td><td></td><td></td><td></td></tr>'
+                output = output + '<tr class="child' + str(indent) + '"><td>' + required + '</td><td>' + schema_name + schema_label + '</td><td></td><td></td><td></td><td></td><td></tr></tr>'
+
     return output, matched_schema_fields
 
 
