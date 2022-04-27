@@ -341,9 +341,8 @@ def cioos_schema_field_map_parent(fields, dc_paths, isodoc_dict, class_dict, map
                 <th style="width:200px;">Harvest Name</th>
                 <th style="width:40px;">N</th>
                 <th style="width:100px;">Description</th>
+                <th style="width:200px;">DataCite Path</th>
                 <th>XML Path</th>
-                <th>DataCite Path</th>
-
             </tr>
         </thead><tbody>'''
     matched_schema_fields = []
@@ -418,7 +417,7 @@ def cioos_schema_field_map_parent(fields, dc_paths, isodoc_dict, class_dict, map
             item_schemapath = field['field_name']
             matched_schema_fields.append(item_schemapath)
 
-        output = output + '<tr><td>' + required + '</td><td>' + schema_name + schema_label + '</td><td>' + item['name'] + '</td><td>' + item['multiplicity'] + '</td><td>' + schema_help + '</td><td>' + sp + '</td><td>' + dcp + '</td></tr>'
+        output = output + '<tr><td>' + required + '</td><td>' + schema_name + schema_label + '</td><td>' + item['name'] + '</td><td>' + item['multiplicity'] + '</td><td>' + schema_help + '</td><td>' + dcp + '</td><td>' + sp + '</td></tr>'
         (output_new, matched_schema_fields) = cioos_schema_field_map_child(subfields, dc_paths, None, item.get('elements'), "", item_schemapath, 1, matched_schema_fields)
         output = output + output_new
 
@@ -440,7 +439,7 @@ def cioos_schema_field_map_parent(fields, dc_paths, isodoc_dict, class_dict, map
                     dcp = '<br/>'.join(dcp)
                 elif isinstance(dcp, dict):
                     dcp = ''
-            output = output + '<tr><td>' + required + '</td><td>' + schema_name + schema_label + '</td><td></td><td></td><td></td><td></td><td>' + dcp + '</td></tr>'
+            output = output + '<tr><td>' + required + '</td><td>' + schema_name + schema_label + '</td><td></td><td></td><td></td><td>' + dcp + '</td><td></td></tr>'
 
     return output + '</tbody></table>'
 
@@ -500,7 +499,7 @@ def cioos_schema_field_map_child(schema_subfields, dc_paths, schema_parentfields
         if item['name']:
             harvest_name = '<i class="fa fa-angle-right"></i>' + item['name']
 
-        output = output + '<tr class="child' + str(indent) + '"><td>' + required + '</td><td>' + schema_name + schema_label + '</td><td>' + harvest_name + '</td><td>' + item['multiplicity'] + '</td><td>' + schema_help + '</td><td>' + sp + '</td><td>' + dcp + '</td></tr>'
+        output = output + '<tr class="child' + str(indent) + '"><td>' + required + '</td><td>' + schema_name + schema_label + '</td><td>' + harvest_name + '</td><td>' + item['multiplicity'] + '</td><td>' + schema_help + '</td><td>' + dcp + '</td><td>' + sp + '</td></tr>'
         (output_new, matched_schema_fields) = cioos_schema_field_map_child(subfields, dc_paths, parentfields, item.get('elements'), isopath + item['name'] + '_', item_schemapath, indent + 1, matched_schema_fields)
         output = output + output_new
 

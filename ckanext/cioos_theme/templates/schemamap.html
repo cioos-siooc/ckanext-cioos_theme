@@ -66,3 +66,9 @@
 {% endblock %}
 
 {% block secondary %}{% endblock %}
+
+{%- block content %}
+<div id="schemamap">
+{{ super() }}
+</div>
+{% endblock -%}
