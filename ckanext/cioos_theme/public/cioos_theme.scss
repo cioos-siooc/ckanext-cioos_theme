@@ -1331,6 +1331,15 @@ section{
   }
 }
 
-
+// restrict organisation image to a resonable size and center
+.context-info .image img, .context-info .image a {
+    display: block;
+    width: auto;
+    height: 100%;
+    max-height: 200px;
+    border-radius: 4px;
+    margin-left: auto;
+    margin-right: auto;
+}
 
 @import url(//fonts.googleapis.com/css?family=Montserrat:400,600,700,800,900|Quicksand:300,400,600,700|PT+Sans:400|Raleway:400);
