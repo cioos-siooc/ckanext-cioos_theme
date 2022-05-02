@@ -12,7 +12,7 @@ Renders a citation for a package
         <tr>
           <td>
             <p id=cite_output></p>
-            <div class="dropdown btn-group" style="float:right;">
+            <div id="citation_download" class="dropdown btn-group" style="float:right;">
               <a href="#" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                 Download Citation
                 <span class="caret"></span>
@@ -55,7 +55,7 @@ Renders a citation for a package
                 </li>
               </ul>
             </div>
-            <span style="float:right; margin-right:5px;">
+            <span id="citation_style" style="float:right; margin-right:5px;">
               <label for="template">Style</label>
               <select id="cite_template name="template" size="1" onChange="loadCite(this.value); cite_template=this.value;">
               <option value="apa" selected="selected">APA</option>
@@ -88,16 +88,25 @@ Renders a citation for a package
       pkg_citation = pkg_citation.replace( /\s\s+/g, ' ' )
       pkg_citation = parseHtmlEnteties(pkg_citation)
 
-      let cite_data = await Cite.async(pkg_citation)
+      let output = ''
+      let output_options = {}
+      try {
+        let cite_data = await Cite.async(pkg_citation)
 
-      let output_options = {
-        format: output_type,
-        type: output_type,
-        template: template_style,
-        lang: 'en-US'
+        output_options = {
+          format: output_type,
+          type: output_type,
+          template: template_style,
+          lang: 'en-US'
+        }
+        output = cite_data.format(cite_format, output_options)
       }
-
-      let output = cite_data.format(cite_format, output_options)
+      catch(err) {
+        console.warn(err.message)
+        output = pkg_citation.slice(2,-2)
+        document.getElementById("citation_download").style.display = 'none';
+        document.getElementById("citation_style").style.display = 'none';
+      }
 
       if (typeof output === 'object'){
         output = Object.values(output)[0]
@@ -110,6 +119,8 @@ Renders a citation for a package
         saveAs(blob, cite_format + ".txt");
       }
     }
+
+
     var cite_template = 'apa';
     loadCite();
   </script>

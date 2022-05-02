@@ -17,7 +17,7 @@
 
 <div class="list-group-item resource-item col-xs-12" data-id="{{ res.id }}">
   {% block resource_item_title %}
-  {% if res.url and h.is_url(res.url) %}
+  {% if res.url and (h.is_url(res.url) or 'mailto:' in res.url)%}
   <a class="heading col-xs-10" href="{{ res.url }}" title="{{ res.name or res.description }}">
   {% else %}
   <a class="heading col-xs-10" href="{{ url }}" title="{{ res.name or res.description }}">
