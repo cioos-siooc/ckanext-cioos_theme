@@ -297,6 +297,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
 
         schema.update({
             'ckan.site_title': [ignore_missing, fluent_field_default(None, None), fluent_text(None, None)],
+            'ckan.site_heading': [ignore_missing, fluent_field_default(None, None), fluent_text(None, None)],
             'ckan.site_description': [ignore_missing, fluent_field_default(None, None), fluent_text(None, None)],
             'ckan.site_about': [ignore_missing, fluent_field_default(None, None), fluent_text(None, None)],
             'ckan.site_intro_text': [ignore_missing, fluent_field_default(None, None), fluent_text(None, None)],
@@ -311,6 +312,8 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             'ckan.hide_organization_in_breadcrumb': [ignore_missing, boolean_validator],
             'ckan.hide_organization_in_dataset_sidebar': [ignore_missing, boolean_validator],
             'ckan.show_responsible_organization_in_dataset_sidebar': [ignore_missing, boolean_validator],
+            'ckan.show_language_picker_in_top_bar': [ignore_missing, boolean_validator],
+            'ckan.show_language_picker_in_menu': [ignore_missing, boolean_validator],
         })
         return schema
 

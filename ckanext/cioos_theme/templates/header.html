@@ -30,6 +30,7 @@
               {% block mobile_social_list %}
                 {% snippet "menu/social_list.html" %}
               {% endblock %}
+              {% if g.show_language_picker_in_menu.lower()|default('', 'true')  == 'true' %}
               <li class="lang-item">
                 {%- if h.lang() == 'en' -%}
                 <a href="{% url_for h.current_url(), locale='fr' %}" tabindex="0" aria-label="French/English">FR</a>
@@ -37,6 +38,7 @@
                 <a href="{% url_for h.current_url(), locale='en' %}" tabindex="0" aria-label="French/English">EN</a>
                 {%- endif -%}
               </li>
+              {% endif %}
             </ul>
           </ul>
         </nav>
@@ -55,6 +57,7 @@
           {% block social_list %}
             {% snippet "menu/social_list.html" %}
           {% endblock %}
+          {% if g.show_language_picker_in_top_bar.lower()|default('', 'true')  == 'true' %}
           <li id="language_picker">
             {%- if h.lang() == 'en' -%}
               <a href="{% url_for h.current_url(), locale='fr' %}" tabindex="0" aria-label="French/English">FR</a>
@@ -62,6 +65,7 @@
               <a href="{% url_for h.current_url(), locale='en' %}" tabindex="0" aria-label="French/English">EN</a>
             {%- endif -%}
           </li>
+          {% endif %}
           <li>
             <a href="https://cioos.ca">
               <img class="mega-menu-logo" width="auto" height="37" src="{{ h.url_for_static_or_external('/base/images/logos/cioos-banner-' + h.lang() +'.png') }}">
@@ -85,6 +89,7 @@
         <div id="header-links-inner" class="header-links">
         <ul id="menu-main-menu" class="menu desktop-menu">
           {% snippet '%s' % g.header_file_name or "/menu/menu_list.html" %}
+          {% if g.show_language_picker_in_menu.lower()|default('', 'true')  == 'true' %}
           <li class="lang-item">
             {%- if h.lang() == 'en' -%}
             <a href="{% url_for h.current_url(), locale='fr' %}" tabindex="0" aria-label="French/English">FR</a>
@@ -92,6 +97,7 @@
             <a href="{% url_for h.current_url(), locale='en' %}" tabindex="0" aria-label="French/English">EN</a>
             {%- endif -%}
           </li>
+          {% endif %}
         </ul>
         </div>
       </div>
