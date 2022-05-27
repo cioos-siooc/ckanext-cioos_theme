@@ -33,23 +33,10 @@
       {%- endif -%}
       {% if ( h.scheming_field_by_name(schema.dataset_fields, 'notes') or h.scheming_field_by_name(schema.dataset_fields, 'notes_translated') ) and h.get_translated(pkg, 'notes') %}
         <div class="notes embedded-content">
-          {{ h.render_markdown(h.get_translated(pkg, 'notes')) }}
+          {{ h.markdown_extract(h.get_translated(pkg, 'notes'), extract_length=200) }}
         </div>
       {% endif %}
     {% endblock %}
-
-    <ul class='formats'>
-    {% if c.userobj %}
-    <li><a href="{{ h.url_for(controller='dataset', action='read', id=pkg.get('name') or pkg.id) }}.dcxml" class="btn"><i class="fa fa-icon fa-link"></i>{{ _(' DataCite XML')}}</a></li>
-    {% endif %}
-    {% if h.cioos_helper_available('structured_data') %}
-    <li><a href="{{ h.url_for(controller='dataset', action='read', id=pkg.get('name') or pkg.id) }}.xml" class="btn"><i class="fa fa-icon fa-link"></i>{{ _('RDF/XML')}}</a></li>
-    <li><a href="{{ h.url_for(controller='dataset', action='read', id=pkg.get('name') or pkg.id) }}.ttl" class="btn"><i class="fa fa-icon fa-link"></i>{{ _('Turtle')}}</a></li>
-    <li><a href="{{ h.url_for(controller='dataset', action='read', id=pkg.get('name') or pkg.id) }}.n3" class="btn"><i class="fa fa-icon fa-link"></i>{{ _('Notation3')}}</a></li>
-    <li><a href="{{ h.url_for(controller='dataset', action='read', id=pkg.get('name') or pkg.id) }}.jsonld" class="btn"><i class="fa fa-icon fa-link"></i>{{ _('JSON-LD')}}</a></li>
-    {% endif %}
-    <li><a href="{{ h.url_for(controller='dataset', action='read', id=pkg.get('name') or pkg.id) }}" class="btn"><i class="fa fa-icon fa-link"></i>{{ _('Show Permalink')}}</a></li>
-    </ul>
 
   {% endblock %}
 
@@ -61,9 +48,7 @@
     {% snippet "package/snippets/resources_list.html", pkg=pkg, resources=pkg.resources %}
   {% endblock %}
 
-  {% block package_dates %}
-    {% snippet "package/snippets/dates.html", pkg_dict=pkg %}
-  {% endblock %}
+
 
   {% block package_citation %}
     {% if pkg.citation %}
@@ -71,8 +56,9 @@
     {% endif %}
   {% endblock %}
 
-  {% block package_metadata_source %}
-    {% snippet "package/snippets/metadata_source.html", pkg_dict=pkg %}
+  {% block package_relationships %}
+    {# snippet "package/snippets/relationships.html", pkg_dict=pkg, relationships=h.get_pkg_dict_extra(c.pkg_dict, 'associated-datasets')  #}
+    {% snippet "package/snippets/relationships.html", pkg_dict=pkg, relationships=h.cioos_get_package_relationships(pkg)%}
   {% endblock %}
 
   {% block package_img_preview %}
@@ -83,18 +69,73 @@
     {% snippet "package/snippets/tags.html", tags=h.cioos_load_json(pkg.get('keywords', {}))[h.lang()] %}
   {% endblock %}
 
-  {% set dataset_extent = h.get_pkg_dict_extra(c.pkg_dict, 'spatial') or c.pkg_dict.get('spatial') %}
+  {% set dataset_extent = h.dump_json(h.get_pkg_dict_extra(c.pkg_dict, 'spatial') or c.pkg_dict.get('spatial')) %}
   {% if dataset_extent %}
     {% snippet "spatial/snippets/dataset_map.html", extent=dataset_extent, max_zoom=h.spatial_get_map_initial_max_zoom(pkg) %}
   {% endif %}
 
-  {% block package_relationships %}
-    {# snippet "package/snippets/relationships.html", pkg_dict=pkg, relationships=h.get_pkg_dict_extra(c.pkg_dict, 'associated-datasets')  #}
-    {% snippet "package/snippets/relationships.html", pkg_dict=pkg, relationships=h.cioos_get_package_relationships(pkg)%}
+  {% block package_dates %}
+    {% snippet "package/snippets/dates.html", pkg_dict=pkg %}
   {% endblock %}
+
+  {% block package_metadata_source %}
+    {% snippet "package/snippets/metadata_source.html", pkg_dict=pkg %}
+  {% endblock %}
+
+  <section id="dataset-contacts" class="additional-info">
+    <h3>
+      <a class="section_hide_controle collapsed" data-toggle="collapse" href="#contacts-container" role="button" aria-expanded="false" aria-controls="contacts_info_list">
+      {{ _('Contacts') }}<i class="fa"></i>
+      </a>
+    </h3>
+    <div id="contacts-container" class="flex-panels collapse">
+
+      {% set field = h.scheming_field_by_name(schema.dataset_fields, 'cited-responsible-party') %}
+      {% set cpkg = pkg.copy() %}
+      {%- set _ = cpkg.update({"cited-responsible-party": h.cioos_group_contacts(cpkg.get('cited-responsible-party',[]) + cpkg.get('metadata-point-of-contact',[]) + cpkg.get('distributor',[]))}) -%}
+      {%- snippet "scheming/display_snippets/repeating_subfields.html",
+        field=field,
+        data=cpkg,
+        errors=errors,
+        entity_type=entity_type,
+        object_type=object_type
+      -%}
+
+    </div>
+  </section>
+
 
   {% block package_additional_info %}
     {% snippet "scheming/package/snippets/additional_info.html", pkg_dict=pkg, dataset_type=dataset_type, schema=schema %}
   {% endblock %}
 
+{% endblock %}
+
+{% block secondary_content %}
+  {{ super() }}
+
+  <section class="module module-narrow module-shallow">
+      <h2 class="module-heading">
+        <i class="fa fa-icon fa-link"></i>
+        {{ _('Formats') }}
+      </h2>
+      <nav>
+        <ul class="list-unstyled nav nav-simple">
+        {% if c.userobj %}
+          <li class="nav-item"><a href="{{ h.url_for(controller='dataset', action='read', id=pkg.get('name') or pkg.id) }}.dcxml"><span class="item-label">{{ _('DataCite XML')}}</span></a></li>
+          {% endif %}
+          {% if h.cioos_helper_available('structured_data') %}
+          <li class="nav-item"><a href="{{ h.url_for(controller='dataset', action='read', id=pkg.get('name') or pkg.id) }}.xml"><span class="item-label">{{ _('RDF/XML')}}</span></a></li>
+          <li class="nav-item"><a href="{{ h.url_for(controller='dataset', action='read', id=pkg.get('name') or pkg.id) }}.ttl"><span class="item-label">{{ _('Turtle')}}</span></a></li>
+          <li class="nav-item"><a href="{{ h.url_for(controller='dataset', action='read', id=pkg.get('name') or pkg.id) }}.n3"><span class="item-label">{{ _('Notation3')}}</span></a></li>
+          <li class="nav-item"><a href="{{ h.url_for(controller='dataset', action='read', id=pkg.get('name') or pkg.id) }}.jsonld"><span class="item-label">{{ _('JSON-LD')}}</span></a></li>
+        {% endif %}
+          <li class="nav-item"><a href="{{ h.url_for(controller='api',
+                              logic_function='package_show',
+                              action='action', ver=3, id=pkg.get('name') or pkg.id) }}"><span class="item-label">{{ _('JSON')}}</span></a></li>
+          <li class="nav-item"><a href="{{ h.url_for(controller='dataset', action='read', id=pkg.get('name') or pkg.id) }}.basic"><span class="item-label">{{ _(' Basic View')}}</span></a></li>
+          <li class="nav-item"><a href="{{ h.url_for(controller='dataset', action='read', id=pkg.get('name') or pkg.id) }}"><span class="item-label">{{ _('Show Permalink')}}</span></a></li>
+        </ul>
+      </nav>
+  </section>
 {% endblock %}

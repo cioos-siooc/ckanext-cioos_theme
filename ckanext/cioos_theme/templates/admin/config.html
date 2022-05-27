@@ -14,6 +14,8 @@
 
       {{ form.input('ckan.site_title', id='field-ckan-site-title', label=_('Site Title'), value=data['ckan.site_title'], error=error, classes=['control-medium']) }}
 
+      {{ form.input('ckan.site_heading', id='field-ckan-site-heading', label=_('Title Heading on Main Page'), value=data['ckan.site_heading'], error=error, classes=['control-medium'], placeholder='{"en": "<span>CIOOS</span> Data Catalogue", "fr": "Catalogue de données du <span>SIOOC</span>"}') }}
+
       {{ form.select('ckan.main_css', id='field-ckan-main-css', label=_('Style'), options=styles, selected=data['ckan.main_css'], error=error) }}
 
       {{ form.input('ckan.site_description', id='field-ckan-site-description', label=_('Site Tag Line'), value=data['ckan.site_description'], error=error, classes=['control-medium']) }}
@@ -50,6 +52,10 @@
       {{ form.input('ckan.hide_organization_in_dataset_sidebar', id='field-ckan-hide-organization-in-dataset-sidebar', label=_('Hide Organization in dataset sidebar'), value=data['ckan.hide_organization_in_dataset_sidebar'], error=error) }}
 
       {{ form.input('ckan.show_responsible_organization_in_dataset_sidebar', id='field-ckan-show-responsible-organization-in-dataset-sidebar', label=_('Show Responsible Organization in dataset sidebar'), value=data['ckan.show_responsible_organization_in_dataset_sidebar'], error=error) }}
+
+      {{ form.input('ckan.show_language_picker_in_top_bar', id='field-ckan-show-language-picker-in-top-bar', label=_('Show language picker in top bar of page'), value=data['ckan.show_language_picker_in_top_bar'], error=error) }}
+
+      {{ form.input('ckan.show_language_picker_in_menu', id='field-ckan-show-language-picker-in-menu', label=_('Show language picker in menu'), value=data['ckan.show_language_picker_in_menu'], error=error) }}
 
       {% endblock %}
       <div class="form-actions">
