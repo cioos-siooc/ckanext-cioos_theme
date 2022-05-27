@@ -24,7 +24,7 @@
     <div id="menu-mobile" class="menu">
       <div class="menu-mobile-menu-container">
         <nav>
-          <ul class="menu mobile-menu">
+          <ul class="menu nav-menu mobile-menu">
             {% snippet '%s' % g.header_file_name or "/menu/menu_list.html" %}
             <ul class="shareicons">
               {% block mobile_social_list %}
@@ -87,7 +87,7 @@
       </div>
       <div id="header-links" class="main-navigation">
         <div id="header-links-inner" class="header-links">
-        <ul id="menu-main-menu" class="menu desktop-menu">
+        <ul id="menu-main-menu" class="menu nav-menu desktop-menu">
           {% snippet '%s' % g.header_file_name or "/menu/menu_list.html" %}
           {% if g.show_language_picker_in_menu.lower()|default('', 'true')  == 'true' %}
           <li class="lang-item">

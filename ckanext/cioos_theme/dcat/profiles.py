@@ -25,9 +25,7 @@ GSP = Namespace('http://www.opengis.net/ont/geosparql#')
 OWL = Namespace('http://www.w3.org/2002/07/owl#')
 SPDX = Namespace('http://spdx.org/rdf/terms#')
 
-DCT = Namespace("http://purl.org/dc/terms/")
-DCAT = Namespace("http://www.w3.org/ns/dcat#")
-SCHEMA = Namespace('http://schema.org/')
+PROV = Namespace("http://www.w3.org/ns/prov#")
 
 GEOJSON_IMT = 'https://www.iana.org/assignments/media-types/application/vnd.geo+json'
 
@@ -605,6 +603,10 @@ class CIOOSDCATProfile(SchemaOrgProfile):
                         self.g.add((identifier, SCHEMA.name, Literal("DOI: %s" % doi)))
                         self.g.add((identifier, SCHEMA.value, Literal("doi:%s" % doi)))
                         self.g.add((identifier, SCHEMA.url, Literal("https://doi.org/%s" % doi)))
+
+                        uri = dataset_uri(dataset_dict)
+                        self.g.add((dataset_ref, DCAT.previousVersion, URIRefOrLiteral(uri)))
+                        self.g.add((dataset_ref, PROV.wasRevisionOf, URIRefOrLiteral(uri)))
         else:
             uri = dataset_uri(dataset_dict)
             g.add((dataset_ref, SCHEMA.identifier, Literal('%s' % uri)))
