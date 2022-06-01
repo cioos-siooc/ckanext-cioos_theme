@@ -464,6 +464,9 @@ msgstr "contributeurs"
 msgid "Show Permalink"
 msgstr "Montrer le Permalien"
 
+msgid "Basic View "
+msgstr "Vue de Base"
+
 msgid "Metadata Reference Date(s)"
 msgstr "Date(s) de référence des métadonnées"
 
@@ -677,7 +680,7 @@ msgstr "Anglais"
 msgid "Marine debris"
 msgstr "Débris marins"
 
-msgid "Ocean color"
+msgid "Ocean colour"
 msgstr "Couleur des océans"
 
 msgid "Ocean sound"
@@ -685,3 +688,18 @@ msgstr "Paysage acoustique des océans"
 
 msgid "Cross-disciplinary"
 msgstr "Interdisciplinaire"
+
+msgid "Year"
+msgstr "Année"
+
+msgid " to "
+msgstr " à "
+
+msgid "Show blank range"
+msgstr "Afficher étendue vide"
+
+msgid "read more"
+msgstr "lire plus"
+
+msgid "read less"
+msgstr "lire moins"
