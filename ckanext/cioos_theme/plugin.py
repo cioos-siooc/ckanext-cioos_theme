@@ -559,7 +559,6 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
 
         return data_dict
 
-
     # group a list of dictionaries based on individual-name or organization-name keys
     def group_by_ind_or_org(self, dict_list):
         from collections import defaultdict
@@ -568,7 +567,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         dict_out = {}
 
         for d in dict_list:
-            group_value = d.get('individual-name') + '_' + d.get('organisation-name')
+            group_value = d.get('individual-name', '') + '_' + d.get('organisation-name', '')
             if not dict_out.get(group_value):
                 dict_out[group_value] = defaultdict(list)
             for key, value in d.items():
@@ -577,7 +576,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                 else:
                     dict_out[group_value][key].append(value)
         for d in dict_list:
-            group_value = d.get('individual-name') + '_' + d.get('organisation-name')
+            group_value = d.get('individual-name', '') + '_' + d.get('organisation-name', '')
             dict_out[group_value] = dict(dict_out[group_value])
 
         for k1, v1 in dict_out.items():
