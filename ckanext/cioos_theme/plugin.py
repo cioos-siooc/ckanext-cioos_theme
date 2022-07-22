@@ -318,6 +318,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
 
         schema.update({
             'ckan.site_title': [ignore_missing, fluent_field_default(None, None), fluent_text(None, None)],
+            'ckan.site_heading': [ignore_missing, fluent_field_default(None, None), fluent_text(None, None)],
             'ckan.site_description': [ignore_missing, fluent_field_default(None, None), fluent_text(None, None)],
             'ckan.site_about': [ignore_missing, fluent_field_default(None, None), fluent_text(None, None)],
             'ckan.site_intro_text': [ignore_missing, fluent_field_default(None, None), fluent_text(None, None)],
@@ -332,6 +333,8 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             'ckan.hide_organization_in_breadcrumb': [ignore_missing, boolean_validator],
             'ckan.hide_organization_in_dataset_sidebar': [ignore_missing, boolean_validator],
             'ckan.show_responsible_organization_in_dataset_sidebar': [ignore_missing, boolean_validator],
+            'ckan.show_language_picker_in_top_bar': [ignore_missing, boolean_validator],
+            'ckan.show_language_picker_in_menu': [ignore_missing, boolean_validator],
         })
         return schema
 
@@ -578,7 +581,6 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
 
         return data_dict
 
-
     # group a list of dictionaries based on individual-name or organization-name keys
     def group_by_ind_or_org(self, dict_list):
         from collections import defaultdict
@@ -587,7 +589,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         dict_out = {}
 
         for d in dict_list:
-            group_value = d.get('individual-name') or d.get('organisation-name')
+            group_value = d.get('individual-name', '') + '_' + d.get('organisation-name', '')
             if not dict_out.get(group_value):
                 dict_out[group_value] = defaultdict(list)
             for key, value in d.items():
@@ -596,7 +598,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                 else:
                     dict_out[group_value][key].append(value)
         for d in dict_list:
-            group_value = d.get('individual-name') or d.get('organisation-name')
+            group_value = d.get('individual-name', '') + '_' + d.get('organisation-name', '')
             dict_out[group_value] = dict(dict_out[group_value])
 
         for k1, v1 in dict_out.items():

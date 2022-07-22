@@ -1,7 +1,6 @@
 ckan.module('truncate', function (jQuery) {
   return {
     initialize: function() {
-      console.log("I've been initialized for element: ", this.el);
       $.proxyAll(this, /_on/);
       this.el.ready(this._onReady);
     },

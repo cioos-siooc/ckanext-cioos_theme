@@ -18,19 +18,12 @@
       {% set pkg = c.pkg_dict or pkg_dict %}
       <table class="table table-striped table-bordered table-condensed">
         {%- for field in schema.dataset_fields -%}
-        {%- if not field.display_snippet -%}
-          {%- if field.repeating_subfields -%}
-            {%- set _ = field.update({"display_snippet":"repeating_subfields.html"}) -%}
-          {%- elif field.simple_subfields -%}
-            {%- set _ = field.update({"display_snippet":"simple_subfields.html"}) -%}
-          {%- elif h.scheming_field_choices(field) -%}
-            {%- set _ = field.update({"display_snippet":"select.html"}) -%}
-          {%- elif field.preset == 'fluent_core_translated' -%}
-            {%- set _ = field.update({"display_snippet": "fluent_text.html"}) -%}
+        {% set display_snippet = field.display_snippet %}
+        {%- if not display_snippet -%}
+          {%- if field.preset == 'fluent_core_translated' -%}
+            {%- set display_snippet = 'fluent_text.html' -%}
           {%- elif 'fluent_' in field.preset -%}
-            {%- set _ = field.update({"display_snippet":field.preset + ".html"}) -%}
-          {%- else -%}
-            {%- set _ = field.update({"display_snippet":"text.html"}) -%}
+            {%- set display_snippet = field.preset + '.html' -%}
           {%- endif -%}
         {%- endif -%}
         {%- set _ = pkg.update({"citation": h.scheming_language_text(pkg.citation)}) -%}
