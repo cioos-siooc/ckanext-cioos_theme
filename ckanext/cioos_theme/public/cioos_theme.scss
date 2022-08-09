@@ -1350,4 +1350,12 @@ section{
     max-width: 100%;
 }
 
+// fix buttons in resource reordering view when editing a dataset resource
+// previously the buttons were hidden.
+.reordering + .form-actions {
+    clear: both;
+    padding-top: 10px;
+    height: fit-content;
+}
+
 @import url(//fonts.googleapis.com/css?family=Montserrat:400,600,700,800,900|Quicksand:300,400,600,700|PT+Sans:400|Raleway:400);
