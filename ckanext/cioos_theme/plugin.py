@@ -557,6 +557,11 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         if(data_dict.get('eov')):
             data_dict['eov'] = cioos_helpers.load_json(data_dict['eov'])
 
+        for res in data_dict.get('resources', []):
+            res_name = cioos_helpers.load_json(res.get('name', '{}'))
+            if res_name and isinstance(res_name, dict) and not res.get('name_translated'):
+                res['name_translated'] = res_name
+
         return data_dict
 
     # group a list of dictionaries based on individual-name or organization-name keys
