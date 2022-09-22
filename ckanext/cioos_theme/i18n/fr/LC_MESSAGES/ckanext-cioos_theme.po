@@ -327,7 +327,7 @@ msgid "SEARCH BY OCEAN VARIABLE"
 msgstr "RECHERCHE PAR VARIABLE OCÉANIQUE"
 
 msgid "Search By Ocean Variable:"
-msgstr "Recherche par variable océanique"
+msgstr "Recherche par variable océanique:"
 
 msgid "Search"
 msgstr "Chercher"
