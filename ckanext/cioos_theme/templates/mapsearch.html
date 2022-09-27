@@ -1,0 +1,13 @@
+{% extends "page.html" %}
+
+{% set pkg_dicts = c.pkg_dicts or pkg_dicts %}
+
+{% block primary %}
+
+{% snippet "spatial/snippets/spatial_query.html" , pkg_geom=pkg_dicts %}
+
+{% endblock %}
+
+
+
+{% block secondary %}{% endblock %}

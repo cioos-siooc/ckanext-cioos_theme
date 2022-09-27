@@ -211,9 +211,22 @@ def render_datacite_xml(id):
     pkg = toolkit.get_action('package_show')(data_dict={'id': id})
     return toolkit.render('package/datacite.html', extra_vars={'pkg_dict': pkg})
 
+
 def render_basic_package_view(id):
     pkg = toolkit.get_action('package_show')(data_dict={'id': id})
     return toolkit.render('package/basic.html', extra_vars={'pkg_dict': pkg})
+
+
+def render_mapsearch():
+    pkg = toolkit.get_action('package_search')(data_dict={'fl': 'title,spatial', 'rows': 200})
+    pkg_geojson = [
+        {
+            "type": "Feature",
+            "properties": {"title": toolkit.h.scheming_language_text(json.loads(x.get('title')))},
+            "geometry": json.loads(x.get('spatial'))
+        } for x in pkg['results']]
+    return toolkit.render('mapsearch.html', extra_vars={'pkg_dicts': json.dumps(pkg_geojson)})
+
 
 class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
     plugins.implements(plugins.ITranslation)
@@ -235,6 +248,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         blueprint = Blueprint('cioos', self.__module__)
         rules = [
             ('/schemamap', 'schemamap', render_schemamap),
+            ('/mapsearch', 'mapsearch', render_mapsearch),
             ('/dataset/<id>.dcxml', 'datacite_xml', render_datacite_xml),
             ('/dataset/<id>.basic', 'package_basic', render_basic_package_view),
         ]
