@@ -222,9 +222,9 @@ def render_mapsearch():
     pkg_geojson = [
         {
             "type": "Feature",
-            "properties": {"title": toolkit.h.scheming_language_text(json.loads(x.get('title')))},
-            "geometry": json.loads(x.get('spatial'))
-        } for x in pkg['results']]
+            "properties": {"title": toolkit.h.scheming_language_text(cioos_helpers.load_json(x.get('title')))},
+            "geometry": cioos_helpers.load_json(x.get('spatial'))
+        } for x in pkg.get('results', [])]
     return toolkit.render('mapsearch.html', extra_vars={'pkg_dicts': json.dumps(pkg_geojson)})
 
 
