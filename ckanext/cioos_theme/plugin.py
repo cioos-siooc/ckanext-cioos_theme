@@ -561,6 +561,9 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             res_name = cioos_helpers.load_json(res.get('name', '{}'))
             if res_name and isinstance(res_name, dict) and not res.get('name_translated'):
                 res['name_translated'] = res_name
+            resource_description = cioos_helpers.load_json(res.get('description', '{}'))
+            if resource_description and isinstance(resource_description, dict) and not res.get('description_translated'):
+                res['description_translated'] = resource_description
 
         return data_dict
 
@@ -675,11 +678,20 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                 result['title_translated'] = cioos_helpers.load_json(title)
                 if isinstance(result['title_translated'], dict):
                     result['title'] = scheming_language_text(result['title_translated'], toolkit.config.get('ckan.locale_default', 'en'))
+
             notes = result.get('notes_translated')
             if(notes):
                 result['notes_translated'] = cioos_helpers.load_json(notes)
                 if isinstance(result['notes_translated'], dict):
                     result['notes'] = scheming_language_text(result['notes_translated'], toolkit.config.get('ckan.locale_default', 'en'))
+
+            for res in result.get('resources', []):
+                res_name = cioos_helpers.load_json(res.get('name_translated', '{}'))
+                if res_name and isinstance(res_name, dict):
+                    res['name'] = scheming_language_text(res_name, toolkit.config.get('ckan.locale_default', 'en'))
+                resource_description = cioos_helpers.load_json(res.get('description_translated', '{}'))
+                if resource_description and isinstance(resource_description, dict):
+                    res['description'] = scheming_language_text(resource_description, toolkit.config.get('ckan.locale_default', 'en'))
 
             # convert the rest of the strings to json
             for field in [
