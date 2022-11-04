@@ -19,6 +19,7 @@ import copy
 import logging
 import json
 import jsonpickle
+import importlib_metadata as metadata
 log = logging.getLogger(__name__)
 
 try:
@@ -470,3 +471,8 @@ def cioos_get_facets(package_type='dataset'):
     #     'search': c.search_facets,
     #     'titles': c.facet_titles,
     # }
+
+
+def cioos_version():
+    '''Return CIOOS version'''
+    return metadata.version('ckanext.cioos_theme')
