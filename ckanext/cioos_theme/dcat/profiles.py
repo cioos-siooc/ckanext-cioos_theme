@@ -166,6 +166,25 @@ class CIOOSDCATProfile(SchemaOrgProfile):
         if 'license_id' not in dataset_dict:
             dataset_dict['license_id'] = self._license(dataset_ref)
 
+        # change license over to "use-limitations"
+        # use_limitations_str = dataset_dict.get('use-limitations', '[]')
+        # dataset_name = dataset_dict.get('name')
+        # try:
+        #     use_limitations = json.loads(use_limitations_str)
+        #     if use_limitations:
+        #         for use_limitation in use_limitations:
+        #             creative_work = BNode()
+        #             g.add((creative_work, RDF.type, SCHEMA.CreativeWork))
+        #             license_str = "License text for {}".format(dataset_name)
+        #             g.add((creative_work, SCHEMA.text, Literal(use_limitation)))
+        #             g.add((creative_work, SCHEMA.name, Literal(license_str)))
+        #             g.add((dataset_ref, SCHEMA.license, creative_work))
+        # NB: this is accurate in Python 2.  In Python 3 JSON parsing
+        #     exceptions are moved to json.JSONDecodeError
+        # except ValueError:
+        #     pass
+
+
         # Source Catalog
         if toolkit.asbool(toolkit.config.get(DCAT_EXPOSE_SUBCATALOGS, False)):
             catalog_src = self._get_source_catalog(dataset_ref)
@@ -390,6 +409,8 @@ class CIOOSDCATProfile(SchemaOrgProfile):
     def graph_from_dataset(self, dataset_dict, dataset_ref):
         g = self.g
 
+        self.g.namespace_manager.bind('@vocab', SCHEMA, replace=True)
+
         # remove all previous contact points set by base profile as it is garbage.
         for s, p, o in self.g.triples((None, SCHEMA.contactPoint, None)):
             self.g.remove((s, None, None))
@@ -492,23 +513,9 @@ class CIOOSDCATProfile(SchemaOrgProfile):
 
             self.g.add((dataset_ref, SCHEMA.creator, creator_details))
 
-        # change license over to "use-limitations"
-        use_limitations_str = dataset_dict.get('use-limitations', '[]')
-        dataset_name = dataset_dict.get('name')
-        try:
-            use_limitations = json.loads(use_limitations_str)
-            if use_limitations:
-                for use_limitation in use_limitations:
-                    creative_work = BNode()
-                    g.add((creative_work, RDF.type, SCHEMA.CreativeWork))
-                    license_str = "License text for {}".format(dataset_name)
-                    g.add((creative_work, SCHEMA.text, Literal(use_limitation)))
-                    g.add((creative_work, SCHEMA.name, Literal(license_str)))
-                    g.add((dataset_ref, SCHEMA.license, creative_work))
-        # NB: this is accurate in Python 2.  In Python 3 JSON parsing
-        #     exceptions are moved to json.JSONDecodeError
-        except ValueError:
-            pass
+
+
+        # variableMeasured
 
         try:
             std_names = dataset_dict.get('cf_standard_names')
@@ -521,6 +528,9 @@ class CIOOSDCATProfile(SchemaOrgProfile):
             for standard_name in sorted(std_names):
                 g.add((dataset_ref, SCHEMA.variableMeasured,
                       Literal(standard_name)))
+
+        for variable in dataset_dict.get('variable-measured', []):
+            self.g.add((dataset_ref, SCHEMA.variableMeasured, Literal(variable)))
 
         spatial_uri = dataset_dict.get('spatial_uri')
         spatial_text = dataset_dict.get('spatial_text')
@@ -576,10 +586,16 @@ class CIOOSDCATProfile(SchemaOrgProfile):
         self.infer_publisher(dataset_dict)
         self._publisher_graph(dataset_ref, dataset_dict)
 
+        if dataset_dict.get('measurement-techniques'):
+            self.g.add((dataset_ref, SCHEMA.measurementTechnique, Literal('. '.join(dataset_dict['measurement-techniques']))))
+
+        for provider in dataset_dict.get('provider', []):
+            self.g.add((dataset_ref, SCHEMA.provider, Literal(provider)))
+
         # Resources
         if dataset_dict.get('resources'):
             for s, p, o in g.triples((None, RDF.type, SCHEMA.DataDownload)):
-                self.g.remove((s,None,None))
+                self.g.remove((s, None, None))
             self.g.remove((dataset_ref, SCHEMA.distribution, None))
         self._resources_graph(dataset_ref, dataset_dict)
 
@@ -610,6 +626,12 @@ class CIOOSDCATProfile(SchemaOrgProfile):
         else:
             uri = dataset_uri(dataset_dict)
             g.add((dataset_ref, SCHEMA.identifier, Literal('%s' % uri)))
+
+        # dataset @id
+        # this should add a new id to the dataset graph but I can't remove the existing id
+        # which is set to the db pk guid
+        # uri = dataset_uri(dataset_dict)
+        # g.add((dataset_ref, SCHEMA['@id'],  Literal('%s' % uri+'.jsonld')))
 
         # Add version
         g.add((dataset_ref, SCHEMA.version, Literal('%s' % dataset_dict.get('version', '1')))),
