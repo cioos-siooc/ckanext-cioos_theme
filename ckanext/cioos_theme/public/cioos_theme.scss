@@ -1233,6 +1233,19 @@ i.fa.translation_icon {
   }
 }
 
+.primary{
+  .identifier_icon_list{
+    max-height: 32px;
+  }
+  .dataset-list .dataset-content .identifier_icon_list{
+    max-height: 16px;
+  }
+  
+  #dataset-contacts .identifier_icon_list{
+    max-height: 16px;
+  }
+}
+
 .secondary{
   #datepickernullrange {
     margin: 10px 0px 10px 15px;
@@ -1243,7 +1256,7 @@ i.fa.translation_icon {
   }
 
   .identifier_icon_list{
-    width: 14px;
+    max-height: 32px;
   }
   .input-group-addon{
     color: #555555;

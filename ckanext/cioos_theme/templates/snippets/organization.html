@@ -38,6 +38,9 @@ Example:
         {% endif %}
       </h1>
       {% endblock %}
+      {% block identifier %}
+        {{ h.snippet('snippets/identifier_list.html', uri=organization.get('organization-uri'), container='h3') }}
+      {% endblock %}
       {% block description %}
       {% if h.get_translated(organization, 'description') %}
         <p>

@@ -31,6 +31,7 @@ except ImportError:
 
 get_action = logic.get_action
 
+
 def load_json(j):
     try:
         new_val = json.loads(j)
@@ -76,6 +77,7 @@ def load_json(j):
 #
 #     return default
 
+
 # copied from dcat extension
 def helper_available(helper_name):
     '''
@@ -87,6 +89,7 @@ def helper_available(helper_name):
         return False
     return True
 
+
 def generate_doi_suffix():
     import random
     chars = ['a','b','c','d','e','f','g','h','j','k','m','n','p','q','r','s',
@@ -95,17 +98,32 @@ def generate_doi_suffix():
     str2 = ''.join(random.SystemRandom().choice(chars) for _ in range(4))
     return str1 + '-' + str2
 
+
 def get_doi_authority_url():
     return toolkit.config.get('ckan.cioos.doi_authority_url', 'https://doi.org/')
+
 
 def get_doi_prefix():
     return toolkit.config.get('ckan.cioos.doi_prefix')
 
+
 def get_datacite_org():
     return toolkit.config.get('ckan.cioos.datacite_org')
 
+
 def get_datacite_test_mode():
     return toolkit.config.get('ckan.cioos.datacite_test_mode', 'True')
+
+
+def get_package_uri(pkg):
+    uris = pkg.get('unique-resource-identifier-full', [])
+    for uri in uris:
+        authority = uri.get('authority') or 'doi.org'
+        if uri:
+            code = uri.get('code')
+            if code and authority not in code:
+                uri['code'] = 'https://' + authority + '/' + code
+    return uris
 
 
 def get_package_relationships(pkg):
@@ -130,7 +148,6 @@ def print_package_relationship_type(type):
     elif 'link' in type:
         out = 'cross link'
     return out
-    #return PackageRelationship.make_type_printable(type)
 
 
 def get_package_relationship_reverse_type(type):

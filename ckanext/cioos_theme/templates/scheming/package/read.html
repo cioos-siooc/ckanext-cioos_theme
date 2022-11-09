@@ -3,6 +3,9 @@
 {%- set schema = h.scheming_get_dataset_schema(dataset_type) -%}
 
 {% block package_notes %}
+  {% block identifier %}
+    {{ h.snippet('snippets/identifier_list.html', uri=h.cioos_get_package_uri(pkg), container='h3') }}
+  {% endblock %}
   {%- if not dataset_type -%}
     <p>
     dataset_type not passed to template. your version of CKAN

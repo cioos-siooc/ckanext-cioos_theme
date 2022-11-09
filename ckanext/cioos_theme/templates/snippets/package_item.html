@@ -57,6 +57,9 @@ Example:
             <p class="empty">{{ _("This dataset has no description") }}</p>
           {% endif %}
         {% endblock %}
+        {% block identifier %}
+          {{ h.snippet('snippets/identifier_list.html', uri=h.cioos_get_package_uri(package), container='div') }}
+        {% endblock %}
       </div>
       {% block resources %}
         {% if package.resources and not hide_resources %}
