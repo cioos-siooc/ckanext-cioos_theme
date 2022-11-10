@@ -4,7 +4,14 @@
 
 {% block package_notes %}
   {% block identifier %}
-    {{ h.snippet('snippets/identifier_list.html', uri=h.cioos_get_package_uri(pkg), container='h3') }}
+    {{ h.snippet('snippets/identifier_list.html',
+        container = 'h3',
+        uri = h.cioos_get_fully_qualified_package_uri(
+          pkg,
+          uri_field='unique-resource-identifier-full',
+          default_authority='doi.org')
+        )
+    }}
   {% endblock %}
   {%- if not dataset_type -%}
     <p>

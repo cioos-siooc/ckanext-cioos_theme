@@ -58,7 +58,14 @@ Example:
           {% endif %}
         {% endblock %}
         {% block identifier %}
-          {{ h.snippet('snippets/identifier_list.html', uri=h.cioos_get_package_uri(package), container='div') }}
+          {{ h.snippet('snippets/identifier_list.html',
+              container = 'div',
+              uri = h.cioos_get_fully_qualified_package_uri(
+                package,
+                uri_field='unique-resource-identifier-full',
+                default_authority='doi.org')
+              )
+          }}
         {% endblock %}
       </div>
       {% block resources %}

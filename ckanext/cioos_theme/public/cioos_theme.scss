@@ -1240,9 +1240,28 @@ i.fa.translation_icon {
   .dataset-list .dataset-content .identifier_icon_list{
     max-height: 16px;
   }
-  
+
   #dataset-contacts .identifier_icon_list{
     max-height: 16px;
+  }
+  dl.organization-field-list dt {
+      float: left;
+      clear: left;
+      width: 100px;
+      text-align: left;
+      font-weight: 700;
+      color: #333;
+  }
+
+  dl.organization-field-list dt::after {
+    content: ":";
+  }
+
+  dl.organization-field-list dd {
+      float: left;
+      min-width: 150px;
+      width: auto;
+      max-width: 395px;
   }
 }
 

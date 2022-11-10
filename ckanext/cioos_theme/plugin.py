@@ -343,7 +343,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             'cioos_get_datacite_test_mode': cioos_helpers.get_datacite_test_mode,
             'cioos_helper_available': cioos_helpers.helper_available,
             'cioos_group_contacts': self.group_by_ind_or_org,
-            'cioos_get_package_uri': cioos_helpers.get_package_uri
+            'cioos_get_fully_qualified_package_uri': cioos_helpers.get_fully_qualified_package_uri
         }
 
     def get_validators(self):
@@ -588,9 +588,12 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         for k1, v1 in dict_out.items():
             for k, v in v1.items():
                 v1[k] = list(OrderedDict.fromkeys(v))
-                v1[k] = list(filter(len, v1[k]))  # remove empty strings from list
                 if len(v1[k]) == 1:
                     v1[k] = v1[k][0]
+                if isinstance(v1[k], list):
+                    v1[k] = list(filter(None, v1[k]))  # remove empty strings from list
+                    if len(v1[k]) == 1:
+                        v1[k] = v1[k][0]
             out.append(v1)
         return out
 

@@ -115,15 +115,42 @@ def get_datacite_test_mode():
     return toolkit.config.get('ckan.cioos.datacite_test_mode', 'True')
 
 
-def get_package_uri(pkg):
-    uris = pkg.get('unique-resource-identifier-full', [])
+def get_fully_qualified_package_uri(pkg, uri_field, default_authority=None):
+    fqURI = []
+    uris = pkg.get(uri_field)
+
+    if not uris:
+        # try to build out of flat fields
+        sep = toolkit.h.scheming_composite_separator()
+        uris = [{
+            "authority": pkg.get(uri_field + 'authority'),
+            "code-space": pkg.get(uri_field + 'code-space'),
+            "code": pkg.get(uri_field + 'code'),
+            "version": pkg.get(uri_field + 'version')
+        }] if pkg.get(uri_field + 'code') else None
+
+    if not uris:
+        return fqURI
+
+    if isinstance(uris, dict):
+        uris = [uris]
+
     for uri in uris:
-        authority = uri.get('authority') or 'doi.org'
-        if uri:
-            code = uri.get('code')
-            if code and authority not in code:
-                uri['code'] = 'https://' + authority + '/' + code
-    return uris
+        if not uri:
+            continue
+        authority = uri.get('authority') or default_authority
+        code_space = uri.get('code-space')
+        code = uri.get('code')
+        version = uri.get('version')
+        if not code:
+            continue
+        if toolkit.h.is_url(code):
+            fqURI.append(code)
+            continue
+        code = '/'.join([code_space, code])
+        if authority not in code:
+            fqURI.append('https://' + authority + '/' + code)
+    return fqURI
 
 
 def get_package_relationships(pkg):

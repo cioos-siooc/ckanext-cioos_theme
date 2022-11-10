@@ -1,22 +1,21 @@
 {% for ident in uri or [] %}
-  {% set code = ident.get('code') %}
   <{{container}}>
-  <a href="{{ code }}" class="">
-  {% if 'ror.org' in code %}
+  <a href="{{ ident }}" class="">
+  {% if 'ror.org' in ident %}
     <img src="/base/images/ror-logo-small.png" class="identifier_icon_list">
-    {{ code.rsplit('/', 1)[-1] }}
-  {% elif 'wikidata' in code %}
+    {{ ident.rsplit('/', 1)[-1] }}
+  {% elif 'wikidata' in ident %}
     <img src="/base/images/wikidata.png" class="identifier_icon_list">
-    {{ code.rsplit('/', 1)[-1] }}
-  {% elif 'orcid.org' in code %}
+    {{ ident.rsplit('/', 1)[-1] }}
+  {% elif 'orcid.org' in ident %}
     <img src="/base/images/orcid.logo.icon.svg" class="identifier_icon_list">
-    {{ code.rsplit('/', 1)[-1] }}
-  {% elif 'doi.org' in code %}
+    {{ ident.rsplit('/', 1)[-1] }}
+  {% elif 'doi.org' in ident %}
     <img src="/base/images/DOI_logo.svg" class="identifier_icon_list">
-    {{ '/'.join(code.rsplit("/", 2)[-2:]) }}
+    {{ '/'.join(ident.rsplit("/", 2)[-2:]) }}
   {% else %}
     <label>Id</label>
-    {{ code.rsplit('/', 1)[-1] }}
+    {{ ident.rsplit('/', 1)[-1] }}
   {% endif %}
   </a></{{container}}>
 {% endfor %}

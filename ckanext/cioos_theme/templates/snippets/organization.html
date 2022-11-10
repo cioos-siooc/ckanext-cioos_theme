@@ -39,7 +39,13 @@ Example:
       </h1>
       {% endblock %}
       {% block identifier %}
-        {{ h.snippet('snippets/identifier_list.html', uri=organization.get('organization-uri'), container='h3') }}
+        {{ h.snippet('snippets/identifier_list.html',
+            container = 'h3',
+            uri = h.cioos_get_fully_qualified_package_uri(
+              organization,
+              uri_field='organization-uri')
+            )
+        }}
       {% endblock %}
       {% block description %}
       {% if h.get_translated(organization, 'description') %}
