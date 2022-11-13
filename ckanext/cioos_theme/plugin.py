@@ -83,6 +83,9 @@ def clean_and_populate_eovs(field, schema):
         for x in toolkit.h.scheming_field_choices(toolkit.h.scheming_field_by_name(schema['dataset_fields'], 'eov')):
             eov_list[x['value'].lower()] = x['value']
             eov_list[x['label'].lower()] = x['value']
+            # if clean_tags is true dueing harvesting then spaces will be
+            # replaced by dash's by mung_tags
+            eov_list[x['label'].replace(' ', '-').lower()] = x['value']
 
         d = json.loads(data.get(key, '[]'))
         for x in eov_data:
