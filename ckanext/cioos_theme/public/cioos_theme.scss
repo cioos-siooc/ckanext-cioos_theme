@@ -1233,6 +1233,40 @@ i.fa.translation_icon {
   }
 }
 
+.primary{
+  .identifier_icon_list{
+    max-height: 32px;
+  }
+  .dataset-list .dataset-content .identifier_icon_list{
+    max-height: 16px;
+  }
+  .media-grid .identifier_icon_list{
+    max-height: 16px;
+  }
+  #dataset-contacts .identifier_icon_list{
+    max-height: 16px;
+  }
+  dl.organization-field-list dt {
+      float: left;
+      clear: left;
+      width: 100px;
+      text-align: left;
+      font-weight: 700;
+      color: #333;
+  }
+
+  dl.organization-field-list dt::after {
+    content: ":";
+  }
+
+  dl.organization-field-list dd {
+      float: left;
+      min-width: 150px;
+      width: auto;
+      max-width: 395px;
+  }
+}
+
 .secondary{
   #datepickernullrange {
     margin: 10px 0px 10px 15px;
@@ -1243,7 +1277,7 @@ i.fa.translation_icon {
   }
 
   .identifier_icon_list{
-    width: 14px;
+    max-height: 32px;
   }
   .input-group-addon{
     color: #555555;

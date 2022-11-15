@@ -21,6 +21,15 @@ Example:
   {% block title %}
     <h3 class="media-heading">{{ h.get_translated(organization, 'title') }}</h3>
   {% endblock %}
+  {% block identifier %}
+    {{ h.snippet('snippets/identifier_list.html',
+        container = 'div',
+        uri = h.cioos_get_fully_qualified_package_uri(
+          organization,
+          uri_field='organization-uri')
+        )
+    }}
+  {% endblock %}
   {% block description %}
     {% if h.get_translated(organization, 'description') %}
       <p  class="media-description">{{ h.markdown_extract(h.get_translated(organization, 'description'), extract_length=80) }}</p>
