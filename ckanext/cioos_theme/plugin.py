@@ -346,7 +346,8 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             'cioos_get_datacite_test_mode': cioos_helpers.get_datacite_test_mode,
             'cioos_helper_available': cioos_helpers.helper_available,
             'cioos_group_contacts': self.group_by_ind_or_org,
-            'cioos_get_fully_qualified_package_uri': cioos_helpers.get_fully_qualified_package_uri
+            'cioos_get_fully_qualified_package_uri': cioos_helpers.get_fully_qualified_package_uri,
+            'cioos_version': cioos_helpers.cioos_version
         }
 
     def get_validators(self):
