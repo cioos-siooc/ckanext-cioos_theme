@@ -83,6 +83,9 @@ def clean_and_populate_eovs(field, schema):
         for x in toolkit.h.scheming_field_choices(toolkit.h.scheming_field_by_name(schema['dataset_fields'], 'eov')):
             eov_list[x['value'].lower()] = x['value']
             eov_list[x['label'].lower()] = x['value']
+            # if clean_tags is true dueing harvesting then spaces will be
+            # replaced by dash's by mung_tags
+            eov_list[x['label'].replace(' ', '-').lower()] = x['value']
 
         d = json.loads(data.get(key, '[]'))
         for x in eov_data:
@@ -343,6 +346,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             'cioos_get_datacite_test_mode': cioos_helpers.get_datacite_test_mode,
             'cioos_helper_available': cioos_helpers.helper_available,
             'cioos_group_contacts': self.group_by_ind_or_org,
+            'cioos_get_fully_qualified_package_uri': cioos_helpers.get_fully_qualified_package_uri,
             'cioos_version': cioos_helpers.cioos_version
         }
 
@@ -562,6 +566,9 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             res_name = cioos_helpers.load_json(res.get('name', '{}'))
             if res_name and isinstance(res_name, dict) and not res.get('name_translated'):
                 res['name_translated'] = res_name
+            resource_description = cioos_helpers.load_json(res.get('description', '{}'))
+            if resource_description and isinstance(resource_description, dict) and not res.get('description_translated'):
+                res['description_translated'] = resource_description
 
         return data_dict
 
@@ -590,6 +597,10 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                 v1[k] = list(OrderedDict.fromkeys(v))
                 if len(v1[k]) == 1:
                     v1[k] = v1[k][0]
+                if isinstance(v1[k], list):
+                    v1[k] = list(filter(None, v1[k]))  # remove empty strings from list
+                    if len(v1[k]) == 1:
+                        v1[k] = v1[k][0]
             out.append(v1)
         return out
 
@@ -676,11 +687,20 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                 result['title_translated'] = cioos_helpers.load_json(title)
                 if isinstance(result['title_translated'], dict):
                     result['title'] = scheming_language_text(result['title_translated'], toolkit.config.get('ckan.locale_default', 'en'))
+
             notes = result.get('notes_translated')
             if(notes):
                 result['notes_translated'] = cioos_helpers.load_json(notes)
                 if isinstance(result['notes_translated'], dict):
                     result['notes'] = scheming_language_text(result['notes_translated'], toolkit.config.get('ckan.locale_default', 'en'))
+
+            for res in result.get('resources', []):
+                res_name = cioos_helpers.load_json(res.get('name_translated', '{}'))
+                if res_name and isinstance(res_name, dict):
+                    res['name'] = scheming_language_text(res_name, toolkit.config.get('ckan.locale_default', 'en'))
+                resource_description = cioos_helpers.load_json(res.get('description_translated', '{}'))
+                if resource_description and isinstance(resource_description, dict):
+                    res['description'] = scheming_language_text(resource_description, toolkit.config.get('ckan.locale_default', 'en'))
 
             # convert the rest of the strings to json
             for field in [

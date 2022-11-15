@@ -32,6 +32,7 @@ except ImportError:
 
 get_action = logic.get_action
 
+
 def load_json(j):
     try:
         new_val = json.loads(j)
@@ -77,6 +78,7 @@ def load_json(j):
 #
 #     return default
 
+
 # copied from dcat extension
 def helper_available(helper_name):
     '''
@@ -88,6 +90,7 @@ def helper_available(helper_name):
         return False
     return True
 
+
 def generate_doi_suffix():
     import random
     chars = ['a','b','c','d','e','f','g','h','j','k','m','n','p','q','r','s',
@@ -96,17 +99,59 @@ def generate_doi_suffix():
     str2 = ''.join(random.SystemRandom().choice(chars) for _ in range(4))
     return str1 + '-' + str2
 
+
 def get_doi_authority_url():
     return toolkit.config.get('ckan.cioos.doi_authority_url', 'https://doi.org/')
+
 
 def get_doi_prefix():
     return toolkit.config.get('ckan.cioos.doi_prefix')
 
+
 def get_datacite_org():
     return toolkit.config.get('ckan.cioos.datacite_org')
 
+
 def get_datacite_test_mode():
     return toolkit.config.get('ckan.cioos.datacite_test_mode', 'True')
+
+
+def get_fully_qualified_package_uri(pkg, uri_field, default_authority=None):
+    fqURI = []
+    uris = pkg.get(uri_field)
+
+    if not uris:
+        # try to build out of flat fields
+        sep = toolkit.h.scheming_composite_separator()
+        uris = [{
+            "authority": pkg.get(uri_field + 'authority'),
+            "code-space": pkg.get(uri_field + 'code-space'),
+            "code": pkg.get(uri_field + 'code'),
+            "version": pkg.get(uri_field + 'version')
+        }] if pkg.get(uri_field + 'code') else None
+
+    if not uris:
+        return fqURI
+
+    if isinstance(uris, dict):
+        uris = [uris]
+
+    for uri in uris:
+        if not uri:
+            continue
+        authority = uri.get('authority') or default_authority
+        code_space = uri.get('code-space')
+        code = uri.get('code')
+        version = uri.get('version')
+        if not code:
+            continue
+        if toolkit.h.is_url(code):
+            fqURI.append(code)
+            continue
+        code = '/'.join([code_space, code])
+        if authority not in code:
+            fqURI.append('https://' + authority + '/' + code)
+    return fqURI
 
 
 def get_package_relationships(pkg):
@@ -131,7 +176,6 @@ def print_package_relationship_type(type):
     elif 'link' in type:
         out = 'cross link'
     return out
-    #return PackageRelationship.make_type_printable(type)
 
 
 def get_package_relationship_reverse_type(type):

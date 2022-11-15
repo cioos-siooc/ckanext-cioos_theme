@@ -636,7 +636,7 @@ msgid "Nitrous oxide"
 msgstr "Protoxyde d'azote"
 
 msgid "Stable carbon isotopes"
-msgstr "Carbone organique dissous"
+msgstr "Isotopes stables du carbone"
 
 msgid "BioEcosystems"
 msgstr "Biologie et écosystèmes"
