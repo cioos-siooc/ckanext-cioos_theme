@@ -13,9 +13,12 @@
   {% elif 'doi.org' in ident %}
     <img src="/base/images/DOI_logo.svg" class="identifier_icon_list">
     {{ '/'.join(ident.rsplit("/", 2)[-2:]) }}
+  {% elif 'isni.org' in ident %}    
+    <img src="/base/images/isni-logo.svg" class="identifier_icon_list">
+    {{ ident.rsplit('/', 1)[-1] }}
   {% else %}
     <label>Id</label>
-    {{ ident.rsplit('/', 1)[-1] }}
+    {{ ident.lstrip('https://').rstrip('/') }}
   {% endif %}
   </a></{{container}}>
 {% endfor %}

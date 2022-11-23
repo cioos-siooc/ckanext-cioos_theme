@@ -347,7 +347,6 @@ def cioos_schema_field_map_parent(fields, isodoc_dict, class_dict, mapkey, capti
         # update class with pre determined definition if appropreit
         if objtype != 'ISOElement' and item.get('elements') and objtype.startswith('ISO'):
             class_json_def = json.loads(class_dict.get(objtype, {}).get('class', '{}'))
-            log.debug(class_json_def)
             elem = class_json_def.get('elements', [])
             item['elements'] = elem
 
