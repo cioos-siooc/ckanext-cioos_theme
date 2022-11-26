@@ -116,7 +116,7 @@ def get_datacite_test_mode():
     return toolkit.config.get('ckan.cioos.datacite_test_mode', 'True')
 
 
-def get_fully_qualified_package_uri(pkg, uri_field, default_authority=None):
+def get_fully_qualified_package_uri(pkg, uri_field, default_code_space=None):
     fqURI = []
     uris = pkg.get(uri_field)
 
@@ -139,8 +139,7 @@ def get_fully_qualified_package_uri(pkg, uri_field, default_authority=None):
     for uri in uris:
         if not uri:
             continue
-        authority = uri.get('authority') or default_authority
-        code_space = uri.get('code-space')
+        code_space = uri.get('code-space') or default_code_space
         code = uri.get('code')
         version = uri.get('version')
         if not code:
@@ -148,9 +147,8 @@ def get_fully_qualified_package_uri(pkg, uri_field, default_authority=None):
         if toolkit.h.is_url(code):
             fqURI.append(code)
             continue
-        code = '/'.join([code_space, code])
-        if authority not in code:
-            fqURI.append('https://' + authority + '/' + code)
+        if code_space not in code:
+            fqURI.append('https://' + code_space + '/' + code)
     return fqURI
 
 
