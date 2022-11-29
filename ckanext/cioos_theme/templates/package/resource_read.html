@@ -1,5 +1,20 @@
 {% ckan_extends %}
 
+{% block download_resource_button %}
+
+
+  {% if res.format.lower() == 'erddap' and res.url_md5 and h.is_url('https://explore.cioos.ca?datasets=' + res.url_md5) %}
+    <a class="btn btn-primary resource-url-analytics resource-type-{{ res.resource_type }}"
+       href="{{ 'https://explore.cioos.ca?datasets=' + res.url_md5 }}" class="resource-url-analytics" target="_blank">
+        <i class="fa fa-map"></i>
+        {{ _('Add to CDE') }}
+    </a>
+
+  {% endif %}
+
+  {{ super() }}
+{% endblock %}
+
 {% block resource_content %}
   {% block package_archive_notice %}
     {{ super() }}
