@@ -70,6 +70,14 @@
         </a>
       </li>
       {% endif %}
+      {% if res.format.lower() == 'erddap' and res.url_md5 and h.is_url('https://explore.cioos.ca?datasets=' + res.url_md5) %}
+      <li>
+        <a href="{{ 'https://explore.cioos.ca?datasets=' + res.url_md5 }}" class="resource-url-analytics" target="_blank">
+            <i class="fa fa-map"></i>
+            {{ _('Add to CDE') }}
+        </a>
+      </li>
+      {% endif %}
       {% if can_edit %}
       <li>
         <a href="{{ h.url_for(pkg.type ~ '_resource.edit', id=pkg.name, resource_id=res.id) }}">
