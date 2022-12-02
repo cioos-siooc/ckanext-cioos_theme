@@ -55,10 +55,6 @@
   color: rgb(255, 255, 255, .5);
 }
 
-.search-form .search-input-group button:hover i {
-  color: #000000;
-}
-
 .toggle-menu label,
 .mobile-nav {
   background: #006e90;
@@ -86,9 +82,28 @@
   font-size: medium;
 }
 
+.title h1 {
+    font-size: 48px;
+    color: #404040;
+}
+
+.title h2 {
+    font-size: 32px;
+    font-weight: 300;
+    color: #707070;
+}
+
 .title h2 span a,
 .title h2 span a:hover {
   color: #ff6b35;
+}
+
+.search-form {
+    padding-bottom: 0px;
+}
+
+.search-form .search-input-group button:hover i {
+  color: #000000;
 }
 
 .search-form .search-input.search-giant button {
