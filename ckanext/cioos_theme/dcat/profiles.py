@@ -326,16 +326,9 @@ class CIOOSDCATProfile(SchemaOrgProfile):
             url = org_details.get('external_home_url')
 
             name = toolkit.h.scheming_language_text(load_json(org_details.get('title_translated', {})))
-            uri_details = org_details.get('organization-uri', {})
-            if uri_details:
-                code = uri_details.get('code')
-                codeSpace = uri_details.get('code-space')
-                authority = uri_details.get('authority')
-                version = uri_details.get('version')
-                id_list = [authority, codeSpace, code, version]
-                uri = '/'.join(x.strip() for x in id_list if x.strip())
-            else:
-                uri = '{0}/organization/{1}'.format(toolkit.config.get('ckan.site_url').rstrip('/'), org_id)
+            qualified_uri = toolkit.h.cioos_get_fully_qualified_package_uri(org_details, 'organization-uri')
+            ckan_page_uri = '{0}/organization/{1}'.format(toolkit.config.get('ckan.site_url').rstrip('/'), org_id)
+            uri = qualified_uri or ckan_page_uri
 
         values['publisher_name'] = name
         values['publisher_uri'] = uri
