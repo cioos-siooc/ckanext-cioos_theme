@@ -580,8 +580,20 @@ class CIOOSDCATProfile(SchemaOrgProfile):
         for variable in dataset_dict.get('variable-measured', []):
             self.g.add((dataset_ref, SCHEMA.variableMeasured, Literal(variable)))
 
+
+
+        schema = toolkit.h.scheming_get_dataset_schema('dataset')
+        fields = schema['dataset_fields']
+        field = toolkit.h.scheming_field_by_name(fields, 'eov')
+        choices = toolkit.h.scheming_field_choices(field)
         for eov in dataset_dict.get('eov', []):
-            self.g.add((dataset_ref, SCHEMA.variableMeasured, Literal(eov)))
+            eov_node = BNode()
+            g.add((dataset_ref, SCHEMA.variableMeasured, eov_node))
+            self.g.add((eov_node, RDF.type, SCHEMA.PropertyValue))
+            self.g.add((eov_node, SCHEMA.name, Literal(toolkit.h.scheming_choices_label(choices, eov))))
+            # self.g.add((eov_node, SCHEMA.description, ))
+            # self.g.add((eov_node, SCHEMA.propertyID, ))
+
 
         spatial_uri = dataset_dict.get('spatial_uri')
         spatial_text = dataset_dict.get('spatial_text')
