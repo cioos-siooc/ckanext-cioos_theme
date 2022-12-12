@@ -1,0 +1,8 @@
+{% ckan_extends %}
+
+{% block resource_read_title %}<h1 class="page-heading" title="{{ h.resource_display_name(res) }}">{{ h.resource_display_name(res) | truncate(50) }}</h1>{% endblock %}
+
+{% block resource_last_updated %}{% endblock %}
+{% block resource_created %}{% endblock %}
+
+{# file modified in scheming extension see scheming repo for template}
