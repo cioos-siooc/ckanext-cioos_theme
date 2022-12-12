@@ -494,7 +494,7 @@ class CIOOSDCATProfile(SchemaOrgProfile):
                 self.g.add((contact_details, VCARD.role, Literal(roles)))
 
         # Creators
-        for responsible_party in load_json(dataset_dict.get('cited-responsible-party','[]')):
+        for responsible_party in load_json(dataset_dict.get('cited-responsible-party', '[]')):
             if 'publisher' in responsible_party['role']:
                 continue
 
@@ -538,14 +538,14 @@ class CIOOSDCATProfile(SchemaOrgProfile):
                 if ',' in name:
                     ind_names = name.split(',')
                     names = ind_names[1].split()
-                    given = names[0].strip(),
+                    given = names[0].strip()
                     additional = ','.join(names[1:-1])
                     family = ind_names[0]
                 else:
                     ind_names = name.split(' ')
                     given = ind_names[0]
                     additional = ','.join(ind_names[1:-1])
-                    family= ind_names[-1]
+                    family = ind_names[-1]
 
                 self.g.add((creator_details, RDF.type, SCHEMA.Person))
                 self.g.add((creator_details, SCHEMA.name, Literal(name)))
@@ -561,10 +561,7 @@ class CIOOSDCATProfile(SchemaOrgProfile):
 
             self.g.add((dataset_ref, SCHEMA.creator, creator_details))
 
-
-
         # variableMeasured
-
         try:
             std_names = dataset_dict.get('cf_standard_names')
         except Exception:
@@ -590,7 +587,11 @@ class CIOOSDCATProfile(SchemaOrgProfile):
             eov_node = BNode()
             g.add((dataset_ref, SCHEMA.variableMeasured, eov_node))
             self.g.add((eov_node, RDF.type, SCHEMA.PropertyValue))
-            self.g.add((eov_node, SCHEMA.name, Literal(toolkit.h.scheming_choices_label(choices, eov))))
+            self.g.add((eov_node, SCHEMA.name,
+                        Literal(
+                            toolkit.h.scheming_choices_label(choices, eov)
+                        )
+                        ))
             # self.g.add((eov_node, SCHEMA.description, ))
             # self.g.add((eov_node, SCHEMA.propertyID, ))
 
@@ -626,8 +627,8 @@ class CIOOSDCATProfile(SchemaOrgProfile):
 
         if spatial_geom:
             try:
-                gj = load_json(spatial_geom)
-                bounds = shape(gj).bounds
+                geo_json = load_json(spatial_geom)
+                bounds = shape(geo_json).bounds
                 bbox = [str(bound) for bound in bounds[1::-1] + bounds[:1:-1]]
             except Exception:
                 pass
@@ -653,7 +654,9 @@ class CIOOSDCATProfile(SchemaOrgProfile):
         self._tags_graph(dataset_ref, dataset_dict)
 
         if dataset_dict.get('measurement-techniques'):
-            self.g.add((dataset_ref, SCHEMA.measurementTechnique, Literal('. '.join(dataset_dict['measurement-techniques']))))
+            self.g.add((dataset_ref, SCHEMA.measurementTechnique,
+                        Literal('. '.join(dataset_dict['measurement-techniques']))
+                        ))
 
         organization = dataset_dict.get("organization")
         if organization:
@@ -676,7 +679,9 @@ class CIOOSDCATProfile(SchemaOrgProfile):
             if organization.get('external_home_url'):
                 g.add((provider_ref, SCHEMA.url, Literal(organization['external_home_url'])))
             for lang in organization.get('image_url_translated', {}):
-                g.add((provider_ref, SCHEMA.logo, Literal(organization['image_url_translated'][lang], lang=lang)))
+                g.add((provider_ref, SCHEMA.logo,
+                       Literal(organization['image_url_translated'][lang], lang=lang)
+                       ))
             self.g.add((dataset_ref, SCHEMA.provider, provider_ref))
 
         for provider in dataset_dict.get('provider', []):
@@ -744,3 +749,46 @@ class CIOOSDCATProfile(SchemaOrgProfile):
                 self.g.add((dataset_ref, SCHEMA.temporalCoverage, Literal('%s/%s' % (start, end or '..'))))
             elif end:
                 self._add_date_triple(dataset_ref, SCHEMA.temporalCoverage, Literal('../%s' % (end)))
+
+        # About
+        # this section could capture platform or instrument linkages
+        acquisition_information = load_json(dataset_dict.get('acquisition-information', {}))
+        if acquisition_information:
+            platform = acquisition_information.get('platform', {})
+            instruments = platform.get('instrument', [])
+            scope = acquisition_information.get('scope', {})
+            scope_level = scope.get('level', {})
+            scope_desc = scope.get('description', {})
+
+            aboutRef = BNode()
+            g.add(dataset_ref, SCHEMA.about, aboutRef)
+            g.add((aboutRef, RDF.type, SCHEMA.Event))
+            g.add((aboutRef, SCHEMA.name, Literal(scope_level)))
+            g.add((aboutRef, SCHEMA.description, Literal(scope_desc)))
+
+            actionRef = BNode()
+            g.add((actionRef, RDF.type, SCHEMA.Action))
+
+            instrumentRef = BNode()
+            g.add((instrumentRef, RDF.type, SCHEMA.Thing))
+            g.add((instrumentRef, SCHEMA.name, Literal('Platform')))
+            g.add((instrumentRef, SCHEMA.description, Literal(platform.get('description'))))
+            g.add((instrumentRef, SCHEMA.url, Literal(platform.get('identifier'))))
+
+            g.add((actionRef, SCHEMA.instrument, instrumentRef))
+            g.add((actionRef, SCHEMA.name, Literal(scope_level)))
+            g.add((aboutRef, SCHEMA.potentialAction, actionRef))
+
+            for instrument in instruments:
+                actionRef = BNode()
+                g.add((actionRef, RDF.type, SCHEMA.Action))
+
+                instrumentRef = BNode()
+                g.add((instrumentRef, RDF.type, SCHEMA.Thing))
+                g.add((instrumentRef, SCHEMA.name, instrument.get('type')))
+                g.add((instrumentRef, SCHEMA.description, Literal(instrument.get('description'))))
+                g.add((instrumentRef, SCHEMA.url, Literal(instrument.get('identifier'))))
+
+                g.add((actionRef, SCHEMA.instrument, instrumentRef))
+                g.add((actionRef, SCHEMA.name, Literal(scope_level)))
+                g.add((aboutRef, SCHEMA.potentialAction, actionRef))
