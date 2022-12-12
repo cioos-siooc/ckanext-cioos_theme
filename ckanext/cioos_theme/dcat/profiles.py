@@ -166,6 +166,25 @@ class CIOOSDCATProfile(SchemaOrgProfile):
         if 'license_id' not in dataset_dict:
             dataset_dict['license_id'] = self._license(dataset_ref)
 
+        # change license over to "use-limitations"
+        # use_limitations_str = dataset_dict.get('use-limitations', '[]')
+        # dataset_name = dataset_dict.get('name')
+        # try:
+        #     use_limitations = json.loads(use_limitations_str)
+        #     if use_limitations:
+        #         for use_limitation in use_limitations:
+        #             creative_work = BNode()
+        #             g.add((creative_work, RDF.type, SCHEMA.CreativeWork))
+        #             license_str = "License text for {}".format(dataset_name)
+        #             g.add((creative_work, SCHEMA.text, Literal(use_limitation)))
+        #             g.add((creative_work, SCHEMA.name, Literal(license_str)))
+        #             g.add((dataset_ref, SCHEMA.license, creative_work))
+        # NB: this is accurate in Python 2.  In Python 3 JSON parsing
+        #     exceptions are moved to json.JSONDecodeError
+        # except ValueError:
+        #     pass
+
+
         # Source Catalog
         if toolkit.asbool(toolkit.config.get(DCAT_EXPOSE_SUBCATALOGS, False)):
             catalog_src = self._get_source_catalog(dataset_ref)
@@ -286,19 +305,17 @@ class CIOOSDCATProfile(SchemaOrgProfile):
                 name = responsible_party.get('organisation-name') or responsible_party.get('individual-name')
                 email = responsible_party.get('contact-info_email')
                 url = responsible_party.get('contact-info_online-resource_url')
-                identifier = responsible_party.get('organisation-uri') or responsible_party.get('individual-uri', {})
+                org_fquri = toolkit.h.cioos_get_fully_qualified_package_uri(responsible_party, 'organization-uri')
+                if org_fquri:
+                    org_fquri = org_fquri[0]
+                ind_fquri = toolkit.h.cioos_get_fully_qualified_package_uri(responsible_party, 'individual-uri')
+                if ind_fquri:
+                    ind_fquri = ind_fquri[0]
+                identifier = org_fquri or ind_fquri
                 if isinstance(identifier, str):
                     uri = identifier
                 else:
-                    code = identifier.get('code')
-                    codeSpace = identifier.get('code-space')
-                    authority = identifier.get('authority')
-                    version = identifier.get('version')
-                    if code:
-                        id_list = [authority, codeSpace, code, version]
-                        uri = '/'.join(x.strip() for x in id_list if x.strip())
-                    else:
-                        uri = ''
+                    uri = ''
             if name:
                 break
         if(not name):
@@ -307,16 +324,11 @@ class CIOOSDCATProfile(SchemaOrgProfile):
             url = org_details.get('external_home_url')
 
             name = toolkit.h.scheming_language_text(load_json(org_details.get('title_translated', {})))
-            uri_details = org_details.get('organization-uri', {})
-            if uri_details:
-                code = uri_details.get('code')
-                codeSpace = uri_details.get('code-space')
-                authority = uri_details.get('authority')
-                version = uri_details.get('version')
-                id_list = [authority, codeSpace, code, version]
-                uri = '/'.join(x.strip() for x in id_list if x.strip())
-            else:
-                uri = '{0}/organization/{1}'.format(toolkit.config.get('ckan.site_url').rstrip('/'), org_id)
+            qualified_uri = toolkit.h.cioos_get_fully_qualified_package_uri(org_details, 'organization-uri')
+            if qualified_uri:
+                qualified_uri = qualified_uri[0]
+            ckan_page_uri = '{0}/organization/{1}'.format(toolkit.config.get('ckan.site_url').rstrip('/'), org_id)
+            uri = qualified_uri or ckan_page_uri
 
         values['publisher_name'] = name
         values['publisher_uri'] = uri
@@ -324,12 +336,51 @@ class CIOOSDCATProfile(SchemaOrgProfile):
         values['publisher_url'] = url
 
     def _basic_fields_graph(self, dataset_ref, dataset_dict):
+
+
+        items = [
+            ('identifier', SCHEMA.identifier, None, Literal),
+            ('issued', SCHEMA.datePublished, ['metadata_created'], Literal),
+            ('modified', SCHEMA.dateModified, ['metadata_modified'], Literal),
+            ('license', SCHEMA.license, ['license_url', 'license_title'], Literal),
+        ]
+        self._add_triples_from_dict(dataset_dict, dataset_ref, items)
+
+        items = [
+            ('issued', SCHEMA.datePublished, ['metadata_created'], Literal),
+            ('modified', SCHEMA.dateModified, ['metadata_modified'], Literal),
+        ]
+
+        self._add_date_triples_from_dict(dataset_dict, dataset_ref, items)
+
+        # Dataset URL
+        dataset_url = toolkit.h.url_for('dataset.read',
+                              id=dataset_dict['name'],
+                              _external=True)
+        self.g.add((dataset_ref, SCHEMA.url, Literal(dataset_url)))
+
+
+        default_language = dataset_dict.get('metadata-language', 'en')
         notes = dataset_dict.get('notes_translated', dataset_dict.get('notes'))
+        title = dataset_dict.get('title_translated', dataset_dict.get('title'))
 
         # remove previous notes and replace with translated version
         for s, p, o in self.g.triples((None, RDF.type, SCHEMA.Dataset)):
             self.g.remove((s, SCHEMA.description, None))
-            self.g.add((s, SCHEMA.description, Literal(toolkit.h.scheming_language_text(load_json(notes)))))
+            notes_obj = load_json(notes)
+            if isinstance(notes_obj, dict):
+                for lang in notes_obj:
+                    self.g.add((s, SCHEMA.description, Literal(notes_obj[lang], lang=lang)))
+            else:
+                self.g.add((s, SCHEMA.name, Literal(notes_obj, lang=default_language)))
+
+            self.g.remove((s, SCHEMA.name, None))
+            title_obj = load_json(title)
+            if isinstance(title_obj, dict):
+                for lang in title_obj:
+                    self.g.add((s, SCHEMA.name, Literal(title_obj[lang], lang=lang)))
+            else:
+                self.g.add((s, SCHEMA.name, Literal(title_obj, lang=default_language)))
 
     def _catalog_graph(self, dataset_ref, dataset_dict):
         # remove all previous catalogs set by base profile as it is garbage.
@@ -387,8 +438,26 @@ class CIOOSDCATProfile(SchemaOrgProfile):
             g.add((distribution, RDF.type, SCHEMA.DataDownload))
             self._distribution_graph(distribution, resource_dict)
 
+    def _tags_graph(self, dataset_ref, dataset_dict):
+        keywords = dataset_dict.get('keywords')
+        for lang in keywords:
+            for tag in keywords[lang]:
+                self.g.add((dataset_ref, SCHEMA.keywords, Literal(tag, lang=lang)))
+
     def graph_from_dataset(self, dataset_dict, dataset_ref):
+
         g = self.g
+
+        self.g.remove((dataset_ref, None, None))
+
+        # Namespaces
+        self._bind_namespaces()
+
+        # change @id to point to jsonld document
+        dataset_ref = URIRef(dataset_uri(dataset_dict) + '.jsonld')
+        g.add((dataset_ref, RDF.type, SCHEMA.Dataset))
+
+        self.g.namespace_manager.bind('@vocab', SCHEMA, replace=True)
 
         # remove all previous contact points set by base profile as it is garbage.
         for s, p, o in self.g.triples((None, SCHEMA.contactPoint, None)):
@@ -425,7 +494,7 @@ class CIOOSDCATProfile(SchemaOrgProfile):
                 self.g.add((contact_details, VCARD.role, Literal(roles)))
 
         # Creators
-        for responsible_party in load_json(dataset_dict.get('cited-responsible-party','[]')):
+        for responsible_party in load_json(dataset_dict.get('cited-responsible-party', '[]')):
             if 'publisher' in responsible_party['role']:
                 continue
 
@@ -469,14 +538,14 @@ class CIOOSDCATProfile(SchemaOrgProfile):
                 if ',' in name:
                     ind_names = name.split(',')
                     names = ind_names[1].split()
-                    given = names[0].strip(),
+                    given = names[0].strip()
                     additional = ','.join(names[1:-1])
                     family = ind_names[0]
                 else:
                     ind_names = name.split(' ')
                     given = ind_names[0]
                     additional = ','.join(ind_names[1:-1])
-                    family= ind_names[-1]
+                    family = ind_names[-1]
 
                 self.g.add((creator_details, RDF.type, SCHEMA.Person))
                 self.g.add((creator_details, SCHEMA.name, Literal(name)))
@@ -492,24 +561,7 @@ class CIOOSDCATProfile(SchemaOrgProfile):
 
             self.g.add((dataset_ref, SCHEMA.creator, creator_details))
 
-        # change license over to "use-limitations"
-        use_limitations_str = dataset_dict.get('use-limitations', '[]')
-        dataset_name = dataset_dict.get('name')
-        try:
-            use_limitations = json.loads(use_limitations_str)
-            if use_limitations:
-                for use_limitation in use_limitations:
-                    creative_work = BNode()
-                    g.add((creative_work, RDF.type, SCHEMA.CreativeWork))
-                    license_str = "License text for {}".format(dataset_name)
-                    g.add((creative_work, SCHEMA.text, Literal(use_limitation)))
-                    g.add((creative_work, SCHEMA.name, Literal(license_str)))
-                    g.add((dataset_ref, SCHEMA.license, creative_work))
-        # NB: this is accurate in Python 2.  In Python 3 JSON parsing
-        #     exceptions are moved to json.JSONDecodeError
-        except ValueError:
-            pass
-
+        # variableMeasured
         try:
             std_names = dataset_dict.get('cf_standard_names')
         except Exception:
@@ -521,6 +573,28 @@ class CIOOSDCATProfile(SchemaOrgProfile):
             for standard_name in sorted(std_names):
                 g.add((dataset_ref, SCHEMA.variableMeasured,
                       Literal(standard_name)))
+
+        for variable in dataset_dict.get('variable-measured', []):
+            self.g.add((dataset_ref, SCHEMA.variableMeasured, Literal(variable)))
+
+
+
+        schema = toolkit.h.scheming_get_dataset_schema('dataset')
+        fields = schema['dataset_fields']
+        field = toolkit.h.scheming_field_by_name(fields, 'eov')
+        choices = toolkit.h.scheming_field_choices(field)
+        for eov in dataset_dict.get('eov', []):
+            eov_node = BNode()
+            g.add((dataset_ref, SCHEMA.variableMeasured, eov_node))
+            self.g.add((eov_node, RDF.type, SCHEMA.PropertyValue))
+            self.g.add((eov_node, SCHEMA.name,
+                        Literal(
+                            toolkit.h.scheming_choices_label(choices, eov)
+                        )
+                        ))
+            # self.g.add((eov_node, SCHEMA.description, ))
+            # self.g.add((eov_node, SCHEMA.propertyID, ))
+
 
         spatial_uri = dataset_dict.get('spatial_uri')
         spatial_text = dataset_dict.get('spatial_text')
@@ -553,8 +627,8 @@ class CIOOSDCATProfile(SchemaOrgProfile):
 
         if spatial_geom:
             try:
-                gj = load_json(spatial_geom)
-                bounds = shape(gj).bounds
+                geo_json = load_json(spatial_geom)
+                bounds = shape(geo_json).bounds
                 bbox = [str(bound) for bound in bounds[1::-1] + bounds[:1:-1]]
             except Exception:
                 pass
@@ -576,10 +650,47 @@ class CIOOSDCATProfile(SchemaOrgProfile):
         self.infer_publisher(dataset_dict)
         self._publisher_graph(dataset_ref, dataset_dict)
 
+        # Tags
+        self._tags_graph(dataset_ref, dataset_dict)
+
+        if dataset_dict.get('measurement-techniques'):
+            self.g.add((dataset_ref, SCHEMA.measurementTechnique,
+                        Literal('. '.join(dataset_dict['measurement-techniques']))
+                        ))
+
+        organization = dataset_dict.get("organization")
+        if organization:
+            fquri = toolkit.h.cioos_get_fully_qualified_package_uri(
+                organization,
+                'organization-uri'
+            )
+            if fquri:
+                fquri = fquri[0]
+            org_uri = (fquri or
+                       organization.get('external_home_url') or
+                       toolkit.h.url_for('organization.read',
+                                         id=organization['name'],
+                                         _external=True)
+                       )
+            provider_ref = URIRef(org_uri)
+            g.add((provider_ref, RDF.type, SCHEMA.Organization))
+            g.add((provider_ref, SCHEMA.legalName, Literal(organization['title'])))
+            g.add((provider_ref, SCHEMA.name, Literal(organization['display_name'])))
+            if organization.get('external_home_url'):
+                g.add((provider_ref, SCHEMA.url, Literal(organization['external_home_url'])))
+            for lang in organization.get('image_url_translated', {}):
+                g.add((provider_ref, SCHEMA.logo,
+                       Literal(organization['image_url_translated'][lang], lang=lang)
+                       ))
+            self.g.add((dataset_ref, SCHEMA.provider, provider_ref))
+
+        for provider in dataset_dict.get('provider', []):
+            self.g.add((dataset_ref, SCHEMA.provider, Literal(provider)))
+
         # Resources
         if dataset_dict.get('resources'):
             for s, p, o in g.triples((None, RDF.type, SCHEMA.DataDownload)):
-                self.g.remove((s,None,None))
+                self.g.remove((s, None, None))
             self.g.remove((dataset_ref, SCHEMA.distribution, None))
         self._resources_graph(dataset_ref, dataset_dict)
 
@@ -611,8 +722,21 @@ class CIOOSDCATProfile(SchemaOrgProfile):
             uri = dataset_uri(dataset_dict)
             g.add((dataset_ref, SCHEMA.identifier, Literal('%s' % uri)))
 
-        # Add version
-        g.add((dataset_ref, SCHEMA.version, Literal('%s' % dataset_dict.get('version', '1')))),
+        # dataset @id
+        # this should add a new id to the dataset graph but I can't remove the existing id
+        # which is set to the db pk guid
+        # uri = dataset_uri(dataset_dict)
+        # g.add((dataset_ref, SCHEMA['@id'],  Literal('%s' % uri+'.jsonld')))
+
+        metadata_dates = [x['value'] for x in load_json(dataset_dict.get('metadata-reference-date', []))]
+        metadata_dates.sort(reverse=True)
+        version_date = ''
+        if metadata_dates:
+            version_date = metadata_dates[0]
+        version = dataset_dict.get('version', version_date or '1')
+
+        # Add version, default latest metadata_reference_date
+        g.add((dataset_ref, SCHEMA.version, Literal('%s' % version))),
 
         # Temporal
         temporal_extent = load_json(dataset_dict.get('temporal-extent', {}))
@@ -621,9 +745,50 @@ class CIOOSDCATProfile(SchemaOrgProfile):
         start = temporal_extent.get('begin')
         end = temporal_extent.get('end')
         if start or end:
-            if start and end:
-                self.g.add((dataset_ref, SCHEMA.temporalCoverage, Literal('%s/%s' % (start, end))))
-            elif start:
-                self._add_date_triple(dataset_ref, SCHEMA.temporalCoverage, start)
+            if start:
+                self.g.add((dataset_ref, SCHEMA.temporalCoverage, Literal('%s/%s' % (start, end or '..'))))
             elif end:
-                self._add_date_triple(dataset_ref, SCHEMA.temporalCoverage, end)
+                self._add_date_triple(dataset_ref, SCHEMA.temporalCoverage, Literal('../%s' % (end)))
+
+        # About
+        # this section could capture platform or instrument linkages
+        acquisition_information = load_json(dataset_dict.get('acquisition-information', {}))
+        if acquisition_information:
+            platform = acquisition_information.get('platform', {})
+            instruments = platform.get('instrument', [])
+            scope = acquisition_information.get('scope', {})
+            scope_level = scope.get('level', {})
+            scope_desc = scope.get('description', {})
+
+            aboutRef = BNode()
+            g.add(dataset_ref, SCHEMA.about, aboutRef)
+            g.add((aboutRef, RDF.type, SCHEMA.Event))
+            g.add((aboutRef, SCHEMA.name, Literal(scope_level)))
+            g.add((aboutRef, SCHEMA.description, Literal(scope_desc)))
+
+            actionRef = BNode()
+            g.add((actionRef, RDF.type, SCHEMA.Action))
+
+            instrumentRef = BNode()
+            g.add((instrumentRef, RDF.type, SCHEMA.Thing))
+            g.add((instrumentRef, SCHEMA.name, Literal('Platform')))
+            g.add((instrumentRef, SCHEMA.description, Literal(platform.get('description'))))
+            g.add((instrumentRef, SCHEMA.url, Literal(platform.get('identifier'))))
+
+            g.add((actionRef, SCHEMA.instrument, instrumentRef))
+            g.add((actionRef, SCHEMA.name, Literal(scope_level)))
+            g.add((aboutRef, SCHEMA.potentialAction, actionRef))
+
+            for instrument in instruments:
+                actionRef = BNode()
+                g.add((actionRef, RDF.type, SCHEMA.Action))
+
+                instrumentRef = BNode()
+                g.add((instrumentRef, RDF.type, SCHEMA.Thing))
+                g.add((instrumentRef, SCHEMA.name, instrument.get('type')))
+                g.add((instrumentRef, SCHEMA.description, Literal(instrument.get('description'))))
+                g.add((instrumentRef, SCHEMA.url, Literal(instrument.get('identifier'))))
+
+                g.add((actionRef, SCHEMA.instrument, instrumentRef))
+                g.add((actionRef, SCHEMA.name, Literal(scope_level)))
+                g.add((aboutRef, SCHEMA.potentialAction, actionRef))

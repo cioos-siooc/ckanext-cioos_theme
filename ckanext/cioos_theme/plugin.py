@@ -129,6 +129,27 @@ def clean_and_populate_projects(field, schema):
 
     return validator
 
+@scheming_validator
+def clean_and_populate_datacentre(field, schema):
+
+    def validator(key, data, errors, context):
+
+        keywords_main = data.get(('keyword-datacentre',), {})
+        if keywords_main:
+            project_data = keywords_main.get('en', [])
+        else:
+            extras = data.get(("__extras", ), {})
+            project_data = extras.get('keyword-datacentre-en', '').split(',')
+
+        d = json.loads(data.get(key, '[]'))
+        for x in project_data:
+            if x not in d:
+                d.append(x)
+
+        data[key] = json.dumps(d)
+        return data
+
+    return validator
 
 
 @scheming_validator
@@ -177,9 +198,9 @@ def url_validator_with_port(key, data, errors, context):
 def cioos_tag_name_validator(field, schema):
 
     def validator(value, context):
-        tagname_match = re.compile('[\w \-.\',;]*$', re.UNICODE)
+        tagname_match = re.compile('[\w \-.\',;\(\)]*$', re.UNICODE)
         if not tagname_match.match(value):
-            raise Invalid(_('Tag "%s" must be alphanumeric characters or symbols: -_.,;\'') % (value))
+            raise Invalid(_('Tag "%s" must be alphanumeric characters or symbols: -_.,;\'()') % (value))
         return value
     return validator
 
@@ -355,6 +376,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             # 'cioos_if_empty_same_as__extras': if_empty_same_as__extras,
             'cioos_clean_and_populate_eovs': clean_and_populate_eovs,
             'cioos_clean_and_populate_projects': clean_and_populate_projects,
+            'cioos_clean_and_populate_datacentre': clean_and_populate_datacentre,
             'cioos_fluent_field_default': fluent_field_default,
             'cioos_url_validator_with_port': url_validator_with_port,
             'cioos_tag_name_validator': cioos_tag_name_validator,
@@ -579,6 +601,22 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         out = []
         dict_out = {}
 
+        # create dictionary of grouped dictionaries where the keys are ind. name + org. name
+        # and the values are dictionaries. The values ob sub dictionary keys are lists of all
+        # the values found when merging the the original list of dictionaries.
+        #
+        # example output:
+        # {'René MANGA_Agence Mamu Innu Kaikusseht (AMIK)': defaultdict( < class 'list' > , {
+        #   'contact-info_email': ['enviro2@l-amik.ca', 'enviro2@l-amik.ca'],
+        #   'contact-info_online-resource': ['', ''],
+        #   'individual-name': ['René MANGA', 'René MANGA'],
+        #   'individual-uri_authority': ['', 'orcid.org'],
+        #   'individual-uri_code': ['https://orcid.org/0000-0003-4718-4962', 'https://orcid.org//0000-0003-4718-4962'],
+        #   'individual-uri_code-space': ['', ''],
+        #   'individual-uri_version': ['', ''],
+        #   'organisation-name': ['Agence Mamu Innu Kaikusseht (AMIK)', 'Agence Mamu Innu Kaikusseht (AMIK)'],
+        #   'role': ['custodian', 'rightsHolder']
+        # }),...}
         for d in dict_list:
             group_value = d.get('individual-name', '') + '_' + d.get('organisation-name', '')
             if not dict_out.get(group_value):
@@ -588,10 +626,16 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                     dict_out[group_value][key] = dict_out[group_value][key] + value
                 else:
                     dict_out[group_value][key].append(value)
+
+        # convert the above dictionary of default dictionary classes into a
+        # dictionary of regular dictionaries classes
+        # example output
+        # {'René MANGA_Agence Mamu Innu Kaikusseht (AMIK)': {...
         for d in dict_list:
             group_value = d.get('individual-name', '') + '_' + d.get('organisation-name', '')
             dict_out[group_value] = dict(dict_out[group_value])
 
+        # remove duplicate entries in value lists and convert to strings if only one value remaining
         for k1, v1 in dict_out.items():
             for k, v in v1.items():
                 v1[k] = list(OrderedDict.fromkeys(v))
@@ -652,17 +696,29 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                 new_eovs.append(item)
             search_results['search_facets']['eov']['items'] = new_eovs
 
-        # need to turn off dataset_count here as it causes a recursive loop with package_search
-        org_list = toolkit.get_action('organization_list')(
-            data_dict={
-                'all_fields': True,
-                'include_dataset_count': False,
-                'include_extras': True,
-                'include_users': False,
-                'include_groups': False,
-                'include_tags': False,
-            }
-        )
+
+        org_list = []
+        limit = 25
+        offset = 0
+        while True:
+            # need to turn off dataset_count here as it causes a recursive loop with package_search
+            res = toolkit.get_action('organization_list')(
+                data_dict={
+                    'limit': limit,
+                    'offset': offset,
+                    'all_fields': True,
+                    'include_dataset_count': False,
+                    'include_extras': True,
+                    'include_users': False,
+                    'include_groups': False,
+                    'include_tags': False,
+                }
+            )
+            if not res:
+                break
+            org_list = org_list + res
+            offset = offset + limit
+
         org_dict = {x['id']: x for x in org_list}
         # convert string encoded json to json objects for translated fields
         # package_search with filters uses solr index values which are strings
@@ -716,28 +772,16 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                 if tmp:
                     result[field] = cioos_helpers.load_json(tmp)
 
-
             # update organization object while we are at it
             org_id = result.get('owner_org')
             if org_id:
-                org_details = org_dict.get(org_id)
-                if org_details:
-                    org_title = org_details.get('title_translated', {})
-                    organization = result.get('organization', {})
-                    if not organization:
-                        organization = {}
-                    if org_title:
-                        organization['title_translated'] = org_title
-                    org_description = org_details.get('description_translated', {})
-                    if org_description:
-                        organization['description_translated'] = org_description
-                    org_image_url = org_details.get('image_url_translated', {})
-                    if org_image_url:
-                        organization['image_url_translated'] = org_image_url
-                    if organization:
-                        result['organization'] = organization
+                org_details = org_dict.get(org_id, {})
+                organization = result.get('organization', {})
+                new_org_dict = {**organization, **org_details}
+                if new_org_dict:
+                    result['organization'] = new_org_dict
                 else:
-                    log.warn('No org details for owner_org %s', result.get('org_descriptionid'))
+                    log.warn('No org details for owner_org %s', org_id)
 
         return search_results
 
@@ -762,17 +806,11 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                 }
             )
 
-            org_title = org_details.get('title_translated', {})
-            if org_title:
-                package_dict['organization']['title_translated'] = org_title
-
-            org_description = org_details.get('description_translated', {})
-            if org_description:
-                package_dict['organization']['description_translated'] = org_description
-
-            org_image_url = org_details.get('image_url_translated', {})
-            if org_image_url:
-                package_dict['organization']['image_url_translated'] = org_image_url
+            if org_details:
+                package_org = package_dict['organization']
+                new_org = {**package_org, **org_details}
+                if new_org:
+                    package_dict['organization'] = new_org
 
         force_resp_org = cioos_helpers.load_json(self._get_extra_value('force_responsible_organization', package_dict))
         cited_responsible_party = package_dict.get('cited-responsible-party')
