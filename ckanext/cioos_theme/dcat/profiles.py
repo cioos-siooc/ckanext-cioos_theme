@@ -684,8 +684,10 @@ class CIOOSDCATProfile(SchemaOrgProfile):
                        ))
             self.g.add((dataset_ref, SCHEMA.provider, provider_ref))
 
-        for provider in dataset_dict.get('provider', []):
-            self.g.add((dataset_ref, SCHEMA.provider, Literal(provider)))
+        # removed this section as maintaining chain of custody info for each catalogue 
+        # is difficult and probably not very useful
+        # for provider in dataset_dict.get('provider', []):
+        #     self.g.add((dataset_ref, SCHEMA.provider, Literal(provider)))
 
         # Resources
         if dataset_dict.get('resources'):
