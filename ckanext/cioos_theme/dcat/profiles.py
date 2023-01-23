@@ -388,12 +388,25 @@ class CIOOSDCATProfile(SchemaOrgProfile):
             self.g.remove((s, None, None))
         self.g.remove((dataset_ref, SCHEMA.includedInDataCatalog, None))
 
-        data_catalog = BNode()
-        self.g.add((dataset_ref, SCHEMA.includedInDataCatalog, data_catalog))
-        self.g.add((data_catalog, RDF.type, SCHEMA.DataCatalog))
-        self.g.add((data_catalog, SCHEMA.name, Literal(toolkit.h.scheming_language_text(load_json(toolkit.config.get('ckan.site_title'))))))
-        self.g.add((data_catalog, SCHEMA.description, Literal(toolkit.h.scheming_language_text(load_json(toolkit.config.get('ckan.site_description'))))))
-        self.g.add((data_catalog, SCHEMA.url, Literal(toolkit.config.get('ckan.site_url'))))
+        inc_dc_list = dataset_dict.get('included_in_data_catalogue')
+        if inc_dc_list:
+            for dc in inc_dc_list:
+                if dc.get('url'):
+                    data_catalog = URIRef(dc.get('url'))
+                else:
+                    data_catalog = BNode()
+                self.g.add((dataset_ref, SCHEMA.includedInDataCatalog, data_catalog))
+                self.g.add((data_catalog, RDF.type, SCHEMA.DataCatalog))
+                self.g.add((data_catalog, SCHEMA.name, Literal(toolkit.h.scheming_language_text(load_json(dc.get('name',''))))))
+                self.g.add((data_catalog, SCHEMA.description, Literal(toolkit.h.scheming_language_text(load_json(dc.get('description',''))))))
+                self.g.add((data_catalog, SCHEMA.url, Literal(dc.get('url'))))       
+        else:
+            data_catalog = URIRef(toolkit.config.get('ckan.site_url'))
+            self.g.add((dataset_ref, SCHEMA.includedInDataCatalog, data_catalog))
+            self.g.add((data_catalog, RDF.type, SCHEMA.DataCatalog))
+            self.g.add((data_catalog, SCHEMA.name, Literal(toolkit.h.scheming_language_text(load_json(toolkit.config.get('ckan.site_title'))))))
+            self.g.add((data_catalog, SCHEMA.description, Literal(toolkit.h.scheming_language_text(load_json(toolkit.config.get('ckan.site_description'))))))
+            self.g.add((data_catalog, SCHEMA.url, Literal(toolkit.config.get('ckan.site_url'))))
 
     def _publisher_graph(self, dataset_ref, dataset_dict):
         if any([
