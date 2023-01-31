@@ -19,7 +19,7 @@ class GeoPackageSearchQuery(PackageSearchQuery):
         """
         query = "*: *"
         fq = "+site_id: \"%s\" " % config.get('ckan.site_id')
-        fq += "+state: active "
+        fq += "+state: active -type: harvest"
 
         conn = make_connection()
 
@@ -38,7 +38,7 @@ class GeoPackageSearchQuery(PackageSearchQuery):
         """
         query = "*: *"
         fq = "+site_id: \"%s\" " % config.get('ckan.site_id')
-        fq += "+state: active "
+        fq += "+state: active -type: harvest"
 
         conn = make_connection()
         try:
