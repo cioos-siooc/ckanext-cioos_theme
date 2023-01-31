@@ -677,8 +677,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         # package_search with filters uses solr index values which are strings
         # this is inconsistant with package data which is returned as json objects
         # by the package_show and package_search end points whout filters applied
-        for result in search_results.get('results', []):
-
+        for i, result in enumerate(search_results.get('results', [])):
             force_resp_org = cioos_helpers.load_json(self._get_extra_value('force_responsible_organization', result))
             cited_responsible_party = result.get('cited-responsible-party')
             if((cited_responsible_party or force_resp_org) and not result.get('responsible_organizations')):
@@ -736,6 +735,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                 else:
                     log.warn('No org details for owner_org %s', org_id)
 
+            search_results['results'][i] = result      
         return search_results
 
     # add organization extras to organization object in package.
