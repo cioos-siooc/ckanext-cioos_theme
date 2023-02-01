@@ -307,10 +307,10 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             'cioos_load_json': cioos_helpers.load_json,
             'cioos_geojson_to_bbox': geojson_to_bbox,
             'cioos_get_facets': cioos_helpers.cioos_get_facets,
-            'cioos_get_package_title': cioos_helpers.get_package_title,
+            #'cioos_get_package_title': cioos_helpers.get_package_title,
             'cioos_get_package_relationships': cioos_helpers.get_package_relationships,
-            'cioos_print_package_relationship_type': cioos_helpers.print_package_relationship_type,
-            'cioos_get_package_relationship_reverse_type': cioos_helpers.get_package_relationship_reverse_type,
+            #'cioos_print_package_relationship_type': cioos_helpers.print_package_relationship_type,
+            #'cioos_get_package_relationship_reverse_type': cioos_helpers.get_package_relationship_reverse_type,
             'cioos_datasets': cioos_helpers.cioos_datasets,
             'cioos_count_datasets': cioos_helpers.cioos_count_datasets,
             'cioos_get_eovs': cioos_helpers.cioos_get_eovs,
@@ -455,10 +455,12 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                 return extra['value']
 
     def after_create(self, context, data_dict):
-        pr.update_package_relationships(context, data_dict, is_create=True)
+        #pr.update_package_relationships(context, data_dict, is_create=True)
+        pass
 
     def after_update(self, context, data_dict):
-        pr.update_package_relationships(context, data_dict, is_create=False)
+        #pr.update_package_relationships(context, data_dict, is_create=False)
+        pass
 
     # modfiey tags, keywords, and eov fields so that they properly index
     def before_index(self, data_dict):

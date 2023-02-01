@@ -20,6 +20,7 @@ import logging
 import json
 import jsonpickle
 import importlib_metadata as metadata
+import re
 log = logging.getLogger(__name__)
 
 try:
@@ -141,6 +142,8 @@ def get_fully_qualified_package_uri(pkg, uri_field, default_code_space=None):
             continue
         code_space = uri.get('code-space') or default_code_space
         code = uri.get('code')
+        if isinstance(code, list):
+            code = code[0]
         version = uri.get('version')
         if not code:
             continue
@@ -152,44 +155,82 @@ def get_fully_qualified_package_uri(pkg, uri_field, default_code_space=None):
     return fqURI
 
 
+
 def get_package_relationships(pkg):
-    '''Returns the relationships of a package.
+    # compare schema field, here called aggregation-info and
+    # package relationships.
+    relationships = pkg.get('aggregation-info', [])
+    rels_from_schema = []
+    for rel in relationships:
+        comment = '/'.join([rel.get('initiative-type'), rel.get('association-type')])
+        comment = re.sub(r'([A-Z])', r' \1', comment)
+        comment = comment.title()
 
-    :param id: the id or name of the package
-    '''
-    rel = pkg.get('relationships_as_subject') + pkg.get('relationships_as_object')
-    b = []
-    for x in rel:
-        if x not in b:
-            b.append(x)
-    return b
+        rel_uri = rel.get('aggregate-dataset-identifier_code')
+        rel_name = rel.get('aggregate-dataset-name')
+
+        map_type ={
+            "largerWorkCitation": "parent",
+            "crossReference": "cross link",
+            "dependency": "depends on",
+            "revisionOf": "revision of",
+            "series": "cross link",
+            "isComposedOf": "child"
+        }
+        rel_type = map_type.get(rel.get('association-type'), 'links to')
+
+        if rel_uri and rel_name:
+            rels_from_schema.append({
+                "subject": pkg['name'],
+                "type": rel_type,
+                "object": {
+                    "title": rel_name,
+                    "url": rel_uri
+                    },
+                "comment": comment
+            })
+    return rels_from_schema
 
 
-def print_package_relationship_type(type):
-    out = 'depends on'
-    if 'child' in type:
-        out = 'parent'
-    elif 'parent' in type:
-        out = 'child'
-    elif 'link' in type:
-        out = 'cross link'
-    return out
+# the following functions have been depricated. use above function instead
+# def get_package_relationships(pkg):
+#     '''Returns the relationships of a package.
+
+#     :param id: the id or name of the package
+#     '''
+#     rel = pkg.get('relationships_as_subject') + pkg.get('relationships_as_object')
+#     b = []
+#     for x in rel:
+#         if x not in b:
+#             b.append(x)
+#     return b
 
 
-def get_package_relationship_reverse_type(type):
-    return PackageRelationship.reverse_type(type)
+# def print_package_relationship_type(type):
+#     out = 'depends on'
+#     if 'child' in type:
+#         out = 'parent'
+#     elif 'parent' in type:
+#         out = 'child'
+#     elif 'link' in type:
+#         out = 'cross link'
+#     return out
 
 
-def get_package_title(id):
-    '''Returns the title of a package.
+# def get_package_relationship_reverse_type(type):
+#     return PackageRelationship.reverse_type(type)
 
-    :param id: the id or name of the package
-    '''
-    try:
-        pkg = toolkit.get_action('package_show')(None, data_dict={'id': id})
-    except Exception as e:
-        return None
-    return toolkit.h.get_translated(pkg, 'title')
+
+# def get_package_title(id):
+#     '''Returns the title of a package.
+
+#     :param id: the id or name of the package
+#     '''
+#     try:
+#         pkg = toolkit.get_action('package_show')(None, data_dict={'id': id})
+#     except Exception as e:
+#         return None
+#     return toolkit.h.get_translated(pkg, 'title')
 
 
 def _merge_lists(key, list1, list2):
