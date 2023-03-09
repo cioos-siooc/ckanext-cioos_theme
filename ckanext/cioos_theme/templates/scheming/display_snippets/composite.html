@@ -1,0 +1,28 @@
+{% set label_dict = h.composite_get_label_dict(field.subfields) %}
+{% set choices_dict = h.composite_get_choices_dict(field.subfields) %}
+{% set name_list = h.composite_get_name_list(field.subfields) %}
+{% set composite_dict = h.composite_get_as_dict(data[field.field_name]) %}
+
+   {% for key in name_list %}
+      {% if composite_dict[key]|length >0 %}
+         {% if choices_dict[key]|length > 0  %}
+            {% if h.composite_is_list(composite_dict[key])  %}
+            	{%- set labels = [] -%}
+            	{% for item in composite_dict[key] %}
+            		{%- do labels.append(h.scheming_choices_label(choices_dict[key], item)) -%}
+            	{% endfor %}
+            	{% set value = h.composite_join_list(labels) %}
+            {% else %}
+            	{% set value = h.scheming_choices_label(choices_dict[key], composite_dict[key]) %}
+            {% endif %}
+         {% else %}
+             {% set value = composite_dict[key] %}
+         {% endif %}
+
+         {% if not (loop.first or (loop.index == 2 and composite_dict[loop.previtem]|length == 0)) %}<br>{% endif %}<b>{{ _(label_dict[key]) }}:</b>
+    		   {{ value.replace('(&#8224;)', '')|trim }}
+    		   {% if '(&#8224;)' in value %}
+    			   (&#8224;)
+    		   {% endif %}
+      {% endif %}
+   {% endfor %}

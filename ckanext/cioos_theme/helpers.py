@@ -8,19 +8,38 @@
 
 import ckan.plugins.toolkit as toolkit
 import ckan.plugins as p
-from ckan.common import OrderedDict, _, c
+from collections import OrderedDict
+from ckantoolkit import _, c, config
 # from ckantoolkit import h
 import ckan.logic as logic
 import ckan.model as model
+from ckan.model import PackageRelationship
 from ckan.common import config
-from paste.deploy.converters import asbool
 import copy
 import logging
 import json
 import jsonpickle
+import importlib_metadata as metadata
+import re
 log = logging.getLogger(__name__)
 
+try:
+    # CKAN >= 2.6
+    from ckan.exceptions import HelperError
+except ImportError:
+    # CKAN < 2.6
+    class HelperError(Exception):
+        pass
+
 get_action = logic.get_action
+
+
+def load_json(j):
+    try:
+        new_val = json.loads(j)
+    except Exception:
+        new_val = j
+    return new_val
 
 # def get_organization_list(data_dict):
 #     '''Returns a list of organizations.
@@ -59,6 +78,159 @@ get_action = logic.get_action
 #             return extra['value']
 #
 #     return default
+
+
+# copied from dcat extension
+def helper_available(helper_name):
+    '''
+    Checks if a given helper name is available on `h`
+    '''
+    try:
+        getattr(toolkit.h, helper_name)
+    except (AttributeError, HelperError):
+        return False
+    return True
+
+
+def generate_doi_suffix():
+    import random
+    chars = ['a','b','c','d','e','f','g','h','j','k','m','n','p','q','r','s',
+             't','u','v','w','x','y','z','0','1','2','3','4','5','6','7','8','9']
+    str1 = ''.join(random.SystemRandom().choice(chars) for _ in range(4))
+    str2 = ''.join(random.SystemRandom().choice(chars) for _ in range(4))
+    return str1 + '-' + str2
+
+
+def get_doi_authority_url():
+    return toolkit.config.get('ckan.cioos.doi_authority_url', 'https://doi.org/')
+
+
+def get_doi_prefix():
+    return toolkit.config.get('ckan.cioos.doi_prefix')
+
+
+def get_datacite_org():
+    return toolkit.config.get('ckan.cioos.datacite_org')
+
+
+def get_datacite_test_mode():
+    return toolkit.config.get('ckan.cioos.datacite_test_mode', 'True')
+
+
+def get_fully_qualified_package_uri(pkg, uri_field, default_code_space=None):
+    fqURI = []
+    uris = pkg.get(uri_field)
+
+    if not uris:
+        # try to build out of flat fields
+        sep = toolkit.h.scheming_composite_separator()
+        uris = [{
+            "authority": pkg.get(uri_field + 'authority'),
+            "code-space": pkg.get(uri_field + 'code-space'),
+            "code": pkg.get(uri_field + 'code'),
+            "version": pkg.get(uri_field + 'version')
+        }] if pkg.get(uri_field + 'code') else None
+
+    if not uris:
+        return fqURI
+
+    if isinstance(uris, dict):
+        uris = [uris]
+
+    for uri in uris:
+        if not uri:
+            continue
+        code_space = uri.get('code-space') or default_code_space
+        code = uri.get('code')
+        if isinstance(code, list):
+            code = code[0]
+        version = uri.get('version')
+        if not code:
+            continue
+        if toolkit.h.is_url(code):
+            fqURI.append(code)
+            continue
+        if code_space not in code:
+            fqURI.append('https://' + code_space + '/' + code)
+    return fqURI
+
+
+
+def get_package_relationships(pkg):
+    # compare schema field, here called aggregation-info and
+    # package relationships.
+    relationships = pkg.get('aggregation-info', [])
+    rels_from_schema = []
+    for rel in relationships:
+        comment = '/'.join([rel.get('initiative-type'), rel.get('association-type')])
+        comment = re.sub(r'([A-Z])', r' \1', comment)
+        comment = comment.title()
+
+        rel_uri = rel.get('aggregate-dataset-identifier_code')
+        rel_name = rel.get('aggregate-dataset-name')
+
+        map_type ={
+            "largerWorkCitation": "parent",
+            "crossReference": "cross link",
+            "dependency": "depends on",
+            "revisionOf": "revision of",
+            "series": "cross link",
+            "isComposedOf": "child"
+        }
+        rel_type = map_type.get(rel.get('association-type'), 'links to')
+
+        if rel_uri and rel_name:
+            rels_from_schema.append({
+                "subject": pkg['name'],
+                "type": rel_type,
+                "object": {
+                    "title": rel_name,
+                    "url": rel_uri
+                    },
+                "comment": comment
+            })
+    return rels_from_schema
+
+
+# the following functions have been depricated. use above function instead
+# def get_package_relationships(pkg):
+#     '''Returns the relationships of a package.
+
+#     :param id: the id or name of the package
+#     '''
+#     rel = pkg.get('relationships_as_subject') + pkg.get('relationships_as_object')
+#     b = []
+#     for x in rel:
+#         if x not in b:
+#             b.append(x)
+#     return b
+
+
+# def print_package_relationship_type(type):
+#     out = 'depends on'
+#     if 'child' in type:
+#         out = 'parent'
+#     elif 'parent' in type:
+#         out = 'child'
+#     elif 'link' in type:
+#         out = 'cross link'
+#     return out
+
+
+# def get_package_relationship_reverse_type(type):
+#     return PackageRelationship.reverse_type(type)
+
+
+# def get_package_title(id):
+#     '''Returns the title of a package.
+
+#     :param id: the id or name of the package
+#     '''
+#     try:
+#         pkg = toolkit.get_action('package_show')(None, data_dict={'id': id})
+#     except Exception as e:
+#         return None
+#     return toolkit.h.get_translated(pkg, 'title')
 
 
 def _merge_lists(key, list1, list2):
@@ -142,7 +314,7 @@ def cioos_schema_field_map():
     map = {
         'title': 'title_translated',
         'abstract': 'notes_translated',
-        'unique-resource-identifier': 'name',
+        'guid': 'name',
         'keywords': ['keywords', 'eov'],
         'bbox': ['bbox-north-lat', 'bbox-south-lat', 'bbox-east-long', 'bbox-west-long'],
         'license_id': 'use-constraints'
@@ -177,7 +349,7 @@ def cioos_schema_field_map():
     output = cioos_schema_field_map_parent(fields, isodoc_dict, class_dict, map, 'Dataset Fields')
 
     # Resources
-    resource_fields_schema = [{'field_name': 'resource_fields', 'subfields': schema['resource_fields']}]
+    resource_fields_schema = [{'field_name': 'resource_fields', 'simple_subfields': schema['resource_fields']}]
     j = jsonpickle.encode([x for x in doc.elements if isinstance(x, spatial_model.ISOResourceLocator)], unpicklable=False)
     isodoc_dict = json.loads(j)
     resource_locator = [x for x in isodoc_dict if x['name'] == 'resource-locator']
@@ -200,7 +372,9 @@ def cioos_schema_field_map_parent(fields, isodoc_dict, class_dict, mapkey, capti
                 <th style="width:200px;">Schema Name</th>
                 <th style="width:200px;">Harvest Name</th>
                 <th style="width:40px;">N</th>
+                <th style="width:100px;">Description</th>
                 <th>XML Path</th>
+
             </tr>
         </thead><tbody>'''
     matched_schema_fields = []
@@ -212,7 +386,6 @@ def cioos_schema_field_map_parent(fields, isodoc_dict, class_dict, mapkey, capti
         # update class with pre determined definition if appropreit
         if objtype != 'ISOElement' and item.get('elements') and objtype.startswith('ISO'):
             class_json_def = json.loads(class_dict.get(objtype, {}).get('class', '{}'))
-            log.debug(class_json_def)
             elem = class_json_def.get('elements', [])
             item['elements'] = elem
 
@@ -242,18 +415,20 @@ def cioos_schema_field_map_parent(fields, isodoc_dict, class_dict, mapkey, capti
 
         schema_name = ''
         schema_label = ''
+        schema_help = ''
         subfields = None
         required = ''
 
         if field:
             schema_name = field['field_name']
             schema_label = ' (' + toolkit.h.scheming_language_text(field.get('label', '')) + ')'
-            subfields = field.get('subfields')
+            schema_help = field.get('help_text', '')
+            subfields = field.get('simple_subfields') or field.get('repeating_subfields')
             if field.get('required'):
                 required = '<span class="required">*</span>'
             matched_schema_fields.append(schema_name)
 
-        output = output + '<tr><td>' + required + '</td><td>' + schema_name + schema_label + '</td><td>' + item['name'] + '</td><td>' + item['multiplicity'] + '</td><td>' + sp + '</td></tr>'
+        output = output + '<tr><td>' + required + '</td><td>' + schema_name + schema_label + '</td><td>' + item['name'] + '</td><td>' + item['multiplicity'] + '</td><td>' + schema_help +'</td><td>' + sp + '</td></tr>'
         (output_new, matched_schema_fields) = cioos_schema_field_map_child(subfields, None, item.get('elements'), "", 1, matched_schema_fields)
         output = output + output_new
 
@@ -266,7 +441,7 @@ def cioos_schema_field_map_parent(fields, isodoc_dict, class_dict, mapkey, capti
             required = ''
             if field.get('required'):
                 required = '<span class="required">*</span>'
-            output = output + '<tr><td>' + required + '</td><td>' + schema_name + schema_label + '</td><td>' + '</td><td>' + '</td><td>' + '</td></tr>'
+            output = output + '<tr><td>' + required + '</td><td>' + schema_name + schema_label + '</td><td></td><td></td><td></td><td></td></tr>'
     return output + '</tbody></table>'
 
 # process any child elements of first level or lower isodocument fields.
@@ -294,6 +469,7 @@ def cioos_schema_field_map_child(schema_subfields, schema_parentfields, harvest_
 
         schema_name = ''
         schema_label = ''
+        schema_help = ''
         subfields = None
         parentfields = schema_subfields
         required = ''
@@ -301,7 +477,8 @@ def cioos_schema_field_map_child(schema_subfields, schema_parentfields, harvest_
         if field:
             schema_name = field['field_name']
             schema_label = ' (' + toolkit.h.scheming_language_text(field.get('label', '')) + ')'
-            subfields = field.get('subfields')
+            schema_help = field.get('help_text', '')
+            subfields = field.get('simple_subfields') or field.get('repeating_subfields')
             matched_schema_fields.append(schema_name)
             schema_name = '<i class="fa fa-angle-right"></i>' + schema_name
             if field.get('required'):
@@ -311,7 +488,7 @@ def cioos_schema_field_map_child(schema_subfields, schema_parentfields, harvest_
         if item['name']:
             harvest_name = '<i class="fa fa-angle-right"></i>' + item['name']
 
-        output = output + '<tr class="child' + str(indent) + '"><td>' + required + '</td><td>' + schema_name + schema_label + '</td><td>' + harvest_name + '</td><td>' + item['multiplicity'] + '</td><td>' + sp + '</td></tr>'
+        output = output + '<tr class="child' + str(indent) + '"><td>' + required + '</td><td>' + schema_name + schema_label + '</td><td>' + harvest_name + '</td><td>' + item['multiplicity'] + '</td><td>' + schema_help +'</td><td>' + sp + '</td></tr>'
         (output_new, matched_schema_fields) = cioos_schema_field_map_child(subfields, parentfields, item.get('elements'), path + item['name'] + '_', indent + 1, matched_schema_fields)
         output = output + output_new
 
@@ -325,7 +502,7 @@ def cioos_schema_field_map_child(schema_subfields, schema_parentfields, harvest_
                 required = ''
                 if field.get('required'):
                     required = '<span class="required">*</span>'
-                output = output + '<tr><td>' + required + '</td><td>' + schema_name + schema_label + '</td><td>' + '</td><td>' + '</td><td>' + '</td></tr>'
+                output = output + '<tr><td>' + required + '</td><td>' + schema_name + schema_label + '</td><td></td><td></td><td></td><td></td></tr>'
     return output, matched_schema_fields
 
 
@@ -360,9 +537,9 @@ def cioos_get_facets(package_type='dataset'):
     c.facet_titles = facets
 
     data_dict = {
-        'facet.field': facets.keys(),
+        'facet.field': list(facets.keys()),
         'rows': 0,
-        'include_private': asbool(config.get(
+        'include_private': toolkit.asbool(config.get(
             'ckan.search.default_include_private', True)),
     }
 
@@ -376,3 +553,8 @@ def cioos_get_facets(package_type='dataset'):
     #     'search': c.search_facets,
     #     'titles': c.facet_titles,
     # }
+
+
+def cioos_version():
+    '''Return CIOOS version'''
+    return metadata.version('ckanext.cioos_theme')

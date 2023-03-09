@@ -14,12 +14,16 @@
 
       {{ form.input('ckan.site_title', id='field-ckan-site-title', label=_('Site Title'), value=data['ckan.site_title'], error=error, classes=['control-medium']) }}
 
-      {{ form.select('ckan.main_css', id='field-ckan-main-css', label=_('Style'), options=styles, selected=data['ckan.main_css'], error=error) }}
+      {{ form.input('ckan.site_heading', id='field-ckan-site-heading', label=_('Title Heading on Main Page'), value=data['ckan.site_heading'], error=error, classes=['control-medium'], placeholder='{"en": "<span>CIOOS</span> Data Catalogue", "fr": "Catalogue de données du <span>SIOOC</span>"}') }}
+
+      {{ form.select('ckan.theme', id='field-ckan-main-css', label=_('Style'), options=styles, selected=data['ckan.theme'], error=error) }}
 
       {{ form.input('ckan.site_description', id='field-ckan-site-description', label=_('Site Tag Line'), value=data['ckan.site_description'], error=error, classes=['control-medium']) }}
 
       {# default page has an image upload input here. TODO: create custom image_upload snippet based on the image_upload macro in /ckan/ckan/templates/macros/form.html #}
       {{ form.input('ckan.site_logo_translated', id='field-ckan-site-logo', label=_('Site logo'), value=data['ckan.site_logo_translated'], error=error, classes=['control-medium']) }}
+
+      {{ form.image_upload(data, errors, is_upload_enabled=h.uploads_enabled(), is_url=is_url, is_upload=is_upload, upload_label = _("Site logo Don't USE"), url_label=_("Site logo Don't Use"),  field_url=field_url, field_upload='logo_upload', field_clear='clear_logo_upload' )}}
 
       {{ form.markdown('ckan.site_about', id='field-ckan-site-about', label=_('About'), value=data['ckan.site_about'], error=error, placeholder=_('About page text')) }}
 
@@ -40,6 +44,18 @@
       {{ form.input('ckan.header_file_name', id='field-ckan-header-file-name', label=_('Custom header filename'), value=data['ckan.header_file_name'], error=error) }}
 
       {{ form.input('ckan.footer_file_name', id='field-ckan-footer-file-name', label=_('Custom footer filename'), value=data['ckan.footer_file_name'], error=error) }}
+
+      {{ form.input('ckan.show_social_in_dataset_sidebar', id='field-ckan-show-social-in-dataset-sidebar', label=_('Show social in dataset sidebar'), value=data['ckan.show_social_in_dataset_sidebar'], error=error) }}
+
+      {{ form.input('ckan.hide_organization_in_breadcrumb', id='field-ckan-hide-organization-in-breadcrumb', label=_('Hide Organization in breadcrumb'), value=data['ckan.hide_organization_in_breadcrumb'],  error=error) }}
+
+      {{ form.input('ckan.hide_organization_in_dataset_sidebar', id='field-ckan-hide-organization-in-dataset-sidebar', label=_('Hide Organization in dataset sidebar'), value=data['ckan.hide_organization_in_dataset_sidebar'], error=error) }}
+
+      {{ form.input('ckan.show_responsible_organization_in_dataset_sidebar', id='field-ckan-show-responsible-organization-in-dataset-sidebar', label=_('Show Responsible Organization in dataset sidebar'), value=data['ckan.show_responsible_organization_in_dataset_sidebar'], error=error) }}
+
+      {{ form.input('ckan.show_language_picker_in_top_bar', id='field-ckan-show-language-picker-in-top-bar', label=_('Show language picker in top bar of page'), value=data['ckan.show_language_picker_in_top_bar'], error=error) }}
+
+      {{ form.input('ckan.show_language_picker_in_menu', id='field-ckan-show-language-picker-in-menu', label=_('Show language picker in menu'), value=data['ckan.show_language_picker_in_menu'], error=error) }}
 
       {% endblock %}
       <div class="form-actions">

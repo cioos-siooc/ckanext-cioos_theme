@@ -1,0 +1,30 @@
+{% if relationships %}
+<section class="relationships">
+  <h3>{{ _('Relationships') }}</h3>
+  <div class="list-group relationship-list">
+    {% for rel in relationships %}
+    <div class="list-group-item relationship-item col-xs-12">
+      <a
+        href="{{  rel['object']['url'] }}"
+        target="_blank"
+        class="relationship-item-link col-xs-12"
+      >
+        <div class="list-group-item-body col-md-10">
+          <div class="heading">{{ rel['object']['title'] }}</div>
+          <div class="description">
+            <span>Type: {{ rel["comment"] }}</span>
+          </div>
+        </div>
+        <div class="list-group-item-body col-md-2 align-content-center">
+          <div class="relationships-type">
+            <span class="label label-clear-100">
+              {{ rel["type"].title() }}
+            </span>
+          </div>
+        </div>
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}

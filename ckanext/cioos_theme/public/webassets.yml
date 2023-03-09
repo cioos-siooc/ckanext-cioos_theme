@@ -1,0 +1,28 @@
+bootstrap_datepicker_js:
+  filter: rjsmin
+  output: ckanext-cioos_theme/%(version)s_bootstrap_datepicker.js
+  extra:
+    preload:
+      - base/main
+      - vendor/font-awesome
+      - vendor/jquery
+  contents:
+    - js/datepicker/bootstrap-datepicker.min.js
+    - js/datepicker/bootstrap-datepicker.fr.min.js
+    - js/modules/date-query.js
+
+bootstrap_datepicker_css:
+  filters: cssrewrite
+  output: ckanext-cioos_theme/%(version)s_bootstrap_datepicker.css
+  contents:
+    - js/datepicker/bootstrap-datepicker3.css
+
+truncate_js:
+  filter: rjsmin
+  output: ckanext-cioos_theme/%(version)s_truncate.js
+  extra:
+    preload:
+      - base/main
+      - vendor/jquery
+  contents:
+    - js/modules/truncate.js

@@ -2,30 +2,30 @@
   <div class="container">
     <div class="row row1">
       <div class="col-md-12 col1 centertext title module-content-end">
-        <h1>{{ _('<span>CIOOS</span> Data Catalogue') }}</h1>
-        <h2>{{ _('Search, find, download — all of our') }} <span><a href="{{ h.url_for(controller='package', action='search') }}">{{h.cioos_count_datasets()}}</a></span> {{ _('datasets') }}.</h2>
+        <h1>{{ h.scheming_language_text(h.cioos_load_json(g.site_heading)) | safe or _('<span>CIOOS</span> Data Catalogue') }}</h1>
+        <h2>{{ _('Search, find, download — all of our') }} <span><a href="{{ h.url_for(controller='dataset', action='search') }}">{{h.cioos_count_datasets()}}</a></span> {{ _('datasets') }}.</h2>
         <!-- old block -->
         {# block promoted #}
         {# snippet 'home/snippets/promoted.html' #}
         {# endblock #}
       </div>
-      <div class="col-md-12 col1 module-content-end">
+      <div class="col-md-12 col1 module-content-end cioos-module-search">
         {% block search %}
         {% snippet 'home/snippets/search.html' %}
         {% endblock %}
       </div>
       <div class="col-md-12 col1 module-content-end">
+        <h3 class="heading">{{ _('Search By Ocean Variable:') }}</h3>
         <div class="module-content box">
           {% block eov_list %}
-          <h3 class="heading">{{ _('SEARCH BY OCEAN VARIABLE') }}</h3>
           {% set eov = h.cioos_get_eovs(show_all=True) %}
-          {% for grouper, list in eov|groupby('category') %}
+          {% for grouper, list in eov|rejectattr('category', 'undefined')|groupby('category') %}
           {% if grouper and grouper not in g.exclude_eov_category %}
           <h4>{{ _(grouper) }}</h4>
           <ul class="media-grid" data-module="media-grid">
-            {% for item in list %}
+            {% for item in list|sort(attribute='name') %}
             {% if item.name not in g.exclude_eov %}
-            {% set href = h.url_for(controller='package', action='search', eov=item.name) %}
+            {% set href = h.url_for(controller='dataset', action='search', eov=item.name) %}
             {% set label = label_function(item) if label_function else item.display_name %}
             {% set label = _(label) %}
             {% set label_truncated = h.truncate(label, 18) if not label_function else label %}

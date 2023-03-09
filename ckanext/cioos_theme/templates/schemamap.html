@@ -3,7 +3,7 @@
 {% block subtitle %}{{ _('Schema Map') }}{% endblock %}
 
 {% block breadcrumb_content %}
-  <li class="active">{% link_for _('Schema Map'), controller='ckanext.cioos_theme.plugin:CIOOSController', action='schemamap' %}</li>
+  <li class="active">{% link_for _('Schema Map'), controller='cioos', action='schemamap' %}</li>
 {% endblock %}
 
 {% block primary %}
@@ -42,7 +42,10 @@
     }
     #schemamap td span.required{
       font-weight: bold;
+      font-size: x-large;
       color: darkred;
+      text-align: center;
+      display: block;
     }
 
   </style>
