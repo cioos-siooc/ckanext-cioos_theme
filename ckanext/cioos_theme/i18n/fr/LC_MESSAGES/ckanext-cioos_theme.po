@@ -706,3 +706,9 @@ msgstr "lire plus"
 
 msgid "read less"
 msgstr "lire moins"
+
+msgid "External Organization Page"
+msgstr "Page Organisation Externe"
+
+msgid "Licenses"
+msgstr "Licences"
