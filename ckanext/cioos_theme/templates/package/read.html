@@ -17,9 +17,11 @@
       {% block page_heading %}
         {{ h.dataset_display_name(pkg) }}
 
-        {% set title_translation_method = h.cioos_load_json( h.get_pkg_dict_extra(pkg, 'title_translation_method') or pkg.get('title_translation_method') or '{}' ) %}
-        {% set default_local = pkg.get('metadata-language') %}
-        {% if title_translation_method and default_local and default_local != h.lang() %}
+        {# preload translation method image #}
+        <img src="/base/images/auto_translate.svg" style="display:none"/>
+
+        {% set title_translation_method = h.scheming_language_text(h.cioos_load_json( h.get_pkg_dict_extra(pkg, 'title_translation_method') or pkg.get('title_translation_method') or '{}' )) %}
+        {% if title_translation_method %}
           <span class="translation_icon_group" title="{{ title_translation_method }}">
             <i class="translation_icon" aria-hidden="true"></i>
           </span>
@@ -44,10 +46,8 @@
       {% if ( h.scheming_field_by_name(schema.dataset_fields, 'notes') or h.scheming_field_by_name(schema.dataset_fields, 'notes_translated') ) and h.get_translated(pkg, 'notes') %}
         <div class="notes embedded-content">
           {{ h.markdown_extract(h.get_translated(pkg, 'notes'), extract_length=200) }}
-
-          {% set notes_translation_method = h.cioos_load_json( h.get_pkg_dict_extra(pkg, 'notes_translation_method') or pkg.get('notes_translation_method') or '{}' ) %}
-          {% set default_local = pkg.get('metadata-language') %}
-          {% if notes_translation_method and default_local and default_local != h.lang() %}
+          {% set notes_translation_method = h.scheming_language_text(h.cioos_load_json( h.get_pkg_dict_extra(pkg, 'notes_translation_method') or pkg.get('notes_translation_method') or '{}' )) %}
+          {% if notes_translation_method %}
             <span class="translation_icon_group" title="{{ notes_translation_method }}">
               <i class="translation_icon" aria-hidden="true"></i>
             </span>
@@ -86,9 +86,8 @@
 
   {% block package_tags %}
     {% snippet "package/snippets/tags.html", 
-      tags=h.cioos_load_json(pkg.get('keywords', {}))[h.lang()],
-      tags_translation_method = h.cioos_load_json( h.get_pkg_dict_extra(pkg, 'keywords_translation_method') or pkg.get('keywords_translation_method') or '{}' ), 
-      default_local=pkg.get('metadata-language') 
+      tags=h.scheming_language_text(h.cioos_load_json(pkg.get('keywords', {}))),
+      tags_translation_method = h.scheming_language_text(h.cioos_load_json( h.get_pkg_dict_extra(pkg, 'keywords_translation_method') or pkg.get('keywords_translation_method') or '{}' )) 
     %}
   {% endblock %}
 

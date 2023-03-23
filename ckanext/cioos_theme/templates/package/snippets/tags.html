@@ -11,7 +11,7 @@
 {% if tags %}
   <section class="tags">
     <h3>{{ _('Keywords') }}
-        {% if tags_translation_method and default_local and default_local != h.lang() %}
+        {% if tags_translation_method %}
           <span class="translation_icon_group" title="{{ tags_translation_method }}">
             <i class="translation_icon" aria-hidden="true"></i>
           </span>

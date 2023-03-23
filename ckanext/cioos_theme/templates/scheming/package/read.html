@@ -24,9 +24,8 @@
     <div class="notes embedded-content">
       {{ h.markdown_extract(h.get_translated(pkg, 'notes'), extract_length=200)[:-4] }} {# remove trailing </p> #}
 
-      {% set notes_translation_method = h.cioos_load_json( h.get_pkg_dict_extra(pkg, 'notes_translation_method') or pkg.get('notes_translation_method') or '{}' ) %}
-      {% set default_local = pkg.get('metadata-language') %}
-      {% if notes_translation_method and default_local and default_local != h.lang() %}
+      {% set notes_translation_method = h.scheming_language_text(h.cioos_load_json( h.get_pkg_dict_extra(pkg, 'notes_translation_method') or pkg.get('notes_translation_method') or '{}' )) %}
+      {% if notes_translation_method %}
         <span class="translation_icon_group" title="{{ notes_translation_method }}">
           <i class="translation_icon" aria-hidden="true"></i>
         </span>
