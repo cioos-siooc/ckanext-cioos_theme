@@ -1147,9 +1147,16 @@ div.search-input-group {
   transition: all 0.3s ease;
 }
 
-i.fa.translation_icon {
-    font-size: large;
-    color: #585858;
+.translation_icon {   
+    background-image: url(/base/images/auto_translate.svg);
+    background-size: auto 100%;
+    background-repeat: no-repeat;
+    padding-left:83px;
+}
+
+.translation_icon_group {
+  padding-left: 3px;
+  font-size: medium;
 }
 
 
