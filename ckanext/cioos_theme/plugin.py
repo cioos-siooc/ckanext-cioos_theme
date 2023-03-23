@@ -81,7 +81,7 @@ def clean_and_populate_eovs(field, schema):
 
         eov_list = {}
         eov_field = toolkit.h.scheming_field_by_name(schema['dataset_fields'], 'eov')
-        langs = toolit.h.fluent_form_languages(eov_field, None, None, schema)
+        langs = toolkit.h.fluent_form_languages(eov_field, None, None, schema)
         for x in toolkit.h.scheming_field_choices(eov_field):
             eov_list[x['value'].lower()] = x['value']
             for lang in langs:
