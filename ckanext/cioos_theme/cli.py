@@ -56,11 +56,11 @@ def create(page_size, max_per_page):
     file_list = []
 
     # write to a temp file
-    DIR_SITEMAP = "ckan/ckan/public/sitemap/"
+    DIR_SITEMAP = "/usr/lib/ckan/venv/src/ckan/ckan/public/sitemap/"
     if not os.path.exists(DIR_SITEMAP):
         os.makedirs(DIR_SITEMAP)
     path = "%ssitemap-%s.xml" % (DIR_SITEMAP, filename_number)
-    fd = os.open(path, os.O_WRONLY|os.O_CREAT)
+    fd = os.open(path, os.O_WRONLY|os.O_CREAT|os.O_TRUNC)
 
     # write header
     os.write(fd, '<?xml version="1.0" encoding="UTF-8"?>\n'.encode('utf-8'))
@@ -98,7 +98,7 @@ def create(page_size, max_per_page):
 
             filename_number = filename_number + 1
             path = "%ssitemap-%s.xml" % (DIR_SITEMAP, filename_number)
-            fd = os.open(path, os.O_WRONLY|os.O_CREAT)
+            fd = os.open(path, os.O_WRONLY|os.O_CREAT|os.O_TRUNC)
 
             # write header
             os.write(fd, '<?xml version="1.0" encoding="UTF-8"?>\n'.encode('utf-8'))

@@ -26,5 +26,15 @@ Disallow: /fr/revision/
 Disallow: /fr/dataset/*/history
 Disallow: /fr/api/
 Disallow: /fr/harvest
+
+Disallow: /erddap*?
+
+Disallow: /*.xml
+Disallow: /*.ttl
+Disallow: /*.n3
+Disallow: /*.basic
+Disallow: /*.iso19115
+Disallow: /*.iso19139
+
 Sitemap: /sitemap/sitemap.xml
 Crawl-Delay: 10
