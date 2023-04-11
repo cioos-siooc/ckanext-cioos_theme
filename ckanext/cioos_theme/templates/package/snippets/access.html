@@ -28,7 +28,7 @@
 
           {# no need to do this if just printing licence because use-constraints
              is used to populate it in the first place #}
-          {% if use_constraints and pkg_dict.license_url %}
+          {% if use_constraints and pkg_dict.license_url and use_constraints != pkg_dict.license_url %}
           <span>
             <strong>Limitations: </strong>
             {{ h.cioos_load_json(use_constraints) }}
