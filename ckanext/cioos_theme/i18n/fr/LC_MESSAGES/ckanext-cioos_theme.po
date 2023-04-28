@@ -721,3 +721,9 @@ msgstr "Date(s) de référence des données"
 
 msgid "Basic View"
 msgstr "Vue de base"
+
+msgid "Limitations"
+msgdtr "Limites"
+
+msgid "Access"
+msgstr "Accès"

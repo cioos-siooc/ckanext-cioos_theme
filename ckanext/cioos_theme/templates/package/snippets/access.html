@@ -27,7 +27,7 @@
           %}
 
           <span>
-            <strong>Licence: </strong>
+            <strong>{{ _('Licence') }}: </strong>
             {%- if license.get('license_url') -%}
             <a href="{{license['license_url']}}">{{ license['license_title'] }}</a>
             {%- else -%}
@@ -40,7 +40,7 @@
              is used to populate it in the first place #}
           {% if use_constraints and pkg_dict.license_url %}
           <span>
-            <strong>Limitations: </strong>
+            <strong>{{ _('Limitations') }}: </strong>
             {{ h.cioos_load_json(use_constraints) }}
           </span>
           <br />
@@ -48,7 +48,7 @@
 
           {% if access_constraints%}
           <span>
-            <strong>Access: </strong>
+            <strong>{{ _('Access') }}: </strong>
             {{ '\n'.join(h.cioos_load_json(access_constraints))|title }}
             {% if other_constraints %}
             {{ '\u2014' }} {{ '\n'.join(h.cioos_load_json(other_constraints)) }}
