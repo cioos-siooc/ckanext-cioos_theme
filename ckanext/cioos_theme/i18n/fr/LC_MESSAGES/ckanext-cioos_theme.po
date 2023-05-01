@@ -723,7 +723,7 @@ msgid "Basic View"
 msgstr "Vue de base"
 
 msgid "Limitations"
-msgdtr "Limites"
+msgstr "Limites"
 
 msgid "Access"
 msgstr "Accès"
