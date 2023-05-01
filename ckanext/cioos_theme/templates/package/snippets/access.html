@@ -3,25 +3,35 @@
   <table class="table table-bordered">
     <tbody>
       <tr>
-        <td>
-          {% set licence_extras = [] %}
-          {% for extra in pkg_dict.extras %}
-          {% if 'licence' == extra.key %}
-          {% set _ = licence_extras.append( ''.join(h.cioos_load_json(extra.value)) ) %}
-          {% endif %}
-          {% endfor %}
-
-          {% set licence = pkg_dict.license_title or pkg_dict.license_id or licence_extras or 'Not Specified'%}
-          {% set use_constraints = pkg_dict.extras | selectattr("key","equalto","use-constraints") | map(attribute="value") | join('')%}
-          {% set access_constraints = pkg_dict.extras | selectattr("key","equalto","access-constraints") | map(attribute="value") | join('')%}
-          {% set other_constraints = pkg_dict.extras | selectattr("key","equalto","limitations-on-public-access") | map(attribute="value") | join('')%}
+        <td>         
+          {% set license = h.cioos_get_license_def(
+              pkg_dict.license_id, 
+              pkg_dict.license_url, 
+              pkg_dict.license_title
+            )
+          %}
+          {% set use_constraints = pkg_dict.extras 
+            | selectattr("key","equalto","use-constraints") 
+            | map(attribute="value") 
+            | join('')
+          %}
+          {% set access_constraints = pkg_dict.extras 
+            | selectattr("key","equalto","access-constraints") 
+            | map(attribute="value") 
+            | join('')
+          %}
+          {% set other_constraints = pkg_dict.extras 
+            | selectattr("key","equalto","limitations-on-public-access") 
+            | map(attribute="value") 
+            | join('')
+          %}
 
           <span>
-            <strong>Licence: </strong>
-            {%- if pkg_dict.license_url -%}
-            <a href="{{pkg_dict.license_url}}">{{ licence }}</a>
+            <strong>{{ _('Licence') }}: </strong>
+            {%- if license.get('license_url') -%}
+            <a href="{{license['license_url']}}">{{ license['license_title'] }}</a>
             {%- else -%}
-            {{ licence }}
+            {{ pkg_dict.license_title or pkg_dict.license_id or 'Not Specified' }}
             {%- endif -%}
           </span>
           <br />
@@ -30,7 +40,7 @@
              is used to populate it in the first place #}
           {% if use_constraints and pkg_dict.license_url %}
           <span>
-            <strong>Limitations: </strong>
+            <strong>{{ _('Limitations') }}: </strong>
             {{ h.cioos_load_json(use_constraints) }}
           </span>
           <br />
@@ -38,7 +48,7 @@
 
           {% if access_constraints%}
           <span>
-            <strong>Access: </strong>
+            <strong>{{ _('Access') }}: </strong>
             {{ '\n'.join(h.cioos_load_json(access_constraints))|title }}
             {% if other_constraints %}
             {{ '\u2014' }} {{ '\n'.join(h.cioos_load_json(other_constraints)) }}

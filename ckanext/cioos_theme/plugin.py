@@ -80,12 +80,16 @@ def clean_and_populate_eovs(field, schema):
             eov_data = extras.get('keywords-en', '').split(',')
 
         eov_list = {}
-        for x in toolkit.h.scheming_field_choices(toolkit.h.scheming_field_by_name(schema['dataset_fields'], 'eov')):
+        eov_field = toolkit.h.scheming_field_by_name(schema['dataset_fields'], 'eov')
+        langs = toolkit.h.fluent_form_languages(eov_field, None, None, schema)
+        for x in toolkit.h.scheming_field_choices(eov_field):
             eov_list[x['value'].lower()] = x['value']
-            eov_list[x['label'].lower()] = x['value']
-            # if clean_tags is true dueing harvesting then spaces will be
-            # replaced by dash's by mung_tags
-            eov_list[x['label'].replace(' ', '-').lower()] = x['value']
+            for lang in langs:
+                if x['label'].get(lang):
+                    eov_list[x['label'][lang].lower()] = x['value']
+                    # if clean_tags is true during harvesting then spaces will be
+                    # replaced by dash's by mung_tags
+                    eov_list[x['label'][lang].replace(' ', '-').lower()] = x['value']
 
         d = json.loads(data.get(key, '[]'))
         for x in eov_data:
@@ -324,7 +328,10 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             'cioos_helper_available': cioos_helpers.helper_available,
             'cioos_group_contacts': self.group_by_ind_or_org,
             'cioos_get_fully_qualified_package_uri': cioos_helpers.get_fully_qualified_package_uri,
-            'cioos_version': cioos_helpers.cioos_version
+            'cioos_version': cioos_helpers.cioos_version,
+            'cioos_get_license_def': cioos_helpers.get_license_def,
+            'cioos_merge_dict': cioos_helpers.merge_dict,
+            'cioos_get_dataset_extents': cioos_helpers.get_dataset_extents
         }
 
     def get_validators(self):
@@ -651,6 +658,16 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                 new_eovs.append(item)
             search_results['search_facets']['eov']['items'] = new_eovs
 
+        license_id = search_facets.get('license_id', {})
+        items = license_id.get('items', [])
+        new_license_items = []
+        if items:
+            for item in items:
+                license = toolkit.h.cioos_get_license_def(item['name'], None, None)
+                if license:
+                    item['display_name'] = license['license_title']
+                new_license_items.append(item)
+            search_results['search_facets']['license_id']['items'] = new_license_items
 
         org_list = []
         limit = 25
