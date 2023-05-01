@@ -85,8 +85,10 @@ Renders a citation for a package
 
     async function loadCite(template_style = 'apa', output_type = 'html', cite_format = 'bibliography', download = false){
       let pkg_citation = `{{h.scheming_language_text(pkg_dict.get('citation'))|replace('\\n',' ')|replace('\\r',' ')}}`
-      pkg_citation = pkg_citation.replace( /\s\s+/g, ' ' )
+      pkg_citation = pkg_citation.replace( /\s\s+/g, ' ' );
       pkg_citation = parseHtmlEnteties(pkg_citation)
+      pkg_citation = pkg_citation.replace( /"version": "(\d+.?\d*)"/, '"version": "v$1"');
+      console.log(pkg_citation);
 
       let cite_data = await Cite.async(pkg_citation)
 
