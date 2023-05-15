@@ -1,0 +1,351 @@
+{
+  "scheming_version": 1,
+  "dataset_type": "dataset",
+  "about": "A reimplementation of the default CKAN dataset schema",
+  "about_url": "http://github.com/ckan/ckanext-scheming",
+  "dataset_fields": [
+    {
+      "field_name": "title",
+      "label": "Title",
+      "preset": "title",
+      "form_placeholder": "eg. A descriptive title"
+    },
+    {
+      "field_name": "name",
+      "label": "URL",
+      "preset": "dataset_slug",
+      "form_placeholder": "eg. my-dataset"
+    },
+    {
+      "field_name": "notes",
+      "label": "Abstract",
+      "form_snippet": "markdown.html",
+      "form_placeholder": "eg. Some useful notes about the data"
+    },
+    {
+      "field_name": "purpose",
+      "label": "Purpose",
+      "form_snippet": "markdown.html",
+      "form_placeholder": "eg. Intented use of the dataset or reason for collecting"
+    },
+    {
+      "field_name": "tag_string",
+      "label": "Keywords",
+      "preset": "tag_string_autocomplete",
+      "form_placeholder": "eg. economy, mental health, government"
+    },
+    {
+      "field_name": "license_id",
+      "label": "License",
+      "form_snippet": "license.html",
+      "help_text": "License definitions and additional information can be found at http://opendefinition.org/"
+    },
+    {
+      "field_name": "status",
+      "label": "Status",
+      "preset": "select",
+      "choices": [
+        {
+          "value": "completed",
+          "label": "Completed"
+        },
+        {
+          "value": "archived",
+          "label": "Archived"
+        },
+        {
+          "value": "on_going",
+          "label": "On Going"
+        },
+        {
+          "value": "planned",
+          "label": "Planned"
+        },
+        {
+          "value": "required",
+          "label": "Required"
+        },
+        {
+          "value": "under_development",
+          "label": "Under Development"
+        }
+     ]
+    },
+    {
+      "field_name": "defaultLocale",
+      "label": "Default Locale",
+      "preset": "select",
+      "choices": [
+        {
+          "value": "EN",
+          "label": "English"
+        },
+        {
+          "value": "FR",
+          "label": "French"
+        }
+     ]
+    },
+    {
+      "field_name": "metadata_created",
+      "label": "Metadata Created",
+      "preset": "date",
+      "form_placeholder": "yyyy-mm-mm"
+    },
+    {
+     "field_name": "CI_ResponsibleParty",
+     "label": "Responsible Party",
+     "preset": "composite",
+     "subfields":[
+         {
+           "field_name": "RP_name",
+           "label": "Name",
+           "form_placeholder": "Joe Bloggs",
+           "hint": "name of orginization or individual"
+         },
+
+         {
+           "field_name": "RP_affiliation",
+           "label": "Affiliation",
+           "preset": "dataset_organization"
+         },
+         {
+           "field_name": "RP_city",
+           "label": "City"
+         },
+         {
+           "field_name": "RP_email",
+           "label": "Email",
+           "form_placeholder": "joe@example.com"
+          },
+         {
+           "field_name": "RP_role",
+           "label": "Role",
+           "preset": "select",
+           "choices": [
+             {
+               "value": "author",
+               "label": "Author"
+             },
+             {
+               "value": "custodian",
+               "label": "Custodian"
+             },
+             {
+               "value": "distributor",
+               "label": "Distributor"
+             },
+             {
+               "value": "originator",
+               "label": "Originator"
+             },
+             {
+               "value": "owner",
+               "label": "Owner"
+             },
+             {
+               "value": "pointOfContact",
+               "label": "Point of Contact"
+             },
+             {
+               "value": "principalInvestigator",
+               "label": "Principal Investigator"
+             },
+             {
+               "value": "processor",
+               "label": "Processor"
+             },
+             {
+               "value": "publisher",
+               "label": "Publisher"
+             },
+             {
+               "value": "resourceProvider",
+               "label": "Resource Provider"
+             },
+             {
+               "value": "user",
+               "label": "User"
+             }
+          ]
+        }
+     ]
+    },
+
+    {
+      "field_name": "maintenanceAndUpdateFrequency",
+      "label": "Maintenance and update frequency",
+      "preset": "select",
+      "choices": [
+        {
+          "value": "continual",
+          "label": "Continual"
+        },
+        {
+          "value": "daily",
+          "label": "Daily"
+        },
+        {
+          "value": "weekly",
+          "label": "Weekly"
+        },
+        {
+          "value": "Fortnightly",
+          "label": "Fortnightly"
+        },
+        {
+          "value": "monthly",
+          "label": "Monthly"
+        },
+        {
+          "value": "quarterly",
+          "label": "Quarterly"
+        },
+        {
+          "value": "bianually",
+          "label": "Bianually"
+        },
+        {
+          "value": "annually",
+          "label": "Annually"
+        },
+        {
+          "value": "as_needed",
+          "label": "As Needed"
+        },
+        {
+          "value": "irregular",
+          "label": "Irregular"
+        },
+        {
+          "value": "not_planned",
+          "label": "Not Planned"
+        },
+        {
+          "value": "unknown",
+          "label": "Unknown"
+        }
+     ]
+   },
+   {
+         "field_name": "maintenanceNote",
+         "label": "Maintenance Note"
+   },
+   {
+      "field_name": "citation_identifier",
+      "label": "Citation identifier",
+      "form_placeholder": "http://doi.org/12345.67890",
+      "display_property": "foaf:homepage",
+      "display_snippet": "link.html"
+    },
+    {
+      "field_name": "owner_org",
+      "label": "Organization",
+      "preset": "dataset_organization"
+    },
+    {
+      "field_name": "version",
+      "label": "Version",
+      "validators": "ignore_missing unicode package_version_validator",
+      "form_placeholder": "1.0"
+    },
+    {
+      "field_name": "author",
+      "label": "Authors",
+      "preset": "composite_repeating",
+      "form_blanks": 1,
+      "subfields": [{
+          "field_name": "name",
+          "label": "Name",
+          "form_placeholder": "eg. John Smith"
+        },
+        {
+          "field_name": "type",
+          "label": "Type",
+          "choices": [{
+              "value": "collaborator",
+              "label": "Collaborator"
+            },
+            {
+              "value": "editor",
+              "label": "Editor"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "field_name": "spatial",
+      "label": "Spatial",
+      "form_snippet": "spatial.html"
+    }, {
+      "field_name": "bbox-north-lat",
+      "label": "North Bounding Latitude",
+      "form_snippet": null
+    }, {
+      "field_name": "bbox-south-lat",
+      "label": "South Bounding Latitude",
+      "form_snippet": null
+    }, {
+      "field_name": "bbox-east-long",
+      "label": "East Bounding Longitude",
+      "form_snippet": null
+    }, {
+      "field_name": "bbox-west-long",
+      "label": "West Bounding Longitude",
+      "form_snippet": null
+    },
+    {
+      "field_name": "EX_TemporalExtent",
+      "label": "Temportal Extent",
+      "preset": "composite",
+      "subfields": [{
+          "field_name": "temporal-extent-begin",
+          "label": "Begin"
+        },
+        {
+          "field_name": "temporal-extent-end",
+          "label": "End"
+        }
+      ]
+    }, {
+      "field_name": "EX_VerticalExtent",
+      "label": "Vertical Extent",
+      "preset": "composite",
+      "subfields": [{
+          "field_name": "vertical-extent-min",
+          "label": "Min"
+        },
+        {
+          "field_name": "vertical-extent-max",
+          "label": "Max"
+        }
+      ]
+    }
+
+
+  ],
+  "resource_fields": [
+    {
+      "field_name": "url",
+      "label": "URL",
+      "preset": "resource_url_upload"
+    },
+    {
+      "field_name": "name",
+      "label": "Name",
+      "form_placeholder": "eg. January 2011 Gold Prices"
+    },
+    {
+      "field_name": "description",
+      "label": "Description",
+      "form_snippet": "markdown.html",
+      "form_placeholder": "Some useful notes about the data"
+    },
+    {
+      "field_name": "format",
+      "label": "Format",
+      "preset": "resource_format_autocomplete"
+    }
+  ]
+}
