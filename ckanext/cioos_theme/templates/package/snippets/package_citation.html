@@ -88,6 +88,7 @@ Renders a citation for a package
       pkg_citation = pkg_citation.replace( /\s\s+/g, ' ' );
       pkg_citation = parseHtmlEnteties(pkg_citation)
       pkg_citation = pkg_citation.replace( /"version": "(\d+.?\d*)"/, '"version": "v$1"');
+      pkg_citation = pkg_citation.replace( /"edition": "(\d+.?\d*)"/, '"version": "v$1"');
       console.log(pkg_citation);
 
       let cite_data = await Cite.async(pkg_citation)
