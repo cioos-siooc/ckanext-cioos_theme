@@ -21,6 +21,7 @@ import json
 import jsonpickle
 import importlib_metadata as metadata
 import re
+from ckanext.spatial.plugin import SpatialQuery
 log = logging.getLogger(__name__)
 
 try:
@@ -115,6 +116,71 @@ def get_datacite_org():
 
 def get_datacite_test_mode():
     return toolkit.config.get('ckan.cioos.datacite_test_mode', 'True')
+
+def get_dataset_extents(q, fields, bbox_values, output=None):
+    search_params = {'q': q,
+                     'fl': 'title,spatial',
+                     'fq_list':[],
+                     'rows': 1000}
+    if bbox_values:
+        bbox_list = bbox_values.split(',')
+        bbox = {}
+        bbox['minx'] = float(bbox_list[0])
+        bbox['miny'] = float(bbox_list[1])
+        bbox['maxx'] = float(bbox_list[2])
+        bbox['maxy'] = float(bbox_list[3])
+        search_params = SpatialQuery._params_for_solr_search(SpatialQuery, bbox, search_params)
+    search_params['fq_list'] = search_params['fq_list'] + ['+%s' % ':'.join(x) for x in fields]
+
+    pkg = toolkit.get_action('package_search')(data_dict=search_params)
+    pkg_geojson = [
+        {
+            "type": "Feature",
+            "properties": {"title": toolkit.h.scheming_language_text(load_json(x.get('title')))},
+            "geometry": load_json(x.get('spatial'))
+        } for x in pkg.get('results', [])]
+    log.debug(pkg_geojson)
+
+    if output == 'json':
+        return json.dumps(pkg_geojson)
+    return pkg_geojson
+
+
+def merge_dict(d1,d2):
+        return {**d1, **d2}
+
+def get_license_def(id, url='', title=''):
+    licenses = toolkit.get_action('license_list')()
+
+    default_locale = toolkit.config.get('ckan.locale_default', toolkit.config.get('ckan.locales_offered', ['en'])[0])
+    lang = toolkit.h.lang() or default_locale
+
+    # check for id first
+    for license in licenses:
+        if id.lower() == license['id'].lower():
+            return {
+                "license_id": license['id'],
+                "license_url": license.get('url_' + lang, license['url']),
+                "license_title": license.get('title_' + lang, license['title'])
+            }
+        
+    # if that fails match on url or title next
+    if url or title:
+        for license in licenses:
+            if url == license.get('url_' + lang, license['url']):
+                return {
+                    "license_id": license['id'],
+                    "license_url": license.get('url_' + lang, license['url']),
+                    "license_title": license.get('title_' + lang, license['title'])
+                }
+            if title.lower() == license.get('url_' + lang, license['url']).lower():
+                return {
+                    "license_id": license['id'],
+                    "license_url": license.get('url_' + lang, license['url']),
+                    "license_title": license.get('title_' + lang, license['title'])
+                }
+    return None
+        
 
 
 def get_fully_qualified_package_uri(pkg, uri_field, default_code_space=None):
