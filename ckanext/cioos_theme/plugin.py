@@ -80,12 +80,16 @@ def clean_and_populate_eovs(field, schema):
             eov_data = extras.get('keywords-en', '').split(',')
 
         eov_list = {}
-        for x in toolkit.h.scheming_field_choices(toolkit.h.scheming_field_by_name(schema['dataset_fields'], 'eov')):
+        eov_field = toolkit.h.scheming_field_by_name(schema['dataset_fields'], 'eov')
+        langs = toolkit.h.fluent_form_languages(eov_field, None, None, schema)
+        for x in toolkit.h.scheming_field_choices(eov_field):
             eov_list[x['value'].lower()] = x['value']
-            eov_list[x['label'].lower()] = x['value']
-            # if clean_tags is true dueing harvesting then spaces will be
-            # replaced by dash's by mung_tags
-            eov_list[x['label'].replace(' ', '-').lower()] = x['value']
+            for lang in langs:
+                if x['label'].get(lang):
+                    eov_list[x['label'][lang].lower()] = x['value']
+                    # if clean_tags is true during harvesting then spaces will be
+                    # replaced by dash's by mung_tags
+                    eov_list[x['label'][lang].replace(' ', '-').lower()] = x['value']
 
         d = json.loads(data.get(key, '[]'))
         for x in eov_data:
@@ -154,7 +158,7 @@ def url_validator_with_port(key, data, errors, context):
 def cioos_tag_name_validator(field, schema):
 
     def validator(value, context):
-        tagname_match = re.compile('[\w \-.\',;\(\)]*$', re.UNICODE)
+        tagname_match = re.compile("[\w\u00C0-\u018F\u0300-\u0315 .'’,;\\/\(\)-]*$", re.UNICODE)
         if not tagname_match.match(value):
             raise Invalid(_('Tag "%s" must be alphanumeric characters or symbols: -_.,;\'()') % (value))
         return value
@@ -307,10 +311,10 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             'cioos_load_json': cioos_helpers.load_json,
             'cioos_geojson_to_bbox': geojson_to_bbox,
             'cioos_get_facets': cioos_helpers.cioos_get_facets,
-            'cioos_get_package_title': cioos_helpers.get_package_title,
+            #'cioos_get_package_title': cioos_helpers.get_package_title,
             'cioos_get_package_relationships': cioos_helpers.get_package_relationships,
-            'cioos_print_package_relationship_type': cioos_helpers.print_package_relationship_type,
-            'cioos_get_package_relationship_reverse_type': cioos_helpers.get_package_relationship_reverse_type,
+            #'cioos_print_package_relationship_type': cioos_helpers.print_package_relationship_type,
+            #'cioos_get_package_relationship_reverse_type': cioos_helpers.get_package_relationship_reverse_type,
             'cioos_datasets': cioos_helpers.cioos_datasets,
             'cioos_count_datasets': cioos_helpers.cioos_count_datasets,
             'cioos_get_eovs': cioos_helpers.cioos_get_eovs,
@@ -324,7 +328,10 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             'cioos_helper_available': cioos_helpers.helper_available,
             'cioos_group_contacts': self.group_by_ind_or_org,
             'cioos_get_fully_qualified_package_uri': cioos_helpers.get_fully_qualified_package_uri,
-            'cioos_version': cioos_helpers.cioos_version
+            'cioos_version': cioos_helpers.cioos_version,
+            'cioos_get_license_def': cioos_helpers.get_license_def,
+            'cioos_merge_dict': cioos_helpers.merge_dict,
+            'cioos_get_dataset_extents': cioos_helpers.get_dataset_extents
         }
 
     def get_validators(self):
@@ -455,10 +462,12 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                 return extra['value']
 
     def after_create(self, context, data_dict):
-        pr.update_package_relationships(context, data_dict, is_create=True)
+        #pr.update_package_relationships(context, data_dict, is_create=True)
+        pass
 
     def after_update(self, context, data_dict):
-        pr.update_package_relationships(context, data_dict, is_create=False)
+        #pr.update_package_relationships(context, data_dict, is_create=False)
+        pass
 
     # modfiey tags, keywords, and eov fields so that they properly index
     def before_index(self, data_dict):
@@ -649,6 +658,16 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                 new_eovs.append(item)
             search_results['search_facets']['eov']['items'] = new_eovs
 
+        license_id = search_facets.get('license_id', {})
+        items = license_id.get('items', [])
+        new_license_items = []
+        if items:
+            for item in items:
+                license = toolkit.h.cioos_get_license_def(item['name'], None, None)
+                if license:
+                    item['display_name'] = license['license_title']
+                new_license_items.append(item)
+            search_results['search_facets']['license_id']['items'] = new_license_items
 
         org_list = []
         limit = 25
@@ -677,8 +696,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         # package_search with filters uses solr index values which are strings
         # this is inconsistant with package data which is returned as json objects
         # by the package_show and package_search end points whout filters applied
-        for result in search_results.get('results', []):
-
+        for i, result in enumerate(search_results.get('results', [])):
             force_resp_org = cioos_helpers.load_json(self._get_extra_value('force_responsible_organization', result))
             cited_responsible_party = result.get('cited-responsible-party')
             if((cited_responsible_party or force_resp_org) and not result.get('responsible_organizations')):
@@ -736,6 +754,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                 else:
                     log.warn('No org details for owner_org %s', org_id)
 
+            search_results['results'][i] = result      
         return search_results
 
     # add organization extras to organization object in package.

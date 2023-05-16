@@ -73,12 +73,10 @@ Example:
           {% block resources_outer %}
             <ul class="dataset-resources list-unstyled">
               {% block resources_inner %}
-                {% for resource in package.resources %}
-                {% if resource.format %}
+                {% for resource in h.dict_list_reduce(package.resources, 'format') %}
                 <li>
-                  <a href="{{ resource.url or h.url_for(package.type ~ '_resource.read', id=package.name, resource_id=resource.id) }}" class="label label-default" data-format="{{ resource.format.lower() }}">{{ _(resource.format) }}</a>
+                  <a href="{{ h.url_for(package.type ~ '.read', id=package.name) }}" class="label label-default" data-format="{{ resource.lower() }}">{{ _(resource) }}</a>
                 </li>
-                {% endif %}
                 {% endfor %}
               {% endblock %}
             </ul>

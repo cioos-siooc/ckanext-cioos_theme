@@ -20,6 +20,8 @@ import logging
 import json
 import jsonpickle
 import importlib_metadata as metadata
+import re
+from ckanext.spatial.plugin import SpatialQuery
 log = logging.getLogger(__name__)
 
 try:
@@ -115,6 +117,71 @@ def get_datacite_org():
 def get_datacite_test_mode():
     return toolkit.config.get('ckan.cioos.datacite_test_mode', 'True')
 
+def get_dataset_extents(q, fields, bbox_values, output=None):
+    search_params = {'q': q,
+                     'fl': 'title,spatial',
+                     'fq_list':[],
+                     'rows': 1000}
+    if bbox_values:
+        bbox_list = bbox_values.split(',')
+        bbox = {}
+        bbox['minx'] = float(bbox_list[0])
+        bbox['miny'] = float(bbox_list[1])
+        bbox['maxx'] = float(bbox_list[2])
+        bbox['maxy'] = float(bbox_list[3])
+        search_params = SpatialQuery._params_for_solr_search(SpatialQuery, bbox, search_params)
+    search_params['fq_list'] = search_params['fq_list'] + ['+%s' % ':'.join(x) for x in fields]
+
+    pkg = toolkit.get_action('package_search')(data_dict=search_params)
+    pkg_geojson = [
+        {
+            "type": "Feature",
+            "properties": {"title": toolkit.h.scheming_language_text(load_json(x.get('title')))},
+            "geometry": load_json(x.get('spatial'))
+        } for x in pkg.get('results', [])]
+    log.debug(pkg_geojson)
+
+    if output == 'json':
+        return json.dumps(pkg_geojson)
+    return pkg_geojson
+
+
+def merge_dict(d1,d2):
+        return {**d1, **d2}
+
+def get_license_def(id, url='', title=''):
+    licenses = toolkit.get_action('license_list')()
+
+    default_locale = toolkit.config.get('ckan.locale_default', toolkit.config.get('ckan.locales_offered', ['en'])[0])
+    lang = toolkit.h.lang() or default_locale
+
+    # check for id first
+    for license in licenses:
+        if id.lower() == license['id'].lower():
+            return {
+                "license_id": license['id'],
+                "license_url": license.get('url_' + lang, license['url']),
+                "license_title": license.get('title_' + lang, license['title'])
+            }
+        
+    # if that fails match on url or title next
+    if url or title:
+        for license in licenses:
+            if url == license.get('url_' + lang, license['url']):
+                return {
+                    "license_id": license['id'],
+                    "license_url": license.get('url_' + lang, license['url']),
+                    "license_title": license.get('title_' + lang, license['title'])
+                }
+            if title.lower() == license.get('url_' + lang, license['url']).lower():
+                return {
+                    "license_id": license['id'],
+                    "license_url": license.get('url_' + lang, license['url']),
+                    "license_title": license.get('title_' + lang, license['title'])
+                }
+    return None
+        
+
 
 def get_fully_qualified_package_uri(pkg, uri_field, default_code_space=None):
     fqURI = []
@@ -141,6 +208,8 @@ def get_fully_qualified_package_uri(pkg, uri_field, default_code_space=None):
             continue
         code_space = uri.get('code-space') or default_code_space
         code = uri.get('code')
+        if isinstance(code, list):
+            code = code[0]
         version = uri.get('version')
         if not code:
             continue
@@ -152,44 +221,82 @@ def get_fully_qualified_package_uri(pkg, uri_field, default_code_space=None):
     return fqURI
 
 
+
 def get_package_relationships(pkg):
-    '''Returns the relationships of a package.
+    # compare schema field, here called aggregation-info and
+    # package relationships.
+    relationships = pkg.get('aggregation-info', [])
+    rels_from_schema = []
+    for rel in relationships:
+        comment = '/'.join([rel.get('initiative-type'), rel.get('association-type')])
+        comment = re.sub(r'([A-Z])', r' \1', comment)
+        comment = comment.title()
 
-    :param id: the id or name of the package
-    '''
-    rel = pkg.get('relationships_as_subject') + pkg.get('relationships_as_object')
-    b = []
-    for x in rel:
-        if x not in b:
-            b.append(x)
-    return b
+        rel_uri = rel.get('aggregate-dataset-identifier_code')
+        rel_name = rel.get('aggregate-dataset-name')
+
+        map_type ={
+            "largerWorkCitation": "parent",
+            "crossReference": "cross link",
+            "dependency": "depends on",
+            "revisionOf": "revision of",
+            "series": "cross link",
+            "isComposedOf": "child"
+        }
+        rel_type = map_type.get(rel.get('association-type'), 'links to')
+
+        if rel_uri and rel_name:
+            rels_from_schema.append({
+                "subject": pkg['name'],
+                "type": rel_type,
+                "object": {
+                    "title": rel_name,
+                    "url": rel_uri
+                    },
+                "comment": comment
+            })
+    return rels_from_schema
 
 
-def print_package_relationship_type(type):
-    out = 'depends on'
-    if 'child' in type:
-        out = 'parent'
-    elif 'parent' in type:
-        out = 'child'
-    elif 'link' in type:
-        out = 'cross link'
-    return out
+# the following functions have been depricated. use above function instead
+# def get_package_relationships(pkg):
+#     '''Returns the relationships of a package.
+
+#     :param id: the id or name of the package
+#     '''
+#     rel = pkg.get('relationships_as_subject') + pkg.get('relationships_as_object')
+#     b = []
+#     for x in rel:
+#         if x not in b:
+#             b.append(x)
+#     return b
 
 
-def get_package_relationship_reverse_type(type):
-    return PackageRelationship.reverse_type(type)
+# def print_package_relationship_type(type):
+#     out = 'depends on'
+#     if 'child' in type:
+#         out = 'parent'
+#     elif 'parent' in type:
+#         out = 'child'
+#     elif 'link' in type:
+#         out = 'cross link'
+#     return out
 
 
-def get_package_title(id):
-    '''Returns the title of a package.
+# def get_package_relationship_reverse_type(type):
+#     return PackageRelationship.reverse_type(type)
 
-    :param id: the id or name of the package
-    '''
-    try:
-        pkg = toolkit.get_action('package_show')(None, data_dict={'id': id})
-    except Exception as e:
-        return None
-    return toolkit.h.get_translated(pkg, 'title')
+
+# def get_package_title(id):
+#     '''Returns the title of a package.
+
+#     :param id: the id or name of the package
+#     '''
+#     try:
+#         pkg = toolkit.get_action('package_show')(None, data_dict={'id': id})
+#     except Exception as e:
+#         return None
+#     return toolkit.h.get_translated(pkg, 'title')
 
 
 def _merge_lists(key, list1, list2):

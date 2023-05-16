@@ -27,7 +27,7 @@ $teenwidth: 100%;
   margin: 0 0 10px 10px;
   background-color: white;
   border-radius: 3px;
-  min-height: 200px;
+  min-height: 238px;
 }
 
 .media-grid {
@@ -1147,9 +1147,16 @@ div.search-input-group {
   transition: all 0.3s ease;
 }
 
-i.fa.translation_icon {
-    font-size: large;
-    color: #585858;
+.translation_icon {   
+    background-image: url(/base/images/auto_translate.svg);
+    background-size: auto 100%;
+    background-repeat: no-repeat;
+    padding-left:83px;
+}
+
+.translation_icon_group {
+  padding-left: 3px;
+  font-size: medium;
 }
 
 
@@ -1220,7 +1227,7 @@ i.fa.translation_icon {
   dl.scheming-subfield-list dd {
       float: left;
       min-width: 150px;
-      width: auto;
+      width: 100%;
       max-width: 395px;
   }
 }
@@ -1392,4 +1399,58 @@ section{
     height: fit-content;
 }
 
+
+
+.relationship-list {
+  display: grid;
+}
+
+.relationship-item {
+  padding: 0px;
+
+
+  .label-clear-100 {
+      color: #000;
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      font-size: 12px;
+    }
+
+  .relationship-item-link {
+    padding: 10px;
+    text-decoration: none;
+  }
+
+  .list-group-item-body {
+    padding: 0px;
+  }
+
+  .heading,
+  .description {
+    color: #000;
+    padding: 0;
+  }
+
+  .heading {
+    font-size: 14px;
+    font-weight: bold;
+  }
+
+  .description {
+    font-size: 12px;
+    font-weight: normal;
+    padding-top: 5px;
+    margin-bottom: 0;
+    padding-left: 10px;
+  }
+
+  .align-content-center {
+    display: flex;
+    justify-content: center;
+  }
+}
+
+.relationship-item:hover {
+  background-color: #eee;
+}
 @import url(//fonts.googleapis.com/css?family=Montserrat:400,600,700,800,900|Quicksand:300,400,600,700|PT+Sans:400|Raleway:400);

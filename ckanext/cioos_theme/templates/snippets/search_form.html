@@ -70,9 +70,9 @@
         {% endfor %}
         {% if facets.extras %}
           {% if facets.extras.get('ext_bbox') %}
-            <span class="facet">Location:</span>
+            <span class="facet">{{ _('Location') }}:</span>
             <span class="filtered pill">
-              bbox
+              {{ _('bbox') }}
               <a href="{{ facets.remove_field(['ext_bbox','ext_prev_extent','ext_location'] ) }}" class="remove" title="{{ _('Remove') }}"><i class="fa fa-times"></i></a>
             </span>
           {% endif %}

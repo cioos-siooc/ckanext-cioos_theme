@@ -14,7 +14,7 @@ Renders a citation for a package
             <p id=cite_output></p>
             <div class="dropdown btn-group" style="float:right;">
               <a href="#" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                Download Citation
+                {{ _('Download Citation') }}
                 <span class="caret"></span>
               </a>
               <ul class="dropdown-menu">
@@ -56,7 +56,7 @@ Renders a citation for a package
               </ul>
             </div>
             <span style="float:right; margin-right:5px;">
-              <label for="template">Style</label>
+              <label for="template">{{ _('Style') }}</label>
               <select id="cite_template name="template" size="1" onChange="loadCite(this.value); cite_template=this.value;">
               <option value="apa" selected="selected">APA</option>
               <option value="vancouver">Vancouver</option>
@@ -85,8 +85,11 @@ Renders a citation for a package
 
     async function loadCite(template_style = 'apa', output_type = 'html', cite_format = 'bibliography', download = false){
       let pkg_citation = `{{h.scheming_language_text(pkg_dict.get('citation'))|replace('\\n',' ')|replace('\\r',' ')}}`
-      pkg_citation = pkg_citation.replace( /\s\s+/g, ' ' )
+      pkg_citation = pkg_citation.replace( /\s\s+/g, ' ' );
       pkg_citation = parseHtmlEnteties(pkg_citation)
+      pkg_citation = pkg_citation.replace( /"version": "(\d+.?\d*)"/, '"version": "v$1"');
+      pkg_citation = pkg_citation.replace( /"edition": "(\d+.?\d*)"/, '"version": "v$1"');
+      console.log(pkg_citation);
 
       let cite_data = await Cite.async(pkg_citation)
 
