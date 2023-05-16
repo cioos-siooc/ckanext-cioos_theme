@@ -1,30 +1,61 @@
 <div role="main" class="hero">
   <div class="container">
-    {% block search %}
+{% block search %}
       {% snippet 'home/snippets/search.html' %}
     {% endblock %}
   </div>
 </div>
-<div role="main">
+
+<div role="main" class="hero">
   <div class="container">
     <div class="row row2">
-      <div class="col-md-6 col2">
-        {% block promoted %}
+      <div class="col-md-9 col2">
+        <h3 class="heading">{{ _('Ocean Variables') }}</h3>
+        <div class="module-content box">
+          {% block eov_list %}
+          {% set eov = h.cioos_get_eovs(show_all=True) %}
+          {% for grouper, list in eov|rejectattr('category', 'undefined')|selectattr('count')|groupby('category') %}
+          {% if grouper and grouper not in g.exclude_eov_category %}
+          
+          {% if list|length > 0 %}
+          <dl class="eov-list">
+            <dt>{{ _(grouper) }}</dt>
+            {% for item in list|sort(attribute='name') %}
+            {% if item.name not in g.exclude_eov %}
+            {% set href = h.url_for(controller='dataset', action='search', eov=item.name) %}
+            {% set label = label_function(item) if label_function else h.scheming_language_text(item.display_name) %}
+            {% set label = _(label) %}
+            {% set label_truncated = h.truncate(label, 35) if not label_function else label %}
+            {% set count = count_label(item['count']) if count_label else ('%d' % item['count']) %}
+            <dd>
+              <a href="{{ href }}" title="{{ label if label != label_truncated else '' }}" >
+                <span class="item-label">{{ label_truncated }}</span>                
+                <span class="item-count badge">{{ count }}</span>
+              </a>
+            </dd>
+            {% endif %}
+            {% endfor %}
+          </dl>
+          {% endif %}
+          {% endif %}
+          {% endfor %}
+          {% endblock %}
+        </div>
+
+    </div>
+
+    <div class="col-md-3 col1 h-100">
+{% block promoted %}
           {% snippet 'home/snippets/promoted.html' %}
         {% endblock %}
-      </div>
-      <div class="col-md-6 col1">
-        {% block stats %}
-          {% snippet 'home/snippets/stats.html' %}
-        {% endblock %}
-      </div>
     </div>
   </div>
 </div>
 
+
 <div role="main">
   <div class="container">
-    <h3 class="heading">{{ _("SEARCH BY LOCATION") }}</h3>
+    <h3 class="heading">{{ _("Search by Location") }}</h3>
     <p> To perform a spatial search, define your search area using the draw tool</p>
     <div class="box">
   	  {% snippet "spatial/snippets/spatial_query.html" , default_extent= h.spatial_default_extent() %}
