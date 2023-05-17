@@ -155,7 +155,7 @@
           <li class="nav-item"><a href="{{ h.url_for(controller='api',
                               logic_function='package_show',
                               action='action', ver=3, id=pkg.get('name') or pkg.id) }}"><span class="item-label">{{ _('JSON')}}</span></a></li>
-          <li class="nav-item"><a href="{{ h.url_for(controller='dataset', action='read', id=pkg.get('name') or pkg.id) }}.basic"><span class="item-label">{{ _(' Basic View')}}</span></a></li>
+          <li class="nav-item"><a href="{{ h.url_for(controller='dataset', action='read', id=pkg.get('name') or pkg.id) }}.basic"><span class="item-label">{{ _('Basic View')}}</span></a></li>
           <li class="nav-item"><a href="{{ h.url_for(controller='dataset', action='read', id=pkg.get('name') or pkg.id) }}"><span class="item-label">{{ _('Show Permalink')}}</span></a></li>
         </ul>
       </nav>

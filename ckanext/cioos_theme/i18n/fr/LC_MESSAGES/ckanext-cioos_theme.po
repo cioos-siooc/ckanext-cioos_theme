@@ -706,3 +706,24 @@ msgstr "lire plus"
 
 msgid "read less"
 msgstr "lire moins"
+
+msgid "External Organization Page"
+msgstr "Page Organisation Externe"
+
+msgid "Licenses"
+msgstr "Licences"
+
+msgid "Keywords"
+msgstr "Mots clés"
+
+msgid "Data Reference Date(s)"
+msgstr "Date(s) de référence des données"
+
+msgid "Basic View"
+msgstr "Vue de base"
+
+msgid "Limitations"
+msgstr "Limites"
+
+msgid "Access"
+msgstr "Accès"
