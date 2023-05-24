@@ -1,14 +1,12 @@
 <div role="main" class="hero">
   <div class="container">
-{% block search %}
+    {% block search %}
       {% snippet 'home/snippets/search.html' %}
     {% endblock %}
   </div>
-</div>
 
-<div role="main" class="hero">
   <div class="container">
-    <div class="row row2">
+    <div class="row">
       <div class="col-md-9 col2">
         <h3 class="heading">{{ _('Ocean Variables') }}</h3>
         <div class="module-content box">
@@ -42,23 +40,27 @@
           {% endblock %}
         </div>
 
+        <h3 class="heading">{{ _('All Datasets') }}</h3>
+        <div class="module-content box">
+          <b>View all <a style="font-size: 18px;" href="{{ h.url_for(controller='dataset', action='search') }}">{{h.cioos_count_datasets()}}</a> datasets</b>
+        </div>
+
     </div>
 
     <div class="col-md-3 col1 h-100">
-{% block promoted %}
+        {% block promoted %}
           {% snippet 'home/snippets/promoted.html' %}
         {% endblock %}
     </div>
   </div>
-</div>
 
-
-<div role="main">
   <div class="container">
-    <h3 class="heading">{{ _("Search by Location") }}</h3>
-    <p> To perform a spatial search, define your search area using the draw tool</p>
-    <div class="box">
-      {% snippet "spatial/snippets/spatial_query.html" , default_extent= h.spatial_default_extent(), dataset_extents= h.cioos_get_dataset_extents(q=None, fields=[], bbox_values=None, output='json')%}
-  	</div>
+    <div class="row">
+      <h3 class="heading">{{ _("Search by Location") }}</h3>
+      <p> To perform a spatial search, define your search area using the draw tool</p>
+      <div class="box">
+        {% snippet "spatial/snippets/spatial_query.html" , default_extent= h.spatial_default_extent(), dataset_extents= h.cioos_get_dataset_extents(q=None, fields=[], bbox_values=None, output='json')%}
+      </div>
+    </div>
   </div>
 </div>
