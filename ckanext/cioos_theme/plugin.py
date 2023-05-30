@@ -419,13 +419,15 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
 
         if 'themes' not in facets_dict \
                 or 'eov' not in facets_dict \
-                or 'responsible_organizations' not in facets_dict:
+                or 'responsible_organizations' not in facets_dict \
+                or 'projects' not in facets_dict:
             # Horrible hack
             # Insert facet themes at first position of the OrderedDict facets_dict.
             ordered_dict = facets_dict.copy()
             facets_dict.clear()
             # facets_dict['themes'] = toolkit._('Theme')
             facets_dict['eov'] = toolkit._('Ocean Variables')
+            facets_dict['projects'] = toolkit._('Projects')
 
             if show_responsible_organizations:
                 facets_dict['responsible_organizations'] = toolkit._('Responsible Organization')
@@ -554,6 +556,8 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             if resource_description and isinstance(resource_description, dict) and not res.get('description_translated'):
                 res['description_translated'] = resource_description
 
+        if data_dict.get('projects'):
+            data_dict['projects'] = cioos_helpers.load_json(data_dict.get('projects'))
         return data_dict
 
     # group a list of dictionaries based on individual-name or organization-name keys
@@ -729,7 +733,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                 if resource_description and isinstance(resource_description, dict):
                     res['description'] = scheming_language_text(resource_description, toolkit.config.get('ckan.locale_default', 'en'))
 
-            # convert the rest of the strings to json
+            # convert the rest of the strings from json
             for field in [
                     "keywords",
                     "temporal-extent",
@@ -738,7 +742,8 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                     "dataset-reference-date",
                     "metadata-reference-date",
                     "metadata-point-of-contact",
-                    "cited-responsible-party"]:
+                    "cited-responsible-party",
+                    "projects"]:
                 tmp = result.get(field)
                 if tmp:
                     result[field] = cioos_helpers.load_json(tmp)
@@ -805,7 +810,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         if(notes):
             result['notes_translated'] = cioos_helpers.load_json(notes)
 
-        # convert the rest of the strings to json
+        # convert the rest of the strings from json
         for field in [
                 "keywords",
                 "temporal-extent",
@@ -814,7 +819,8 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                 "dataset-reference-date",
                 "metadata-reference-date",
                 "metadata-point-of-contact",
-                "cited-responsible-party"]:
+                "cited-responsible-party",
+                "projects"]:
             tmp = result.get(field)
             if tmp:
                 result[field] = cioos_helpers.load_json(tmp)
