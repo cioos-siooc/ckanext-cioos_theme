@@ -763,7 +763,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         org_id = package_dict.get('owner_org')
         data_type = package_dict.get('type')
 
-        if org_id and data_type == 'dataset':
+        if org_id and (data_type == 'dataset' or data_type == 'harvest'):
             # need to turn off dataset_count, usersand groups here as it causes a recursive loop
             org_details = toolkit.get_action('organization_show')(
                 data_dict={
@@ -783,6 +783,9 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                 new_org = {**package_org, **org_details}
                 if new_org:
                     package_dict['organization'] = new_org
+
+        if data_type == 'harvest':
+            return package_dict
 
         force_resp_org = cioos_helpers.load_json(self._get_extra_value('force_responsible_organization', package_dict))
         cited_responsible_party = package_dict.get('cited-responsible-party')
