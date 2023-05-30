@@ -1192,6 +1192,7 @@ div.search-input-group {
 .additional-info {
   tr th:first-child, tr td:first-child {
     width: 25%;
+    font-weight: 600;
   }
 
   .panel-default .panel-heading {
@@ -1214,30 +1215,43 @@ div.search-input-group {
   dl.scheming-subfield-list dt {
       float: left;
       clear: left;
-      width: 70px;
+      // width: 70px;
       text-align: left;
       font-weight: 700;
       color: #333;
+      font-weight:600;
   }
 
   dl.scheming-subfield-list dt::after {
     content: ":";
+    padding-right: 5px;
   }
 
   dl.scheming-subfield-list dd {
-      float: left;
+      // float: left;
       min-width: 150px;
       width: 100%;
-      max-width: 395px;
+      margin-inline-start: 10px;
+      // max-width: 395px;
   }
 }
 
+ .module{
+    h3 {
+      font-weight: 400;
+    }
 
+    strong {
+    font-weight: 600;
+    }
+  }
 
 .dates {
   tr th:first-child, tr td:first-child {
     width: 25%;
+    font-weight:600;
   }
+
 }
 
 .primary{
@@ -1361,6 +1375,7 @@ section{
   .resource-item .heading {
       padding: 10px 0 10px 60px;
       text-decoration: none;
+      font-weight: 600;
   }
 
   .resource-item .description {
@@ -1453,4 +1468,4 @@ section{
 .relationship-item:hover {
   background-color: #eee;
 }
-@import url(//fonts.googleapis.com/css?family=Montserrat:400,600,700,800,900|Quicksand:300,400,600,700|PT+Sans:400|Raleway:400);
+@import url(//fonts.googleapis.com/css?family=Montserrat:400,600,700,800,900|Quicksand:300,400,600,700|PT+Sans:400|Raleway:300,400,600,700);
