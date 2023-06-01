@@ -157,7 +157,8 @@ def get_license_def(id, url='', title=''):
 
     # check for id first
     for license in licenses:
-        if id.lower() == license['id'].lower():
+        if id.lower() == license['id'].lower() or \
+            id.lower() in [x.lower() for x in license.get('legacy_ids', [])]:
             return {
                 "license_id": license['id'],
                 "license_url": license.get('url_' + lang, license['url']),
