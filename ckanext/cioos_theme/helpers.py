@@ -173,7 +173,7 @@ def get_license_def(id, url='', title=''):
                     "license_url": license.get('url_' + lang, license['url']),
                     "license_title": license.get('title_' + lang, license['title'])
                 }
-            if title.lower() == license.get('url_' + lang, license['url']).lower():
+            if title.lower() == license.get('title_' + lang, license['title']).lower():
                 return {
                     "license_id": license['id'],
                     "license_url": license.get('url_' + lang, license['url']),

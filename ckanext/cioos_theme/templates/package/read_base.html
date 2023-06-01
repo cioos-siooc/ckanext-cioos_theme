@@ -97,7 +97,7 @@
 {% endif %}
 
   {% block package_license %}
-    {% set licence = h.cioos_get_license_def(pkg.license_id, pkg.license_url, pkg.license_title) %}
+    {% set licence = h.cioos_get_license_def(pkg.license_id, pkg.license_url, pkg.license_title) or {} %}
     {% snippet "snippets/license.html", pkg_dict=h.cioos_merge_dict(pkg,licence), has_context_title=true %}
   {% endblock %}
 
