@@ -5745,5 +5745,8 @@
         ]
       ]
     ]
-  ]
+  ],
+  "properties": {
+    "name": "Pacific"
+  }
 }

@@ -331,7 +331,8 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             'cioos_version': cioos_helpers.cioos_version,
             'cioos_get_license_def': cioos_helpers.get_license_def,
             'cioos_merge_dict': cioos_helpers.merge_dict,
-            'cioos_get_dataset_extents': cioos_helpers.get_dataset_extents
+            'cioos_get_dataset_extents': cioos_helpers.get_dataset_extents,
+            'cioos_get_ra_extents': cioos_helpers.get_ra_extents
         }
 
     def get_validators(self):
