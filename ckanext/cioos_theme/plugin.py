@@ -23,6 +23,7 @@ from ckantoolkit import _
 import ckan.lib.base as base
 import re
 import time
+from pyld import jsonld
 
 Invalid = df.Invalid
 
@@ -199,6 +200,21 @@ def render_basic_package_view(id):
     pkg = toolkit.get_action('package_show')(data_dict={'id': id})
     return toolkit.render('package/basic.html', extra_vars={'pkg_dict': pkg})
 
+@toolkit.chained_action
+@toolkit.side_effect_free
+def dcat_dataset_show(up_func, context, data_dict):
+
+    parent_output = up_func(context, data_dict)
+    _frame = toolkit.request.params.get('frame')
+    if _frame == 'schemaorg':
+        frametext =   {
+            "@context": {"@vocab": "http://schema.org/"},
+            "@type": "Dataset"
+        }
+        framed_output = jsonld.frame(json.loads(parent_output), frametext)
+        return framed_output
+    return parent_output
+    
 class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
     plugins.implements(plugins.ITranslation)
     plugins.implements(plugins.IConfigurer)
@@ -209,6 +225,14 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
     plugins.implements(plugins.IAuthenticator)
     plugins.implements(plugins.IClick)
     plugins.implements(plugins.IBlueprint)
+    plugins.implements(plugins.IActions)
+
+    #IActions
+
+    def get_actions(self):
+        return {
+            u"dcat_dataset_show": dcat_dataset_show
+        }
 
     # IClick
     def get_commands(self):
