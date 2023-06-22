@@ -1,24 +1,35 @@
 {% for ident in uri or [] %}
   <{{container}}>
-  <a href="{{ ident }}" class="">
   {% if 'ror.org' in ident %}
+    <a href="{{ ident }}" title="{{ ident }}" class="">
     <img src="/base/images/ror-logo-small.png" class="identifier_icon_list">
     {{ ident.rsplit('/', 1)[-1] }}
+    </a>
   {% elif 'wikidata' in ident %}
+    <a href="{{ ident }}" title="{{ ident }}" class="">
     <img src="/base/images/wikidata.png" class="identifier_icon_list">
     {{ ident.rsplit('/', 1)[-1] }}
+    </a>
   {% elif 'orcid.org' in ident %}
+    <a href="{{ ident }}" title="{{ ident }}" class="">
     <img src="/base/images/orcid.logo.icon.svg" class="identifier_icon_list">
     {{ ident.rsplit('/', 1)[-1] }}
+    </a>
   {% elif 'doi.org' in ident %}
+    <a href="{{ ident }}" title="{{ ident }}" class="">
     <img src="/base/images/DOI_logo.svg" class="identifier_icon_list">
     {{ '/'.join(ident.rsplit("/", 2)[-2:]) }}
+    </a>
   {% elif 'isni.org' in ident %}    
+    <a href="{{ ident }}" title="{{ ident }}" class="">
     <img src="/base/images/isni-logo.svg" class="identifier_icon_list">
     {{ ident.rsplit('/', 1)[-1] }}
+    </a>
   {% else %}
+    <span>
     <label>Id</label>
-    {{ ident.lstrip('https://').rstrip('/') }}
+    {{ ident.replace('https://','').rstrip('/') }}
+    <span>
   {% endif %}
-  </a></{{container}}>
+  </{{container}}>
 {% endfor %}

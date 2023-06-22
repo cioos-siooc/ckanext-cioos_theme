@@ -509,6 +509,11 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             log.error("error:%s, keywords:%r", err, data_dict.get('keywords', '{}'))
             tags_dict = {"en": [], "fr": []}
 
+        # this should not be needed but harvesting from glos puts the 
+        # date/time object in a funny format which breaks solr indexing
+        if data_dict.get('xml_modified_date'):
+            data_dict['xml_modified_date'] = data_dict['xml_modified_date'].replace('000+00:00Z','')
+
         force_resp_org = cioos_helpers.load_json(data_dict.get('force_responsible_organization', '[]'))
         data_dict['responsible_organizations'] = self._cited_responsible_party_to_responsible_organizations(data_dict.get('cited-responsible-party', '{}'), force_resp_org)
 

@@ -207,11 +207,12 @@ def get_fully_qualified_package_uri(pkg, uri_field, default_code_space=None):
     for uri in uris:
         if not uri:
             continue
+        authority = uri.get('authority')
         code_space = uri.get('code-space') or default_code_space
         code = uri.get('code')
-        if isinstance(code, list):
-            code = code[0]
         version = uri.get('version')
+        if isinstance(code, list):
+            code = code[0]        
         if not code:
             continue
         if toolkit.h.is_url(code):
