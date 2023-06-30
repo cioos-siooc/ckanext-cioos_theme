@@ -715,7 +715,12 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                 for ch in choices:
                     if ch['value'] == item['name']:
                         item['display_name'] = toolkit.h.scheming_language_text(ch.get('label', item['name']))
-                        item['category'] = ch.get('catagory', u'')
+                        cat = ch.get('category', '')
+                        if cat:
+                            item['category'] = cat
+                        subcat = ch.get('subcatagory', '')
+                        if subcat:
+                            item['subcategory'] = subcat
                 new_values.append(item)
             return new_values
         return None
