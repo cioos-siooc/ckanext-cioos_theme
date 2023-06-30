@@ -17,8 +17,10 @@
     <img src="/base/images/isni-logo.svg" class="identifier_icon_list">
     {{ ident.rsplit('/', 1)[-1] }}
   {% else %}
-    <label>Id</label>
-    {{ ident.lstrip('https://').rstrip('/') }}
+    
+    <label>ID</label>
+    <span class="id_span">{{ ident.replace('https://','').rstrip('/') }}</span>
+    
   {% endif %}
   </a></{{container}}>
 {% endfor %}
