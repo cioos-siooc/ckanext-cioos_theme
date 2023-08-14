@@ -3,6 +3,7 @@
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
 import ckan.model as model
+from ckan.views.dataset import GroupView
 import ckanext.cioos_theme.helpers as cioos_helpers
 import ckanext.cioos_theme.cli as cli
 import ckanext.cioos_theme.util.package_relationships as pr
@@ -24,6 +25,7 @@ import ckan.lib.base as base
 import re
 import time
 from pyld import jsonld
+import ckan.lib.munge as munge
 
 Invalid = df.Invalid
 
@@ -258,6 +260,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
     plugins.implements(plugins.IClick)
     plugins.implements(plugins.IBlueprint)
     plugins.implements(plugins.IActions)
+    # plugins.implements(plugins.IDatasetForm)
 
     #IActions
 
@@ -270,6 +273,49 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
     def get_commands(self):
         return cli.get_commands()
 
+
+    def dataset_custom_GroupView(self, package_type, id):
+        if toolkit.request.method == 'POST':
+            GroupView().post(
+                package_type, 
+                id
+            )
+            return toolkit.h.redirect_to('cioos.resorg', package_type=package_type, id=id)
+        
+        context, pkg_dict = GroupView()._prepare(id)
+        dataset_type = pkg_dict['type'] or package_type
+        context['is_member'] = True
+        users_groups = toolkit.get_action('group_list_authz')(context, {'id': id})
+
+        pkg_group_ids = set(
+            group['id'] for group in pkg_dict.get('groups', [])
+        )
+
+        user_group_ids = set(group['id'] for group in users_groups)
+        filtered_groups = toolkit.get_action('group_list')(context, data_dict={'type':'resorg'})
+
+        # filter groups by type       
+        pkg_dict['groups'] = [g for g in pkg_dict.get('groups', []) if g['name'] in filtered_groups]
+        group_dropdown = [[group['id'], group['display_name']]
+                          for group in users_groups
+                          if group['id'] not in pkg_group_ids
+                          and group['name'] in filtered_groups]
+
+        for group in pkg_dict.get('groups', []):
+            group['user_member'] = (group['id'] in user_group_ids)
+
+        # TODO: remove
+        #g.pkg_dict = pkg_dict
+        #g.group_dropdown = group_dropdown
+
+        return base.render(
+            u'package/group_list.html', {
+                u'dataset_type': dataset_type,
+                u'pkg_dict': pkg_dict,
+                u'group_dropdown': group_dropdown
+            }
+        ) 
+
     # IBlueprint
     def get_blueprint(self):
         blueprint = Blueprint('cioos', self.__module__)
@@ -280,6 +326,8 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         ]
         for rule in rules:
             blueprint.add_url_rule(*rule)
+
+        blueprint.add_url_rule('/<package_type>/resorg/<id>', 'resorg', view_func=self.dataset_custom_GroupView, methods=['GET', 'POST'])
 
         return blueprint
 
@@ -471,14 +519,15 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         toolkit.c.search_extras = search_extras
 
         # remove groups facet
-        if 'groups' in facets_dict:
-            facets_dict.pop('groups')
+        #if 'groups' in facets_dict:
+        #    facets_dict.pop('groups')
 
         if 'themes' not in facets_dict \
                 or 'eov' not in facets_dict \
                 or 'ecv' not in facets_dict \
                 or 'responsible_organizations' not in facets_dict \
-                or 'projects' not in facets_dict:
+                or 'projects' not in facets_dict \
+                    or 'resource-type' not in facets_dict:
             # Horrible hack
             # Insert facet themes at first position of the OrderedDict facets_dict.
             ordered_dict = facets_dict.copy()
@@ -487,6 +536,8 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             facets_dict['eov'] = toolkit._('Ocean Variables')
             facets_dict['ecv'] = toolkit._('Climate Variables')
             facets_dict['projects'] = toolkit._('Projects')
+            facets_dict['resource-type'] = toolkit._('Resource Type')
+            
 
             if show_responsible_organizations:
                 facets_dict['responsible_organizations'] = toolkit._('Responsible Organization')
@@ -501,9 +552,10 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                     facets_dict[key] = value
         return facets_dict
 
+
     # IPackageController
 
-    def _cited_responsible_party_to_responsible_organizations(self, parties, force_responsible_organization):
+    def _cited_responsible_party_to_responsible_organizations(self, parties, force_responsible_organization, as_group = False):
         if force_responsible_organization:
             if isinstance(force_responsible_organization, list):
                 resp_orgs = force_responsible_organization
@@ -511,9 +563,31 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                 resp_orgs = [force_responsible_organization]
         else:
             resp_org_roles = cioos_helpers.load_json(toolkit.config.get('ckan.responsible_organization_roles', '["owner", "originator", "custodian", "author", "principalInvestigator"]'))
+
+        if as_group:
+            resp_orgs = [
+                {
+                    'name': munge.munge_name(x['organisation-name'].strip()).lower(),
+                    'display_name': x['organisation-name'].strip(),
+                    'title': x['organisation-name'].strip(),
+                    'title_translated': {
+                        'en' : x['organisation-name'].strip(),
+                        'fr' : x['organisation-name'].strip(),
+                    },
+                    'organisation-uri':{
+                        'authority': x.get('organisation-uri_authority'),
+                        'code': x.get('organisation-uri_code'),
+                        'code-space': x.get('organisation-uri_code-space'),
+                        'version': x.get('organisation-uri_version'),
+                    },
+                } 
+                for x in cioos_helpers.load_json(parties) if not set(cioos_helpers.load_json(x.get('role'))).isdisjoint(resp_org_roles)
+            ]
+        else:
             resp_orgs = [x.get('organisation-name', '').strip() for x in cioos_helpers.load_json(parties) if not set(cioos_helpers.load_json(x.get('role'))).isdisjoint(resp_org_roles)]
-            resp_orgs = list(dict.fromkeys(resp_orgs))  # remove duplicates
-            resp_orgs = list(filter(None, resp_orgs))  # remove empty elements (in a python 2 and 3 friendly way)
+            
+        resp_orgs = list(dict.fromkeys(resp_orgs))  # remove duplicates
+        resp_orgs = list(filter(None, resp_orgs))  # remove empty elements (in a python 2 and 3 friendly way)
 
         return resp_orgs
 
@@ -725,6 +799,50 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             return new_values
         return None
 
+    def get_all_groups(self, action_type):
+        group_list = []
+        limit = 25
+        offset = 0
+        schema_list = toolkit.get_action('scheming_%s_schema_list' % action_type)()
+        schema_types = list(dict.fromkeys( schema_list + [action_type] ))
+
+        for type in schema_types:
+            while True:
+                # need to turn off dataset_count here as it causes a recursive loop with package_search
+                res = toolkit.get_action('%s_list' % action_type)(
+                    data_dict={
+                        'type': type,
+                        'limit': limit,
+                        'offset': offset,
+                        'all_fields': True,
+                        'include_dataset_count': False,
+                        'include_extras': True,
+                        'include_users': False,
+                        'include_groups': False,
+                        'include_tags': False,
+                    }
+                )
+                if not res:
+                    break
+                group_list = group_list + res
+                offset = offset + limit
+        return {x['id']: x for x in group_list}
+
+    def get_group(self, type, id):
+        # need to turn off dataset_count, usersand groups here as it causes a recursive loop
+            return toolkit.get_action('%s_show' % type)(
+                data_dict={
+                    'id': id,
+                    'include_datasets': False,
+                    'include_dataset_count': False,
+                    'include_extras': True,
+                    'include_users': False,
+                    'include_groups': False,
+                    'include_tags': False,
+                    'include_followers': False,
+                }
+            )
+
     # update eov search facets with keys from choices list in the scheming extension schema
     # format search results for consistant json output
     # add organization extra fields to results
@@ -755,29 +873,9 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                 new_license_items.append(item)
             search_results['search_facets']['license_id']['items'] = new_license_items
 
-        org_list = []
-        limit = 25
-        offset = 0
-        while True:
-            # need to turn off dataset_count here as it causes a recursive loop with package_search
-            res = toolkit.get_action('organization_list')(
-                data_dict={
-                    'limit': limit,
-                    'offset': offset,
-                    'all_fields': True,
-                    'include_dataset_count': False,
-                    'include_extras': True,
-                    'include_users': False,
-                    'include_groups': False,
-                    'include_tags': False,
-                }
-            )
-            if not res:
-                break
-            org_list = org_list + res
-            offset = offset + limit
-
-        org_dict = {x['id']: x for x in org_list}
+        org_dict = self.get_all_groups('organization')
+        group_dict = self.get_all_groups('group')
+        
         # convert string encoded json to json objects for translated fields
         # package_search with filters uses solr index values which are strings
         # this is inconsistant with package data which is returned as json objects
@@ -785,8 +883,16 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         for i, result in enumerate(search_results.get('results', [])):
             force_resp_org = cioos_helpers.load_json(self._get_extra_value('force_responsible_organization', result))
             cited_responsible_party = result.get('cited-responsible-party')
-            if((cited_responsible_party or force_resp_org) and not result.get('responsible_organizations')):
-                result['responsible_organizations'] = self._cited_responsible_party_to_responsible_organizations(cited_responsible_party, force_resp_org)
+
+            # Update group list
+            groups = result.get('groups')
+            if groups:
+                group_dict = self.get_all_groups('group')
+                new_group_list = []
+                for group in groups:
+                    new_group_list.append( group_dict.get(group['id'],group) )
+                if new_group_list:
+                    result['groups'] = new_group_list
 
             if result.get('cited-responsible-party'):
                 result['cited-responsible-party'] = self.group_by_ind_or_org(result.get('cited-responsible-party'))
@@ -851,20 +957,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         data_type = package_dict.get('type')
 
         if org_id and (data_type == 'dataset' or data_type == 'harvest'):
-            # need to turn off dataset_count, usersand groups here as it causes a recursive loop
-            org_details = toolkit.get_action('organization_show')(
-                data_dict={
-                    'id': org_id,
-                    'include_datasets': False,
-                    'include_dataset_count': False,
-                    'include_extras': True,
-                    'include_users': False,
-                    'include_groups': False,
-                    'include_tags': False,
-                    'include_followers': False,
-                }
-            )
-
+            org_details = self.get_group('organization',org_id)           
             if org_details:
                 package_org = package_dict['organization']
                 new_org = {**package_org, **org_details}
@@ -873,6 +966,26 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
 
         if data_type == 'harvest':
             return package_dict
+
+        harvest_source_id = self._get_extra_value('harvest_source_id', package_dict)
+
+        if harvest_source_id:
+            harvest_source = toolkit.get_action("harvest_source_show")(context, {
+                "id": harvest_source_id
+            })
+            log.debug(harvest_source)
+            package_dict['harvest_source_url'] = harvest_source.get('organization')
+            package_dict['harvest_source_organization'] = harvest_source.get('organization')
+
+        # Update group list
+        groups = package_dict.get('groups')
+        if groups:
+            group_dict = self.get_all_groups('group')
+            new_group_list = []
+            for group in groups:
+                new_group_list.append( group_dict.get(group['id'],group) )
+            if new_group_list:
+                package_dict['groups'] = new_group_list
 
         force_resp_org = cioos_helpers.load_json(self._get_extra_value('force_responsible_organization', package_dict))
         cited_responsible_party = package_dict.get('cited-responsible-party')

@@ -688,7 +688,7 @@ class CIOOSDCATProfile(SchemaOrgProfile):
             provider_ref = URIRef(org_uri)
             g.add((provider_ref, RDF.type, SCHEMA.Organization))
             g.add((provider_ref, SCHEMA.legalName, Literal(organization['title'])))
-            g.add((provider_ref, SCHEMA.name, Literal(organization['display_name'])))
+            g.add((provider_ref, SCHEMA.name, Literal(organization.get('display_name') or organization.get('title'))))
             if organization.get('external_home_url'):
                 g.add((provider_ref, SCHEMA.url, Literal(organization['external_home_url'])))
             for lang in organization.get('image_url_translated', {}):

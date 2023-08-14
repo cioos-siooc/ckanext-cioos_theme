@@ -566,7 +566,7 @@ body {
 
 .btn {
   display: inline-block;
-  text-transform: uppercase;
+  //text-transform: uppercase;
   margin-bottom: 0;
   font-family: $defaultfont;
   font-weight: normal;
@@ -1306,6 +1306,16 @@ div.search-input-group {
     background-image: none;
     border: 1px solid #ccc;
     border-radius: 0;
+  }
+
+  .module-content h1.heading a {
+    color: inherit;
+  }
+
+  .module-content h1.title {
+    color: inherit;
+    margin-bottom: 0px;
+    line-height: 1;
   }
 
 }
