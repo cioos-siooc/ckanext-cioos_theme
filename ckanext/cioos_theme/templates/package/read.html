@@ -59,6 +59,10 @@
 
   {% endblock %}
 
+  {% block metadata_quality_statment %}
+      {% snippet "package/snippets/metadata_quality.html", pkg_dict=pkg %}
+  {% endblock %}
+
   {% block package_access %}
     {% snippet "package/snippets/access.html", pkg_dict=pkg %}
   {% endblock %}
@@ -66,8 +70,6 @@
   {% block package_resources %}
     {% snippet "package/snippets/resources_list.html", pkg=pkg, resources=pkg.resources %}
   {% endblock %}
-
-
 
   {% block package_citation %}
     {% if pkg.citation %}
@@ -125,7 +127,6 @@
 
     </div>
   </section>
-
 
   {% block package_additional_info %}
     {% snippet "scheming/package/snippets/additional_info.html", pkg_dict=pkg, dataset_type=dataset_type, schema=schema %}

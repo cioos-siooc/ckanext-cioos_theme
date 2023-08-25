@@ -1344,6 +1344,23 @@ section{
     font-family: 'FontAwesome';
     content: '\f146';
   }
+
+  a.section_hide_controle_full_width{
+    display:inline-block;
+    width:100%;
+    height:100%;
+    padding: 10px 15px;
+  }
+
+  a.section_hide_controle_full_width i{
+    float:right;
+    padding-top:3px;
+  }
+
+  .panel-heading-thin{
+    padding: unset;
+  }
+
 }
 
 .table.collapse.in {
