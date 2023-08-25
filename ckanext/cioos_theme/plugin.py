@@ -973,8 +973,6 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             harvest_source = toolkit.get_action("harvest_source_show")(context, {
                 "id": harvest_source_id
             })
-            log.debug(harvest_source)
-            package_dict['harvest_source_url'] = harvest_source.get('organization')
             package_dict['harvest_source_organization'] = harvest_source.get('organization')
 
         # Update group list
