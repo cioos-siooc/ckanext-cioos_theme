@@ -44,12 +44,29 @@ log_auth = logging.getLogger(__name__ + '.auth')
 show_responsible_organizations = toolkit.asbool(
     toolkit.config.get('cioos.show_responsible_organizations_facet', "True"))
 
+hide_organization_in_dataset_sidebar = toolkit.asbool(
+    toolkit.config.get('cioos.hide_organization_in_dataset_sidebar', "True"))
+
 contact_email = toolkit.config.get('cioos.contact_email', "info@cioos.ca")
 organizations_info_text = toolkit.config.get(
     'cioos.organizations_info_text',
     {
         "en": "CKAN Organizations are used to create, manage and publish collections of datasets. Users can have different roles within an Organization, depending on their level of authorisation to create, edit and publish.",
         "fr": u"Les Organisations CKAN sont utilisées pour créer, gérer et publier des collections de jeux de données. Les utilisateurs peuvent avoir différents rôles au sein d'une Organisation, en fonction de leur niveau d'autorisation pour créer, éditer et publier."
+    }
+)
+
+group_info_text = toolkit.config.get(
+    'cioos.group_info_text',
+    {
+    "resorg":{
+        "en":"You can use CKAN Responsible Organizations to create and manage collections of datasets. In this case, a dataset is assigned to each organization that has been identified as contributing to, retains ownership of, or responsible for the data in the dataset.",
+        "fr":"Vous pouvez utiliser les organisations responsables de CKAN pour créer et gérer des collections d'ensembles de données. Dans ce cas, un ensemble de données est attribué à chaque organisation qui a été identifiée comme contribuant, conservant la propriété ou responsable des données de l'ensemble de données."
+    },
+    "group": {
+        "en": "You can use CKAN Groups to create and manage collections of datasets. This could be to catalogue datasets for a particular project or team, or on a particular theme, or as a very simple way to help people find and search your own published datasets.",
+        "fr": u"Vous pouvez utiliser les groupes CKAN pour créer et gérer des collections d'ensembles de données. Il peut s'agir de cataloguer des ensembles de données pour un projet ou une équipe particulière, ou sur un thème particulier, ou encore d'un moyen très simple d'aider les gens à trouver et à rechercher vos propres ensembles de données publiés."
+    }
     }
 )
 
@@ -66,6 +83,8 @@ def populate_select(key, data, errors, langs, select_field, keyword_list):
     # create dictionary from select choice list
     for x in toolkit.h.scheming_field_choices(select_field):
         candidate_dict[x['value'].lower()] = x['value']
+        for id in + x.get('alternative_ids', []):
+            candidate_dict[id.lower()] = x['value']
         for lang in langs:
             if x['label'].get(lang):
                 candidate_dict[x['label'][lang].lower()] = x['value']
@@ -85,6 +104,7 @@ def populate_select(key, data, errors, langs, select_field, keyword_list):
         if val and val not in d:
             d.append(val)
 
+    # why do we run this twice? double errors in list?
     if len(d) and u'Select at least one' in errors[key]:
         errors[key].remove(u'Select at least one')
     if len(d) and 'Select at least one' in errors[key]:
@@ -259,6 +279,8 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
     plugins.implements(plugins.IBlueprint)
     plugins.implements(plugins.IActions)
 
+    all_groups_dict_by_name = None
+
     #IActions
 
     def get_actions(self):
@@ -351,7 +373,6 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             'ckan.show_social_in_dataset_sidebar': [ignore_missing, boolean_validator],
             'ckan.hide_organization_in_breadcrumb': [ignore_missing, boolean_validator],
             'ckan.hide_organization_in_dataset_sidebar': [ignore_missing, boolean_validator],
-            'ckan.show_responsible_organization_in_dataset_sidebar': [ignore_missing, boolean_validator],
             'ckan.show_language_picker_in_top_bar': [ignore_missing, boolean_validator],
             'ckan.show_language_picker_in_menu': [ignore_missing, boolean_validator],
         })
@@ -364,6 +385,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         return {
             'cioos_organizations_info_text': lambda: organizations_info_text,
             'cioos_contact_email': lambda: contact_email,
+            'cioos_group_info_text': lambda: group_info_text,
             'cioos_load_json': cioos_helpers.load_json,
             'cioos_geojson_to_bbox': geojson_to_bbox,
             'cioos_get_facets': cioos_helpers.cioos_get_facets,
@@ -415,7 +437,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         :rtype: OrderedDict
 
         """
-        self._update_facets(facets_dict)
+        self._update_facets(facets_dict, package_type, None)
         return facets_dict
 
     def group_facets(self, facets_dict, group_type, package_type):
@@ -434,7 +456,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         :rtype: OrderedDict
 
         """
-        self._update_facets(facets_dict)
+        self._update_facets(facets_dict, package_type, group_type)
         return facets_dict
 
     def organization_facets(self, facets_dict, organization_type, package_type):
@@ -452,10 +474,10 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         :returns: the updated facets_dict
         :rtype: OrderedDict
         """
-        self._update_facets(facets_dict)
+        self._update_facets(facets_dict, package_type, organization_type)
         return facets_dict
 
-    def _update_facets(self, facets_dict):
+    def _update_facets(self, facets_dict, package_type, group_type):
         u"""
             Add facet themes
         :param facets_dict:
@@ -470,34 +492,36 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                 search_extras[param] = value
         toolkit.c.search_extras = search_extras
 
-        # remove groups facet
-        if 'groups' in facets_dict:
-            facets_dict.pop('groups')
+        # remove unneeded facet
+        for f in ['groups','organization','tags']:
+            if f in facets_dict:
+               facets_dict.pop(f)
 
         if 'themes' not in facets_dict \
                 or 'eov' not in facets_dict \
                 or 'ecv' not in facets_dict \
                 or 'responsible_organizations' not in facets_dict \
-                or 'projects' not in facets_dict:
-            # Horrible hack
-            # Insert facet themes at first position of the OrderedDict facets_dict.
+                or 'resource-type' not in facets_dict:
+                or 'projects' not in facets_dict \
+                or 'resource-type' not in facets_dict:
             ordered_dict = facets_dict.copy()
             facets_dict.clear()
-            # facets_dict['themes'] = toolkit._('Theme')
+            
             facets_dict['eov'] = toolkit._('Ocean Variables')
             facets_dict['ecv'] = toolkit._('Climate Variables')
+            if show_responsible_organizations:
+                facets_dict['resorg_groups' + '_' + self.lang()] = toolkit._('Responsible Organization')
+            if not hide_organization_in_dataset_sidebar:
+                facets_dict['organization' + '_' + self.lang()] = toolkit._('Organization')
+            facets_dict['harvest_source_title'] = toolkit._('Metadata Harvested From')
+            facets_dict['tags' + '_' + self.lang()] = toolkit._('Tags')           
             facets_dict['projects'] = toolkit._('Projects')
 
             if show_responsible_organizations:
                 facets_dict['responsible_organizations'] = toolkit._('Responsible Organization')
 
             for key, value in ordered_dict.items():
-                # Make translation 'on the fly' of facet tags.
-                # Should check for all translated fields.
-                # Should check translation exists.
-                if key == 'tags' or key == 'organization':
-                    facets_dict[key + '_' + self.lang()] = value
-                else:
+                if key not in facets_dict:            
                     facets_dict[key] = value
         return facets_dict
 
@@ -544,8 +568,9 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             log.error("error:%s, keywords:%r", err, data_dict.get('keywords', '{}'))
             tags_dict = {"en": [], "fr": []}
 
-        force_resp_org = cioos_helpers.load_json(data_dict.get('force_responsible_organization', '[]'))
-        data_dict['responsible_organizations'] = self._cited_responsible_party_to_responsible_organizations(data_dict.get('cited-responsible-party', '{}'), force_resp_org)
+        # force_resp_org = cioos_helpers.load_json(data_dict.get('force_responsible_organization', '[]'))
+        # data_dict['responsible_organizations'] = self._cited_responsible_party_to_responsible_organizations(data_dict.get('cited-responsible-party', '{}'), force_resp_org)
+
 
         # update tag list by language
         data_dict['tags_en'] = tags_dict.get('en', [])
@@ -575,6 +600,28 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             title = cioos_helpers.load_json(data_dict.get('title_translated', '{}'))
             data_dict['title_en'] = title.get('en', [])
             data_dict['title_fr'] = title.get('fr', [])
+        except Exception as err:
+            log.error(err)
+
+        try:
+            title = cioos_helpers.load_json(data_dict.get('notes_translated', '{}'))
+            data_dict['notes_en'] = title.get('en', [])
+            data_dict['notes_fr'] = title.get('fr', [])
+        except Exception as err:
+            log.error(err)
+
+        try:
+            if not self.all_groups_dict_by_name:
+                log.debug('Setting all_groups_dict_by_name')
+                self.all_groups_dict_by_name = self.get_all_groups('group','name')
+
+            for name in data_dict.get('groups', []):
+                if name.startswith('resorg'):
+                    data_dict['resorg_groups'] = name
+                    group_title = self.all_groups_dict_by_name[name].get('title_translated', {})
+                    data_dict['resorg_groups_en'] = group_title.get('en', '')
+                    data_dict['resorg_groups_fr'] = group_title.get('fr', '')
+
         except Exception as err:
             log.error(err)
 
@@ -621,6 +668,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
 
         if data_dict.get('projects'):
             data_dict['projects'] = cioos_helpers.load_json(data_dict.get('projects'))
+
         return data_dict
 
     # group a list of dictionaries based on individual-name or organization-name keys
@@ -679,9 +727,13 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
 
     # handle custom temporal range search facet
     def before_search(self, search_params):
-
         if '-dataset_type:harvest' not in search_params.get('fq', {}):
             return search_params
+
+        if toolkit.request:
+            lang = toolkit.h.lang()
+            # log.debug('Lang: %r', lang)   
+            search_params['qf'] = 'name^4 title_%s^4 tags_%s^2 groups^2 text_%s' % (lang,lang,lang)
 
         begin = search_params.get('extras', {}).get('ext_year_begin', '*')
         end = search_params.get('extras', {}).get('ext_year_end', '*')
@@ -698,6 +750,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         else:
             search_params['fq_list'].append('+temporal-extent-range:[{begin} TO {end}]'
                                             .format(begin=begin, end=end))
+
         return search_params
 
 
@@ -783,7 +836,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         # this is inconsistant with package data which is returned as json objects
         # by the package_show and package_search end points whout filters applied
         for i, result in enumerate(search_results.get('results', [])):
-            force_resp_org = cioos_helpers.load_json(self._get_extra_value('force_responsible_organization', result))
+            # force_resp_org = cioos_helpers.load_json(self._get_extra_value('force_responsible_organization', result))
             cited_responsible_party = result.get('cited-responsible-party')
             if((cited_responsible_party or force_resp_org) and not result.get('responsible_organizations')):
                 result['responsible_organizations'] = self._cited_responsible_party_to_responsible_organizations(cited_responsible_party, force_resp_org)
@@ -835,8 +888,8 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             if org_id:
                 org_details = org_dict.get(org_id, {})
                 organization = result.get('organization', {})
-                new_org_dict = {**organization, **org_details}
-                if new_org_dict:
+                if organization or org_details:
+                    new_org_dict = {**organization, **org_details}
                     result['organization'] = new_org_dict
                 else:
                     log.warn('No org details for owner_org %s', org_id)
@@ -873,6 +926,24 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
 
         if data_type == 'harvest':
             return package_dict
+
+        harvest_source_id = self._get_extra_value('harvest_source_id', package_dict)
+
+        if harvest_source_id:
+            harvest_source = toolkit.get_action("harvest_source_show")(context, {
+                "id": harvest_source_id
+            })
+            package_dict['harvest_source_organization'] = harvest_source.get('organization')
+
+        # Update group list
+        groups = package_dict.get('groups')
+        if groups:
+            group_dict = self.get_all_groups('group')
+            new_group_list = []
+            for group in groups:
+                new_group_list.append( group_dict.get(group['id'],group) )
+            if new_group_list:
+                package_dict['groups'] = new_group_list
 
         force_resp_org = cioos_helpers.load_json(self._get_extra_value('force_responsible_organization', package_dict))
         cited_responsible_party = package_dict.get('cited-responsible-party')
