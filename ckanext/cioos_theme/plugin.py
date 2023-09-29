@@ -23,6 +23,7 @@ from ckantoolkit import _
 import ckan.lib.base as base
 import re
 import time
+from pyld import jsonld
 
 Invalid = df.Invalid
 
@@ -60,6 +61,38 @@ def geojson_to_bbox(o):
     return shape(o).bounds
 
 
+def populate_select(key, data, errors, langs, select_field, keyword_list):
+    candidate_dict = {}
+    # create dictionary from select choice list
+    for x in toolkit.h.scheming_field_choices(select_field):
+        candidate_dict[x['value'].lower()] = x['value']
+        for lang in langs:
+            if x['label'].get(lang):
+                candidate_dict[x['label'][lang].lower()] = x['value']
+                # if clean_tags is true during harvesting then spaces will be
+                # replaced by dash's by mung_tags
+                candidate_dict[x['label'][lang].replace(' ', '-').lower()] = x['value']
+    
+    d = json.loads(data.get(key, '[]'))
+    # search for matching keywords in select choices dictionary
+    for x in keyword_list:
+        if isinstance(x, str):
+            val = candidate_dict.get(x.lower(), '')
+        elif isinstance(x, dict):
+            val = candidate_dict.get(x['name'].lower(), '')
+        else:
+            val = candidate_dict.get(x, '')
+        if val and val not in d:
+            d.append(val)
+
+    if len(d) and u'Select at least one' in errors[key]:
+        errors[key].remove(u'Select at least one')
+    if len(d) and 'Select at least one' in errors[key]:
+        errors[key].remove('Select at least one')
+
+    data[key] = json.dumps(d)
+    return data
+
 # IValidators
 
 # this validator tries to populate eov from keywords. It looks for any english
@@ -72,45 +105,45 @@ def clean_and_populate_eovs(field, schema):
         if errors[key] and (u'Select at least one' not in errors[key] or 'Select at least one' not in errors[key]):
             return
 
+        select_field = toolkit.h.scheming_field_by_name(schema['dataset_fields'], 'eov')
+        langs = toolkit.h.fluent_form_languages(select_field, None, None, schema)
+
         keywords_main = data.get(('keywords',), {})
         if keywords_main:
-            eov_data = keywords_main.get('en', [])
+            keyword_list = keywords_main.get('en', []) + keywords_main.get('fr', [])
         else:
             extras = data.get(("__extras", ), {})
-            eov_data = extras.get('keywords-en', '').split(',')
+            keyword_list = extras.get('keywords-en', '').split(',') + extras.get('keywords-fr', '').split(',')
 
-        eov_list = {}
-        eov_field = toolkit.h.scheming_field_by_name(schema['dataset_fields'], 'eov')
-        langs = toolkit.h.fluent_form_languages(eov_field, None, None, schema)
-        for x in toolkit.h.scheming_field_choices(eov_field):
-            eov_list[x['value'].lower()] = x['value']
-            for lang in langs:
-                if x['label'].get(lang):
-                    eov_list[x['label'][lang].lower()] = x['value']
-                    # if clean_tags is true during harvesting then spaces will be
-                    # replaced by dash's by mung_tags
-                    eov_list[x['label'][lang].replace(' ', '-').lower()] = x['value']
-
-        d = json.loads(data.get(key, '[]'))
-        for x in eov_data:
-            if isinstance(x, str):
-                val = eov_list.get(x.lower(), '')
-            elif isinstance(x, dict):
-                val = eov_list.get(x['name'].lower(), '')
-            else:
-                val = eov_list.get(x, '')
-            if val and val not in d:
-                d.append(val)
-
-        if len(d) and u'Select at least one' in errors[key]:
-            errors[key].remove(u'Select at least one')
-        if len(d) and 'Select at least one' in errors[key]:
-            errors[key].remove('Select at least one')
-
-        data[key] = json.dumps(d)
-        return data
+        return populate_select(key, data, errors, langs, select_field, keyword_list)
 
     return validator
+
+# this validator tries to populate ecv from keywords. It looks for any english
+# or french keywords that match either the value or label in the choice list for the ecv
+# field and add's them to the eov field.
+@scheming_validator
+def clean_and_populate_ecvs(field, schema):
+
+    def validator(key, data, errors, context):
+              
+        if errors[key]:
+            return
+
+        select_field = toolkit.h.scheming_field_by_name(schema['dataset_fields'], 'ecv')
+        langs = toolkit.h.fluent_form_languages(select_field, None, None, schema)
+
+        keywords_main = data.get(('keywords',), {})
+        if keywords_main:
+            keyword_list = keywords_main.get('en', []) + keywords_main.get('fr', [])
+        else:
+            extras = data.get(("__extras", ), {})
+            keyword_list = extras.get('keywords-en', '').split(',') + extras.get('keywords-fr', '').split(',')
+
+        return populate_select(key, data, errors, langs, select_field, keyword_list)
+
+    return validator
+
 
 @scheming_validator
 def fluent_field_default(field, schema):
@@ -199,6 +232,21 @@ def render_basic_package_view(id):
     pkg = toolkit.get_action('package_show')(data_dict={'id': id})
     return toolkit.render('package/basic.html', extra_vars={'pkg_dict': pkg})
 
+@toolkit.chained_action
+@toolkit.side_effect_free
+def dcat_dataset_show(up_func, context, data_dict):
+
+    parent_output = up_func(context, data_dict)
+    _frame = toolkit.request.params.get('frame')
+    if _frame == 'schemaorg':
+        frametext =   {
+            "@context": {"@vocab": "http://schema.org/"},
+            "@type": "Dataset"
+        }
+        framed_output = jsonld.frame(json.loads(parent_output), frametext)
+        return framed_output
+    return parent_output
+    
 class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
     plugins.implements(plugins.ITranslation)
     plugins.implements(plugins.IConfigurer)
@@ -209,6 +257,14 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
     plugins.implements(plugins.IAuthenticator)
     plugins.implements(plugins.IClick)
     plugins.implements(plugins.IBlueprint)
+    plugins.implements(plugins.IActions)
+
+    #IActions
+
+    def get_actions(self):
+        return {
+            u"dcat_dataset_show": dcat_dataset_show
+        }
 
     # IClick
     def get_commands(self):
@@ -338,6 +394,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
     def get_validators(self):
         return {
             'cioos_clean_and_populate_eovs': clean_and_populate_eovs,
+            'cioos_clean_and_populate_ecvs': clean_and_populate_ecvs,
             'cioos_fluent_field_default': fluent_field_default,
             'cioos_url_validator_with_port': url_validator_with_port,
             'cioos_tag_name_validator': cioos_tag_name_validator,
@@ -420,6 +477,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
 
         if 'themes' not in facets_dict \
                 or 'eov' not in facets_dict \
+                or 'ecv' not in facets_dict \
                 or 'responsible_organizations' not in facets_dict \
                 or 'projects' not in facets_dict:
             # Horrible hack
@@ -428,6 +486,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             facets_dict.clear()
             # facets_dict['themes'] = toolkit._('Theme')
             facets_dict['eov'] = toolkit._('Ocean Variables')
+            facets_dict['ecv'] = toolkit._('Climate Variables')
             facets_dict['projects'] = toolkit._('Projects')
 
             if show_responsible_organizations:
@@ -549,6 +608,10 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         if(data_dict.get('eov')):
             data_dict['eov'] = cioos_helpers.load_json(data_dict['eov'])
 
+        # ecv is multi select so it is a json list rather then a python list
+        if(data_dict.get('ecv')):
+            data_dict['ecv'] = cioos_helpers.load_json(data_dict['ecv'])
+
         for res in data_dict.get('resources', []):
             res_name = cioos_helpers.load_json(res.get('name', '{}'))
             if res_name and isinstance(res_name, dict) and not res.get('name_translated'):
@@ -638,6 +701,31 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                                             .format(begin=begin, end=end))
         return search_params
 
+
+
+    def populate_schema_select_display_name(self, search_facets, field_name):
+        facet_field = search_facets.get(field_name, {})
+        items = facet_field.get('items')
+        if items:
+            schema = toolkit.h.scheming_get_dataset_schema('dataset')
+            fields = schema['dataset_fields']
+            field = toolkit.h.scheming_field_by_name(fields, field_name)
+            choices = toolkit.h.scheming_field_choices(field)
+            new_values = []
+            for item in items:
+                for ch in choices:
+                    if ch['value'] == item['name']:
+                        item['display_name'] = toolkit.h.scheming_language_text(ch.get('label', item['name']))
+                        cat = ch.get('category', '')
+                        if cat:
+                            item['category'] = cat
+                        subcat = ch.get('subcatagory', '')
+                        if subcat:
+                            item['subcategory'] = subcat
+                new_values.append(item)
+            return new_values
+        return None
+
     # update eov search facets with keys from choices list in the scheming extension schema
     # format search results for consistant json output
     # add organization extra fields to results
@@ -647,21 +735,15 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             return search_results
 
         search_facets = search_results.get('search_facets', {})
-        eov = search_facets.get('eov', {})
-        items = eov.get('items', [])
+
+        items = self.populate_schema_select_display_name(search_facets, 'eov')
         if items:
-            schema = toolkit.h.scheming_get_dataset_schema('dataset')
-            fields = schema['dataset_fields']
-            field = toolkit.h.scheming_field_by_name(fields, 'eov')
-            choices = toolkit.h.scheming_field_choices(field)
-            new_eovs = []
-            for item in items:
-                for ch in choices:
-                    if ch['value'] == item['name']:
-                        item['display_name'] = toolkit.h.scheming_language_text(ch.get('label', item['name']))
-                        item['category'] = ch.get('catagory', u'')
-                new_eovs.append(item)
-            search_results['search_facets']['eov']['items'] = new_eovs
+            search_results['search_facets']['eov']['items'] = items
+
+        items = self.populate_schema_select_display_name(search_facets, 'ecv')
+        if items:
+            search_results['search_facets']['ecv']['items'] = items
+        
 
         license_id = search_facets.get('license_id', {})
         items = license_id.get('items', [])
