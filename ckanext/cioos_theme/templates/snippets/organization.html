@@ -25,19 +25,18 @@ Example:
     <section class="module-content">
       {% block inner %}
 
-      {% with image_url = organization.image_display_url or h.get_translated(organization, 'image_url') %}
       {% block image %}
-      {% if image_url %}
+      {% if organization.image_display_url or h.get_translated(organization, 'image_url') %}
       <div class="image">
         <a href="{{ url }}">
-          <img src="{{ image_url }}" width="200" alt="{{ organization.name }}" />
+          <img src="{{ organization.image_display_url or h.get_translated(organization, 'image_url') }}" width="200" alt="{{ organization.name }}" />
         </a>
       </div>
       {% endif %}
       {% endblock %}
 
       {% block heading %}
-      {% if not image_url %}
+      {% if not organization.image_display_url or h.get_translated(organization, 'image_url') %}
        <h1 class="heading"><a href="{{ url }}">{{ h.get_translated(organization, 'title') or organization.name }}
         {% if organization.state == 'deleted' %}
           [{{ _('Deleted') }}]
@@ -45,7 +44,7 @@ Example:
       </a></h1>
       {% endif %}
       {% endblock %}
-      {% endwith %}
+
       {% block identifier %}
         {{ h.snippet('snippets/identifier_list.html',
             container = 'h3',

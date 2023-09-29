@@ -139,7 +139,7 @@ def get_dataset_extents(q, fields, bbox_values, output=None):
             "properties": {"title": toolkit.h.scheming_language_text(load_json(x.get('title')))},
             "geometry": load_json(x.get('spatial'))
         } for x in pkg.get('results', [])]
-    log.debug(pkg_geojson)
+    # log.debug(pkg_geojson)
 
     if output == 'json':
         return json.dumps(pkg_geojson)
