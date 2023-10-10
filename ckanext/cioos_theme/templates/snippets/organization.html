@@ -24,20 +24,28 @@ Example:
     {% endif %}
     <section class="module-content">
       {% block inner %}
+
+      {% with image_url = organization.image_display_url or h.get_translated(organization, 'image_url') %}
       {% block image %}
-        <div class="image">
-          <a href="{{ url }}">
-            <img src="{{ organization.image_display_url or h.get_translated(organization, 'image_url') or h.url_for_static('/base/images/placeholder-organization.png') }}" width="200" alt="{{ organization.name }}" />
-          </a>
-        </div>
+      {% if image_url %}
+      <div class="image">
+        <a href="{{ url }}">
+          <img src="{{ image_url }}" width="200" alt="{{ organization.name }}" />
+        </a>
+      </div>
+      {% endif %}
       {% endblock %}
+
       {% block heading %}
-      <h1 class="heading">{{ h.get_translated(organization, 'title') or organization.name }}
+      {% if not image_url %}
+       <h1 class="heading"><a href="{{ url }}">{{ h.get_translated(organization, 'title') or organization.name }}
         {% if organization.state == 'deleted' %}
           [{{ _('Deleted') }}]
         {% endif %}
-      </h1>
+      </a></h1>
+      {% endif %}
       {% endblock %}
+      {% endwith %}
       {% block identifier %}
         {{ h.snippet('snippets/identifier_list.html',
             container = 'h3',
@@ -53,8 +61,6 @@ Example:
           {{ h.render_markdown(h.get_translated(organization, 'description'), 180) }}
           {% link_for _('read more'), controller='organization', action='about', id=organization.name %}
         </p>
-      {% else %}
-        <p class="empty">{{ _('There is no description for this organization') }}</p>
       {% endif %}
       {% if organization.external_home_url %}
         <a href="{{ organization.external_home_url }}" class="btn"><i class="fa fa-icon fa-link"></i>{{ _('External Organization Page') }}</a>
