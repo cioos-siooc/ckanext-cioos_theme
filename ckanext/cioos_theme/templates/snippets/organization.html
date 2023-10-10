@@ -24,7 +24,6 @@ Example:
     {% endif %}
     <section class="module-content">
       {% block inner %}
-
       {% block image %}
       {% if organization.image_display_url or h.get_translated(organization, 'image_url') %}
       <div class="image">
@@ -44,7 +43,6 @@ Example:
       </a></h1>
       {% endif %}
       {% endblock %}
-
       {% block identifier %}
         {{ h.snippet('snippets/identifier_list.html',
             container = 'h3',
