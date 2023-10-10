@@ -117,6 +117,16 @@ def get_datacite_org():
 def get_datacite_test_mode():
     return toolkit.config.get('ckan.cioos.datacite_test_mode', 'True')
 
+def get_ra_extents():
+    # './ckanext-cioos_theme/ckanext/cioos_theme/public/base/layers/pacific_RA.json'
+    ra_file = toolkit.config.get('ckan.cioos.ra_json_file')
+    if ra_file:
+        with open(ra_file, 'r') as file:
+            data = file.read()
+            log.debug(data)
+            return data
+    return 'null'
+
 def get_dataset_extents(q, fields, bbox_values, output=None):
     search_params = {'q': q,
                      'fl': 'title,spatial',
@@ -139,7 +149,6 @@ def get_dataset_extents(q, fields, bbox_values, output=None):
             "properties": {"title": toolkit.h.scheming_language_text(load_json(x.get('title')))},
             "geometry": load_json(x.get('spatial'))
         } for x in pkg.get('results', [])]
-    # log.debug(pkg_geojson)
 
     if output == 'json':
         return json.dumps(pkg_geojson)

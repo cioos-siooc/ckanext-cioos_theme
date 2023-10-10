@@ -69,6 +69,33 @@
     {% endblock %}
   {% endif %}
 
+  {% if g.show_responsible_organization_in_dataset_sidebar.lower()|default('', 'true')  == 'true' %}
+  <section class="module module-narrow module-shallow">
+      <h2 class="module-heading">
+        <i class="fa fa-database"></i>
+        {{ _('Responsible Organization') }}
+      </h2>
+      {% with items = pkg.responsible_organizations %}
+      {% if items %}
+        <nav>
+          <ul class="{{ nav_class or 'list-unstyled nav nav-simple nav-facet' }}">
+            {% for item in items %}
+              {% set href = h.add_url_param(new_params={'responsible_organizations': item}, controller='dataset', action='search') %}
+              {% set label = item %}
+              {% set label_truncated = h.truncate(label, 30) %}
+                <li class="nav-item">
+                  <a href="{{ href }}" title="{{ label if label != label_truncated else '' }}">
+                    <span class="item-label">{{ label_truncated }}</span>
+                  </a>
+                </li>
+            {% endfor %}
+          </ul>
+        </nav>
+      {% endif %}
+      {% endwith %}
+  </section>
+  {% endif %}
+
   {% block harvest_source %}
   {% set organization = pkg.harvest_source_organization %}
   {% set source_id = pkg.extras | selectattr("key","equalto","harvest_source_id") | map(attribute="value") | join('') %}
@@ -127,6 +154,7 @@
       </a>
     </p>
     </section>
+
 
 {% endblock %}
 
