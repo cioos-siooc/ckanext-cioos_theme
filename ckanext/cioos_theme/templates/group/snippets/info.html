@@ -1,0 +1,68 @@
+{% set truncate = truncate or 0 %}
+{% set url = h.url_for(group.type + '.read', id=group.name, ) %}
+
+{% block info %}
+<div class="module context-info">
+  <section class="module-content">
+    {% block inner %}
+    {% block image %}
+    <div class="image">
+      <a href="{{ url }}">
+         <img src="{{ group.image_display_url or h.get_translated(group, 'image_url') }}" width="200" alt="{{ group.name }}" />
+    </div>
+    {% endblock %}
+    {% block heading %}
+    <h1 class="heading"><a href="{{ url }}">{{ h.get_translated(group, 'title') or group.name }}
+      {% if group.state == 'deleted' %}
+        [{{ _('Deleted') }}]
+      {% endif %}
+    </h1>
+    {% endblock %}
+
+    {% block identifier %}
+        {{ h.snippet('snippets/identifier_list.html',
+            container = 'h3',
+            uri = h.cioos_get_fully_qualified_package_uri(
+              group,
+              uri_field='group-uri')
+            )
+        }}
+      {% endblock %}
+    {% block description %}
+    {% if group.description %}
+      {% if h.get_translated(group, 'description') %}
+        <p class="description">
+          {{ h.render_markdown(h.get_translated(group, 'description'), 180) }}
+        </p>
+        <p class="read-more">
+          {% link_for _('read more'), named_route='group.about', id=group.name %}
+        </p>
+      {% endif %}
+    {% endif %}
+    {% if group.external_home_url %}
+      <a href="{{ group.external_home_url }}" class="btn"><i class="fa fa-icon fa-link"></i>{{ _('External Page') }}</a>
+    {% endif %}
+    {% endblock %}
+    {% if show_nums %}
+      {% block nums %}
+      <div class="nums">
+        <dl>
+          <dt>{{ _('Followers') }}</dt>
+          <dd data-module="followers-counter" data-module-id="{{ group.id }}" data-module-num_followers="{{ group.num_followers }}">{{ h.SI_number_span(group.num_followers) }}</dd>
+        </dl>
+        <dl>
+          <dt>{{ _('Datasets') }}</dt>
+          <dd>{{ h.SI_number_span(group.package_count) }}</dd>
+        </dl>
+      </div>
+      {% endblock %}
+      {% block follow %}
+      <div class="follow_button">
+        {{ h.follow_button('group', group.id) }}
+      </div>
+      {% endblock %}
+    {% endif %}
+    {% endblock %}
+  </section>
+</div>
+{% endblock %}
