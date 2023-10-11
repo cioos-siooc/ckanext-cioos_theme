@@ -27,7 +27,7 @@ $teenwidth: 100%;
   margin: 0 0 10px 10px;
   background-color: white;
   border-radius: 3px;
-  min-height: 200px;
+  min-height: 238px;
 }
 
 .media-grid {
@@ -566,7 +566,7 @@ body {
 
 .btn {
   display: inline-block;
-  text-transform: uppercase;
+  //text-transform: uppercase;
   margin-bottom: 0;
   font-family: $defaultfont;
   font-weight: normal;
@@ -1147,9 +1147,16 @@ div.search-input-group {
   transition: all 0.3s ease;
 }
 
-i.fa.translation_icon {
-    font-size: large;
-    color: #585858;
+.translation_icon {   
+    background-image: url(/base/images/auto_translate.svg);
+    background-size: auto 100%;
+    background-repeat: no-repeat;
+    padding-left:83px;
+}
+
+.translation_icon_group {
+  padding-left: 3px;
+  font-size: medium;
 }
 
 
@@ -1185,6 +1192,7 @@ i.fa.translation_icon {
 .additional-info {
   tr th:first-child, tr td:first-child {
     width: 25%;
+    font-weight: 600;
   }
 
   .panel-default .panel-heading {
@@ -1207,29 +1215,76 @@ i.fa.translation_icon {
   dl.scheming-subfield-list dt {
       float: left;
       clear: left;
-      width: 70px;
+      // width: 70px;
+      text-align: left;
+      font-weight: 700;
+      color: #333;
+      font-weight:600;
+  }
+
+  dl.scheming-subfield-list dt::after {
+    content: ":";
+    padding-right: 5px;
+  }
+
+  dl.scheming-subfield-list dd {
+      // float: left;
+      min-width: 150px;
+      width: 100%;
+      margin-inline-start: 10px;
+      // max-width: 395px;
+  }
+}
+
+ .module{
+    h3 {
+      font-weight: 400;
+    }
+
+    strong {
+    font-weight: 600;
+    }
+  }
+
+.dates {
+  tr th:first-child, tr td:first-child {
+    width: 25%;
+    font-weight:600;
+  }
+
+}
+
+.primary{
+  .identifier_icon_list{
+    max-height: 32px;
+  }
+  .dataset-list .dataset-content .identifier_icon_list{
+    max-height: 16px;
+  }
+  .media-grid .identifier_icon_list{
+    max-height: 16px;
+  }
+  #dataset-contacts .identifier_icon_list{
+    max-height: 16px;
+  }
+  dl.organization-field-list dt {
+      float: left;
+      clear: left;
+      width: 100px;
       text-align: left;
       font-weight: 700;
       color: #333;
   }
 
-  dl.scheming-subfield-list dt::after {
+  dl.organization-field-list dt::after {
     content: ":";
   }
 
-  dl.scheming-subfield-list dd {
+  dl.organization-field-list dd {
       float: left;
       min-width: 150px;
       width: auto;
       max-width: 395px;
-  }
-}
-
-
-
-.dates {
-  tr th:first-child, tr td:first-child {
-    width: 25%;
   }
 }
 
@@ -1243,7 +1298,7 @@ i.fa.translation_icon {
   }
 
   .identifier_icon_list{
-    width: 14px;
+    max-height: 32px;
   }
   .input-group-addon{
     color: #555555;
@@ -1251,6 +1306,16 @@ i.fa.translation_icon {
     background-image: none;
     border: 1px solid #ccc;
     border-radius: 0;
+  }
+
+  .module-content h1.heading a {
+    color: inherit;
+  }
+
+  .module-content h1.title {
+    color: inherit;
+    margin-bottom: 0px;
+    line-height: 1;
   }
 
 }
@@ -1279,6 +1344,23 @@ section{
     font-family: 'FontAwesome';
     content: '\f146';
   }
+
+  a.section_hide_controle_full_width{
+    display:inline-block;
+    width:100%;
+    height:100%;
+    padding: 10px 15px;
+  }
+
+  a.section_hide_controle_full_width i{
+    float:right;
+    padding-top:3px;
+  }
+
+  .panel-heading-thin{
+    padding: unset;
+  }
+
 }
 
 .table.collapse.in {
@@ -1320,6 +1402,7 @@ section{
   .resource-item .heading {
       padding: 10px 0 10px 60px;
       text-decoration: none;
+      font-weight: 600;
   }
 
   .resource-item .description {
@@ -1358,4 +1441,63 @@ section{
     height: fit-content;
 }
 
-@import url(//fonts.googleapis.com/css?family=Montserrat:400,600,700,800,900|Quicksand:300,400,600,700|PT+Sans:400|Raleway:400);
+
+
+.relationship-list {
+  display: grid;
+}
+
+.relationship-item {
+  padding: 0px;
+
+
+  .label-clear-100 {
+      color: #000;
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      font-size: 12px;
+    }
+
+  .relationship-item-link {
+    padding: 10px;
+    text-decoration: none;
+  }
+
+  .list-group-item-body {
+    padding: 0px;
+  }
+
+  .heading,
+  .description {
+    color: #000;
+    padding: 0;
+  }
+
+  .heading {
+    font-size: 14px;
+    font-weight: bold;
+  }
+
+  .description {
+    font-size: 12px;
+    font-weight: normal;
+    padding-top: 5px;
+    margin-bottom: 0;
+    padding-left: 10px;
+  }
+
+  .align-content-center {
+    display: flex;
+    justify-content: center;
+  }
+}
+
+.relationship-item:hover {
+  background-color: #eee;
+}
+
+.id_span {
+  word-break: break-all;
+}
+
+@import url(//fonts.googleapis.com/css?family=Montserrat:400,600,700,800,900|Quicksand:300,400,600,700|PT+Sans:400|Raleway:300,400,600,700);

@@ -1,3 +1,6 @@
+# This file has been depricated in favour of using related datasets in the schema only. this allows 
+# for linking to external datasets which is preferable by users
+
 import ckan.plugins.toolkit as toolkit
 import ckan.model as model
 from ckan.lib.search import rebuild

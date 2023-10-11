@@ -15,7 +15,7 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # http://packaging.python.org/en/latest/tutorial.html#version
-    version='0.0.1',
+    version='1.4.0',
 
     description='''CIOOS Custom Theme''',
     long_description=long_description,
@@ -81,6 +81,7 @@ setup(
     entry_points='''
         [ckan.plugins]
         cioos_theme=ckanext.cioos_theme.plugin:Cioos_ThemePlugin
+        cioos_group=ckanext.cioos_theme.plugin:Cioos_GroupPlugin
 
         [babel.extractors]
         ckan = ckan.lib.extract:extract_ckan

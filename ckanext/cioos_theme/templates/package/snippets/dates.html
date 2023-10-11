@@ -79,7 +79,7 @@
 
         {% if dataset_reference_date and h.cioos_load_json(dataset_reference_date) | list | length > 0 %}
           <tr>
-            <th scope="row" class="dataset-label">{{ _("Dataset Reference Date(s)") }}</th>
+            <th scope="row" class="dataset-label">{{ _("Data Reference Date(s)") }}</th>
             <td class="dataset-details">
               {% for d in h.cioos_load_json(dataset_reference_date) %}
                 {% if d['value']| length == 10 %}
@@ -97,11 +97,12 @@
         {%- set schema = h.scheming_get_dataset_schema('dataset') -%}
         {%- set field = h.scheming_field_by_name(schema.dataset_fields, 'frequency-of-update') -%}
         {%- set choices = h.scheming_field_choices(field) -%}
-        {% if frequency_of_update%}
+        {% if frequency_of_update %}
           <tr>
             <th scope="row" class="dataset-label">{{ _("Frequency of Update") }}</th>
             <td class="dataset-details">
-              {% set value = h.scheming_choices_label(choices, frequency_of_update) %}
+              {% set label = h.scheming_choices_label(choices, frequency_of_update) %}
+              {% set value = h.scheming_language_text(label) %}
               {% if value %}
                 {{- value -}}
               {% endif %}

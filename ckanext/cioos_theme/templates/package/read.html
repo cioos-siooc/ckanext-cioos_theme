@@ -1,6 +1,7 @@
 {% ckan_extends %}
 
 {% set pkg = c.pkg_dict %}
+
 {%- set schema = h.scheming_get_dataset_schema(dataset_type) -%}
 
 {% block primary_content_inner %}
@@ -14,6 +15,17 @@
     <h1>
       {% block page_heading %}
         {{ h.dataset_display_name(pkg) }}
+
+        {# preload translation method image #}
+        <img src="/base/images/auto_translate.svg" style="display:none"/>
+
+        {% set title_translation_method = h.scheming_language_text(h.cioos_load_json( h.get_pkg_dict_extra(pkg, 'title_translation_method') or pkg.get('title_translation_method') or '{}' )) %}
+        {% if title_translation_method %}
+          <span class="translation_icon_group" title="{{ title_translation_method }}">
+            <i class="translation_icon" aria-hidden="true"></i>
+          </span>
+        {% endif %}
+
         {% if pkg.state.startswith('draft') %}
           [{{ _('Draft') }}]
         {% endif %}
@@ -24,7 +36,6 @@
     </h1>
 
     {% block package_notes %}
-      {# this block will be overwriten by scheming/package/read.html if the scheming extension is being used #}
       {%- if not dataset_type -%}
         <p>
         dataset_type not passed to template. your version of CKAN
@@ -34,9 +45,25 @@
       {% if ( h.scheming_field_by_name(schema.dataset_fields, 'notes') or h.scheming_field_by_name(schema.dataset_fields, 'notes_translated') ) and h.get_translated(pkg, 'notes') %}
         <div class="notes embedded-content">
           {{ h.markdown_extract(h.get_translated(pkg, 'notes'), extract_length=200) }}
+          {% set notes_translation_method = h.scheming_language_text(h.cioos_load_json( h.get_pkg_dict_extra(pkg, 'notes_translation_method') or pkg.get('notes_translation_method') or '{}' )) %}
+          {% if notes_translation_method %}
+            <span class="translation_icon_group" title="{{ notes_translation_method }}">
+              <i class="translation_icon" aria-hidden="true"></i>
+            </span>
+          {% endif %}
+
         </div>
       {% endif %}
     {% endblock %}
+
+  {% endblock %}
+
+  
+  {% block metadata_quality_statment %}
+      {% set harvest_source_quality_level = h.get_pkg_dict_extra(c.pkg_dict, 'harvest_source_quality_level') %}
+      {% if harvest_source_quality_level is defined and harvest_source_quality_level in ('unknown','external') %}
+        {% snippet "package/snippets/metadata_quality.html", pkg_dict=pkg %}
+      {% endif %}
 
   {% endblock %}
 
@@ -47,8 +74,6 @@
   {% block package_resources %}
     {% snippet "package/snippets/resources_list.html", pkg=pkg, resources=pkg.resources %}
   {% endblock %}
-
-
 
   {% block package_citation %}
     {% if pkg.citation %}
@@ -66,7 +91,10 @@
   {% endblock %}
 
   {% block package_tags %}
-    {% snippet "package/snippets/tags.html", tags=h.cioos_load_json(pkg.get('keywords', {}))[h.lang()] %}
+    {% snippet "package/snippets/tags.html", 
+      tags=h.scheming_language_text(h.cioos_load_json(pkg.get('keywords', {}))),
+      tags_translation_method = h.scheming_language_text(h.cioos_load_json( h.get_pkg_dict_extra(pkg, 'keywords_translation_method') or pkg.get('keywords_translation_method') or '{}' )) 
+    %}
   {% endblock %}
 
   {% set dataset_extent = h.dump_json(h.get_pkg_dict_extra(c.pkg_dict, 'spatial') or c.pkg_dict.get('spatial')) %}
@@ -104,7 +132,6 @@
     </div>
   </section>
 
-
   {% block package_additional_info %}
     {% snippet "scheming/package/snippets/additional_info.html", pkg_dict=pkg, dataset_type=dataset_type, schema=schema %}
   {% endblock %}
@@ -129,11 +156,12 @@
           <li class="nav-item"><a href="{{ h.url_for(controller='dataset', action='read', id=pkg.get('name') or pkg.id) }}.ttl"><span class="item-label">{{ _('Turtle')}}</span></a></li>
           <li class="nav-item"><a href="{{ h.url_for(controller='dataset', action='read', id=pkg.get('name') or pkg.id) }}.n3"><span class="item-label">{{ _('Notation3')}}</span></a></li>
           <li class="nav-item"><a href="{{ h.url_for(controller='dataset', action='read', id=pkg.get('name') or pkg.id) }}.jsonld"><span class="item-label">{{ _('JSON-LD')}}</span></a></li>
+          <li class="nav-item"><a href="{{ h.url_for(controller='dataset', action='read', id=pkg.get('name') or pkg.id) }}.jsonld?frame=schemaorg"><span class="item-label">{{ _('JSON-LD/Schema.org')}}</span></a></li>
         {% endif %}
           <li class="nav-item"><a href="{{ h.url_for(controller='api',
                               logic_function='package_show',
                               action='action', ver=3, id=pkg.get('name') or pkg.id) }}"><span class="item-label">{{ _('JSON')}}</span></a></li>
-          <li class="nav-item"><a href="{{ h.url_for(controller='dataset', action='read', id=pkg.get('name') or pkg.id) }}.basic"><span class="item-label">{{ _(' Basic View')}}</span></a></li>
+          <li class="nav-item"><a href="{{ h.url_for(controller='dataset', action='read', id=pkg.get('name') or pkg.id) }}.basic"><span class="item-label">{{ _('Basic View')}}</span></a></li>
           <li class="nav-item"><a href="{{ h.url_for(controller='dataset', action='read', id=pkg.get('name') or pkg.id) }}"><span class="item-label">{{ _('Show Permalink')}}</span></a></li>
         </ul>
       </nav>
