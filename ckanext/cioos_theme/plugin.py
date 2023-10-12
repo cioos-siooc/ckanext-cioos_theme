@@ -85,7 +85,7 @@ def populate_select(key, data, errors, langs, select_field, keyword_list):
     # create dictionary from select choice list
     for x in toolkit.h.scheming_field_choices(select_field):
         candidate_dict[x['value'].lower()] = x['value']
-        for id in + x.get('alternative_ids', []):
+        for id in x.get('alternative_ids', []):
             candidate_dict[id.lower()] = x['value']
         for lang in langs:
             if x['label'].get(lang):
@@ -830,25 +830,28 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
     def populate_schema_select_display_name(self, search_facets, field_name):
         facet_field = search_facets.get(field_name, {})
         items = facet_field.get('items')
-        if items:
-            schema = toolkit.h.scheming_get_dataset_schema('dataset')
-            fields = schema['dataset_fields']
-            field = toolkit.h.scheming_field_by_name(fields, field_name)
-            choices = toolkit.h.scheming_field_choices(field)
-            new_values = []
-            for item in items:
-                for ch in choices:
-                    if ch['value'] == item['name']:
-                        item['display_name'] = toolkit.h.scheming_language_text(ch.get('label', item['name']))
-                        cat = ch.get('category', '')
-                        if cat:
-                            item['category'] = cat
-                        subcat = ch.get('subcatagory', '')
-                        if subcat:
-                            item['subcategory'] = subcat
-                new_values.append(item)
-            return new_values
-        return None
+        if not items:
+            return None
+        schema = toolkit.h.scheming_get_dataset_schema('dataset')
+        fields = schema['dataset_fields']
+        field = toolkit.h.scheming_field_by_name(fields, field_name)
+        if not field:
+            return None
+        choices = toolkit.h.scheming_field_choices(field)
+        new_values = []
+        for item in items:
+            for ch in choices:
+                if ch['value'] == item['name']:
+                    item['display_name'] = toolkit.h.scheming_language_text(ch.get('label', item['name']))
+                    cat = ch.get('category', '')
+                    if cat:
+                        item['category'] = cat
+                    subcat = ch.get('subcatagory', '')
+                    if subcat:
+                        item['subcategory'] = subcat
+            new_values.append(item)
+        return new_values
+        
 
     def get_all_groups(self, action_type, key='id'):
         group_list = []
