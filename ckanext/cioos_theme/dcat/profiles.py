@@ -452,7 +452,7 @@ class CIOOSDCATProfile(SchemaOrgProfile):
             self._distribution_graph(distribution, resource_dict)
 
     def _tags_graph(self, dataset_ref, dataset_dict):
-        keywords = dataset_dict.get('keywords')
+        keywords = dataset_dict.get('keywords', [])
         for lang in keywords:
             for tag in keywords[lang]:
                 self.g.add((dataset_ref, SCHEMA.keywords, Literal(tag, lang=lang)))

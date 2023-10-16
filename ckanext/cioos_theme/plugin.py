@@ -458,7 +458,8 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             'cioos_get_license_def': cioos_helpers.get_license_def,
             'cioos_merge_dict': cioos_helpers.merge_dict,
             'cioos_get_dataset_extents': cioos_helpers.get_dataset_extents,
-            'cioos_get_ra_extents': cioos_helpers.get_ra_extents
+            'cioos_get_ra_extents': cioos_helpers.get_ra_extents,
+            'cioos_get_extra_value':self._get_extra_value
         }
 
     def get_validators(self):
@@ -577,41 +578,41 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
 
     # IPackageController
 
-    def _cited_responsible_party_to_responsible_organizations(self, parties, force_responsible_organization, as_group = False):
-        if force_responsible_organization:
-            if isinstance(force_responsible_organization, list):
-                resp_orgs = force_responsible_organization
-            else:
-                resp_orgs = [force_responsible_organization]
-        else:
-            resp_org_roles = cioos_helpers.load_json(toolkit.config.get('ckan.responsible_organization_roles', '["owner", "originator", "custodian", "author", "principalInvestigator"]'))
+    # def _cited_responsible_party_to_responsible_organizations(self, parties, force_responsible_organization, as_group = False):
+    #     if force_responsible_organization:
+    #         if isinstance(force_responsible_organization, list):
+    #             resp_orgs = force_responsible_organization
+    #         else:
+    #             resp_orgs = [force_responsible_organization]
+    #     else:
+    #         resp_org_roles = cioos_helpers.load_json(toolkit.config.get('ckan.responsible_organization_roles', '["owner", "originator", "custodian", "author", "principalInvestigator"]'))
 
-        if as_group:
-            resp_orgs = [
-                {
-                    'name': munge.munge_name(x['organisation-name'].strip()).lower(),
-                    'display_name': x['organisation-name'].strip(),
-                    'title': x['organisation-name'].strip(),
-                    'title_translated': {
-                        'en' : x['organisation-name'].strip(),
-                        'fr' : x['organisation-name'].strip(),
-                    },
-                    'organisation-uri':{
-                        'authority': x.get('organisation-uri_authority'),
-                        'code': x.get('organisation-uri_code'),
-                        'code-space': x.get('organisation-uri_code-space'),
-                        'version': x.get('organisation-uri_version'),
-                    },
-                } 
-                for x in cioos_helpers.load_json(parties) if not set(cioos_helpers.load_json(x.get('role'))).isdisjoint(resp_org_roles)
-            ]
-        else:
-            resp_orgs = [x.get('organisation-name', '').strip() for x in cioos_helpers.load_json(parties) if not set(cioos_helpers.load_json(x.get('role'))).isdisjoint(resp_org_roles)]
+    #     if as_group:
+    #         resp_orgs = [
+    #             {
+    #                 'name': munge.munge_name(x['organisation-name'].strip()).lower(),
+    #                 'display_name': x['organisation-name'].strip(),
+    #                 'title': x['organisation-name'].strip(),
+    #                 'title_translated': {
+    #                     'en' : x['organisation-name'].strip(),
+    #                     'fr' : x['organisation-name'].strip(),
+    #                 },
+    #                 'organisation-uri':{
+    #                     'authority': x.get('organisation-uri_authority'),
+    #                     'code': x.get('organisation-uri_code'),
+    #                     'code-space': x.get('organisation-uri_code-space'),
+    #                     'version': x.get('organisation-uri_version'),
+    #                 },
+    #             } 
+    #             for x in cioos_helpers.load_json(parties) if not set(cioos_helpers.load_json(x.get('role'))).isdisjoint(resp_org_roles)
+    #         ]
+    #     else:
+    #         resp_orgs = [x.get('organisation-name', '').strip() for x in cioos_helpers.load_json(parties) if not set(cioos_helpers.load_json(x.get('role'))).isdisjoint(resp_org_roles)]
             
-        resp_orgs = list(dict.fromkeys(resp_orgs))  # remove duplicates
-        resp_orgs = list(filter(None, resp_orgs))  # remove empty elements (in a python 2 and 3 friendly way)
+    #     resp_orgs = list(dict.fromkeys(resp_orgs))  # remove duplicates
+    #     resp_orgs = list(filter(None, resp_orgs))  # remove empty elements (in a python 2 and 3 friendly way)
 
-        return resp_orgs
+    #     return resp_orgs
 
     def _get_extra_value(self, key, package_dict):
         for extra in package_dict.get('extras', []):
@@ -1028,6 +1029,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
     # add organization extras to organization object in package.
     # this will make the show and search endpoints look the same
     def after_show(self, context, package_dict):
+        
         org_id = package_dict.get('owner_org')
         data_type = package_dict.get('type')
 
@@ -1040,15 +1042,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                     package_dict['organization'] = new_org
 
         if data_type == 'harvest':
-            return package_dict
-
-        harvest_source_id = self._get_extra_value('harvest_source_id', package_dict)
-
-        if harvest_source_id:
-            harvest_source = toolkit.get_action("harvest_source_show")(context, {
-                "id": harvest_source_id
-            })
-            package_dict['harvest_source_organization'] = harvest_source.get('organization')
+            return package_dict        
 
         # Update group list
         groups = package_dict.get('groups')

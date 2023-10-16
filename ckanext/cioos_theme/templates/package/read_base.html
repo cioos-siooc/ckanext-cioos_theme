@@ -70,7 +70,7 @@
   {% endif %}
 
   {% block harvest_source %}
-  {% set organization = pkg.harvest_source_organization %}
+  {% set organization = h.cioos_load_json(h.cioos_get_extra_value('harvest_source_organization', pkg)) %}
   {% set source_id = pkg.extras | selectattr("key","equalto","harvest_source_id") | map(attribute="value") | join('') %}
   {% set url = h.url_for('harvest.read', id = source_id) %}
   {% if organization %}
@@ -114,8 +114,10 @@
   {% endblock %}
 
   {% block package_license %}
+    {% if pkg.license_id %}
     {% set licence = h.cioos_get_license_def(pkg.license_id, pkg.license_url, pkg.license_title) or {} %}
     {% snippet "snippets/license.html", pkg_dict=h.cioos_merge_dict(pkg,licence), has_context_title=true %}
+    {% endif %}
   {% endblock %}
 
   <section class="module module-narrow module-shallow resource-type">
