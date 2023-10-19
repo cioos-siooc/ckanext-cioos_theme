@@ -743,7 +743,7 @@ class CIOOSDCATProfile(SchemaOrgProfile):
         # uri = dataset_uri(dataset_dict)
         # g.add((dataset_ref, SCHEMA['@id'],  Literal('%s' % uri+'.jsonld')))
 
-        metadata_dates = [x['value'] for x in load_json(dataset_dict.get('metadata-reference-date', []))]
+        metadata_dates = [x.get('value') for x in load_json(dataset_dict.get('metadata-reference-date', []))]
         metadata_dates.sort(reverse=True)
         version_date = ''
         if metadata_dates:
