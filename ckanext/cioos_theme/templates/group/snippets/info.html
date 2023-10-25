@@ -1,5 +1,6 @@
 {% set truncate = truncate or 0 %}
 {% set url = h.url_for(group.type + '.read', id=group.name, ) %}
+{% set img_url = group.image_display_url or h.get_translated(group, 'image_url') %}
 
 {% block info %}
 <div class="module context-info">
@@ -7,8 +8,10 @@
     {% block inner %}
     {% block image %}
     <div class="image">
+      {% if img_url %}
       <a href="{{ url }}">
-         <img src="{{ group.image_display_url or h.get_translated(group, 'image_url') }}" width="200" alt="{{ group.name }}" />
+         <img src="{{- img_url -}}" width="200" alt="{{ group.name }}" />
+      {% endif %}
     </div>
     {% endblock %}
     {% block heading %}
