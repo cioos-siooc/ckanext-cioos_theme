@@ -1,7 +1,7 @@
 <section class="metadata_quality">
   <div class="panel panel-warning">
   <div class="panel-heading panel-heading-thin"><a class="section_hide_controle section_hide_controle_full_width" data-toggle="collapse" href="#metadata-quality-statment-container" role="button" aria-expanded="false" aria-controls="metadata-quality-statment-container">
-  <b>{{ _('Made available by') }} {{ h.get_translated(h.cioos_load_json(pkg_dict.get('harvest_source_organization','{}')), 'title') }}</b> <i class="fa"></i>
+  <b>{{ _('Made available by') }} {{ h.get_translated(h.cioos_load_json(h.cioos_get_extra_value('harvest_source_organization', pkg_dict)), 'title') }}</b> <i class="fa"></i>
   </a></div>
   <div id="metadata-quality-statment-container" class="panel-body flex-panels collapse in">
     <p> These resources are not under the control of {{ _('CIOOS') }} and the 
