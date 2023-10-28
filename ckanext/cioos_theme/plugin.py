@@ -26,6 +26,8 @@ import re
 import time
 from pyld import jsonld
 import ckan.lib.munge as munge
+import lxml.etree as ET
+from copy import deepcopy
 
 Invalid = df.Invalid
 
@@ -650,6 +652,56 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         data_dict['tags_fr'] = tags_dict.get('fr', [])
         data_dict['tags'] = data_dict['tags_en'] + data_dict['tags_fr']
 
+        # update citation by language
+        citation_dict = cioos_helpers.load_json(data_dict.get('citation', '{}'))
+        data_dict['citation_en'] = citation_dict.get('en', [])
+        data_dict['citation_fr'] = citation_dict.get('fr', [])
+
+        # update translation method fields by language
+        ttm_dict = cioos_helpers.load_json(data_dict.get('title_translation_method', '{}'))
+        data_dict['title_translation_method_en'] = ttm_dict.get('en', [])
+        data_dict['title_translation_method_fr'] = ttm_dict.get('fr', [])
+
+        ntm_dict = cioos_helpers.load_json(data_dict.get('notes_translation_method', '{}'))
+        data_dict['notes_translation_method_en'] = ntm_dict.get('en', [])
+        data_dict['notes_translation_method_fr'] = ntm_dict.get('fr', [])
+
+        ktm_dict = cioos_helpers.load_json(data_dict.get('keywords_translation_method', '{}'))
+        data_dict['keywords_translation_method_en'] = ktm_dict.get('en', [])
+        data_dict['keywords_translation_method_fr'] = ktm_dict.get('fr', [])
+  
+        # split xml in harvest_document_content into french and englsih fields for indexing
+        hdc = data_dict.get('harvest_document_content')
+        if hdc:
+            
+            namespaces = {'lan': 'http://standards.iso.org/iso/19115/-3/lan/1.0',
+                        'mdb': 'http://standards.iso.org/iso/19115/-3/mdb/2.0',
+                        'gmd': 'http://www.isotc211.org/2005/gmd'}
+
+            root = ET.fromstring(hdc)
+
+            default_lang = root.xpath("./mdb:defaultLocale/lan:PT_Locale/lan:language/lan:LanguageCode/@codeListValue|./gmd:language/gmd:LanguageCode/@codeListValue", namespaces=namespaces)
+            if default_lang:
+                default_lang = default_lang[0]
+
+            root_fr = ET.Element("fr")
+            root_en = ET.Element("en")
+            if default_lang in ["eng","en"]:    
+                for locale in root.xpath(".//lan:LocalisedCharacterString[@locale='#fr' or @locale='#FR']|.//gmd:LocalisedCharacterString[@locale='#fr' or @locale='#FR']", namespaces=namespaces):
+                    root_fr.append(deepcopy(locale))
+                    locale.getparent().remove(locale)
+                root_en = deepcopy(root)
+            elif default_lang in ["fra","fr"]:
+                for locale in root.xpath(".//lan:LocalisedCharacterString[@locale='#en' or @locale='#EN']|.//gmd:LocalisedCharacterString[@locale='#en' or @locale='#EN']", namespaces=namespaces):
+                    root_en.append(deepcopy(locale))
+                    locale.getparent().remove(locale)
+                root_fr = deepcopy(root)
+            else:
+                log.error('No default language set in xml document. can not split document into language fields')
+
+            data_dict['harvest_document_content_en'] = ET.strip_tags(root_en, '*', '*')
+            data_dict['harvest_document_content_fr'] = ET.strip_tags(root_fr, '*', '*')
+
         # update organization list by language
         org_id = data_dict.get('owner_org')
         if org_id:
@@ -806,7 +858,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         if toolkit.request:
             lang = toolkit.h.lang()
             # log.debug('Lang: %r', lang)   
-            search_params['qf'] = 'name^4 title_%s^4 tags_%s^2 groups^2 text_%s' % (lang,lang,lang)
+            search_params['qf'] = 'name^4 title_%s^4 tags_%s^2 text_%s text' % (lang,lang,lang)
 
         begin = search_params.get('extras', {}).get('ext_year_begin', '*')
         end = search_params.get('extras', {}).get('ext_year_end', '*')

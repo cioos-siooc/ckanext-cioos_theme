@@ -123,7 +123,6 @@ def get_ra_extents():
     if ra_file:
         with open(ra_file, 'r') as file:
             data = file.read()
-            log.debug(data)
             return data
     return 'null'
 

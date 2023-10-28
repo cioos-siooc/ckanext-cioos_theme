@@ -646,12 +646,20 @@ class CIOOSDCATProfile(SchemaOrgProfile):
             except Exception:
                 pass
             else:
-                bbox_str = ' '.join(bbox)
-                geo_shape = BNode()
-                g.add((geo_shape, RDF.type, SCHEMA.GeoShape))
-                g.add((geo_shape, SCHEMA.box, Literal(bbox_str)))
-                # Add bounding box element
-                g.add((spatial_ref, SCHEMA.geo, geo_shape))
+                if geo_json['type'] == 'Point':
+                    geo_shape_point = BNode()
+                    g.add((geo_shape_point, RDF.type, SCHEMA.GeoCoordinates))
+                    g.add((geo_shape_point, SCHEMA.latitude, Literal(bbox[0])))
+                    g.add((geo_shape_point, SCHEMA.longitude, Literal(bbox[1])))
+                    # add point coordinates
+                    g.add((spatial_ref, SCHEMA.geo, geo_shape_point))
+                else: 
+                    geo_shape = BNode()
+                    bbox_str = ' '.join(bbox)
+                    g.add((geo_shape, RDF.type, SCHEMA.GeoShape))
+                    g.add((geo_shape, SCHEMA.box, Literal(bbox_str)))
+                    # Add bounding box element
+                    g.add((spatial_ref, SCHEMA.geo, geo_shape))
 
         # Basic fields
         self._basic_fields_graph(dataset_ref, dataset_dict)
