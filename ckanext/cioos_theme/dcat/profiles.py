@@ -452,7 +452,7 @@ class CIOOSDCATProfile(SchemaOrgProfile):
             self._distribution_graph(distribution, resource_dict)
 
     def _tags_graph(self, dataset_ref, dataset_dict):
-        keywords = dataset_dict.get('keywords')
+        keywords = dataset_dict.get('keywords', [])
         for lang in keywords:
             for tag in keywords[lang]:
                 self.g.add((dataset_ref, SCHEMA.keywords, Literal(tag, lang=lang)))
@@ -646,12 +646,20 @@ class CIOOSDCATProfile(SchemaOrgProfile):
             except Exception:
                 pass
             else:
-                bbox_str = ' '.join(bbox)
-                geo_shape = BNode()
-                g.add((geo_shape, RDF.type, SCHEMA.GeoShape))
-                g.add((geo_shape, SCHEMA.box, Literal(bbox_str)))
-                # Add bounding box element
-                g.add((spatial_ref, SCHEMA.geo, geo_shape))
+                if geo_json['type'] == 'Point':
+                    geo_shape_point = BNode()
+                    g.add((geo_shape_point, RDF.type, SCHEMA.GeoCoordinates))
+                    g.add((geo_shape_point, SCHEMA.latitude, Literal(bbox[0])))
+                    g.add((geo_shape_point, SCHEMA.longitude, Literal(bbox[1])))
+                    # add point coordinates
+                    g.add((spatial_ref, SCHEMA.geo, geo_shape_point))
+                else: 
+                    geo_shape = BNode()
+                    bbox_str = ' '.join(bbox)
+                    g.add((geo_shape, RDF.type, SCHEMA.GeoShape))
+                    g.add((geo_shape, SCHEMA.box, Literal(bbox_str)))
+                    # Add bounding box element
+                    g.add((spatial_ref, SCHEMA.geo, geo_shape))
 
         # Basic fields
         self._basic_fields_graph(dataset_ref, dataset_dict)
@@ -688,7 +696,7 @@ class CIOOSDCATProfile(SchemaOrgProfile):
             provider_ref = URIRef(org_uri)
             g.add((provider_ref, RDF.type, SCHEMA.Organization))
             g.add((provider_ref, SCHEMA.legalName, Literal(organization['title'])))
-            g.add((provider_ref, SCHEMA.name, Literal(organization['display_name'])))
+            g.add((provider_ref, SCHEMA.name, Literal(organization.get('display_name') or organization.get('title'))))
             if organization.get('external_home_url'):
                 g.add((provider_ref, SCHEMA.url, Literal(organization['external_home_url'])))
             for lang in organization.get('image_url_translated', {}):
@@ -743,7 +751,7 @@ class CIOOSDCATProfile(SchemaOrgProfile):
         # uri = dataset_uri(dataset_dict)
         # g.add((dataset_ref, SCHEMA['@id'],  Literal('%s' % uri+'.jsonld')))
 
-        metadata_dates = [x['value'] for x in load_json(dataset_dict.get('metadata-reference-date', []))]
+        metadata_dates = [x.get('value') for x in load_json(dataset_dict.get('metadata-reference-date', []))]
         metadata_dates.sort(reverse=True)
         version_date = ''
         if metadata_dates:

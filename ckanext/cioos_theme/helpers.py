@@ -117,6 +117,15 @@ def get_datacite_org():
 def get_datacite_test_mode():
     return toolkit.config.get('ckan.cioos.datacite_test_mode', 'True')
 
+def get_ra_extents():
+    # './ckanext-cioos_theme/ckanext/cioos_theme/public/base/layers/pacific_RA.json'
+    ra_file = toolkit.config.get('ckan.cioos.ra_json_file')
+    if ra_file:
+        with open(ra_file, 'r') as file:
+            data = file.read()
+            return data
+    return 'null'
+
 def get_dataset_extents(q, fields, bbox_values, output=None):
     search_params = {'q': q,
                      'fl': 'title,spatial',
@@ -139,7 +148,6 @@ def get_dataset_extents(q, fields, bbox_values, output=None):
             "properties": {"title": toolkit.h.scheming_language_text(load_json(x.get('title')))},
             "geometry": load_json(x.get('spatial'))
         } for x in pkg.get('results', [])]
-    log.debug(pkg_geojson)
 
     if output == 'json':
         return json.dumps(pkg_geojson)
@@ -157,7 +165,8 @@ def get_license_def(id, url='', title=''):
 
     # check for id first
     for license in licenses:
-        if id.lower() == license['id'].lower():
+        if id.lower() == license['id'].lower() or \
+            id.lower() in [x.lower() for x in license.get('legacy_ids', [])]:
             return {
                 "license_id": license['id'],
                 "license_url": license.get('url_' + lang, license['url']),
@@ -173,7 +182,7 @@ def get_license_def(id, url='', title=''):
                     "license_url": license.get('url_' + lang, license['url']),
                     "license_title": license.get('title_' + lang, license['title'])
                 }
-            if title.lower() == license.get('url_' + lang, license['url']).lower():
+            if title.lower() == license.get('title_' + lang, license['title']).lower():
                 return {
                     "license_id": license['id'],
                     "license_url": license.get('url_' + lang, license['url']),

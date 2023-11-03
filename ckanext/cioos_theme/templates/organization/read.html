@@ -41,7 +41,7 @@
       {% snippet "spatial/snippets/spatial_query.html" , default_extent= h.spatial_default_extent() %}
       {% snippet "snippets/daterange.html" %}
       {% for facet in facet_titles %}
-        {{ h.snippet('snippets/facet_list.html', title=facet_titles[facet], name=facet, extras={'id':group_dict.id}) }}
+        {{ h.snippet('snippets/facet_list.html', title=facet_titles[facet], name=facet, hide_empty="true", extras={'id':group_dict.id}) }}
       {% endfor %}
     </div>
     <a class="close no-text hide-filters"><i class="fa fa-times-circle"></i><span class="text">close</span></a>
