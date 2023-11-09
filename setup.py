@@ -81,6 +81,7 @@ setup(
     entry_points='''
         [ckan.plugins]
         cioos_theme=ckanext.cioos_theme.plugin:Cioos_ThemePlugin
+        cioos_group=ckanext.cioos_theme.plugin:Cioos_GroupPlugin
 
         [babel.extractors]
         ckan = ckan.lib.extract:extract_ckan

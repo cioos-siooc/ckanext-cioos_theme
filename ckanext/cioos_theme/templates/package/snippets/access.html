@@ -8,7 +8,7 @@
               pkg_dict.license_id, 
               pkg_dict.license_url, 
               pkg_dict.license_title
-            )
+            ) or {}
           %}
           {% set use_constraints = pkg_dict.extras 
             | selectattr("key","equalto","use-constraints") 

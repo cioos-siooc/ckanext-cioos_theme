@@ -2,7 +2,6 @@
 
 {% set pkg = c.pkg_dict %}
 
-
 {%- set schema = h.scheming_get_dataset_schema(dataset_type) -%}
 
 {% block primary_content_inner %}
@@ -59,6 +58,15 @@
 
   {% endblock %}
 
+  
+  {% block metadata_quality_statment %}
+      {% set harvest_source_quality_level = h.get_pkg_dict_extra(c.pkg_dict, 'harvest_source_quality_level') %}
+      {% if harvest_source_quality_level is defined and harvest_source_quality_level in ('unknown','external') %}
+        {% snippet "package/snippets/metadata_quality.html", pkg_dict=pkg %}
+      {% endif %}
+
+  {% endblock %}
+
   {% block package_access %}
     {% snippet "package/snippets/access.html", pkg_dict=pkg %}
   {% endblock %}
@@ -66,8 +74,6 @@
   {% block package_resources %}
     {% snippet "package/snippets/resources_list.html", pkg=pkg, resources=pkg.resources %}
   {% endblock %}
-
-
 
   {% block package_citation %}
     {% if pkg.citation %}
@@ -126,7 +132,6 @@
     </div>
   </section>
 
-
   {% block package_additional_info %}
     {% snippet "scheming/package/snippets/additional_info.html", pkg_dict=pkg, dataset_type=dataset_type, schema=schema %}
   {% endblock %}
@@ -151,6 +156,7 @@
           <li class="nav-item"><a href="{{ h.url_for(controller='dataset', action='read', id=pkg.get('name') or pkg.id) }}.ttl"><span class="item-label">{{ _('Turtle')}}</span></a></li>
           <li class="nav-item"><a href="{{ h.url_for(controller='dataset', action='read', id=pkg.get('name') or pkg.id) }}.n3"><span class="item-label">{{ _('Notation3')}}</span></a></li>
           <li class="nav-item"><a href="{{ h.url_for(controller='dataset', action='read', id=pkg.get('name') or pkg.id) }}.jsonld"><span class="item-label">{{ _('JSON-LD')}}</span></a></li>
+          <li class="nav-item"><a href="{{ h.url_for(controller='dataset', action='read', id=pkg.get('name') or pkg.id) }}.jsonld?frame=schemaorg"><span class="item-label">{{ _('JSON-LD/Schema.org')}}</span></a></li>
         {% endif %}
           <li class="nav-item"><a href="{{ h.url_for(controller='api',
                               logic_function='package_show',
