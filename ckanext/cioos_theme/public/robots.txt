@@ -8,6 +8,7 @@ Disallow: /dataset/*/history
 Disallow: /api/
 Disallow: /harvest
 Disallow: /_tracking
+Disallow: /resorg*?
 
 Disallow: /en/dataset*?
 Disallow: /en/organization*?
@@ -17,6 +18,7 @@ Disallow: /en/revision/
 Disallow: /en/dataset/*/history
 Disallow: /en/api/
 Disallow: /en/harvest
+Disallow: /en/resorg*?
 
 Disallow: /fr/dataset*?
 Disallow: /fr/organization*?
@@ -26,6 +28,7 @@ Disallow: /fr/revision/
 Disallow: /fr/dataset/*/history
 Disallow: /fr/api/
 Disallow: /fr/harvest
+Disallow: /fr/resorg*?
 
 Disallow: /erddap*?
 

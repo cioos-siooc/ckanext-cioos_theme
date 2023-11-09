@@ -737,7 +737,6 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
 
         try:
             if not self.all_groups_dict_by_name:
-                log.debug('Setting all_groups_dict_by_name')
                 self.all_groups_dict_by_name = self.get_all_groups('group','name')
 
             for name in data_dict.get('groups', []):
@@ -857,7 +856,6 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
 
         if toolkit.request:
             lang = toolkit.h.lang()
-            # log.debug('Lang: %r', lang)   
             search_params['qf'] = 'name^4 title_%s^4 tags_%s^2 text_%s text' % (lang,lang,lang)
 
         begin = search_params.get('extras', {}).get('ext_year_begin', '*')
@@ -988,13 +986,9 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         org_dict = self.get_all_groups('organization')
         group_dict = self.get_all_groups('group')
         group_dict_by_name = {v['name']: v for k,v in group_dict.items()}
-        
 
         resorg_groups = search_facets.get('resorg_groups', {})
-        log.debug('resorg_groups: %r', resorg_groups)
-
         groups = search_facets.get('groups', {})
-        log.debug('groups: %r', groups)
 
         items = resorg_groups.get('items', [])
         new_resorg_items = []
