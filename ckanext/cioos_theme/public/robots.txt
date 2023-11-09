@@ -10,6 +10,7 @@ Disallow: /harvest
 Disallow: /_tracking
 Disallow: /dataset/*/resource
 Disallow: /dataset/activity
+Disallow: /resorg*
 
 Disallow: /en/dataset*?
 Disallow: /en/organization*?
@@ -21,6 +22,7 @@ Disallow: /en/api/
 Disallow: /en/harvest
 Disallow: /en/dataset/*/resource
 Disallow: /en/dataset/activity
+Disallow: /en/resorg*
 
 Disallow: /fr/dataset*?
 Disallow: /fr/organization*?
@@ -32,6 +34,7 @@ Disallow: /fr/api/
 Disallow: /fr/harvest
 Disallow: /fr/dataset/*/resource
 Disallow: /fr/dataset/activity
+Disallow: /fr/resorg*
 
 Disallow: /erddap*?
 
