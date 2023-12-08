@@ -673,34 +673,40 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         # split xml in harvest_document_content into french and englsih fields for indexing
         hdc = data_dict.get('harvest_document_content')
         if hdc:
-            
-            namespaces = {'lan': 'http://standards.iso.org/iso/19115/-3/lan/1.0',
-                        'mdb': 'http://standards.iso.org/iso/19115/-3/mdb/2.0',
-                        'gmd': 'http://www.isotc211.org/2005/gmd'}
+            try:
+                namespaces = {'lan': 'http://standards.iso.org/iso/19115/-3/lan/1.0',
+                              'mdb': 'http://standards.iso.org/iso/19115/-3/mdb/2.0',
+                              'gmd': 'http://www.isotc211.org/2005/gmd'}
 
-            root = ET.fromstring(hdc)
+                root = ET.fromstring(hdc)
 
-            default_lang = root.xpath("./mdb:defaultLocale/lan:PT_Locale/lan:language/lan:LanguageCode/@codeListValue|./gmd:language/gmd:LanguageCode/@codeListValue", namespaces=namespaces)
-            if default_lang:
-                default_lang = default_lang[0]
+                default_lang = root.xpath(
+                    "./mdb:defaultLocale/lan:PT_Locale/lan:language/lan:LanguageCode/@codeListValue|./gmd:language/gmd:LanguageCode/@codeListValue", namespaces=namespaces)
+                if default_lang:
+                    default_lang = default_lang[0]
 
-            root_fr = ET.Element("fr")
-            root_en = ET.Element("en")
-            if default_lang in ["eng","en"]:    
-                for locale in root.xpath(".//lan:LocalisedCharacterString[@locale='#fr' or @locale='#FR']|.//gmd:LocalisedCharacterString[@locale='#fr' or @locale='#FR']", namespaces=namespaces):
-                    root_fr.append(deepcopy(locale))
-                    locale.getparent().remove(locale)
-                root_en = deepcopy(root)
-            elif default_lang in ["fra","fr"]:
-                for locale in root.xpath(".//lan:LocalisedCharacterString[@locale='#en' or @locale='#EN']|.//gmd:LocalisedCharacterString[@locale='#en' or @locale='#EN']", namespaces=namespaces):
-                    root_en.append(deepcopy(locale))
-                    locale.getparent().remove(locale)
-                root_fr = deepcopy(root)
-            else:
-                log.error('No default language set in xml document. can not split document into language fields')
+                root_fr = ET.Element("fr")
+                root_en = ET.Element("en")
+                if default_lang in ["eng", "en"]:
+                    for locale in root.xpath(".//lan:LocalisedCharacterString[@locale='#fr' or @locale='#FR']|.//gmd:LocalisedCharacterString[@locale='#fr' or @locale='#FR']", namespaces=namespaces):
+                        root_fr.append(deepcopy(locale))
+                        locale.getparent().remove(locale)
+                    root_en = deepcopy(root)
+                elif default_lang in ["fra", "fr"]:
+                    for locale in root.xpath(".//lan:LocalisedCharacterString[@locale='#en' or @locale='#EN']|.//gmd:LocalisedCharacterString[@locale='#en' or @locale='#EN']", namespaces=namespaces):
+                        root_en.append(deepcopy(locale))
+                        locale.getparent().remove(locale)
+                    root_fr = deepcopy(root)
+                else:
+                    log.error(
+                        'No default language set in xml document. can not split document into language fields')
 
-            data_dict['harvest_document_content_en'] = ET.strip_tags(root_en, '*', '*')
-            data_dict['harvest_document_content_fr'] = ET.strip_tags(root_fr, '*', '*')
+                data_dict['harvest_document_content_en'] = ET.strip_tags(
+                    root_en, '*', '*')
+                data_dict['harvest_document_content_fr'] = ET.strip_tags(
+                    root_fr, '*', '*')
+            except ET.XMLSyntaxError as err:
+                log.error(err)
 
         # update organization list by language
         org_id = data_dict.get('owner_org')
