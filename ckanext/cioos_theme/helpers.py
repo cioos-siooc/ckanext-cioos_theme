@@ -226,8 +226,13 @@ def get_fully_qualified_package_uri(pkg, uri_field, default_code_space=None):
         if toolkit.h.is_url(code):
             fqURI.append(code)
             continue
-        if code_space not in code:
-            fqURI.append('https://' + code_space + '/' + code)
+        out_code = code
+        if code_space not in out_code:
+            out_code = code_space + '/' + out_code
+        if not toolkit.h.is_url(out_code):
+            out_code = 'https://' + out_code
+
+        fqURI.append(out_code)
     return fqURI
 
 
