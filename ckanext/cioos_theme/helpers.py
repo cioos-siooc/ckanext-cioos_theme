@@ -139,8 +139,9 @@ def get_dataset_extents(q, fields, bbox_values, output=None):
         bbox['maxx'] = float(bbox_list[2])
         bbox['maxy'] = float(bbox_list[3])
         search_params = SpatialQuery._params_for_solr_search(SpatialQuery, bbox, search_params)
-    search_params['fq_list'] = search_params['fq_list'] + ['+%s' % ':'.join(x) for x in fields]
-    search_params['fl'] = 'spatial'
+    clean_fields = [(i, '("%s")' % j) for i, j in fields]
+    search_params['fq_list'] = search_params['fq_list'] + \
+        ['+%s' % ':'.join(x) for x in clean_fields]
 
     pkg = toolkit.get_action('package_search')(data_dict=search_params)
     pkg_geojson = [
