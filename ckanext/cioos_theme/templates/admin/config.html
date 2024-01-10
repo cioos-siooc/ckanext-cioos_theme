@@ -31,7 +31,7 @@
 
       {{ form.textarea('ckan.site_custom_css', id='field-ckan-site-custom-css', label=_('Custom CSS'), value=data['ckan.site_custom_css'], error=error, placeholder=_('Customisable css inserted into the page header')) }}
 
-      {{ form.select('ckan.homepage_style', id='field-homepage-style', label=_('Homepage'), options=homepages, selected=data['ckan.homepage_style'], error=error) }}
+      {{ form.select('ckan.homepage_style', id='field-homepage-style', label=_('Homepage'), options=h.cioos_append_to_homepages(homepages), selected=data['ckan.homepage_style'], error=error) }}
 
       {{ form.input('ckan.site_home_url', id='field-ckan-site-home-url', label=_('Site Landing Page'), value=data['ckan.site_home_url'], error=error) }}
 

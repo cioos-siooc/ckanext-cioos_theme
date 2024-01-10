@@ -6,6 +6,7 @@
 
 '''
 
+from ckanext.dcat.processors import RDFSerializer
 import ckan.plugins.toolkit as toolkit
 import ckan.plugins as p
 from collections import OrderedDict
@@ -215,6 +216,7 @@ def get_fully_qualified_package_uri(pkg, uri_field, default_code_space=None):
         uris = [uris]
 
     for uri in uris:
+        uri = toolkit.h.cioos_load_json(uri)
         if not uri:
             continue
         code_space = uri.get('code-space') or default_code_space
@@ -336,21 +338,26 @@ def cioos_get_eovs(show_all=False):
                     active.
        '''
     schema = toolkit.h.scheming_get_dataset_schema('dataset')
-    fields = []
     choices = []
-    facets = toolkit.h.cioos_get_facets()  # needed to make get_facet_items_dict work
+    # needed to make get_facet_items_dict work
+    facets = toolkit.h.cioos_get_facets(
+        package_type='dataset',
+        facet_list=['eov'])
     eov = toolkit.h.get_facet_items_dict('eov', limit=None, exclude_active=False)
-    if schema:
-        fields = schema.get('dataset_fields')
-    if fields:
+
+    try:
         # retreave a copy of the choices list for the eov field
-        choices = copy.deepcopy(toolkit.h.scheming_field_choices(toolkit.h.scheming_field_by_name(fields, 'eov')))
+        choices = copy.deepcopy(toolkit.h.scheming_field_choices(
+            toolkit.h.scheming_field_by_name(schema['dataset_fields'], 'eov')))
         # make choices list more facet like
         for x in choices:
             x['name'] = x['value']
             x['display_name'] = x['label']
+    except:
+        pass
 
     if show_all:
+        # TODO: could this be improved?
         output = _merge_lists('name', eov, choices)
     else:
         lookup = {x['name']: x for x in eov}
@@ -588,7 +595,7 @@ def cioos_schema_field_map_child(schema_subfields, schema_parentfields, harvest_
     return output, matched_schema_fields
 
 
-def cioos_get_facets(package_type='dataset'):
+def cioos_get_facets(package_type='dataset', facet_list=['ALL']):
     ''' get all dataset for the given package type, including private ones.
         This function works similarly to code found in ckan/ckan/controllers/package.py
         in that it does a search of all datasets and populates the following
@@ -616,6 +623,10 @@ def cioos_get_facets(package_type='dataset'):
     for plugin in p.PluginImplementations(p.IFacets):
         facets = plugin.dataset_facets(facets, package_type)
 
+    # filter facets if needed
+    facets = {k: v for k, v in facets.items(
+    ) if 'ALL' in facet_list or k in facet_list}
+
     c.facet_titles = facets
 
     data_dict = {
@@ -640,3 +651,21 @@ def cioos_get_facets(package_type='dataset'):
 def cioos_version():
     '''Return CIOOS version'''
     return metadata.version('ckanext.cioos_theme')
+
+
+def append_to_homepages(homepages):
+    homepages.append({'value': '4', 'text': 'CIOOS'})
+    return homepages
+
+
+
+def cioos_structured_data(data_dict):
+
+    toolkit.check_access('dcat_dataset_show', {}, data_dict)
+
+    serializer = RDFSerializer(profiles=['schemaorg', 'cioos_dcat'])
+
+    output = serializer.serialize_dataset(data_dict,
+                                          _format='jsonld')
+
+    return output

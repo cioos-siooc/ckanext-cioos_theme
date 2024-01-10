@@ -34,7 +34,7 @@
             {% set img_url = item.image_display_url or h.url_for_static(icon_base + item.get('icon')) %}
             <li class="media-item {{ 'media-item-disabled' if count|trim == '0'}}">
               <a class="media-image" href="{{ href }}" title="{{ label if label != label_truncated else '' }}">
-                <img src="{{ img_url }}" alt="{{ item.name }}" class="media-image img-responsive">
+                <img rel="preload" as="image" type="image/svg+xml" src="{{ img_url }}" alt="{{ item.name }}" class="media-image img-responsive">
                 <span class="media-heading">{{ label_truncated }}</span>
                 <span class="hidden separator"> - </span>
                 <span class="item-count badge">{{ count }}</span>
