@@ -1005,30 +1005,29 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
 
         try:
             items = search_results['search_facets']['license_id']['items']
-        if items:
-        new_license_items = []
-            for item in items:
+            if items:
+                new_license_items = []
+                for item in items:
                     license = toolkit.h.cioos_get_license_def(
                         item['name'], None, None)
-                if license:
-                    item['display_name'] = license['license_title']
-                new_license_items.append(item)
-            search_results['search_facets']['license_id']['items'] = new_license_items
+                    if license:
+                        item['display_name'] = license['license_title']
+                    new_license_items.append(item)
+                search_results['search_facets']['license_id']['items'] = new_license_items
         except:
             pass
 
         try:
             items = search_results['search_facets']['resorg_groups']['items']
             # move group call here so it is only run if needed
-        group_dict = self.get_all_groups('group')
+            group_dict = self.get_all_groups('group')
             group_dict_by_name = {v['name']: v for k, v in group_dict.items()}
             if items:
-        new_resorg_items = []
-            for item in items:
-                    item['display_name'] = group_dict_by_name[item['name']
-                                                              ]['display_name']
-                new_resorg_items.append(item)
-            search_results['search_facets']['resorg_groups']['items'] = new_resorg_items
+                new_resorg_items = []
+                for item in items:
+                    item['display_name'] = group_dict_by_name[item['name']]['display_name']
+                    new_resorg_items.append(item)
+                search_results['search_facets']['resorg_groups']['items'] = new_resorg_items
         except:
             pass
 
