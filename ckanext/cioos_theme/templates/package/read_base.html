@@ -146,8 +146,10 @@
     #}
       {% if h.cioos_helper_available('structured_data') %}
           <script type="application/ld+json">
-           {{ h.structured_data(pkg.id, profiles=['schemaorg','cioos_dcat'])|safe }}
+           {{ h.cioos_structured_data(pkg)|safe }}
           </script>
       {% endif %}
+
+
   {% endblock %}
 {% endblock %}

@@ -59,7 +59,7 @@ class PackageRelationships(CkanCommand):
         from ckan.lib.search import rebuild, commit
 
         # cron job
-        # ckan --config=/etc/ckan/production.ini package_relationships rebuild [dataset name]
+        # ckan --config=/srv/app/ckan.ini package_relationships rebuild [dataset name]
 
         dataset_id_arg = None
 

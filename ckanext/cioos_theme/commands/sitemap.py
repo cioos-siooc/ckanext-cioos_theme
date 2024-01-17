@@ -41,7 +41,7 @@ class SiteMap(CkanCommand):
         log.info('sitemap is being generated...')
 
         # cron job
-        # ckan --config=/etc/ckan/production.ini sitemap create
+        # ckan --config=/srv/app/ckan.ini sitemap create
         # sql = '''Select id from package where id not in (select pkg_id from miscs_solr_sync); '''
 
         package_query = GeoPackageSearchQuery()
