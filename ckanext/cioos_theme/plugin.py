@@ -1129,7 +1129,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
     # this will make the show and search endpoints look the same
     def after_show(self, context, package_dict):
 
-        if toolkit.request.path.startswith('/dataset/'):
+        if toolkit.request and toolkit.request.path.startswith('/dataset/'):
             try:
                 del package_dict['harvest_document_content']
             except:

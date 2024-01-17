@@ -129,7 +129,7 @@ def get_ra_extents():
 
 def get_dataset_extents(q, fields, bbox_values, output=None):
     search_params = {'q': q,
-                     'fl': 'title,spatial',
+                     'fl': 'spatial',
                      'fq_list':[],
                      'rows': 1000}
     if bbox_values:
@@ -148,7 +148,7 @@ def get_dataset_extents(q, fields, bbox_values, output=None):
     pkg_geojson = [
         {
             "type": "Feature",
-            "properties": {"title": toolkit.h.scheming_language_text(load_json(x.get('title')))},
+            # "properties": {"title": toolkit.h.scheming_language_text(load_json(x.get('title')))},
             "geometry": load_json(x.get('spatial'))
         } for x in pkg.get('results', [])]
 
