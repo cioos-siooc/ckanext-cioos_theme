@@ -14,7 +14,8 @@ tags: list of tags
           {% set name = tag.name %}
           {% set display_name = tag.display_name %}
         {% endif %}
-        <a class="{% block tag_list_item_class %}tag{% endblock %}" href="{% url_for controller='dataset', action='search', tags=name %}">{{ h.truncate(display_name, 22) }}</a>
+        {% set params = { "tags_"+h.lang():name } %}
+        <a class="{% block tag_list_item_class %}tag{% endblock %}" href="{{ h.url_for(controller='dataset', action='search', **params) }}">{{ h.truncate(display_name, 22) }}</a>
       </li>
     {% endfor %}
   </ul>
