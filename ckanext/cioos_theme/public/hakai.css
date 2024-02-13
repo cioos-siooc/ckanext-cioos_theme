@@ -22,16 +22,37 @@
 body {
     background: #005d7a;
 }
+a {
+  color: #B60C0E;
+}
+a:hover {
+  color: #94090b;
+}
+.btn-primary {
+    background-color: #B60C0E;
+    border-color: #B60C0E;
+}
+.btn-primary:hover {
+    background-color: #94090b;
+    border-color: #94090b;
+}
 .masthead {
-    background: #005d7a;
+    background: #B60C0E;
+}
+.masthead a {
+    color: #fff;
 }
 .account-masthead {
     background-image: none;
-    background-color: #005d7a;
+    background-color: #B60C0E;
     border-top: black solid 1px;
 }
 .site-footer {
-    background: #005d7a;
+    background: #B60C0E;
+}
+
+.site-footer a {
+  color: #fff;
 }
 
 homepage h3 {
@@ -120,8 +141,8 @@ homepage h3 {
 
 .citation  .btn-secondary:hover{
       color: #fff;
-      background-color: #30778d;
-      border: 1px solid #235767;
+      background-color: #B60C0E;
+      border: 1px solid #94090b;
   }
 
 .citation  button.dropdown-item:hover {
