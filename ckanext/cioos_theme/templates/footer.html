@@ -1,8 +1,8 @@
 {# import macros from ra footer file #}
 {% if self._TemplateReference__context.name != g.footer_file_name %}
-  {% from '%s' % g.footer_file_name or 'footer_wp.html' import include_site_footer with context %}
+  {% from '%s' % g.footer_file_name or '/footer/default_footer.html' import include_site_footer with context %}
 {% else %}
-  {% from 'footer_wp.html' import include_site_footer with context %}
+  {% from '/footer/default_footer.html' import include_site_footer with context %}
 {% endif %}
 
 

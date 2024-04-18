@@ -6,6 +6,7 @@
 
 '''
 
+from ckanext.dcat.processors import RDFSerializer
 import ckan.plugins.toolkit as toolkit
 import ckan.plugins as p
 from collections import OrderedDict
@@ -128,7 +129,7 @@ def get_ra_extents():
 
 def get_dataset_extents(q, fields, bbox_values, output=None):
     search_params = {'q': q,
-                     'fl': 'title,spatial',
+                     'fl': 'spatial',
                      'fq_list':[],
                      'rows': 1000}
     if bbox_values:
@@ -139,13 +140,15 @@ def get_dataset_extents(q, fields, bbox_values, output=None):
         bbox['maxx'] = float(bbox_list[2])
         bbox['maxy'] = float(bbox_list[3])
         search_params = SpatialQuery._params_for_solr_search(SpatialQuery, bbox, search_params)
-    search_params['fq_list'] = search_params['fq_list'] + ['+%s' % ':'.join(x) for x in fields]
+    clean_fields = [(i, '("%s")' % j) for i, j in fields]
+    search_params['fq_list'] = search_params['fq_list'] + \
+        ['+%s' % ':'.join(x) for x in clean_fields]
 
     pkg = toolkit.get_action('package_search')(data_dict=search_params)
     pkg_geojson = [
         {
             "type": "Feature",
-            "properties": {"title": toolkit.h.scheming_language_text(load_json(x.get('title')))},
+            # "properties": {"title": toolkit.h.scheming_language_text(load_json(x.get('title')))},
             "geometry": load_json(x.get('spatial'))
         } for x in pkg.get('results', [])]
 
@@ -213,6 +216,7 @@ def get_fully_qualified_package_uri(pkg, uri_field, default_code_space=None):
         uris = [uris]
 
     for uri in uris:
+        uri = toolkit.h.cioos_load_json(uri)
         if not uri:
             continue
         code_space = uri.get('code-space') or default_code_space
@@ -225,8 +229,13 @@ def get_fully_qualified_package_uri(pkg, uri_field, default_code_space=None):
         if toolkit.h.is_url(code):
             fqURI.append(code)
             continue
-        if code_space not in code:
-            fqURI.append('https://' + code_space + '/' + code)
+        out_code = code
+        if code_space not in out_code:
+            out_code = code_space + '/' + out_code
+        if not toolkit.h.is_url(out_code):
+            out_code = 'https://' + out_code
+
+        fqURI.append(out_code)
     return fqURI
 
 
@@ -329,21 +338,26 @@ def cioos_get_eovs(show_all=False):
                     active.
        '''
     schema = toolkit.h.scheming_get_dataset_schema('dataset')
-    fields = []
     choices = []
-    facets = toolkit.h.cioos_get_facets()  # needed to make get_facet_items_dict work
+    # needed to make get_facet_items_dict work
+    facets = toolkit.h.cioos_get_facets(
+        package_type='dataset',
+        facet_list=['eov'])
     eov = toolkit.h.get_facet_items_dict('eov', limit=None, exclude_active=False)
-    if schema:
-        fields = schema.get('dataset_fields')
-    if fields:
+
+    try:
         # retreave a copy of the choices list for the eov field
-        choices = copy.deepcopy(toolkit.h.scheming_field_choices(toolkit.h.scheming_field_by_name(fields, 'eov')))
+        choices = copy.deepcopy(toolkit.h.scheming_field_choices(
+            toolkit.h.scheming_field_by_name(schema['dataset_fields'], 'eov')))
         # make choices list more facet like
         for x in choices:
             x['name'] = x['value']
             x['display_name'] = x['label']
+    except:
+        pass
 
     if show_all:
+        # TODO: could this be improved?
         output = _merge_lists('name', eov, choices)
     else:
         lookup = {x['name']: x for x in eov}
@@ -581,7 +595,7 @@ def cioos_schema_field_map_child(schema_subfields, schema_parentfields, harvest_
     return output, matched_schema_fields
 
 
-def cioos_get_facets(package_type='dataset'):
+def cioos_get_facets(package_type='dataset', facet_list=['ALL']):
     ''' get all dataset for the given package type, including private ones.
         This function works similarly to code found in ckan/ckan/controllers/package.py
         in that it does a search of all datasets and populates the following
@@ -609,6 +623,10 @@ def cioos_get_facets(package_type='dataset'):
     for plugin in p.PluginImplementations(p.IFacets):
         facets = plugin.dataset_facets(facets, package_type)
 
+    # filter facets if needed
+    facets = {k: v for k, v in facets.items(
+    ) if 'ALL' in facet_list or k in facet_list}
+
     c.facet_titles = facets
 
     data_dict = {
@@ -633,3 +651,21 @@ def cioos_get_facets(package_type='dataset'):
 def cioos_version():
     '''Return CIOOS version'''
     return metadata.version('ckanext.cioos_theme')
+
+
+def append_to_homepages(homepages):
+    homepages.append({'value': '4', 'text': 'CIOOS'})
+    return homepages
+
+
+
+def cioos_structured_data(data_dict):
+
+    toolkit.check_access('dcat_dataset_show', {}, data_dict)
+
+    serializer = RDFSerializer(profiles=['schemaorg', 'cioos_dcat'])
+
+    output = serializer.serialize_dataset(data_dict,
+                                          _format='jsonld')
+
+    return output

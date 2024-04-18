@@ -1,0 +1,10 @@
+{% macro include_site_footer() %}
+<div class="container">
+  <div class="col-md-6 col1">
+    <a href="https://mappocean.org/contact-us/" title="{{ _('CONTACT US') }}">{{ _('CONTACT US') }}</a>
+  </div>
+  <div class="col-md-6 col1 rightalign">
+    <a href="{{ g.site_home_url or h.url_for('home.index') }}" title="{{ _('BACK TO MaPP MAIN WEBSITE') }}">{{ _('BACK TO MaPP MAIN WEBSITE') }}</a>
+  </div>
+</div>
+{% endmacro %}
