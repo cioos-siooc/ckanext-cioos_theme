@@ -17,23 +17,41 @@ $teenwidth: 100%;
 .media-heading {
   font-size: 16px;
   color: #333333;
+    max-width: 212px;
+    word-break: break-word;
+    display: inline-block;
+    margin: 0;
+    vertical-align: middle;
 }
 
 .media-item {
   position: relative;
   float: left;
-  width: 150px;
-  padding: 15px;
+  width: 338px;
+  padding: 0;
   margin: 0 0 10px 10px;
   background-color: white;
   border-radius: 3px;
-  min-height: 238px;
+  min-height: 75px;
+}
+
+.media-item .media-image {
+    margin: 0;
+    display: unset;
+    width: 75px;
+    height: 75px;
+}
+
+.media-item  .item-count {
+    margin: 28px 10px;
+    float: right;
 }
 
 .media-grid {
   background: none;
   background-color: #f8f8f8;
-  border: 1px solid #52a7d7;
+  border: none;
+  min-height: unset;
 }
 
 .main,
@@ -745,10 +763,6 @@ ul.formats{
   -ms-transition: all 0.3s ease;
   -o-transition: all 0.3s ease;
   transition: all 0.3s ease;
-}
-
-.media-grid {
-  border: none;
 }
 
 .composite-control-repeating {
