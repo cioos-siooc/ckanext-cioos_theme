@@ -1503,4 +1503,8 @@ section{
   word-break: break-all;
 }
 
+#flDebug, #flDebug * {
+overflow-y: auto;
+}
+
 @import url(//fonts.googleapis.com/css?family=Montserrat:400,600,700,800,900|Quicksand:300,400,600,700|PT+Sans:400|Raleway:300,400,600,700);
