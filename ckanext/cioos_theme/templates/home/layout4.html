@@ -33,8 +33,8 @@
             {% set icon_base = g.eov_icon_base_path or '/base/images/eov-icons-svg/' %}
             {% set img_url = item.image_display_url or h.url_for_static(icon_base + item.get('icon')) %}
             <li class="media-item {{ 'media-item-disabled' if count|trim == '0'}}">
-              <a class="media-link" href="{{ href }}" title="{{ label if label != label_truncated else '' }}">
-                <img src="{{ img_url }}" alt="{{ item.name }}" class="media-image img-responsive">
+              <a class="media-image" href="{{ href }}" title="{{ label if label != label_truncated else '' }}">
+                <img rel="preload" as="image" type="image/svg+xml" src="{{ img_url }}" alt="{{ item.name }}" class="media-image img-responsive">
                 <div class="media-heading">{{ label_truncated }}</div>
                 <div class="item-count badge">{{ count }}</div>
               </a>
