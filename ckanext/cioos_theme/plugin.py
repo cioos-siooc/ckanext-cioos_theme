@@ -15,6 +15,7 @@ import ckan.model as model
 from flask import Blueprint
 import json
 from shapely.geometry import shape
+from shapely import transform
 import logging
 import ckan.lib.navl.dictization_functions as df
 from ckantoolkit import g
@@ -294,7 +295,6 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
     plugins.implements(plugins.IClick)
     plugins.implements(plugins.IBlueprint)
     plugins.implements(plugins.IActions)
-    # plugins.implements(plugins.IDatasetForm)
 
     all_groups_dict_by_name = None
 
@@ -452,10 +452,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             'cioos_load_json': cioos_helpers.load_json,
             'cioos_geojson_to_bbox': geojson_to_bbox,
             'cioos_get_facets': cioos_helpers.cioos_get_facets,
-            #'cioos_get_package_title': cioos_helpers.get_package_title,
             'cioos_get_package_relationships': cioos_helpers.get_package_relationships,
-            #'cioos_print_package_relationship_type': cioos_helpers.print_package_relationship_type,
-            #'cioos_get_package_relationship_reverse_type': cioos_helpers.get_package_relationship_reverse_type,
             'cioos_datasets': cioos_helpers.cioos_datasets,
             'cioos_count_datasets': cioos_helpers.cioos_count_datasets,
             'cioos_get_eovs': cioos_helpers.cioos_get_eovs,
@@ -472,8 +469,8 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             'cioos_version': cioos_helpers.cioos_version,
             'cioos_get_license_def': cioos_helpers.get_license_def,
             'cioos_merge_dict': cioos_helpers.merge_dict,
-            'cioos_get_dataset_extents': cioos_helpers.get_dataset_extents,
-            'cioos_get_ra_extents': cioos_helpers.get_ra_extents,
+            'cioos_get_dataset_extents_url': cioos_helpers.get_dataset_extents_url,
+            'cioos_get_ra_extents_url': cioos_helpers.get_ra_extents_url,
             'cioos_get_extra_value': self._get_extra_value,
             'cioos_append_to_homepages': cioos_helpers.append_to_homepages,
             'cioos_structured_data': cioos_helpers.cioos_structured_data
@@ -595,225 +592,192 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
 
     # IPackageController
 
-    # def _cited_responsible_party_to_responsible_organizations(self, parties, force_responsible_organization, as_group = False):
-    #     if force_responsible_organization:
-    #         if isinstance(force_responsible_organization, list):
-    #             resp_orgs = force_responsible_organization
-    #         else:
-    #             resp_orgs = [force_responsible_organization]
-    #     else:
-    #         resp_org_roles = cioos_helpers.load_json(toolkit.config.get('ckan.responsible_organization_roles', '["owner", "originator", "custodian", "author", "principalInvestigator"]'))
-
-    #     if as_group:
-    #         resp_orgs = [
-    #             {
-    #                 'name': munge.munge_name(x['organisation-name'].strip()).lower(),
-    #                 'display_name': x['organisation-name'].strip(),
-    #                 'title': x['organisation-name'].strip(),
-    #                 'title_translated': {
-    #                     'en' : x['organisation-name'].strip(),
-    #                     'fr' : x['organisation-name'].strip(),
-    #                 },
-    #                 'organisation-uri':{
-    #                     'authority': x.get('organisation-uri_authority'),
-    #                     'code': x.get('organisation-uri_code'),
-    #                     'code-space': x.get('organisation-uri_code-space'),
-    #                     'version': x.get('organisation-uri_version'),
-    #                 },
-    #             } 
-    #             for x in cioos_helpers.load_json(parties) if not set(cioos_helpers.load_json(x.get('role'))).isdisjoint(resp_org_roles)
-    #         ]
-    #     else:
-    #         resp_orgs = [x.get('organisation-name', '').strip() for x in cioos_helpers.load_json(parties) if not set(cioos_helpers.load_json(x.get('role'))).isdisjoint(resp_org_roles)]
-            
-    #     resp_orgs = list(dict.fromkeys(resp_orgs))  # remove duplicates
-    #     resp_orgs = list(filter(None, resp_orgs))  # remove empty elements (in a python 2 and 3 friendly way)
-
-    #     return resp_orgs
-
     def _get_extra_value(self, key, package_dict):
         for extra in package_dict.get('extras', []):
             if extra['key'] == key:
                 return extra['value']
 
-    def after_create(self, context, data_dict):
-        #pr.update_package_relationships(context, data_dict, is_create=True)
-        pass
+    # def after_create(self, context, data_dict):
+    #     #pr.update_package_relationships(context, data_dict, is_create=True)
+    #     pass
 
-    def after_update(self, context, data_dict):
-        #pr.update_package_relationships(context, data_dict, is_create=False)
-        pass
+    # def after_update(self, context, data_dict):
+    #     #pr.update_package_relationships(context, data_dict, is_create=False)
+    #     pass
 
     # modfiey tags, keywords, and eov fields so that they properly index
     def before_index(self, data_dict):
-        data_type = data_dict.get('type')
-        if data_type != 'dataset':
-            return data_dict
-
         try:
-            tags_dict = cioos_helpers.load_json(data_dict.get('keywords', '{}'))
-        except Exception as err:
-            log.error(data_dict.get('id', 'NO ID'))
-            log.error(type(err))
-            log.error("error:%s, keywords:%r", err, data_dict.get('keywords', '{}'))
-            tags_dict = {"en": [], "fr": []}
+            data_type = data_dict.get('type')
+            if data_type != 'dataset':
+                return data_dict
 
-        # force_resp_org = cioos_helpers.load_json(data_dict.get('force_responsible_organization', '[]'))
-        # data_dict['responsible_organizations'] = self._cited_responsible_party_to_responsible_organizations(data_dict.get('cited-responsible-party', '{}'), force_resp_org)
-
-
-        # update tag list by language
-        data_dict['tags_en'] = tags_dict.get('en', [])
-        data_dict['tags_fr'] = tags_dict.get('fr', [])
-        data_dict['tags'] = data_dict['tags_en'] + data_dict['tags_fr']
-
-        # update citation by language
-        citation_dict = cioos_helpers.load_json(data_dict.get('citation', '{}'))
-        data_dict['citation_en'] = citation_dict.get('en', [])
-        data_dict['citation_fr'] = citation_dict.get('fr', [])
-
-        # update translation method fields by language
-        ttm_dict = cioos_helpers.load_json(data_dict.get('title_translation_method', '{}'))
-        data_dict['title_translation_method_en'] = ttm_dict.get('en', [])
-        data_dict['title_translation_method_fr'] = ttm_dict.get('fr', [])
-
-        ntm_dict = cioos_helpers.load_json(data_dict.get('notes_translation_method', '{}'))
-        data_dict['notes_translation_method_en'] = ntm_dict.get('en', [])
-        data_dict['notes_translation_method_fr'] = ntm_dict.get('fr', [])
-
-        ktm_dict = cioos_helpers.load_json(data_dict.get('keywords_translation_method', '{}'))
-        data_dict['keywords_translation_method_en'] = ktm_dict.get('en', [])
-        data_dict['keywords_translation_method_fr'] = ktm_dict.get('fr', [])
-  
-        # split xml in harvest_document_content into french and englsih fields for indexing
-        hdc = data_dict.get('harvest_document_content')
-        if hdc:
             try:
-                namespaces = {'lan': 'http://standards.iso.org/iso/19115/-3/lan/1.0',
-                              'mdb': 'http://standards.iso.org/iso/19115/-3/mdb/2.0',
-                              'gmd': 'http://www.isotc211.org/2005/gmd'}
+                tags_dict = cioos_helpers.load_json(data_dict.get('keywords', '{}'))
+            except Exception as err:
+                log.error(data_dict.get('id', 'NO ID'))
+                log.error(type(err))
+                log.error("error:%s, keywords:%r", err, data_dict.get('keywords', '{}'))
+                tags_dict = {"en": [], "fr": []}
 
-                root = ET.fromstring(hdc)
+            # update tag list by language
+            data_dict['tags_en'] = tags_dict.get('en', [])
+            data_dict['tags_fr'] = tags_dict.get('fr', [])
+            data_dict['tags'] = data_dict['tags_en'] + data_dict['tags_fr']
 
-                default_lang = root.xpath(
-                    "./mdb:defaultLocale/lan:PT_Locale/lan:language/lan:LanguageCode/@codeListValue|./gmd:language/gmd:LanguageCode/@codeListValue", namespaces=namespaces)
-                if default_lang:
-                    default_lang = default_lang[0]
+            # update citation by language
+            citation_dict = cioos_helpers.load_json(data_dict.get('citation', '{}'))
+            data_dict['citation_en'] = citation_dict.get('en', [])
+            data_dict['citation_fr'] = citation_dict.get('fr', [])
 
-                root_fr = ET.Element("fr")
-                root_en = ET.Element("en")
-                if default_lang in ["eng", "en"]:
-                    for locale in root.xpath(".//lan:LocalisedCharacterString[@locale='#fr' or @locale='#FR']|.//gmd:LocalisedCharacterString[@locale='#fr' or @locale='#FR']", namespaces=namespaces):
-                        root_fr.append(deepcopy(locale))
-                        locale.getparent().remove(locale)
-                    root_en = deepcopy(root)
-                elif default_lang in ["fra", "fr"]:
-                    for locale in root.xpath(".//lan:LocalisedCharacterString[@locale='#en' or @locale='#EN']|.//gmd:LocalisedCharacterString[@locale='#en' or @locale='#EN']", namespaces=namespaces):
-                        root_en.append(deepcopy(locale))
-                        locale.getparent().remove(locale)
-                    root_fr = deepcopy(root)
-                else:
-                    log.error(
-                        'No default language set in xml document. can not split document into language fields')
+            # update translation method fields by language
+            ttm_dict = cioos_helpers.load_json(data_dict.get('title_translation_method', '{}'))
+            data_dict['title_translation_method_en'] = ttm_dict.get('en', [])
+            data_dict['title_translation_method_fr'] = ttm_dict.get('fr', [])
 
-                data_dict['harvest_document_content_en'] = ET.strip_tags(
-                    root_en, '*', '*')
-                data_dict['harvest_document_content_fr'] = ET.strip_tags(
-                    root_fr, '*', '*')
-            except ET.XMLSyntaxError as err:
+            ntm_dict = cioos_helpers.load_json(data_dict.get('notes_translation_method', '{}'))
+            data_dict['notes_translation_method_en'] = ntm_dict.get('en', [])
+            data_dict['notes_translation_method_fr'] = ntm_dict.get('fr', [])
+
+            ktm_dict = cioos_helpers.load_json(data_dict.get('keywords_translation_method', '{}'))
+            data_dict['keywords_translation_method_en'] = ktm_dict.get('en', [])
+            data_dict['keywords_translation_method_fr'] = ktm_dict.get('fr', [])
+    
+            # split xml in harvest_document_content into french and englsih fields for indexing
+            hdc = data_dict.get('harvest_document_content')
+            if hdc:
+                try:
+                    namespaces = {'lan': 'http://standards.iso.org/iso/19115/-3/lan/1.0',
+                                'mdb': 'http://standards.iso.org/iso/19115/-3/mdb/2.0',
+                                'gmd': 'http://www.isotc211.org/2005/gmd'}
+
+                    root = ET.fromstring(hdc)
+
+                    default_lang = root.xpath(
+                        "./mdb:defaultLocale/lan:PT_Locale/lan:language/lan:LanguageCode/@codeListValue|./gmd:language/gmd:LanguageCode/@codeListValue", namespaces=namespaces)
+                    if default_lang:
+                        default_lang = default_lang[0]
+
+                    root_fr = ET.Element("fr")
+                    root_en = ET.Element("en")
+                    if default_lang in ["eng", "en"]:
+                        for locale in root.xpath(".//lan:LocalisedCharacterString[@locale='#fr' or @locale='#FR']|.//gmd:LocalisedCharacterString[@locale='#fr' or @locale='#FR']", namespaces=namespaces):
+                            root_fr.append(deepcopy(locale))
+                            locale.getparent().remove(locale)
+                        root_en = deepcopy(root)
+                    elif default_lang in ["fra", "fr"]:
+                        for locale in root.xpath(".//lan:LocalisedCharacterString[@locale='#en' or @locale='#EN']|.//gmd:LocalisedCharacterString[@locale='#en' or @locale='#EN']", namespaces=namespaces):
+                            root_en.append(deepcopy(locale))
+                            locale.getparent().remove(locale)
+                        root_fr = deepcopy(root)
+                    else:
+                        log.error(
+                            'No default language set in xml document. can not split document into language fields')
+
+                    data_dict['harvest_document_content_en'] = ET.strip_tags(
+                        root_en, '*', '*')
+                    data_dict['harvest_document_content_fr'] = ET.strip_tags(
+                        root_fr, '*', '*')
+                except ET.XMLSyntaxError as err:
+                    log.error(err)
+
+            # update organization list by language
+            org_id = data_dict.get('owner_org')
+            if org_id:
+                org_details = toolkit.get_action('organization_show')(
+                    data_dict={
+                        'id': org_id,
+                        'include_datasets': False,
+                        'include_dataset_count': False,
+                        'include_extras': True,
+                        'include_users': False,
+                        'include_groups': False,
+                        'include_tags': False,
+                        'include_followers': False,
+                    }
+                )
+                org_title = org_details.get('title_translated', {})
+                data_dict['organization_en'] = org_title.get('en', '')
+                data_dict['organization_fr'] = org_title.get('fr', '')
+
+            try:
+                title = cioos_helpers.load_json(data_dict.get('title_translated', '{}'))
+                data_dict['title_en'] = title.get('en', [])
+                data_dict['title_fr'] = title.get('fr', [])
+            except Exception as err:
                 log.error(err)
 
-        # update organization list by language
-        org_id = data_dict.get('owner_org')
-        if org_id:
-            org_details = toolkit.get_action('organization_show')(
-                data_dict={
-                    'id': org_id,
-                    'include_datasets': False,
-                    'include_dataset_count': False,
-                    'include_extras': True,
-                    'include_users': False,
-                    'include_groups': False,
-                    'include_tags': False,
-                    'include_followers': False,
-                }
-            )
-            org_title = org_details.get('title_translated', {})
-            data_dict['organization_en'] = org_title.get('en', '')
-            data_dict['organization_fr'] = org_title.get('fr', '')
+            try:
+                title = cioos_helpers.load_json(data_dict.get('notes_translated', '{}'))
+                data_dict['notes_en'] = title.get('en', [])
+                data_dict['notes_fr'] = title.get('fr', [])
+            except Exception as err:
+                log.error(err)
 
-        try:
-            title = cioos_helpers.load_json(data_dict.get('title_translated', '{}'))
-            data_dict['title_en'] = title.get('en', [])
-            data_dict['title_fr'] = title.get('fr', [])
-        except Exception as err:
-            log.error(err)
+            try:
+                if not self.all_groups_dict_by_name:
+                    self.all_groups_dict_by_name = self.get_all_groups('group','name')
 
-        try:
-            title = cioos_helpers.load_json(data_dict.get('notes_translated', '{}'))
-            data_dict['notes_en'] = title.get('en', [])
-            data_dict['notes_fr'] = title.get('fr', [])
-        except Exception as err:
-            log.error(err)
+                for name in data_dict.get('groups', []):
+                    if name.startswith('resorg'):
+                        data_dict['resorg_groups'] = name
+                        group_title = self.all_groups_dict_by_name[name].get('title_translated', {})
+                        data_dict['resorg_groups_en'] = group_title.get('en', '')
+                        data_dict['resorg_groups_fr'] = group_title.get('fr', '')
 
-        try:
-            if not self.all_groups_dict_by_name:
-                self.all_groups_dict_by_name = self.get_all_groups('group','name')
+            except Exception as err:
+                log.error(err)
 
-            for name in data_dict.get('groups', []):
-                if name.startswith('resorg'):
-                    data_dict['resorg_groups'] = name
-                    group_title = self.all_groups_dict_by_name[name].get('title_translated', {})
-                    data_dict['resorg_groups_en'] = group_title.get('en', '')
-                    data_dict['resorg_groups_fr'] = group_title.get('fr', '')
+            # create temporal extent index.
+            te = data_dict.get('temporal-extent', '{}')
+            if te:
+                temporal_extent = cioos_helpers.load_json(te)
+                if isinstance(temporal_extent, list):
+                    temporal_extent = temporal_extent[0]
+                temporal_extent_begin = temporal_extent.get('begin')
+                temporal_extent_end = temporal_extent.get('end')
+                if(temporal_extent_begin):
+                    data_dict['temporal-extent-begin'] = temporal_extent_begin
+                if(temporal_extent_end):
+                    data_dict['temporal-extent-end'] = temporal_extent_end
+                # If end is not set then we will still include these dataset in temporal searches by giving them an end time of 'NOW'
+                if(temporal_extent_begin):
+                    data_dict['temporal-extent-range'] = '[' + temporal_extent_begin + ' TO ' + (temporal_extent_end or '*') + ']'
 
-        except Exception as err:
-            log.error(err)
+            # create vertical extent index
+            ve = data_dict.get('vertical-extent', '{}')
+            if ve:
+                vertical_extent = cioos_helpers.load_json(ve)
+                if isinstance(vertical_extent, list):
+                    vertical_extent = vertical_extent[0]
+                vertical_extent_min = vertical_extent.get('min')
+                vertical_extent_max = vertical_extent.get('max')
+                if(vertical_extent_min):
+                    data_dict['vertical-extent-min'] = vertical_extent_min
+                if(vertical_extent_max):
+                    data_dict['vertical-extent-max'] = vertical_extent_max
 
-        # create temporal extent index.
-        te = data_dict.get('temporal-extent', '{}')
-        if te:
-            temporal_extent = cioos_helpers.load_json(te)
-            temporal_extent_begin = temporal_extent.get('begin')
-            temporal_extent_end = temporal_extent.get('end')
-            if(temporal_extent_begin):
-                data_dict['temporal-extent-begin'] = temporal_extent_begin
-            if(temporal_extent_end):
-                data_dict['temporal-extent-end'] = temporal_extent_end
-            # If end is not set then we will still include these dataset in temporal searches by giving them an end time of 'NOW'
-            if(temporal_extent_begin):
-                data_dict['temporal-extent-range'] = '[' + temporal_extent_begin + ' TO ' + (temporal_extent_end or '*') + ']'
+            # eov is multi select so it is a json list rather then a python list
+            if(data_dict.get('eov')):
+                data_dict['eov'] = cioos_helpers.load_json(data_dict['eov'])
 
-        # create vertical extent index
-        ve = data_dict.get('vertical-extent', '{}')
-        if ve:
-            vertical_extent = cioos_helpers.load_json(ve)
-            vertical_extent_min = vertical_extent.get('min')
-            vertical_extent_max = vertical_extent.get('max')
-            if(vertical_extent_min):
-                data_dict['vertical-extent-min'] = vertical_extent_min
-            if(vertical_extent_max):
-                data_dict['vertical-extent-max'] = vertical_extent_max
+            # ecv is multi select so it is a json list rather then a python list
+            if(data_dict.get('ecv')):
+                data_dict['ecv'] = cioos_helpers.load_json(data_dict['ecv'])
 
-        # eov is multi select so it is a json list rather then a python list
-        if(data_dict.get('eov')):
-            data_dict['eov'] = cioos_helpers.load_json(data_dict['eov'])
+            for res in data_dict.get('resources', []):
+                res_name = cioos_helpers.load_json(res.get('name', '{}'))
+                if res_name and isinstance(res_name, dict) and not res.get('name_translated'):
+                    res['name_translated'] = res_name
+                resource_description = cioos_helpers.load_json(res.get('description', '{}'))
+                if resource_description and isinstance(resource_description, dict) and not res.get('description_translated'):
+                    res['description_translated'] = resource_description
 
-        # ecv is multi select so it is a json list rather then a python list
-        if(data_dict.get('ecv')):
-            data_dict['ecv'] = cioos_helpers.load_json(data_dict['ecv'])
-
-        for res in data_dict.get('resources', []):
-            res_name = cioos_helpers.load_json(res.get('name', '{}'))
-            if res_name and isinstance(res_name, dict) and not res.get('name_translated'):
-                res['name_translated'] = res_name
-            resource_description = cioos_helpers.load_json(res.get('description', '{}'))
-            if resource_description and isinstance(resource_description, dict) and not res.get('description_translated'):
-                res['description_translated'] = resource_description
-
-        if data_dict.get('projects'):
-            data_dict['projects'] = cioos_helpers.load_json(data_dict.get('projects'))
-
+            if data_dict.get('projects'):
+                data_dict['projects'] = cioos_helpers.load_json(data_dict.get('projects'))
+        except Exception as e:
+            log.exception(e)
+            raise e
         return data_dict
 
     # group a list of dictionaries based on individual-name or organization-name keys
@@ -926,12 +890,15 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         return new_values
         
 
-    def get_all_groups(self, action_type, key='id'):
+    def get_all_groups(self, action_type, key='id', groups=None):
         group_list = []
         limit = 25
         offset = 0
         schema_list = toolkit.get_action('scheming_%s_schema_list' % action_type)()
         schema_types = list(dict.fromkeys( schema_list + [action_type] ))
+        groups_dict = {}
+        if groups:
+            groups_dict = {'groups': groups}
 
         for type in schema_types:
             while True:
@@ -947,6 +914,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                         'include_users': False,
                         'include_groups': False,
                         'include_tags': False,
+                        **groups_dict,
                     }
                 )
                 if not res:
@@ -1032,7 +1000,6 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             pass
 
         groups = search_results['search_facets'].get('groups', {})
-
         # convert string encoded json to json objects for translated fields
         # package_search with filters uses solr index values which are strings
         # this is inconsistant with package data which is returned as json objects
@@ -1051,8 +1018,6 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                         pass
             except:
                 pass
-
-            # force_resp_org = cioos_helpers.load_json(self._get_extra_value('force_responsible_organization', result))
 
             # Update group list
             groups = result.get('groups')
@@ -1122,13 +1087,12 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                 else:
                     log.warn('No org details for owner_org %s', org_id)
 
-            search_results['results'][i] = result      
+            search_results['results'][i] = result
         return search_results
 
     # add organization extras to organization object in package.
     # this will make the show and search endpoints look the same
     def after_show(self, context, package_dict):
-
         if toolkit.request and toolkit.request.path.startswith('/dataset/'):
             try:
                 del package_dict['harvest_document_content']
@@ -1152,19 +1116,14 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         # Update group list
         groups = package_dict.get('groups')
         if groups:
-            group_dict = self.get_all_groups('group')
+            group_dict = self.get_all_groups(
+                'group', groups=[x['name'] for x in groups])
             new_group_list = []
             for group in groups:
                 new_group_list.append( group_dict.get(group['id'],group) )
             if new_group_list:
                 package_dict['groups'] = new_group_list
-                
-            
-        # force_resp_org = cioos_helpers.load_json(self._get_extra_value('force_responsible_organization', package_dict))
-        # cited_responsible_party = package_dict.get('cited-responsible-party')
-        # if((cited_responsible_party or force_resp_org) and not package_dict.get('responsible_organizations')):
-        #     package_dict['responsible_organizations'] = self._cited_responsible_party_to_responsible_organizations(cited_responsible_party, force_resp_org)
-
+                           
         if package_dict.get('cited-responsible-party'):
             package_dict['cited-responsible-party'] = self.group_by_ind_or_org(package_dict.get('cited-responsible-party'))
         if package_dict.get('metadata-point-of-contact'):
@@ -1224,7 +1183,6 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                 result = toolkit.get_action('package_search')(context, data_dict={'q': 'id:%s' % id, 'fl': 'name'})
                 if result['results']:
                     rel['subject_package_name'] = result['results'][0]['name']
-
         return package_dict
 
     # Custom section
