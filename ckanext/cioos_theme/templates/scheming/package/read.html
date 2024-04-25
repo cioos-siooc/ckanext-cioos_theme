@@ -3,6 +3,16 @@
 {%- set schema = h.scheming_get_dataset_schema(dataset_type) -%}
 
 {% block package_notes %}
+  {% block identifier %}
+    {{ h.snippet('snippets/identifier_list.html',
+        container = 'h3',
+        uri = h.cioos_get_fully_qualified_package_uri(
+          pkg,
+          uri_field='unique-resource-identifier-full',
+          default_code_space='doi.org')
+        )
+    }}
+  {% endblock %}
   {%- if not dataset_type -%}
     <p>
     dataset_type not passed to template. your version of CKAN
@@ -12,8 +22,17 @@
 
   {% if ( h.scheming_field_by_name(schema.dataset_fields, 'notes') or h.scheming_field_by_name(schema.dataset_fields, 'notes_translated') ) and h.get_translated(pkg, 'notes') %}
     <div class="notes embedded-content">
-      {{ h.render_markdown(h.get_translated(pkg, 'notes')) }}
+      {{ h.markdown_extract(h.get_translated(pkg, 'notes'), extract_length=200)[:-4] }} {# remove trailing </p> #}
+
+      {% set notes_translation_method = h.scheming_language_text(h.cioos_load_json( h.get_pkg_dict_extra(pkg, 'notes_translation_method') or pkg.get('notes_translation_method') or '{}' )) %}
+      {% if notes_translation_method %}
+        <span class="translation_icon_group" title="{{ notes_translation_method }}">
+          <i class="translation_icon" aria-hidden="true"></i>
+        </span>
+      {% endif %}
+      
+      </p>
     </div>
   {% endif %}
-
+  {% asset 'ckanext-cioos_theme/truncate_js' %}
 {% endblock %}

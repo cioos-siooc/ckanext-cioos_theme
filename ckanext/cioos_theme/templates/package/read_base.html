@@ -19,8 +19,8 @@
 
 {% block content_primary_nav %}
   {{ h.build_nav_icon(dataset_type ~ '.read', _('Dataset'), id=pkg.name) }}
-  {{ h.build_nav_icon(dataset_type ~ '.groups', _('Groups'), id=pkg.id if is_activity_archive else pkg.name, icon='users') }}
-  {{ h.build_nav_icon(dataset_type ~ '.activity', _('Activity Stream'), id=pkg.name) }}
+  {{ h.build_nav_icon('cioos.resorg', _('Responsible Organizations'), package_type=dataset_type, id=pkg.id if is_activity_archive else pkg.name, icon='users') }}
+  {# {{ h.build_nav_icon(dataset_type ~ '.activity', _('Activity Stream'), id=pkg.name) }} #}
 {% endblock %}
 
 {# block primary_content_inner %}
@@ -41,66 +41,94 @@
 
 {% block secondary_content %}
 
-{#
-  {% set dataset_extent = h.get_pkg_dict_extra(c.pkg_dict, 'spatial', '') %}
-  {% if dataset_extent %}
-    {% snippet "spatial/snippets/dataset_map_sidebar.html", extent=dataset_extent %}
+  {#
+    {% set dataset_extent = h.get_pkg_dict_extra(c.pkg_dict, 'spatial', '') %}
+    {% if dataset_extent %}
+      {% snippet "spatial/snippets/dataset_map_sidebar.html", extent=dataset_extent %}
+    {% endif %}
+  #}
+
+    {% block secondary_help_content %}{% endblock %}
+
+    {% block package_info %}
+      {% snippet 'package/snippets/info.html', pkg=pkg %}
+    {% endblock %}
+
+  {% if g.hide_organization_in_dataset_sidebar.lower()|default('', 'false') != 'true' %}
+    {% block package_organization %}
+      {% if pkg.organization %}
+        {% set org = h.get_organization(pkg.organization.name) %}
+        {% snippet "snippets/organization.html", organization=org, has_context_title=true %}
+      {% endif %}
+    {% endblock %}
   {% endif %}
-#}
 
-  {% block secondary_help_content %}{% endblock %}
+  {% if g.show_social_in_dataset_sidebar.lower()|default('', 'false')  == 'true' %}
+    {% block package_social %}
+      {% snippet "snippets/social.html" %}
+    {% endblock %}
+  {% endif %}
 
-  {% block package_info %}
-    {% snippet 'package/snippets/info.html', pkg=pkg %}
-  {% endblock %}
-
-{% if g.hide_organization_in_dataset_sidebar.lower()|default('', 'false') != 'true' %}
-  {% block package_organization %}
-    {% if pkg.organization %}
-      {% set org = h.get_organization(pkg.organization.name) %}
-      {% snippet "snippets/organization.html", organization=org, has_context_title=true %}
-    {% endif %}
-  {% endblock %}
-{% endif %}
-
-{% if g.show_social_in_dataset_sidebar.lower()|default('', 'false')  == 'true' %}
-  {% block package_social %}
-    {% snippet "snippets/social.html" %}
-  {% endblock %}
-{% endif %}
-
-{% if g.show_responsible_organization_in_dataset_sidebar.lower()|default('', 'true')  == 'true' %}
-<section class="module module-narrow module-shallow">
+  {% block harvest_source %}
+  {% set organization = h.cioos_load_json(h.cioos_get_extra_value('harvest_source_organization', pkg)) %}
+  {% set source_id = pkg.extras | selectattr("key","equalto","harvest_source_id") | map(attribute="value") | join('') %}
+  {% set url = h.url_for('harvest.read', id = source_id) %}
+  {% if organization %}
+  <section class="module module-narrow module-shallow">
     <h2 class="module-heading">
-      <i class="fa fa-database"></i>
-      {{ _('Responsible Organizations') }}
+      <i class="fa fa-book"></i>
+      {{ _('Harvested From') }}
     </h2>
-    {% with items = pkg.responsible_organizations %}
-    {% if items %}
-      <nav>
-        <ul class="{{ nav_class or 'list-unstyled nav nav-simple nav-facet' }}">
-          {% for item in items %}
-            {% set href = h.add_url_param(new_params={'responsible_organizations': item}, controller='dataset', action='search') %}
-            {% set label = item %}
-            {% set label_truncated = h.truncate(label, 30) %}
-              <li class="nav-item">
-                <a href="{{ href }}" title="{{ label if label != label_truncated else '' }}">
-                  <span class="item-label">{{ label_truncated }}</span>
-                </a>
-              </li>
-          {% endfor %}
-        </ul>
-      </nav>
+
+    <section class="module-content">
+
+    {% set image_url = organization.image_display_url or h.get_translated(organization, 'image_url') %}
+    {% if image_url %}
+    <div class="image">
+      <a href="{{ url }}" title="{{ h.get_translated(organization, 'title') }}">
+        <img src="{{ image_url }}" width="200" alt="{{ organization.name }}" />
+      </a>
+    </div>
+    {% else %}
+
+    <h1 class="heading">{{ h.get_translated(organization, 'title') or organization.name }}
+      {% if organization.state == 'deleted' %}
+        [{{ _('Deleted') }}]
+      {% endif %}
+    </h1>
+
     {% endif %}
-    {% endwith %}
-</section>
-{% endif %}
+
+    {% if h.get_translated(organization, 'description') %}
+      <p>
+        {{ h.render_markdown(h.get_translated(organization, 'description'), 180) }}
+      </p>
+    {% endif %}
+
+
+    </section>
+  </section>
+  {% endif %}
+
+
+  {% endblock %}
 
   {% block package_license %}
-    {% snippet "snippets/license.html", pkg_dict=pkg, has_context_title=true %}
+    {% if pkg.license_id %}
+    {% set licence = h.cioos_get_license_def(pkg.license_id, pkg.license_url, pkg.license_title) or {} %}
+    {% snippet "snippets/license.html", pkg_dict=h.cioos_merge_dict(pkg,licence), has_context_title=true %}
+    {% endif %}
   {% endblock %}
 
-
+  <section class="module module-narrow module-shallow resource-type">
+   <h2 class="module-heading"><i class="fa fa-tag"></i> {{ _('Resource Type') }}</h2>
+    <p class="module-content">
+      {% set href = h.add_url_param(new_params={'resource-type': pkg['resource-type']}, controller='dataset', action='search') %}
+       <a href="{{ href }}" title="{{pkg['resource-type']}}">
+      <span>{{pkg['resource-type'] | title}}</span>
+      </a>
+    </p>
+    </section>
 
 
 {% endblock %}

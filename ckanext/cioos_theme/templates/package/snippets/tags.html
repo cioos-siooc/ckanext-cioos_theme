@@ -1,0 +1,22 @@
+{#
+  Renders tags
+
+  tags - a list of tag dicts
+
+  Example:
+
+  {% snippet "package/snippets/tags.html", tags=pkg.tags, tags_translation_method=pkg.tags_translation_method, default_local=pkg.default_local %}
+
+#}
+{% if tags %}
+  <section class="tags">
+    <h3>{{ _('Keywords') }}
+        {% if tags_translation_method %}
+          <span class="translation_icon_group" title="{{ tags_translation_method }}">
+            <i class="translation_icon" aria-hidden="true"></i>
+          </span>
+        {% endif %}
+    </h3>
+    {% snippet 'snippets/tag_list.html', tags=tags, _class='tag-list table-bordered' %}
+  </section>
+{% endif %}

@@ -1,7 +1,7 @@
 {% set tags = h.get_facet_items_dict('tags', limit=3) %}
 {% set placeholder = _('E.g. temperature') %}
 
-<h3 class="cioos-search heading">{{ _("Search By Keyword:") }}</h3>
+<h3 class="cioos-search heading">{{ _("Search By Keyword") }}</h3>
 <div class="module-content box">
   <form class="search-form" method="get" action="{% url_for controller='dataset', action='search' %}">
     <div class="col-md-3 col1"></div>

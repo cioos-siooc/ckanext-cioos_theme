@@ -326,6 +326,9 @@ msgstr "Variables océaniques"
 msgid "SEARCH BY OCEAN VARIABLE"
 msgstr "RECHERCHE PAR VARIABLE OCÉANIQUE"
 
+msgid "Search By Ocean Variable:"
+msgstr "Recherche par variable océanique:"
+
 msgid "Search"
 msgstr "Chercher"
 
@@ -463,6 +466,9 @@ msgstr "contributeurs"
 
 msgid "Show Permalink"
 msgstr "Montrer le Permalien"
+
+msgid "Basic View "
+msgstr "Vue de Base"
 
 msgid "Metadata Reference Date(s)"
 msgstr "Date(s) de référence des métadonnées"
@@ -630,7 +636,7 @@ msgid "Nitrous oxide"
 msgstr "Protoxyde d'azote"
 
 msgid "Stable carbon isotopes"
-msgstr "Carbone organique dissous"
+msgstr "Isotopes stables du carbone"
 
 msgid "BioEcosystems"
 msgstr "Biologie et écosystèmes"
@@ -677,7 +683,7 @@ msgstr "Anglais"
 msgid "Marine debris"
 msgstr "Débris marins"
 
-msgid "Ocean color"
+msgid "Ocean colour"
 msgstr "Couleur des océans"
 
 msgid "Ocean sound"
@@ -685,3 +691,65 @@ msgstr "Paysage acoustique des océans"
 
 msgid "Cross-disciplinary"
 msgstr "Interdisciplinaire"
+
+msgid "Year"
+msgstr "Année"
+
+msgid " to "
+msgstr " à "
+
+msgid "Show blank range"
+msgstr "Afficher étendue vide"
+
+msgid "read more"
+msgstr "lire plus"
+
+msgid "read less"
+msgstr "lire moins"
+
+msgid "External Organization Page"
+msgstr "Page Organisation Externe"
+
+msgid "Licenses"
+msgstr "Licences"
+
+msgid "Keywords"
+msgstr "Mots clés"
+
+msgid "Data Reference Date(s)"
+msgstr "Date(s) de référence des données"
+
+msgid "Basic View"
+msgstr "Vue de base"
+
+msgid "Limitations"
+msgstr "Limites"
+
+msgid "Access"
+msgstr "Accès"
+
+msgid "What are Responsible Organization?"
+msgstr "Que sont les Organisation Responsable?"
+
+msgid "Search responsible organization..."
+msgstr "Rechercher des organisation responsables..."
+
+#:
+#, python-format
+msgid "%(count)d responsible organizations found"
+msgstr "%(count)d organisations responsables trouvées"
+
+#: ckan/templates/snippets/search_result_text.html:21
+msgid "{number} responsible organization found for \"{query}\""
+msgid_plural "{number} responsible organizations found for \"{query}\""
+msgstr[0] "{number} groupe  trouvé pour \"{query}\""
+msgstr[1] "{number} groupes  trouvés pour \"{query}\""
+msgstr[2] "{number} groupes  trouvés pour \"{query}\""
+
+#: ckan/templates/snippets/search_result_text.html:23
+msgid "{number} responsible organization found"
+msgid_plural "{number} responsible organizations found"
+msgstr[0] "{number} groupe  trouvé"
+msgstr[1] "{number} groupes trouvés"
+msgstr[2] "{number} groupes trouvés"
+

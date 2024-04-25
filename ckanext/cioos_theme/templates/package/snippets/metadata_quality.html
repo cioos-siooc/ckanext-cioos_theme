@@ -1,0 +1,22 @@
+<section class="metadata_quality">
+  <div class="panel panel-warning">
+  <div class="panel-heading panel-heading-thin"><a class="section_hide_controle section_hide_controle_full_width" data-toggle="collapse" href="#metadata-quality-statment-container" role="button" aria-expanded="false" aria-controls="metadata-quality-statment-container">
+  <b>{{ _('Made available by') }} {{ h.get_translated(h.cioos_load_json(h.cioos_get_extra_value('harvest_source_organization', pkg_dict)) or {}, 'title') }}</b> <i class="fa"></i>
+  </a></div>
+  <div id="metadata-quality-statment-container" class="panel-body flex-panels collapse in">
+    <p> These resources are not under the control of {{ _('CIOOS') }} and the 
+      link is provided solely for the convenience of our website visitors. We 
+      are not responsible for the accuracy, currency or reliability of the 
+      content of this website. {{ _('CIOOS') }} does not offer any guarantee in 
+      that regard and is not responsible for the information found through this 
+      link.
+    </p>
+    <p>
+      Visitors should also be aware that the information offered may be available 
+      only in the language used by the site. With respect to privacy, visitors 
+      should research the privacy policies of this external website before 
+      providing personal information.
+    </p>
+  </div>
+  </div>
+</section>

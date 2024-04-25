@@ -2,7 +2,7 @@
   <div class="container">
     <div class="row row1">
       <div class="col-md-12 col1 centertext title module-content-end">
-        <h1>{{ _('<span>CIOOS</span> Data Catalogue') }}</h1>
+        <h1>{{ h.scheming_language_text(h.cioos_load_json(g.site_heading)) | safe or _('<span>CIOOS</span> Data Catalogue') }}</h1>
         <h2>{{ _('Search, find, download — all of our') }} <span><a href="{{ h.url_for(controller='dataset', action='search') }}">{{h.cioos_count_datasets()}}</a></span> {{ _('datasets') }}.</h2>
         <!-- old block -->
         {# block promoted #}
@@ -26,9 +26,9 @@
             {% for item in list|sort(attribute='name') %}
             {% if item.name not in g.exclude_eov %}
             {% set href = h.url_for(controller='dataset', action='search', eov=item.name) %}
-            {% set label = label_function(item) if label_function else item.display_name %}
+            {% set label = label_function(item) if label_function else h.scheming_language_text(item.display_name) %}
             {% set label = _(label) %}
-            {% set label_truncated = h.truncate(label, 18) if not label_function else label %}
+            {% set label_truncated = h.truncate(label, 45) if not label_function else label %}
             {% set count = count_label(item['count']) if count_label else ('%d' % item['count']) %}
             {% set icon_base = g.eov_icon_base_path or '/base/images/eov-icons-svg/' %}
             {% set img_url = item.image_display_url or h.url_for_static(icon_base + item.get('icon')) %}

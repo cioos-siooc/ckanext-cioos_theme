@@ -15,11 +15,13 @@ import ckan.logic as logic
 import ckan.model as model
 from ckan.model import PackageRelationship
 from ckan.common import config
-from paste.deploy.converters import asbool
 import copy
 import logging
 import json
 import jsonpickle
+import importlib_metadata as metadata
+import re
+from ckanext.spatial.plugin import SpatialQuery
 log = logging.getLogger(__name__)
 
 try:
@@ -31,6 +33,7 @@ except ImportError:
         pass
 
 get_action = logic.get_action
+
 
 def load_json(j):
     try:
@@ -77,6 +80,7 @@ def load_json(j):
 #
 #     return default
 
+
 # copied from dcat extension
 def helper_available(helper_name):
     '''
@@ -88,6 +92,7 @@ def helper_available(helper_name):
         return False
     return True
 
+
 def generate_doi_suffix():
     import random
     chars = ['a','b','c','d','e','f','g','h','j','k','m','n','p','q','r','s',
@@ -96,58 +101,212 @@ def generate_doi_suffix():
     str2 = ''.join(random.SystemRandom().choice(chars) for _ in range(4))
     return str1 + '-' + str2
 
+
 def get_doi_authority_url():
     return toolkit.config.get('ckan.cioos.doi_authority_url', 'https://doi.org/')
+
 
 def get_doi_prefix():
     return toolkit.config.get('ckan.cioos.doi_prefix')
 
+
 def get_datacite_org():
     return toolkit.config.get('ckan.cioos.datacite_org')
+
 
 def get_datacite_test_mode():
     return toolkit.config.get('ckan.cioos.datacite_test_mode', 'True')
 
+def get_ra_extents():
+    # './ckanext-cioos_theme/ckanext/cioos_theme/public/base/layers/pacific_RA.json'
+    ra_file = toolkit.config.get('ckan.cioos.ra_json_file')
+    if ra_file:
+        with open(ra_file, 'r') as file:
+            data = file.read()
+            return data
+    return 'null'
+
+def get_dataset_extents(q, fields, bbox_values, output=None):
+    search_params = {'q': q,
+                     'fl': 'title,spatial',
+                     'fq_list':[],
+                     'rows': 1000}
+    if bbox_values:
+        bbox_list = bbox_values.split(',')
+        bbox = {}
+        bbox['minx'] = float(bbox_list[0])
+        bbox['miny'] = float(bbox_list[1])
+        bbox['maxx'] = float(bbox_list[2])
+        bbox['maxy'] = float(bbox_list[3])
+        search_params = SpatialQuery._params_for_solr_search(SpatialQuery, bbox, search_params)
+    search_params['fq_list'] = search_params['fq_list'] + ['+%s' % ':'.join(x) for x in fields]
+    search_params['fl'] = 'spatial'
+
+    pkg = toolkit.get_action('package_search')(data_dict=search_params)
+    pkg_geojson = [
+        {
+            "type": "Feature",
+            "properties": {"title": toolkit.h.scheming_language_text(load_json(x.get('title')))},
+            "geometry": load_json(x.get('spatial'))
+        } for x in pkg.get('results', [])]
+
+    if output == 'json':
+        return json.dumps(pkg_geojson)
+    return pkg_geojson
+
+
+def merge_dict(d1,d2):
+        return {**d1, **d2}
+
+def get_license_def(id, url='', title=''):
+    licenses = toolkit.get_action('license_list')()
+
+    default_locale = toolkit.config.get('ckan.locale_default', toolkit.config.get('ckan.locales_offered', ['en'])[0])
+    lang = toolkit.h.lang() or default_locale
+
+    # check for id first
+    for license in licenses:
+        if id.lower() == license['id'].lower() or \
+            id.lower() in [x.lower() for x in license.get('legacy_ids', [])]:
+            return {
+                "license_id": license['id'],
+                "license_url": license.get('url_' + lang, license['url']),
+                "license_title": license.get('title_' + lang, license['title'])
+            }
+        
+    # if that fails match on url or title next
+    if url or title:
+        for license in licenses:
+            if url == license.get('url_' + lang, license['url']):
+                return {
+                    "license_id": license['id'],
+                    "license_url": license.get('url_' + lang, license['url']),
+                    "license_title": license.get('title_' + lang, license['title'])
+                }
+            if title.lower() == license.get('title_' + lang, license['title']).lower():
+                return {
+                    "license_id": license['id'],
+                    "license_url": license.get('url_' + lang, license['url']),
+                    "license_title": license.get('title_' + lang, license['title'])
+                }
+    return None
+        
+
+
+def get_fully_qualified_package_uri(pkg, uri_field, default_code_space=None):
+    fqURI = []
+    uris = pkg.get(uri_field)
+
+    if not uris:
+        # try to build out of flat fields
+        sep = toolkit.h.scheming_composite_separator()
+        uris = [{
+            "authority": pkg.get(uri_field + 'authority'),
+            "code-space": pkg.get(uri_field + 'code-space'),
+            "code": pkg.get(uri_field + 'code'),
+            "version": pkg.get(uri_field + 'version')
+        }] if pkg.get(uri_field + 'code') else None
+
+    if not uris:
+        return fqURI
+
+    if isinstance(uris, dict):
+        uris = [uris]
+
+    for uri in uris:
+        if not uri:
+            continue
+        code_space = uri.get('code-space') or default_code_space
+        code = uri.get('code')
+        if isinstance(code, list):
+            code = code[0]
+        version = uri.get('version')
+        if not code:
+            continue
+        if toolkit.h.is_url(code):
+            fqURI.append(code)
+            continue
+        if code_space not in code:
+            fqURI.append('https://' + code_space + '/' + code)
+    return fqURI
+
+
 
 def get_package_relationships(pkg):
-    '''Returns the relationships of a package.
+    # compare schema field, here called aggregation-info and
+    # package relationships.
+    relationships = pkg.get('aggregation-info', [])
+    rels_from_schema = []
+    for rel in relationships:
+        comment = '/'.join([rel.get('initiative-type'), rel.get('association-type')])
+        comment = re.sub(r'([A-Z])', r' \1', comment)
+        comment = comment.title()
 
-    :param id: the id or name of the package
-    '''
-    rel = pkg.get('relationships_as_subject') + pkg.get('relationships_as_object')
-    b = []
-    for x in rel:
-        if x not in b:
-            b.append(x)
-    return b
+        rel_uri = rel.get('aggregate-dataset-identifier_code')
+        rel_name = rel.get('aggregate-dataset-name')
+
+        map_type ={
+            "largerWorkCitation": "parent",
+            "crossReference": "cross link",
+            "dependency": "depends on",
+            "revisionOf": "revision of",
+            "series": "cross link",
+            "isComposedOf": "child"
+        }
+        rel_type = map_type.get(rel.get('association-type'), 'links to')
+
+        if rel_uri and rel_name:
+            rels_from_schema.append({
+                "subject": pkg['name'],
+                "type": rel_type,
+                "object": {
+                    "title": rel_name,
+                    "url": rel_uri
+                    },
+                "comment": comment
+            })
+    return rels_from_schema
 
 
-def print_package_relationship_type(type):
-    out = 'depends on'
-    if 'child' in type:
-        out = 'parent'
-    elif 'parent' in type:
-        out = 'child'
-    elif 'link' in type:
-        out = 'cross link'
-    return out
-    #return PackageRelationship.make_type_printable(type)
+# the following functions have been depricated. use above function instead
+# def get_package_relationships(pkg):
+#     '''Returns the relationships of a package.
+
+#     :param id: the id or name of the package
+#     '''
+#     rel = pkg.get('relationships_as_subject') + pkg.get('relationships_as_object')
+#     b = []
+#     for x in rel:
+#         if x not in b:
+#             b.append(x)
+#     return b
 
 
-def get_package_relationship_reverse_type(type):
-    return PackageRelationship.reverse_type(type)
+# def print_package_relationship_type(type):
+#     out = 'depends on'
+#     if 'child' in type:
+#         out = 'parent'
+#     elif 'parent' in type:
+#         out = 'child'
+#     elif 'link' in type:
+#         out = 'cross link'
+#     return out
 
 
-def get_package_title(id):
-    '''Returns the title of a package.
+# def get_package_relationship_reverse_type(type):
+#     return PackageRelationship.reverse_type(type)
 
-    :param id: the id or name of the package
-    '''
-    try:
-        pkg = toolkit.get_action('package_show')(None, data_dict={'id': id})
-    except Exception as e:
-        return None
-    return toolkit.h.get_translated(pkg, 'title')
+
+# def get_package_title(id):
+#     '''Returns the title of a package.
+
+#     :param id: the id or name of the package
+#     '''
+#     try:
+#         pkg = toolkit.get_action('package_show')(None, data_dict={'id': id})
+#     except Exception as e:
+#         return None
+#     return toolkit.h.get_translated(pkg, 'title')
 
 
 def _merge_lists(key, list1, list2):
@@ -303,7 +462,6 @@ def cioos_schema_field_map_parent(fields, isodoc_dict, class_dict, mapkey, capti
         # update class with pre determined definition if appropreit
         if objtype != 'ISOElement' and item.get('elements') and objtype.startswith('ISO'):
             class_json_def = json.loads(class_dict.get(objtype, {}).get('class', '{}'))
-            log.debug(class_json_def)
             elem = class_json_def.get('elements', [])
             item['elements'] = elem
 
@@ -471,3 +629,8 @@ def cioos_get_facets(package_type='dataset'):
     #     'search': c.search_facets,
     #     'titles': c.facet_titles,
     # }
+
+
+def cioos_version():
+    '''Return CIOOS version'''
+    return metadata.version('ckanext.cioos_theme')

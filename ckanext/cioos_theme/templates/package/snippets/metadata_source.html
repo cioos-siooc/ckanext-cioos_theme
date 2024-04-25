@@ -1,6 +1,8 @@
 <section class="metadata_source">
-  <h3>{{ _('Metadata Source') }}</h3>
-  <table class="table table-bordered table-condensed">
+  <h3><a class="section_hide_controle collapsed" data-toggle="collapse" href="#metadata_source_info_table" role="button" aria-expanded="false" aria-controls="metadata_source_info_table">
+  {{ _('Metadata Source') }}<i class="fa"></i>
+  </a></h3>
+  <table id="metadata_source_info_table" class="table table-bordered table-condensed collapse">
     <tbody>
       {% block package_metadata_source %}
       <tr>
@@ -26,14 +28,16 @@
           {# {% set gn_view_metadata_url = pkg_dict.extras | selectattr("key","equalto","gn_view_metadata_url") | map(attribute="value") | join('') %} #}
           {% set url = h.cioos_load_json(pkg_dict.xml_location_url or xml_location_extras or gn_view_metadata_url or h_source_url) %}
 
+          {#
+          This section removed as harvest objects are cleared our periodically
           {% if harvest_object %}
           <span style="font-weight:bold;">{{_("View Harvested Metadata")}}: <a href="{{ remote_ckan_base_url + h.url_for('harvest_object_show', id = harvest_object ) }}">XML/JSON</a></span><br>
           {% else %}
           <span>Source information unavailable</span><br>
-          {% endif %}
+          {% endif %} #}
 
           {% if url %}
-          <p style="margin-left:20px;margin-bottom: 0px;">
+          <p style="margin-left:10px;margin-bottom: 0px;">
             {% if url is iterable and url is not string %}
             <span> {{ _("Access full metadata") }} </span>
             <ul>
@@ -49,14 +53,14 @@
           </p>
 
           {% if xml_modified_date %}
-          <p style="margin-left:50px;font-size:small;line-height: 1;margin-bottom: 2.5px;"><span>{{ _("Source last modified") }} </span>
+          <p style="margin-left:40px;font-size:small;line-height: 1;margin-bottom: 2.5px;"><span>{{ _("Source last modified") }} </span>
           {{- h.render_datetime(h.date_str_to_datetime(xml_modified_date), "MMMM dd, YYYY 'at' hh:mm", with_hours=true) -}}</p>
           {% else %}
           {% endif %}
 
           {% endif %}
           {% if source_id %}
-          <p style="margin-left:20px;margin-bottom: 0px;">
+          <p style="margin-left:10px;margin-bottom: 0px;">
             <span> {{ _("Other records harvested from") }} </span><a href="{{h.url_for('harvest.read', id = source_id)}}">{{ title }}</a>
           </p>
           {% endif %}
