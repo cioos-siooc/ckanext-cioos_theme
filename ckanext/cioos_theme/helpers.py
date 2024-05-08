@@ -236,7 +236,7 @@ def get_package_relationships(pkg):
     relationships = pkg.get('aggregation-info', [])
     rels_from_schema = []
     for rel in relationships:
-        comment = '/'.join([rel.get('initiative-type'), rel.get('association-type')])
+        comment = '/'.join(filter(None, [rel.get('initiative-type'), rel.get('association-type')]))
         comment = re.sub(r'([A-Z])', r' \1', comment)
         comment = comment.title()
 

@@ -352,6 +352,31 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             }
         ) 
 
+    def dataset_custom_LineageView(self, package_type, id):
+        context = {
+            u'model': model,
+            u'session': model.Session,
+            u'user': g.user,
+            u'for_view': True,
+            u'auth_user_obj': g.userobj
+        }
+        data_dict = {u'id': id, u'include_tracking': False}
+
+        # check if package exists
+        try:
+            pkg_dict = toolkit.get_action(u'package_show')(context, data_dict)
+        except (toolkit.NotFound, toolkit.NotAuthorized):
+            return base.abort(404, _(u'Dataset not found'))
+
+        return base.render(
+            u'package/lineage.html', {
+                u'dataset_type': package_type,
+                u'pkg_dict': pkg_dict,
+                u'id': id
+            }
+        )
+    
+
     # IBlueprint
     def get_blueprint(self):
         blueprint = Blueprint('cioos', self.__module__)
@@ -365,7 +390,8 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             blueprint.add_url_rule(*rule)
 
         blueprint.add_url_rule('/<package_type>/resorg/<id>', 'resorg', view_func=self.dataset_custom_GroupView, methods=['GET', 'POST'])
-
+        blueprint.add_url_rule('/<package_type>/lineage/<id>', 'lineage',
+                       view_func=self.dataset_custom_LineageView, methods=['GET', 'POST'])
         return blueprint
 
     # IAuthenticator
@@ -1114,6 +1140,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             return package_dict        
 
         # Update group list
+        # TODO since groups are split into there own page do we need this? might still be used during indexing?
         groups = package_dict.get('groups')
         if groups:
             group_dict = self.get_all_groups(
