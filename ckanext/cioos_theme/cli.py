@@ -56,7 +56,7 @@ def create(page_size, max_per_page):
     file_list = []
 
     # write to a temp file
-    DIR_SITEMAP = "/usr/lib/ckan/venv/src/ckan/ckan/public/sitemap/"
+    DIR_SITEMAP = "/srv/app/src/ckan/ckan/public/sitemap/"
     if not os.path.exists(DIR_SITEMAP):
         os.makedirs(DIR_SITEMAP)
     path = "%ssitemap-%s.xml" % (DIR_SITEMAP, filename_number)
