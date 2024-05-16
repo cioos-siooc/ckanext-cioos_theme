@@ -6,17 +6,25 @@
   <span>{{ values }}</span>
 {% elif values is mapping %}
   <ul class="scheming-subfield-items">
-  {%- for key, value in values.items()  -%}
+  {%- for key, value in values.items()|sort(attribute='0') if key != 'onlineResource'  -%}
     {% set data = h.cioos_load_json(value) %}
     {% if data %}
-    <li>
       {% if h.lang() in data %}
         {% if data[h.lang()] %}
-          <span style="font-weight:bold;padding-right: 5px;">{{key}}:</span><span>{{ h.scheming_language_text(data) }}</span>
+      <li>
+        <span style="font-weight:bold;padding-right: 5px;">{{key}}:</span><span>{{ h.scheming_language_text(data) }}</span>
+      </li>
         {% endif %}
       {% elif data is string %}
-        <span style="font-weight:bold;padding-right: 5px;">{{key}}:</span><span>{{ data }}</span>
+      <li>
+        {% if h.is_url(data) %}
+          <span style="font-weight:bold;padding-right: 5px;">{{key}}:</span><a href="{{ data }}">{{ data }}</a>
+        {% else %}
+          <span style="font-weight:bold;padding-right: 5px;">{{key}}:</span><span>{{ data }}</span>
+        {% endif %}
+      </li>
       {% else %}
+      <li>
       <span style="font-weight:bold;padding-right: 5px;">{{key}}:</span>
       <ul class="scheming-subfield-items">
         {%- snippet "scheming/display_snippets/lineage_item.html",
@@ -27,8 +35,8 @@
           object_type=object_type
         -%}
       </ul>
+      </li>
       {% endif %}
-    </li>
     {% endif %}
   {%- endfor -%}
   </ul>    
