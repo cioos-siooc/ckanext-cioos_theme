@@ -40,7 +40,7 @@ def create(page_size, max_per_page):
     click.echo('sitemap is being generated...')
 
     # cron job
-    # ckan --config=/etc/ckan/production.ini sitemap create
+    # ckan --config=/srv/app/ckan.ini sitemap create
     # sql = '''Select id from package where id not in (select pkg_id from miscs_solr_sync); '''
 
     package_query = GeoPackageSearchQuery()
@@ -56,7 +56,7 @@ def create(page_size, max_per_page):
     file_list = []
 
     # write to a temp file
-    DIR_SITEMAP = "/usr/lib/ckan/venv/src/ckan/ckan/public/sitemap/"
+    DIR_SITEMAP = "/srv/app/src/ckan/ckan/public/sitemap/"
     if not os.path.exists(DIR_SITEMAP):
         os.makedirs(DIR_SITEMAP)
     path = "%ssitemap-%s.xml" % (DIR_SITEMAP, filename_number)
@@ -179,7 +179,7 @@ def rebuild(dataset_id_or_name=None, clear=False):
     from ckan.lib.search import rebuild, commit
 
     # cron job
-    # ckan --config=/etc/ckan/production.ini package_relationships rebuild [dataset name]
+    # ckan --config=/srv/app/ckan.ini package_relationships rebuild [dataset name]
 
     dataset_id_arg = dataset_id_or_name
 

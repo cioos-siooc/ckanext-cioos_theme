@@ -54,7 +54,7 @@
 
           {% if xml_modified_date %}
           <p style="margin-left:40px;font-size:small;line-height: 1;margin-bottom: 2.5px;"><span>{{ _("Source last modified") }} </span>
-          {{- h.render_datetime(h.date_str_to_datetime(xml_modified_date), "MMMM dd, YYYY 'at' hh:mm", with_hours=true) -}}</p>
+          {{- h.render_datetime(h.date_str_to_datetime(xml_modified_date), date_format="%B %d, %Y at %H:%M", with_hours=true) -}}</p>
           {% else %}
           {% endif %}
 

@@ -15,7 +15,9 @@
   <input type="checkbox" class="main-nav-check" id="main-nav-check" />
   <!-- Logo -->
   <div class="mobileheader toggle-menu">
+    {% if gns.site_logo %}
     <a class="logo" href="{{ g.site_home_url or h.url_for('home.index') }}"><img src="{{ logo_url }}" alt="{{ gns.site_title }}" title="{{ gns.site_title }}" /></a>
+    {% endif %}
     <label for="main-nav-check">Menu</label>
   </div>
   <!-- Menu -->
@@ -82,7 +84,9 @@
     <div id="header-core">
       <div id="logo">
         {% block header_logo %}
+        {% if gns.site_logo %}
         <a rel="home" href="{{ g.site_home_url }}"><img src="{{ logo_url }}" alt="Logo"></a>
+        {% endif %}
         {% endblock %}
       </div>
       <div id="header-links" class="main-navigation">

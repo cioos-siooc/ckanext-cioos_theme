@@ -1,3 +1,5 @@
+Crawl-Delay: 10
+
 User-Agent: *
 Disallow: /dataset*?
 Disallow: /organization*?
@@ -40,4 +42,3 @@ Disallow: /*.iso19115
 Disallow: /*.iso19139
 
 Sitemap: /sitemap/sitemap.xml
-Crawl-Delay: 10

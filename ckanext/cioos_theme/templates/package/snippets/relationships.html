@@ -1,6 +1,6 @@
 {% if relationships %}
 <section class="relationships">
-  <h3>{{ _('Relationships') }}</h3>
+  <h3>{{ _('Related Works') }}</h3>
   <div class="list-group relationship-list">
     {% for rel in relationships %}
     <div class="list-group-item relationship-item col-xs-12">
@@ -10,10 +10,10 @@
         class="relationship-item-link col-xs-12"
       >
         <div class="list-group-item-body col-md-10">
-          <div class="heading">{{ rel['object']['title'] }}</div>
-          <div class="description">
+          <div class="heading">{{ h.scheming_language_text(rel['object']['title']) }}</div>
+          {# <div class="description">
             <span>Type: {{ rel["comment"] }}</span>
-          </div>
+          </div> #}
         </div>
         <div class="list-group-item-body col-md-2 align-content-center">
           <div class="relationships-type">

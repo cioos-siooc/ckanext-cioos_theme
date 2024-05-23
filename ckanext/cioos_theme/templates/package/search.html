@@ -1,6 +1,9 @@
 {% extends "page.html" %}
 {% import 'macros/form.html' as form %}
 {% set lang = h.lang() %}
+{% set default_extent = h.spatial_default_extent() %}
+{% set dataset_extents_url = h.cioos_get_dataset_extents_url(q=c.q, fields=c.fields, bbox_values=dict(request.params).get('ext_bbox'), output='json') %}
+{% set ra_extents_url = h.cioos_get_ra_extents_url() %}
 
 {% block subtitle %}{{ _("Datasets") }}{% endblock %}
 
@@ -72,14 +75,13 @@
   {% endblock %}
 {% endblock %}
 
-
 {% block secondary_content %}
 <div class="filters">
   <div>
     {% snippet "spatial/snippets/spatial_query.html", 
-      default_extent= h.spatial_default_extent(), 
-      dataset_extents= h.cioos_get_dataset_extents(q=c.q, fields=c.fields, bbox_values=dict(request.params).get('ext_bbox'), output='json'),
-      ra_extents=h.cioos_get_ra_extents()
+      default_extent=default_extent, 
+      dataset_extents_url=dataset_extents_url,
+      ra_extents_url=ra_extents_url
     %}
     {% snippet "snippets/daterange.html" %}
     {% for facet in c.facet_titles %}
