@@ -582,11 +582,6 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                 search_extras[param] = value
         toolkit.c.search_extras = search_extras
 
-        # remove unneeded facet
-        for f in ['groups','organization','tags']:
-            if f in facets_dict:
-               facets_dict.pop(f)
-
         if 'themes' not in facets_dict \
                 or 'eov' not in facets_dict \
                 or 'ecv' not in facets_dict \
@@ -613,6 +608,16 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             for key, value in ordered_dict.items():
                 if key not in facets_dict:            
                     facets_dict[key] = value
+
+        # remove unneeded facet
+        facets_to_hide = cioos_helpers.load_json(
+            toolkit.config.get('ckan.cioos.exclude_facets', '[]')
+        ) + ['groups', 'organization', 'tags']
+        log.debug('facets_to_hide: %r', facets_to_hide)
+        for f in facets_to_hide:
+            if f in facets_dict:
+               facets_dict.pop(f)
+
         return facets_dict
 
 
