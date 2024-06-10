@@ -1,0 +1,11 @@
+{% ckan_extends %}
+
+{% if group_type == 'resorg' %}
+    {% set group_label = 'Responsible Organization' %}
+{% else %}
+  {% set group_label = 'Groups' %}
+{% endif %}
+
+{% block secondary_content %}
+  {% snippet "group/snippets/helper.html", group_type=group_type, group_label=group_label %}
+{% endblock %}

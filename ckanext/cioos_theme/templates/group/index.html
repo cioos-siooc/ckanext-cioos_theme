@@ -32,7 +32,7 @@
   {% block groups_list %}
     {% if page.items or request.params %}
       {% if page.items %}
-        {% snippet "group/snippets/group_list.html", groups=page.items, group_label=group_label%}
+        {% snippet "group/snippets/group_list.html", groups=page.items, group_label=group_label %}
       {% endif %}
     {% else %}
       <p class="empty">
