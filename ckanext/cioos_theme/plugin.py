@@ -223,6 +223,48 @@ def cioos_tag_name_validator(field, schema):
     return validator
 
 
+
+@scheming_validator
+def cioos_name_validator(field, schema):
+    
+    CIOOS_PACKAGE_NAME_MAX_LENGTH = 255
+    name_match = re.compile('[a-z0-9_\-]*$')
+
+    def validator(value, context):
+        '''Return the given value if it's a valid name, otherwise raise Invalid.
+
+        If it's a valid name, the given value will be returned unmodified.
+
+        This function applies general validation rules for names of packages,
+        groups, users, etc.
+
+        Most schemas also have their own custom name validator function to apply
+        custom validation rules after this function, for example a
+        ``package_name_validator()`` to check that no package with the given name
+        already exists.
+
+        :raises ckan.lib.navl.dictization_functions.Invalid: if ``value`` is not
+            a valid name
+
+        '''
+        if not isinstance(value, str):
+            raise Invalid(_('Names must be strings'))
+
+        # check basic textual rules
+        if value in ['new', 'edit', 'search']:
+            raise Invalid(_('That name cannot be used'))
+
+        if len(value) < 2:
+            raise Invalid(_('Must be at least %s characters long') % 2)
+        if len(value) > CIOOS_PACKAGE_NAME_MAX_LENGTH:
+            raise Invalid(_('Name must be a maximum of %i characters long') %
+                          CIOOS_PACKAGE_NAME_MAX_LENGTH)
+        if not name_match.match(value):
+            raise Invalid(_('Must be purely lowercase alphanumeric '
+                            '(ascii) characters and these symbols: -_'))
+        return value
+    return validator
+
 @scheming_validator
 def cioos_is_valid_range(field, schema):
 
@@ -509,6 +551,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             'cioos_fluent_field_default': fluent_field_default,
             'cioos_url_validator_with_port': url_validator_with_port,
             'cioos_tag_name_validator': cioos_tag_name_validator,
+            'cioos_name_validator': cioos_name_validator,
             'cioos_is_valid_range': cioos_is_valid_range,
         }
 
