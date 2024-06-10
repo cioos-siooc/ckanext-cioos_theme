@@ -1,0 +1,23 @@
+{% extends "package/read_base.html" %}
+{% import 'macros/form.html' as form %}
+
+{% block primary_content_inner %}
+  <h2 class="hide-heading">{{ _('Lineage') }}</h2>
+<div class="lineage">
+  {% if pkg_dict.lineage %}
+      {%- set schema = h.scheming_get_dataset_schema(dataset_type) -%}
+      {% set field = h.scheming_field_by_name(schema.dataset_fields, 'lineage') %}
+      {% set cpkg = pkg.copy() %}
+      {%- snippet "scheming/display_snippets/repeating_subfields.html",
+        field=field,
+        data=cpkg,
+        errors=errors,
+        entity_type=entity_type,
+        object_type=object_type
+      -%}
+</div>
+  {% else %}
+    <p class="empty">{{ _('There is no lineage for this dataset') }}</p>
+  {% endif %}
+
+{% endblock %}

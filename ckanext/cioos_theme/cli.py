@@ -43,8 +43,10 @@ def create(page_size, max_per_page):
     # ckan --config=/srv/app/ckan.ini sitemap create
     # sql = '''Select id from package where id not in (select pkg_id from miscs_solr_sync); '''
 
-    package_query = GeoPackageSearchQuery()
 
+    DIR_SITEMAP = "/srv/app/src/ckan/ckan/public/sitemap/"
+
+    package_query = GeoPackageSearchQuery()
     count = package_query.get_count()
     click.echo('%s records found' % count)
     if not count:
@@ -55,74 +57,22 @@ def create(page_size, max_per_page):
     filename_number = 1
     file_list = []
 
-    # write to a temp file
-    DIR_SITEMAP = "/usr/lib/ckan/venv/src/ckan/ckan/public/sitemap/"
-    if not os.path.exists(DIR_SITEMAP):
-        os.makedirs(DIR_SITEMAP)
-    path = "%ssitemap-%s.xml" % (DIR_SITEMAP, filename_number)
-    fd = os.open(path, os.O_WRONLY|os.O_CREAT|os.O_TRUNC)
-
-    # write header
-    os.write(fd, '<?xml version="1.0" encoding="UTF-8"?>\n'.encode('utf-8'))
-    os.write(fd, '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'.encode('utf-8'))
-    file_list.append({
-        'path': path,
-        'filename_s3': "/sitemap/sitemap-%s.xml" % filename_number
-    })
-
-    for x in range(0, int(math.ceil(old_div(count, page_size))) + 1):
-        pkgs = package_query.get_paginated_entity_name_modtime(
-            max_results=page_size, start=start
-        )
-
-        for pkg in pkgs:
-            os.write(fd, '    <url>\n'.encode('utf-8'))
-            os.write(fd, ('        <loc>%s</loc>\n' % (
-                '%s/dataset/%s' % (config.get('ckan.site_url'), pkg.get('name')),
-            )).encode('utf-8'))
-            os.write(fd, ('        <lastmod>%s</lastmod>\n' % (
-                pkg.get('metadata_modified').strftime('%Y-%m-%d'),
-            )).encode('utf-8'))
-            os.write(fd, '    </url>\n'.encode('utf-8'))
-        click.echo('%i to %i of %i records done.' % (start + 1, min(start + page_size, count), count))
-        start = start + page_size
-
-        if start % max_per_page == 0 and \
-                x != int(math.ceil(old_div(count, page_size))):
-
-            # write footer
-            os.write(fd, '</urlset>\n'.encode('utf-8'))
-            os.close(fd)
-
-            click.echo('done with %s.', path)
-
-            filename_number = filename_number + 1
-            path = "%ssitemap-%s.xml" % (DIR_SITEMAP, filename_number)
-            fd = os.open(path, os.O_WRONLY|os.O_CREAT|os.O_TRUNC)
-
-            # write header
-            os.write(fd, '<?xml version="1.0" encoding="UTF-8"?>\n'.encode('utf-8'))
-            os.write(fd, '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'.encode('utf-8'))
-
-            file_list.append({
-                'path': path,
-                'filename_s3': "/sitemap/sitemap-%s.xml" % filename_number
-            })
-
-    # write footer
-    os.write(fd, '</urlset>\n'.encode('utf-8'))
-    os.close(fd)
-
-    click.echo('done with %s.' % path)
-
-    # if not upload_to_s3:
-        # log.info('Skip upload and finish.')
-        # click.echo('Done locally: File list\n{}'.format(json.dumps(file_list, indent=4)))
-        # return file_list
-
-    # bucket_name = config.get('ckanext.geodatagov.aws_bucket_name')
-    # bucket_path = config.get('ckanext.geodatagov.s3sitemap.aws_storage_path', '')
-    # bucket = get_s3_bucket(bucket_name)
+    write_sitemap_files(count, 
+                        start, 
+                        filename_number,
+                        file_list, 
+                        page_size,
+                        max_per_page,
+                        DIR_SITEMAP)
+    write_sitemap_files(count, 
+                        start, 
+                        filename_number, 
+                        file_list, 
+                        page_size, 
+                        max_per_page,
+                        DIR_SITEMAP,
+                        'dataset_jsonld_schemaorg', 
+                        '.jsonld?frame=schemaorg')
 
     path = DIR_SITEMAP + "sitemap.xml"
     fd = os.open(path, os.O_WRONLY|os.O_CREAT)
@@ -133,9 +83,6 @@ def create(page_size, max_per_page):
 
     current_time = datetime.datetime.now().strftime('%Y-%m-%d')
     for item in file_list:
-        # upload_to_key(bucket, item['path'],
-        #               bucket_path + item['filename_s3'])
-        # os.remove(item['path'])
 
         # add to sitemap index file
         os.write(fd, '    <sitemap>\n'.encode('utf-8'))
@@ -150,6 +97,93 @@ def create(page_size, max_per_page):
 
     click.echo('Sitemap complete.')
 
+
+def write_sitemap_files(count, start, filename_number, file_list, page_size,
+                        max_per_page, DIR_SITEMAP, type='', url_suffix=''):
+    
+    package_query = GeoPackageSearchQuery()
+
+    # write to a temp file
+    
+    if not os.path.exists(DIR_SITEMAP):
+        os.makedirs(DIR_SITEMAP)
+    if type:
+        path = "%ssitemap-%s-%s.xml" % (DIR_SITEMAP, type, filename_number)
+    else:
+        path = "%ssitemap-%s.xml" % (DIR_SITEMAP, filename_number)
+    
+    if type:
+        relPath = "/sitemap/sitemap-%s-%s.xml" % (type, filename_number)
+    else:
+        relPath = "/sitemap/sitemap-%s.xml" % (filename_number)
+
+    fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC)
+
+    # write header
+    os.write(fd, '<?xml version="1.0" encoding="UTF-8"?>\n'.encode('utf-8'))
+    os.write(
+        fd, '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'.encode('utf-8'))
+    file_list.append({
+        'path': path,
+        'filename_s3': relPath
+    })
+
+    for x in range(0, int(math.ceil(old_div(count, page_size))) + 1):
+        pkgs = package_query.get_paginated_entity_name_modtime(
+            max_results=page_size, start=start
+        )
+
+        for pkg in pkgs:
+            os.write(fd, '    <url>\n'.encode('utf-8'))
+            os.write(fd, ('        <loc>%s</loc>\n' % (
+                '%s/dataset/%s%s' % (config.get('ckan.site_url'),
+                                   pkg.get('name'),
+                                   url_suffix),
+            )).encode('utf-8'))
+            os.write(fd, ('        <lastmod>%s</lastmod>\n' % (
+                pkg.get('metadata_modified').strftime('%Y-%m-%d'),
+            )).encode('utf-8'))
+            os.write(fd, '    </url>\n'.encode('utf-8'))
+        click.echo('%i to %i of %i records done.' %
+                   (start + 1, min(start + page_size, count), count))
+        start = start + page_size
+
+        if start % max_per_page == 0 and \
+                x != int(math.ceil(old_div(count, page_size))):
+
+            # write footer
+            os.write(fd, '</urlset>\n'.encode('utf-8'))
+            os.close(fd)
+
+            click.echo('done with %s.', path)
+
+            filename_number = filename_number + 1
+            if type:
+                path = "%ssitemap-%s-%s.xml" % (DIR_SITEMAP, type, filename_number)
+            else:
+                path = "%ssitemap-%s.xml" % (DIR_SITEMAP, filename_number)
+
+            if type:
+                relPath = "/sitemap/sitemap-%s-%s.xml" % (type, filename_number)
+            else:
+                relPath = "/sitemap/sitemap-%s.xml" % (filename_number)
+            fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC)
+
+            # write header
+            os.write(fd, '<?xml version="1.0" encoding="UTF-8"?>\n'.encode('utf-8'))
+            os.write(
+                fd, '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'.encode('utf-8'))
+
+            file_list.append({
+                'path': path,
+                'filename_s3': relPath
+            })
+
+    # write footer
+    os.write(fd, '</urlset>\n'.encode('utf-8'))
+    os.close(fd)
+
+    click.echo('done with %s.' % path)
 
 ###########################################################################
 # Package Relationships

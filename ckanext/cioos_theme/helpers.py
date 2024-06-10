@@ -118,43 +118,33 @@ def get_datacite_org():
 def get_datacite_test_mode():
     return toolkit.config.get('ckan.cioos.datacite_test_mode', 'True')
 
-def get_ra_extents():
+def get_ra_extents_url():
     # './ckanext-cioos_theme/ckanext/cioos_theme/public/base/layers/pacific_RA.json'
-    ra_file = toolkit.config.get('ckan.cioos.ra_json_file')
-    if ra_file:
-        with open(ra_file, 'r') as file:
-            data = file.read()
-            return data
-    return 'null'
+    ra_file_url = toolkit.config.get('ckan.cioos.ra_json_file', 'null')
+    return ra_file_url
 
-def get_dataset_extents(q, fields, bbox_values, output=None):
+def get_dataset_extents_url(q, fields, bbox_values, output=None):
     search_params = {'q': q,
                      'fl': 'spatial',
-                     'fq_list':[],
+                     'fq_list': [],
+                     'facet': 'false',
                      'rows': 1000}
-    if bbox_values:
-        bbox_list = bbox_values.split(',')
-        bbox = {}
-        bbox['minx'] = float(bbox_list[0])
-        bbox['miny'] = float(bbox_list[1])
-        bbox['maxx'] = float(bbox_list[2])
-        bbox['maxy'] = float(bbox_list[3])
-        search_params = SpatialQuery._params_for_solr_search(SpatialQuery, bbox, search_params)
+
     clean_fields = [(i, '("%s")' % j) for i, j in fields]
     search_params['fq_list'] = search_params['fq_list'] + \
         ['+%s' % ':'.join(x) for x in clean_fields]
+    search_params['fq'] = ''.join(search_params['fq_list'])
+    del (search_params['fq_list'])
 
-    pkg = toolkit.get_action('package_search')(data_dict=search_params)
-    pkg_geojson = [
-        {
-            "type": "Feature",
-            # "properties": {"title": toolkit.h.scheming_language_text(load_json(x.get('title')))},
-            "geometry": load_json(x.get('spatial'))
-        } for x in pkg.get('results', [])]
+    # search_params['output'] = 'geojson'
+    if bbox_values:
+        # ids = toolkit.get_action('spatial_query_geo')(data_dict={'bbox':bbox_values})
+        search_params['bbox'] = bbox_values
 
-    if output == 'json':
-        return json.dumps(pkg_geojson)
-    return pkg_geojson
+    search_url = toolkit.h.url_for(
+        'spatial_api.geo_package_search', register='dataset', **search_params)
+
+    return search_url
 
 
 def merge_dict(d1,d2):
@@ -246,7 +236,7 @@ def get_package_relationships(pkg):
     relationships = pkg.get('aggregation-info', [])
     rels_from_schema = []
     for rel in relationships:
-        comment = '/'.join([rel.get('initiative-type'), rel.get('association-type')])
+        comment = '/'.join(filter(None, [rel.get('initiative-type'), rel.get('association-type')]))
         comment = re.sub(r'([A-Z])', r' \1', comment)
         comment = comment.title()
 

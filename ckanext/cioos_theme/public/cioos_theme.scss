@@ -1521,4 +1521,29 @@ section{
 overflow-y: auto;
 }
 
+.lineage {
+  .scheming-subfield-items {
+      margin-left: 10px;
+      padding: 0;
+      list-style-type: none;
+  }
+
+  dl.scheming-subfield-list {
+    display: grid;
+    grid-template-columns: max-content auto;
+  }
+
+  dl.scheming-subfield-list dt {
+    grid-column-start: 1;
+      margin-bottom: 10px;
+      border-bottom: #ddd solid 1px;
+  }
+
+  dl.scheming-subfield-list dd {
+    grid-column-start: 2;
+      margin-bottom: 10px;
+      border-bottom: #ddd solid 1px;
+  }
+}
+
 @import url(//fonts.googleapis.com/css?family=Montserrat:400,600,700,800,900|Quicksand:300,400,600,700|PT+Sans:400|Raleway:300,400,600,700);

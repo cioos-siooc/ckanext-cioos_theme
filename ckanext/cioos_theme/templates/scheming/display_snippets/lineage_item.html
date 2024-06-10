@@ -1,0 +1,59 @@
+{% import 'macros/form.html' as form %}
+
+{%- set values = h.cioos_load_json(data[field.field_name]) if field else h.cioos_load_json(data) -%}
+
+{% if values is string %}
+  <span>{{ values }}</span>
+{% elif values is mapping %}
+  <ul class="scheming-subfield-items">
+  {%- for key, value in values.items()|sort(attribute='0') if key != 'onlineResource'  -%}
+    {% set data = h.cioos_load_json(value) %}
+    {% if data %}
+      {% if h.lang() in data %}
+        {% if data[h.lang()] %}
+      <li>
+        <span style="font-weight:bold;padding-right: 5px;">{{key}}:</span><span>{{ h.scheming_language_text(data) }}</span>
+      </li>
+        {% endif %}
+      {% elif data is string %}
+      <li>
+        {% if h.is_url(data) %}
+          <span style="font-weight:bold;padding-right: 5px;">{{key}}:</span><a href="{{ data }}">{{ data }}</a>
+        {% else %}
+          <span style="font-weight:bold;padding-right: 5px;">{{key}}:</span><span>{{ data }}</span>
+        {% endif %}
+      </li>
+      {% else %}
+      <li>
+      <span style="font-weight:bold;padding-right: 5px;">{{key}}:</span>
+      <ul class="scheming-subfield-items">
+        {%- snippet "scheming/display_snippets/lineage_item.html",
+          field=null,
+          data=data,
+          errors=errors,
+          entity_type=entity_type,
+          object_type=object_type
+        -%}
+      </ul>
+      </li>
+      {% endif %}
+    {% endif %}
+  {%- endfor -%}
+  </ul>    
+{% else %}
+  <ul class="scheming-subfield-items">
+  {%- for element in values  -%}
+    <li>
+    {%- snippet "scheming/display_snippets/lineage_item.html",
+      field=null,
+      data=h.cioos_load_json(element),
+      errors=errors,
+      entity_type=entity_type,
+      object_type=object_type
+    -%}
+    </li>
+  {%- endfor -%}
+  </ul>
+{% endif %}
+
+
