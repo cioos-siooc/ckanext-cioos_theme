@@ -20,39 +20,34 @@
     border-bottom: 0px dotted #dddddd
 }
 body {
-    background: #005d7a;
+    background: #FFF;
 }
-a {
-  color: #B60C0E;
-}
-a:hover {
-  color: #94090b;
-}
+
 .btn-primary {
-    background-color: #B60C0E;
-    border-color: #B60C0E;
+    background-color: #AA2025;
+    border-color: #94090b;
 }
 .btn-primary:hover {
     background-color: #94090b;
     border-color: #94090b;
 }
+
 .masthead {
-    background: #B60C0E;
-}
-.masthead a {
-    color: #fff;
-}
-.account-masthead {
-    background-image: none;
-    background-color: #B60C0E;
-    border-top: black solid 1px;
-}
-.site-footer {
-    background: #B60C0E;
+    background: #AA2025;
 }
 
-.site-footer a {
-  color: #fff;
+.masthead .navigation .nav-pills li a:hover, .masthead .navigation .nav-pills li a:focus, .masthead .navigation .nav-pills li.active a {
+    background-color: #94090b;
+}
+
+.site-footer {
+    background: #333;
+}
+
+.account-masthead {
+    background-image: none;
+    background-color: #333;
+    border-top: black solid 1px;
 }
 
 homepage h3 {
@@ -141,8 +136,8 @@ homepage h3 {
 
 .citation  .btn-secondary:hover{
       color: #fff;
-      background-color: #B60C0E;
-      border: 1px solid #94090b;
+      background-color: #30778d;
+      border: 1px solid #235767;
   }
 
 .citation  button.dropdown-item:hover {
@@ -177,23 +172,26 @@ homepage h3 {
 .additional-info dl.scheming-subfield-list dt {
       float: left;
       clear: left;
-      width: 75px;
       text-align: left;
-      font-weight: 700;
+      font-weight: 600;
       color: #333;
   }
 
 .additional-info dl.scheming-subfield-list dt::after {
     content: ":";
+    padding-right: 5px;
   }
 
 .additional-info dl.scheming-subfield-list dd {
-      float: left;
-      min-width: 150px;
-      width: auto;
-      max-width: 395px;
+    min-width: 150px;
+    width: 100%;
+    margin-inline-start: 10px;
   }
 
+.additional-info tr th:first-child, .additional-info tr td:first-child {
+    width: 25%;
+    font-weight: 600;
+}
 ul.formats{
   padding-inline-start: 0px;
 }
@@ -357,4 +355,16 @@ width: 14px;
     border-radius: 0;
   }
 
+.eov-list {
+  display: inline-grid;
+  padding-right: 15px;
+}
 
+.eov-list:last-child{
+padding-right:0px;
+}
+
+.masthead .logo img {
+    max-height: 60px;
+    width: 100%;
+}
