@@ -31,9 +31,9 @@
 
     {%- block styles %}
       {# TODO: store just name of asset instead of path to it. #}
-      {% set main_css = h.get_rtl_css() if h.is_rtl_language() else g.main_css %}
+      {% set theme = h.get_rtl_css() if h.is_rtl_language() else g.theme %}
       {# strip '/base/' prefix and '.css' suffix #}
-      {% asset main_css[6:-4] %}
+      {% asset theme[6:-4] %}
     {% endblock %}
 
     {# render all assets included in styles block #}
