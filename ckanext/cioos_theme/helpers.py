@@ -22,7 +22,11 @@ import json
 import jsonpickle
 import importlib_metadata as metadata
 import re
-from ckanext.spatial.plugin import SpatialQuery
+try:
+    from ckanext.spatial.plugin import SpatialQuery
+except AttributeError:
+    # Handle CKAN 2.11+ where IRoutes was removed
+    SpatialQuery = None
 log = logging.getLogger(__name__)
 
 try:
