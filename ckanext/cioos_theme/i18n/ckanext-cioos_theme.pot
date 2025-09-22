@@ -221,3 +221,8 @@ msgstr ""
 msgid "Graphic Preview"
 msgstr ""
 
+msgid "Harvested From"
+msgstr ""
+
+msgid "Resource Type"
+msgstr ""
