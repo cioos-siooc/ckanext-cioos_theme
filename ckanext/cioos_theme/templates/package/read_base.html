@@ -69,7 +69,8 @@
       {% snippet "snippets/social.html" %}
     {% endblock %}
   {% endif %}
-
+  
+  {% if h.config.get('ckan.show_harvested_from_in_dataset_sidebar', 'true').lower() == 'true' %}
   {% block harvest_source %}
   {% set organization = h.cioos_load_json(h.cioos_get_extra_value('harvest_source_organization', pkg)) %}
   {% set source_id = pkg.extras | selectattr("key","equalto","harvest_source_id") | map(attribute="value") | join('') %}
@@ -113,6 +114,9 @@
 
 
   {% endblock %}
+  {% endif %}
+
+  {# License #}
 
   {% block package_license %}
     {% if pkg.license_id %}
