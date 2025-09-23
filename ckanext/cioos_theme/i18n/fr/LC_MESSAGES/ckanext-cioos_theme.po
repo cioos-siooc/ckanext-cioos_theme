@@ -292,6 +292,15 @@ msgstr "Récolté de"
 msgid "Resource Type"
 msgstr "Type de ressource"
 
+msgid "Projects"
+msgstr "Projets"
+
+msgid "Metadata Harvested From"
+msgstr "Métadonnées récoltés de"
+
+msgid "Climate Variables"
+msgstr "Variables climatiques"
+
 #: ckanext/cioos_theme/templates/package/snippets/metadata_source.html:2
 msgid "Other records from"
 msgstr "Autres disques de"
