@@ -286,8 +286,20 @@ msgid "View Full Metadata"
 msgstr "Afficher les métadonnées complètes"
 
 #: ckanext/cioos_theme/templates/package/snippets/metadata_source.html:2
-msgid "Harvested from"
-msgstr "Récolté à partir de"
+msgid "Harvested From"
+msgstr "Récolté de"
+
+msgid "Resource Type"
+msgstr "Type de ressource"
+
+msgid "Projects"
+msgstr "Projets"
+
+msgid "Metadata Harvested From"
+msgstr "Métadonnées récoltés de"
+
+msgid "Climate Variables"
+msgstr "Variables climatiques"
 
 #: ckanext/cioos_theme/templates/package/snippets/metadata_source.html:2
 msgid "Other records from"
@@ -484,9 +496,6 @@ msgstr "Accédez aux métadonnées complètes"
 
 msgid "here"
 msgstr "ici"
-
-msgid "Harvested from"
-msgstr "Récolté à partir de"
 
 msgid "Other records harvested from"
 msgstr "Autres documents récoltés à partir de"

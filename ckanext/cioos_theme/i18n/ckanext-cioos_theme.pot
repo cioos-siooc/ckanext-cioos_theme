@@ -221,3 +221,17 @@ msgstr ""
 msgid "Graphic Preview"
 msgstr ""
 
+msgid "Harvested From"
+msgstr ""
+
+msgid "Resource Type"
+msgstr ""
+
+msgid "Projects"
+msgstr ""
+
+msgid "Metadata Harvested From"
+msgstr ""
+
+msgid "Climate Variables"
+msgstr ""
