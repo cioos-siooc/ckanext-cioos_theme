@@ -780,3 +780,6 @@ msgstr "Organisations responsables"
 
 msgid "Related Works"
 msgstr "Travaux connexes"
+
+msgid "Download Citation"
+msgstr "Télécharger la citation"

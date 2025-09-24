@@ -245,3 +245,6 @@ msgstr ""
 
 msgid "Related Works"
 msgstr ""
+
+msgid "Download Citation"
+msgstr ""
