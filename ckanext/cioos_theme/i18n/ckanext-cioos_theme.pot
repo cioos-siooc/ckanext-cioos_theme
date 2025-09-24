@@ -217,6 +217,24 @@ msgstr ""
 msgid "Metadata Source"
 msgstr ""
 
+#: ckanext/cioos_theme/templates/package/snippets/preview.html:6
+msgid "Graphic Preview"
+msgstr ""
+
+msgid "Harvested From"
+msgstr ""
+
+msgid "Resource Type"
+msgstr ""
+
+msgid "Projects"
+msgstr ""
+
+msgid "Metadata Harvested From"
+msgstr ""
+
+msgid "Climate Variables"
+msgstr ""
 
 msgid "Download Citation"
 msgstr ""
