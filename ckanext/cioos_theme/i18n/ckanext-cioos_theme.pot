@@ -235,3 +235,10 @@ msgstr ""
 
 msgid "Climate Variables"
 msgstr ""
+
+
+msgid "Lineage"
+msgstr ""
+
+msgid "Responsible Organizations"
+msgstr ""
