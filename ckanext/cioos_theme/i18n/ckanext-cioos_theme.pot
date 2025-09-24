@@ -248,3 +248,106 @@ msgstr ""
 
 msgid "Download Citation"
 msgstr ""
+
+#: Related works association types
+msgid "Is Cited By"
+msgstr ""
+
+msgid "Cites"
+msgstr ""
+
+msgid "Is Supplement To"
+msgstr ""
+
+msgid "Is Supplemented By"
+msgstr ""
+
+msgid "Is Continued By"
+msgstr ""
+
+msgid "Continues"
+msgstr ""
+
+msgid "Is Described By"
+msgstr ""
+
+msgid "Describes"
+msgstr ""
+
+msgid "Has Metadata"
+msgstr ""
+
+msgid "Is Metadata For"
+msgstr ""
+
+msgid "Has Version"
+msgstr ""
+
+msgid "Is Version Of"
+msgstr ""
+
+msgid "Is New Version Of"
+msgstr ""
+
+msgid "Previous Version Of"
+msgstr ""
+
+msgid "Is Part Of"
+msgstr ""
+
+msgid "Has Part"
+msgstr ""
+
+msgid "Is Published In"
+msgstr ""
+
+msgid "Is Referenced By"
+msgstr ""
+
+msgid "References"
+msgstr ""
+
+msgid "Is Documented By"
+msgstr ""
+
+msgid "Documents"
+msgstr ""
+
+msgid "Is Compiled By"
+msgstr ""
+
+msgid "Compiles"
+msgstr ""
+
+msgid "Is Variant Form Of"
+msgstr ""
+
+msgid "Is Original Form Of"
+msgstr ""
+
+msgid "Is Identical To"
+msgstr ""
+
+msgid "Is Reviewed By"
+msgstr ""
+
+msgid "Reviews"
+msgstr ""
+
+msgid "Is Derived From"
+msgstr ""
+
+msgid "Is Source Of"
+msgstr ""
+
+msgid "Requires"
+msgstr ""
+
+msgid "Is Required By"
+msgstr ""
+
+msgid "Is Obsoleted By"
+msgstr ""
+
+msgid "Obsoletes"
+msgstr ""
