@@ -777,3 +777,6 @@ msgstr "Généalogie"
 
 msgid "Responsible Organizations"
 msgstr "Organisations responsables"
+
+msgid "Related Works"
+msgstr "Travaux connexes"
