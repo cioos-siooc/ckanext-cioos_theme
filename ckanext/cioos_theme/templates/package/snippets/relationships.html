@@ -4,7 +4,11 @@
   <div class="list-group relationship-list">
     {% for rel in relationships %}
     <div class="list-group-item relationship-item col-xs-12">
-      <a href="{{  rel['object']['url'] }}" target="_blank" class="relationship-item-link col-xs-12">
+      <a
+        href="{{  rel['object']['url'] }}"
+        target="_blank"
+        class="relationship-item-link col-xs-12"
+      >
         <div class="list-group-item-body col-md-10">
           <div class="heading">{{ h.scheming_language_text(rel['object']['title']) }}</div>
           {# <div class="description">
@@ -14,7 +18,7 @@
         <div class="list-group-item-body col-md-2 align-content-center">
           <div class="relationships-type">
             <span class="label label-clear-100">
-              {{ _(rel["type"].title()) }}
+              {{ rel["type"].title() }}
             </span>
           </div>
         </div>
