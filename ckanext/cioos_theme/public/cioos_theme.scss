@@ -41,14 +41,14 @@ $teenwidth: 100%;
   min-height: unset;
 
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(6, 150px);
   gap: 16px;
 
   // responsive columns using your existing breakpoints
-  @media (max-width: $papabreak) { grid-template-columns: repeat(4, 1fr); }
-  @media (max-width: $mamabreak) { grid-template-columns: repeat(3, 1fr); }
-  @media (max-width: $teenbreak) { grid-template-columns: repeat(2, 1fr); }
-  @media (max-width: 520px)      { grid-template-columns: 1fr; }
+  @media (max-width: $papabreak) { grid-template-columns: repeat(5, 150px); }
+  @media (max-width: $mamabreak) { grid-template-columns: repeat(4, 150px); }
+  @media (max-width: $teenbreak) { grid-template-columns: repeat(3, 150px); }
+  @media (max-width: 520px)      { grid-template-columns: repeat(2, 150px); }
 
   // ensure only direct li children are grid items, kill legacy widths/margins/floats
   > li {
