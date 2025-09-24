@@ -216,3 +216,7 @@ msgstr ""
 #: ckanext/cioos_theme/templates/package/snippets/metadata_source.html:2
 msgid "Metadata Source"
 msgstr ""
+
+
+msgid "Download Citation"
+msgstr ""
