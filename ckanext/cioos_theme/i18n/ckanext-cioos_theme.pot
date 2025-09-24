@@ -235,3 +235,6 @@ msgstr ""
 
 msgid "Climate Variables"
 msgstr ""
+
+msgid "Download Citation"
+msgstr ""

@@ -771,3 +771,15 @@ msgstr "Ces ressources ne sont pas sous le contrôle de SIOOC et le lien est fou
 #: ckanext-cioos_theme/ckanext/cioos_theme/templates/package/snippets/metadata_quality.html:14
 msgid "Visitors should also be aware that the information offered may be available only in the language used by the site. With respect to privacy, visitors should research the privacy policies of this external website before providing personal information."
 msgstr "Les visiteurs doivent également être conscients que les informations proposées peuvent être disponibles uniquement dans la langue utilisée par le site. En ce qui concerne la confidentialité, les visiteurs doivent rechercher les politiques de confidentialité de ce site Web externe avant de fournir des informations personnelles."
+
+msgid "Lineage"
+msgstr "Généalogie"
+
+msgid "Responsible Organizations"
+msgstr "Organisations responsables"
+
+msgid "Related Works"
+msgstr "Travaux connexes"
+
+msgid "Download Citation"
+msgstr "Télécharger la citation"
