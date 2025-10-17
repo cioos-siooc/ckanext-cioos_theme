@@ -1,7 +1,3 @@
-@charset "UTF-8";
-/* ------------------------------------------------------------------
-   Generic text bits (unchanged)
--------------------------------------------------------------------*/
 @import url(//fonts.googleapis.com/css?family=Montserrat:400,600,700,800,900|Quicksand:300,400,600,700|PT+Sans:400|Raleway:300,400,600,700);
 .media-heading {
   font-size: 16px;
@@ -13,114 +9,41 @@
   vertical-align: middle;
 }
 
-/* ------------------------------------------------------------------
-   EOV / Media Grid — modern, float-free, scoped so it doesn't
-   affect other places that reuse these classes.
--------------------------------------------------------------------*/
-.media-grid {
-  list-style: none;
+.media-item {
+  position: relative;
+  float: left;
+  width: 150px;
+  padding: 10px;
+  margin: 0 0 10px 10px;
+  background-color: white;
+  border-radius: 3px;
+  min-height: 75px;
+  height: 275px;
+}
+
+.media-item .media-image {
   margin: 0;
-  padding: 0;
+  padding: 0 0 10px 0;
+  display: unset;
+  max-width: 135px;
+  max-height: 135px;
+  align-items: center; /* vertical center */
+  justify-content: center; /* horizontal center */
+  object-fit: contain;
+}
+
+.media-item .item-count {
+  margin: 28px 10px;
+  float: right;
+}
+
+.media-grid {
   background: none;
   background-color: #f8f8f8;
   border: none;
   min-height: unset;
-  display: grid;
-  grid-template-columns: repeat(6, 150px);
-  gap: 16px;
-}
-@media (max-width: 1140px) {
-  .media-grid {
-    grid-template-columns: repeat(5, 150px);
-  }
-}
-@media (max-width: 980px) {
-  .media-grid {
-    grid-template-columns: repeat(4, 150px);
-  }
-}
-@media (max-width: 770px) {
-  .media-grid {
-    grid-template-columns: repeat(3, 150px);
-  }
-}
-@media (max-width: 520px) {
-  .media-grid {
-    grid-template-columns: repeat(2, 150px);
-  }
-}
-.media-grid > li {
-  width: auto !important;
-  margin: 0 !important;
-  float: none !important;
-}
-.media-grid .media-item {
-  position: relative;
-  padding: 0;
-  margin: 0;
-  background-color: #fff;
-  border: 1px solid #e6e6e6;
-  border-radius: 6px;
-  min-height: 0;
-  box-shadow: none;
-}
-.media-grid .media-item > a.media-image {
-  position: relative;
-  display: block;
-  padding: 14px 14px 46px;
-  text-decoration: none;
-}
-.media-grid .media-item > a.media-image > img.media-image {
-  display: block;
-  width: 100% !important;
-  height: auto !important;
-  aspect-ratio: 1/1;
-  object-fit: cover;
-  margin: 0 0 10px 0;
-  background: #f2f2f2;
-}
-.media-grid .media-item .media-heading {
-  max-width: none !important;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  font-size: 15px;
-  line-height: 1.35;
-  color: #2e3a40;
-  margin: 0;
-}
-.media-grid .media-item .item-count {
-  position: absolute;
-  padding: 0;
-  background: #bdbdbd;
-  color: #fff;
-  font-size: 12px;
-  border-radius: 50%;
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 24px;
-  line-height: 1;
-}
-.media-grid {
-  font-size: 14px;
-  line-height: 1.4;
 }
 
-/* Kill legacy clearfix ghosts so they don't become grid items */
-.media-grid::before,
-.media-grid::after {
-  content: none !important;
-  display: none !important;
-}
-
-/* ------------------------------------------------------------------
-   Legacy float-based media styles removed/replaced above.
-   (Kept here for reference; now overridden by the scoped rules.)
--------------------------------------------------------------------*/
 .main,
 [role=main] {
   padding-top: 10px;
@@ -470,7 +393,8 @@ body {
   .mobile-nav ul.menu ul.sub-menu ul.sub-menu ul.sub-menu li a:before {
     content: "--- ";
   }
-  /* Mobile topbar */
+  /* Mobile topbar
+  ======================= */
   .topbar {
     margin-top: 30px;
   }
@@ -504,7 +428,8 @@ body {
   .close-menu {
     display: none;
   }
-  /* Mobile navigation Animations */
+  /* Mobile navigation Animations
+  ================================== */
   #main-nav-check:checked ~ .toggle-menu label:before {
     content: "\f056";
   }
@@ -600,7 +525,7 @@ body {
   color: #404041;
   background-color: #c6e3df;
   border-color: #c6e3df;
-  padding: 8px 30px !important;
+  padding: 0 30px 10px !important;
   margin: 0 30px;
 }
 
@@ -778,6 +703,10 @@ ul.formats li a.btn {
 .logo img {
   width: auto;
   max-height: 85px;
+  -webkit-transition: all 0.3s ease;
+  -moz-transition: all 0.3s ease;
+  -ms-transition: all 0.3s ease;
+  -o-transition: all 0.3s ease;
   transition: all 0.3s ease;
 }
 
@@ -1066,13 +995,17 @@ div.search-input-group {
   word-wrap: break-word;
 }
 #footer input::placeholder {
+  /* Chrome, Firefox, Opera, Safari 10.1+ */
   color: white;
   opacity: 1;
+  /* Firefox */
 }
 #footer input:-ms-input-placeholder {
+  /* Internet Explorer 10-11 */
   color: white;
 }
 #footer input::-ms-input-placeholder {
+  /* Microsoft Edge */
   color: white;
 }
 #footer .one_half,
@@ -1128,6 +1061,10 @@ div.search-input-group {
   font-size: 30px;
   color: #fff;
   background: #202020;
+  -webkit-transition: all 0.3s ease;
+  -moz-transition: all 0.3s ease;
+  -ms-transition: all 0.3s ease;
+  -o-transition: all 0.3s ease;
   transition: all 0.3s ease;
 }
 
@@ -1189,6 +1126,7 @@ div.search-input-group {
   float: left;
   clear: left;
   text-align: left;
+  font-weight: 700;
   color: #333;
   font-weight: 600;
 }

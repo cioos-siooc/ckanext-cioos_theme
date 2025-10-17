@@ -20,9 +20,6 @@ $mamawidth: 900px;
 $teenbreak: 770px;
 $teenwidth: 100%;
 
-/* ------------------------------------------------------------------
-   Generic text bits (unchanged)
--------------------------------------------------------------------*/
 .media-heading {
   font-size: 16px;
   color: #333333;
@@ -33,122 +30,40 @@ $teenwidth: 100%;
   vertical-align: middle;
 }
 
-/* ------------------------------------------------------------------
-   EOV / Media Grid — modern, float-free, scoped so it doesn't
-   affect other places that reuse these classes.
--------------------------------------------------------------------*/
-.media-grid {
-  list-style: none;
+.media-item {
+  position: relative;
+  float: left;
+  width: 150px;
+  padding: 10px;
+  margin: 0 0 10px 10px;
+  background-color: white;
+  border-radius: 3px;
+  min-height: 75px;
+  height: 275px;
+}
+
+.media-item .media-image {
   margin: 0;
-  padding: 0;
+  padding: 0 0 10px 0;
+  display: unset;
+  max-width: 135px;
+  max-height: 135px;
+  align-items: center; /* vertical center */
+  justify-content: center; /* horizontal center */
+  object-fit: contain;
+}
+
+.media-item .item-count {
+  margin: 28px 10px;
+  float: right;
+}
+
+.media-grid {
   background: none;
   background-color: #f8f8f8;
   border: none;
   min-height: unset;
-
-  display: grid;
-  grid-template-columns: repeat(6, 150px);
-  gap: 16px;
-
-  // responsive columns using your existing breakpoints
-  @media (max-width: $papabreak) {
-    grid-template-columns: repeat(5, 150px);
-  }
-  @media (max-width: $mamabreak) {
-    grid-template-columns: repeat(4, 150px);
-  }
-  @media (max-width: $teenbreak) {
-    grid-template-columns: repeat(3, 150px);
-  }
-  @media (max-width: 520px) {
-    grid-template-columns: repeat(2, 150px);
-  }
-
-  // ensure only direct li children are grid items, kill legacy widths/margins/floats
-  > li {
-    width: auto !important;
-    margin: 0 !important;
-    float: none !important;
-  }
-
-  .media-item {
-    position: relative;
-    padding: 0;
-    margin: 0;
-    background-color: #fff;
-    border: 1px solid #e6e6e6;
-    border-radius: 6px;
-    min-height: 0; // no forced height
-    box-shadow: none;
-
-    // clickable area becomes a vertical card: image on top, text below
-    > a.media-image {
-      position: relative;
-      display: block;
-      padding: 14px 14px 46px; // bottom room for badge
-      text-decoration: none;
-
-      // icon/image
-      > img.media-image {
-        display: block;
-        width: 100% !important;
-        height: auto !important;
-        aspect-ratio: 1 / 1; // template-like square tiles
-        object-fit: cover; // swap to "contain" if you prefer whitespace around SVGs
-        margin: 0 0 10px 0;
-        background: #f2f2f2; // subtle placeholder
-      }
-    }
-
-    // title inside the grid — remove global max-width and clamp lines
-    .media-heading {
-      max-width: none !important;
-      display: -webkit-box;
-      -webkit-line-clamp: 3;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      font-size: 15px;
-      line-height: 1.35;
-      color: #2e3a40;
-      margin: 0;
-    }
-
-    // small circular count badge pinned bottom-left
-    .item-count {
-      position: absolute;
-      padding: 0;
-      background: #bdbdbd;
-      color: #fff;
-      font-size: 12px;
-      border-radius: 50%;
-      width: 24px;
-      height: 24px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 24px;
-      line-height: 1;
-    }
-  }
-
-  // keep local typographic base modest so grid doesn't balloon
-  font-size: 14px;
-  line-height: 1.4;
 }
-/* Kill legacy clearfix ghosts so they don't become grid items */
-.media-grid::before,
-.media-grid::after {
-  content: none !important;
-  display: none !important;
-}
-
-/* ------------------------------------------------------------------
-   Legacy float-based media styles removed/replaced above.
-   (Kept here for reference; now overridden by the scoped rules.)
--------------------------------------------------------------------*/
-// .media-item { ...float/width... }  // removed
-// .media-item .media-image { ...75px... } // removed
-// .media-item .item-count { ...float right... } // removed
 
 .main,
 [role="main"] {
@@ -534,8 +449,8 @@ body {
       }
     }
   }
-
-  /* Mobile topbar */
+  /* Mobile topbar
+  ======================= */
   .topbar {
     margin-top: 30px;
   }
@@ -570,11 +485,12 @@ body {
   .main-nav-check {
     display: none;
   }
+
   .close-menu {
     display: none;
   }
-
-  /* Mobile navigation Animations */
+  /* Mobile navigation Animations
+  ================================== */
   #main-nav-check:checked ~ .toggle-menu label:before {
     content: "\f056";
   }
@@ -879,6 +795,10 @@ ul.formats {
 .logo img {
   width: auto;
   max-height: 85px;
+  -webkit-transition: all 0.3s ease;
+  -moz-transition: all 0.3s ease;
+  -ms-transition: all 0.3s ease;
+  -o-transition: all 0.3s ease;
   transition: all 0.3s ease;
 }
 
@@ -895,6 +815,7 @@ ul.formats {
 .media-item-disabled:active {
   pointer-events: none;
 }
+
 .media-item-disabled {
   pointer-events: auto;
   opacity: 0.6;
@@ -967,6 +888,7 @@ div.search-input-group {
 
   #logo img {
     font-size: 1rem;
+    // width: auto;
     height: 6em;
     vertical-align: middle;
     border: 0;
@@ -1078,10 +1000,12 @@ div.search-input-group {
 
   #header .menu > li > a span,
   #header .menu > li.current-menu-item > a span {
+    //color: #58595b;
     font-weight: 700;
   }
 
   #header .sub-menu > li > a span {
+    //color: #58595b;
     font-weight: 400;
   }
 
@@ -1100,6 +1024,7 @@ div.search-input-group {
     display: block;
     visibility: visible;
   }
+
   #header .menu .subhide {
     display: none;
     visibility: hidden;
@@ -1130,6 +1055,7 @@ div.search-input-group {
   #header .menu > li > a:hover::after,
   #header .menu > li.current_page_item > a::after {
     width: 100%;
+    //margin-top: -3px;
   }
 }
 
@@ -1202,13 +1128,19 @@ div.search-input-group {
   }
 
   input::placeholder {
+    /* Chrome, Firefox, Opera, Safari 10.1+ */
     color: white;
     opacity: 1;
+    /* Firefox */
   }
+
   input:-ms-input-placeholder {
+    /* Internet Explorer 10-11 */
     color: white;
   }
+
   input::-ms-input-placeholder {
+    /* Microsoft Edge */
     color: white;
   }
 
@@ -1233,9 +1165,11 @@ div.search-input-group {
   .one_sixth {
     width: 14.5%;
   }
+
   .one_third {
     width: 31.6%;
   }
+
   .one_half {
     width: 48.7%;
   }
@@ -1270,6 +1204,10 @@ div.search-input-group {
   font-size: 30px;
   color: #fff;
   background: #202020;
+  -webkit-transition: all 0.3s ease;
+  -moz-transition: all 0.3s ease;
+  -ms-transition: all 0.3s ease;
+  -o-transition: all 0.3s ease;
   transition: all 0.3s ease;
 }
 
@@ -1341,7 +1279,9 @@ div.search-input-group {
   dl.scheming-subfield-list dt {
     float: left;
     clear: left;
+    // width: 70px;
     text-align: left;
+    font-weight: 700;
     color: #333;
     font-weight: 600;
   }
@@ -1352,9 +1292,11 @@ div.search-input-group {
   }
 
   dl.scheming-subfield-list dd {
+    // float: left;
     min-width: 150px;
     width: 100%;
     margin-inline-start: 10px;
+    // max-width: 395px;
   }
 }
 
@@ -1362,6 +1304,7 @@ div.search-input-group {
   h3 {
     font-weight: 400;
   }
+
   strong {
     font-weight: 600;
   }
@@ -1391,7 +1334,6 @@ div.search-input-group {
   #dataset-contacts .identifier_icon_list {
     max-height: 16px;
   }
-
   dl.organization-field-list dt {
     float: left;
     clear: left;
@@ -1425,7 +1367,6 @@ div.search-input-group {
   .identifier_icon_list {
     max-height: 32px;
   }
-
   .input-group-addon {
     color: #555555;
     background-color: #fff;
@@ -1460,7 +1401,6 @@ section {
   a.section_hide_controle i {
     margin-left: 10px;
   }
-
   a.section_hide_controle.collapsed i::before {
     font-family: "FontAwesome";
     content: "\f0fe";
