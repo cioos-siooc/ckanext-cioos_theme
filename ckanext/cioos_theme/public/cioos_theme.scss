@@ -54,8 +54,11 @@ $teenwidth: 100%;
 }
 
 .media-item .item-count {
-  margin-top: 4px;
-  float: left;
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  margin: 0;
+  float: none;
 }
 
 .media-grid {
