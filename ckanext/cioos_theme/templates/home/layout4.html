@@ -32,7 +32,7 @@
             {% set count = count_label(item['count']) if count_label else ('%d' % item['count']) %}
             {% set icon_base = g.eov_icon_base_path or '/base/images/eov-icons-svg/' %}
             {% set img_url = item.image_display_url or h.url_for_static(icon_base + item.get('icon')) %}
-            <li class="media-item {{ 'media-item-disabled' if count|trim == '0'}}">
+            <li class="media-item {{ 'media-item-disabled' if count|trim == '0'}}" style="height: 245px;">
               <a class="media-image" href="{{ href }}" title="{{ label if label != label_truncated else '' }}">
                 <img rel="preload" as="image" type="image/svg+xml" src="{{ img_url }}" alt="{{ item.name }}" class="media-image img-responsive">
                 <div class="media-heading">{{ label_truncated }}</div>
