@@ -3,6 +3,7 @@
   font-size: 16px;
   color: #333333;
   max-width: 212px;
+  width: 100%;
   word-break: break-word;
   display: inline-block;
   margin: 0;
@@ -18,7 +19,6 @@
   background-color: white;
   border-radius: 3px;
   min-height: 75px;
-  height: 275px;
 }
 
 .media-item .media-image {
@@ -33,8 +33,8 @@
 }
 
 .media-item .item-count {
-  margin: 28px 10px;
-  float: right;
+  margin-top: 4px;
+  float: left;
 }
 
 .media-grid {
