@@ -1,62 +1,47 @@
 {% macro include_site_footer() %}
 {% block footer_core %}
-<div id="footer-col1" class="widget-area one_sixth width_auto">
+<div id="footer-col1" class="widget-area one_sixth">
 	<aside class="widget widget_text">
 		<h3 class="footer-widget-title">
-			<span>CONTACT US</span>
+			<span> {{_('CONTACT US')}}</span>
 		</h3>
 		<div class="textwidget">
 			<p>
-				<a href="mailto:{{ h.cioos_contact_email() }}">{{ h.cioos_contact_email() }}</a>
+				<a href="mailto:info@cioos.ca">info@cioos.ca</a><br>
+				<a href="https://www.jotform.com/form/200203999319256">{{_('Submit feedback')}}</a>
 			</p>
 		</div>
 	</aside>
 </div>
-<div id="footer-col2" class="widget-area one_sixth width_auto">
+<div id="footer-col2" class="widget-area one_third">
 	<aside class="widget widget_text">
 		<h3 class="footer-widget-title">
-			<span>CIOOS</span>
+			<span> {{_('CIOOS')}}</span>
 		</h3>
 		<div class="textwidget">
 			<div class="widget-area width_auto">
 				<aside class="widget_text widget widget_custom_html">
-					<div>
-						<a href="https://www.cioos.ca/">CIOOS National</a>
-					</div>
 					<div class="textwidget custom-html-widget">
-						<a href="#">Pacific Region</a>
+						<a href="https://cioospacific.ca/"> {{_('Pacific Region')}}</a>
 						<br>
-						<a href="https://new.ogsl.ca/en/home/">St. Lawrence Region</a>
+						<a href="https://ogsl.ca"> {{_('St. Lawrence Region')}}</a>
 						<br>
-						<a href="https://cioosatlantic.ca/">Atlantic Region</a>
+						<a href="https://cioosatlantic.ca/"> {{_('Atlantic Region')}}</a>
 					</div>
 				</aside>
 			</div>
 		</div>
 	</aside>
 </div>
-<div id="footer-col3" class="widget-area one_sixth">
-	<aside class="widget widget_nav_menu">
-		<h3 class="footer-widget-title"><span>DATA</span></h3>
-		<div class="textwidget">
-			<div class="widget-area width_auto">
-				<aside class="widget_text widget widget_custom_html">
-					<div>
-						<a href="{{ h.url_for('home.index') }}">DATA CATALOG</a>
-					</div>
-				</aside>
-			</div>
-	</aside>
-</div>
-<div id="footer-col4" class="widget-area last one_half">
+<div id="footer-col3" class="widget-area last one_half width_auto">
 	<aside class="widget_text widget widget_custom_html">
 		<h3 class="footer-widget-title">
-			<span>SUBSCRIBE TO CIOOS VIA EMAIL</span>
+			<span> {{_('SUBSCRIBE TO CIOOS VIA EMAIL')}}</span>
 		</h3>
 		<div class="textwidget custom-html-widget">
 			<div id="mc_embed_signup">
 				<form
-					action="https://cioos.us4.list-manage.com/subscribe/post?u=878a48e5216df1dd94addb795&amp;id=a3c7b19b1e"
+					action="https://cioos.us4.list-manage.com/subscribe/post?u=878a48e5216df1dd94addb795&id=a3c7b19b1e"
 					method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate"
 					target="_blank" novalidate="">
 					<div id="mc_embed_signup_scroll">
@@ -70,11 +55,11 @@
 							</div>
 							<div class="mc-field-group email">
 								<input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL"
-									placeholder="Email Address">
+									placeholder="{{_('Email Address')}}">
 							</div>
 							<div class="clear">
-								<input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe"
-									class="subscribe">
+								<input type="submit" value="{{_('SUBSCRIBE')}}" name="subscribe"
+									id="mc-embedded-subscribe" class="subscribe">
 							</div>
 						</div>
 					</div>
@@ -82,7 +67,6 @@
 			</div>
 		</div>
 	</aside>
-</div>
 </div>
 {% endblock %}
 {% endmacro %}
