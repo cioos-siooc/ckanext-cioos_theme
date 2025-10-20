@@ -8,7 +8,17 @@
 		<div class="textwidget">
 			<p>
 				<a href="mailto:info@cioos.ca">info@cioos.ca</a><br>
-				<a href="https://www.jotform.com/form/200203999319256">{{_('Submit feedback')}}</a>
+				{%- if h.lang() == 'en' -%}
+				<a
+					href="https://docs.google.com/forms/d/e/1FAIpQLSeVJNzjk2AKJJ2IowUKPGH_ci9IfzWJvH8vvQL7tf3BfHFB2A/viewform?usp=header">
+					{{_('Submit feedback')}}
+				</a>
+				{%- else -%}
+				<a
+					href="https://docs.google.com/forms/d/e/1FAIpQLSeptvtJUnvoeDGWDiW6K7OjoBYQSfrsmFP6HWhxUBCgWCr-tA/viewform?usp=header">
+					{{_('Submit feedback')}}
+				</a>
+				{%- endif -%}
 			</p>
 		</div>
 	</aside>
