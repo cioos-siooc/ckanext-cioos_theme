@@ -1,83 +1,82 @@
 {% macro include_site_footer() %}
-  {% block footer_core %}
-			<div id="footer-col1" class="widget-area one_sixth width_auto">
-				<aside class="widget widget_text">
-					<h3 class="footer-widget-title">
-						<span>CONTACT US</span>
-					</h3>
-					<div class="textwidget">
-						<p>
-							<a href="mailto:{{ h.cioos_contact_email() }}">{{ h.cioos_contact_email() }}</a>
-						</p>
-					</div>
-				</aside>
-			</div>
-			<div id="footer-col2" class="widget-area one_sixth width_auto">
-				<aside class="widget widget_text">
-					<h3 class="footer-widget-title">
-						<span>CIOOS</span>
-					</h3>
-					<div class="textwidget">
-						<div class="widget-area width_auto">
-							<aside class="widget_text widget widget_custom_html">
-								<div>
-									<a href="https://www.cioos.ca/">CIOOS National</a>
-								</div>
-								<div class="textwidget custom-html-widget">
-									<a href="#">Pacific Region</a>
-									<br>
-									<a href="https://new.ogsl.ca/en/home/">St. Lawrence Region</a>
-									<br>
-									<a href="https://cioosatlantic.ca/">Atlantic Region</a>
-								</div>
-							</aside>
-						</div>
-					</div>
-				</aside>
-			</div>
-      <div id="footer-col3" class="widget-area one_sixth">
-        <aside class="widget widget_nav_menu">
-          <h3 class="footer-widget-title"><span>DATA</span></h3>
-          <div class="textwidget">
-						<div class="widget-area width_auto">
-							<aside class="widget_text widget widget_custom_html">
-								<div>
-									<a href="{{ h.url_for('home.index') }}">DATA CATALOG</a>
-								</div>
-              </aside>
-          </div>
-        </aside>
-      </div>
-			<div id="footer-col4" class="widget-area last one_half">
+{% block footer_core %}
+<div id="footer-col1" class="widget-area one_sixth">
+	<aside class="widget widget_text">
+		<h3 class="footer-widget-title">
+			<span> {{_('CONTACT US')}}</span>
+		</h3>
+		<div class="textwidget">
+			<p>
+				<a href="mailto:info@cioos.ca">info@cioos.ca</a><br>
+				{%- if h.lang() == 'en' -%}
+				<a
+					href="https://docs.google.com/forms/d/e/1FAIpQLSeVJNzjk2AKJJ2IowUKPGH_ci9IfzWJvH8vvQL7tf3BfHFB2A/viewform?usp=header">
+					{{_('Submit feedback')}}
+				</a>
+				{%- else -%}
+				<a
+					href="https://docs.google.com/forms/d/e/1FAIpQLSeptvtJUnvoeDGWDiW6K7OjoBYQSfrsmFP6HWhxUBCgWCr-tA/viewform?usp=header">
+					{{_('Submit feedback')}}
+				</a>
+				{%- endif -%}
+			</p>
+		</div>
+	</aside>
+</div>
+<div id="footer-col2" class="widget-area one_third">
+	<aside class="widget widget_text">
+		<h3 class="footer-widget-title">
+			<span> {{_('CIOOS')}}</span>
+		</h3>
+		<div class="textwidget">
+			<div class="widget-area width_auto">
 				<aside class="widget_text widget widget_custom_html">
-					<h3 class="footer-widget-title">
-						<span>SUBSCRIBE TO CIOOS VIA EMAIL</span>
-					</h3>
 					<div class="textwidget custom-html-widget">
-						<div id="mc_embed_signup">
-							<form action="https://cioos.us4.list-manage.com/subscribe/post?u=878a48e5216df1dd94addb795&amp;id=a3c7b19b1e" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate="">
-								<div id="mc_embed_signup_scroll">
-									<div id="mce-responses" class="clear">
-										<div class="response" id="mce-error-response" style="display:none"></div>
-										<div class="response" id="mce-success-response" style="display:none"></div>
-									</div>
-									<div class="subcribe_container">
-										<div style="position: absolute; left: -5000px;" aria-hidden="true">
-											<input type="text" name="b_bbfb1b3442ef6556f2c6cdfff_da0cc8ed40" tabindex="-1" value="">
-										</div>
-										<div class="mc-field-group email">
-											<input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="Email Address">
-										</div>
-										<div class="clear">
-											<input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="subscribe">
-										</div>
-									</div>
-								</div>
-							</form>
-						</div>
+						<a href="https://cioospacific.ca/"> {{_('Pacific Region')}}</a>
+						<br>
+						<a href="https://ogsl.ca"> {{_('St. Lawrence Region')}}</a>
+						<br>
+						<a href="https://cioosatlantic.ca/"> {{_('Atlantic Region')}}</a>
 					</div>
 				</aside>
 			</div>
 		</div>
-  {% endblock %}
+	</aside>
+</div>
+<div id="footer-col3" class="widget-area last one_half width_auto">
+	<aside class="widget_text widget widget_custom_html">
+		<h3 class="footer-widget-title">
+			<span> {{_('SUBSCRIBE TO CIOOS VIA EMAIL')}}</span>
+		</h3>
+		<div class="textwidget custom-html-widget">
+			<div id="mc_embed_signup">
+				<form
+					action="https://cioos.us4.list-manage.com/subscribe/post?u=878a48e5216df1dd94addb795&id=a3c7b19b1e"
+					method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate"
+					target="_blank" novalidate="">
+					<div id="mc_embed_signup_scroll">
+						<div id="mce-responses" class="clear">
+							<div class="response" id="mce-error-response" style="display:none"></div>
+							<div class="response" id="mce-success-response" style="display:none"></div>
+						</div>
+						<div class="subcribe_container">
+							<div style="position: absolute; left: -5000px;" aria-hidden="true">
+								<input type="text" name="b_bbfb1b3442ef6556f2c6cdfff_da0cc8ed40" tabindex="-1" value="">
+							</div>
+							<div class="mc-field-group email">
+								<input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL"
+									placeholder="{{_('Email Address')}}">
+							</div>
+							<div class="clear">
+								<input type="submit" value="{{_('SUBSCRIBE')}}" name="subscribe"
+									id="mc-embedded-subscribe" class="subscribe">
+							</div>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</aside>
+</div>
+{% endblock %}
 {% endmacro %}
