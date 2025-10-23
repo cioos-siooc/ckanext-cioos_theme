@@ -466,6 +466,18 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         log_auth.info('Logout by %s from %s', toolkit.request.remote_user, remote_addr)
         return
 
+    def authenticate(self, identity):
+        '''Authenticate the user.
+
+        This method is called by CKAN to authenticate the user.
+        We don't do any custom authentication here, just pass through
+        to allow the default CKAN authentication to work.
+
+        Returns None to indicate that we're not handling authentication,
+        allowing other authenticators to process the identity.
+        '''
+        return None
+
     def abort(self, status_code, detail, headers, comment):
         '''Handle an abort.'''
         try:
