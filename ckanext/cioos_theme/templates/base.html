@@ -33,9 +33,10 @@
 
   {%- block styles %}
   {# TODO: store just name of asset instead of path to it. #}
-  {% set theme = h.get_rtl_css() if h.is_rtl_language() else config.get('ckan.theme', 'css/main') %}
+  {% set theme = h.get_rtl_css() if h.is_rtl_language() else config.get('ckan.theme', '/base/css/main.css') %}
   {# strip '/base/' prefix and '.css' suffix #}
-  {% if theme %}{% asset theme[6:-4] %}{% endif %}
+  {% set asset_name = theme[6:-4] if theme and theme|length > 10 else '' %}
+  {% if asset_name %}{% asset asset_name %}{% endif %}
   {% endblock %}
 
   {# render all assets included in styles block #}
