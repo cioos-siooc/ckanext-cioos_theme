@@ -1,5 +1,5 @@
 {% extends "page.html" %}
-{% set homepage_style = ( g.homepage_style or '1' ) %}
+{% set homepage_style = ( config.get('ckan.homepage_style') or '1' ) %}
 
 {% block subtitle %}{% endblock %}
 

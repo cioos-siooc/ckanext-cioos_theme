@@ -24,6 +24,6 @@
 
 {% block flash %}
   {# eat the flash messages caused by the 404 #}
-  {% set flash_messages = h.flash.pop_messages() %}
+  {# Note: In CKAN 2.11, flash messages are handled by the base template #}
 {% endblock %}
 

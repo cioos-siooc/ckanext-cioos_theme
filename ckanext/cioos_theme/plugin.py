@@ -507,6 +507,8 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             'ckan.show_harvested_from_in_dataset_sidebar': [ignore_missing, boolean_validator],
             'ckan.show_language_picker_in_top_bar': [ignore_missing, boolean_validator],
             'ckan.show_language_picker_in_menu': [ignore_missing, boolean_validator],
+            'ckan.cioos.ra_css_path': [ignore_missing],
+            'ckan.homepage_style': [ignore_missing],
         })
         return schema
 
