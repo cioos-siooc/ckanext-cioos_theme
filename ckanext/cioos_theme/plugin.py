@@ -329,6 +329,7 @@ def dcat_dataset_show(up_func, context, data_dict):
 class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
     plugins.implements(plugins.ITranslation)
     plugins.implements(plugins.IConfigurer)
+    plugins.implements(plugins.IConfigDeclaration)
     plugins.implements(plugins.ITemplateHelpers)
     plugins.implements(plugins.IFacets)
     plugins.implements(plugins.IPackageController, inherit=True)
@@ -511,6 +512,32 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             'ckan.homepage_style': [ignore_missing],
         })
         return schema
+
+    # IConfigDeclaration
+
+    def declare_config_options(self, declaration, key):
+        # Regional Association CSS path
+        declaration.declare("ckan.cioos.ra_css_path")
+        # Homepage style
+        declaration.declare("ckan.homepage_style")
+        # Site configuration options
+        declaration.declare("ckan.site_heading")
+        declaration.declare("ckan.site_logo_translated")
+        declaration.declare("ckan.site_home_url")
+        # EOV (Essential Ocean Variables) configuration
+        declaration.declare("ckan.exclude_eov_category")
+        declaration.declare("ckan.exclude_eov")
+        declaration.declare("ckan.eov_icon_base_path")
+        # Header/Footer configuration
+        declaration.declare("ckan.header_file_name")
+        declaration.declare("ckan.footer_file_name")
+        # Display options
+        declaration.declare("ckan.show_social_in_dataset_sidebar")
+        declaration.declare("ckan.hide_organization_in_breadcrumb")
+        declaration.declare("ckan.hide_organization_in_dataset_sidebar")
+        declaration.declare("ckan.show_harvested_from_in_dataset_sidebar")
+        declaration.declare("ckan.show_language_picker_in_top_bar")
+        declaration.declare("ckan.show_language_picker_in_menu")
 
     def get_additional_css_path(self):
         return toolkit.config.get('ckan.cioos.ra_css_path')
