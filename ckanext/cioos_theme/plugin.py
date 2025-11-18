@@ -493,6 +493,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             'ckan.site_heading': [ignore_missing, fluent_field_default(None, None), fluent_text(None, None)],
             'ckan.site_description': [ignore_missing, fluent_field_default(None, None), fluent_text(None, None)],
             'ckan.site_about': [ignore_missing, fluent_field_default(None, None), fluent_text(None, None)],
+            'ckan.site_about_markdown_file': [ignore_missing],
             'ckan.site_intro_text': [ignore_missing, fluent_field_default(None, None), fluent_text(None, None)],
             'ckan.site_logo_translated': [ignore_missing, fluent_field_default(None, None), fluent_text(None, None)],
             'ckan.site_home_url': [ignore_missing, url_validator_with_port],
@@ -542,7 +543,8 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             'cioos_get_ra_extents_url': cioos_helpers.get_ra_extents_url,
             'cioos_get_extra_value': self._get_extra_value,
             'cioos_append_to_homepages': cioos_helpers.append_to_homepages,
-            'cioos_structured_data': cioos_helpers.cioos_structured_data
+            'cioos_structured_data': cioos_helpers.cioos_structured_data,
+            'cioos_load_about_markdown': cioos_helpers.load_about_markdown
         }
 
     def get_validators(self):

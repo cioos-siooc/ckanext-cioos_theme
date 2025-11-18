@@ -43,6 +43,53 @@ def load_json(j):
         new_val = j
     return new_val
 
+
+def load_about_markdown():
+    """
+    Load about page content from markdown files.
+
+    Supports multilingual markdown files via ckan.site_about_markdown_file config.
+
+    Config format (JSON string):
+    {"en": "/path/to/about_en.md", "fr": "/path/to/about_fr.md"}
+
+    Returns:
+        dict: Dictionary with language keys and markdown content, or None if not configured
+    """
+    markdown_file_config = config.get('ckan.site_about_markdown_file')
+
+    if not markdown_file_config:
+        return None
+
+    try:
+        # Parse the JSON config
+        file_paths = load_json(markdown_file_config)
+
+        if not isinstance(file_paths, dict):
+            log.warning('ckan.site_about_markdown_file must be a JSON object with language keys')
+            return None
+
+        markdown_content = {}
+
+        # Load markdown files for each language
+        for lang, file_path in file_paths.items():
+            if not file_path:
+                continue
+
+            try:
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    markdown_content[lang] = f.read()
+            except FileNotFoundError:
+                log.error(f'About markdown file not found: {file_path}')
+            except IOError as e:
+                log.error(f'Error reading about markdown file {file_path}: {e}')
+
+        return markdown_content if markdown_content else None
+
+    except Exception as e:
+        log.error(f'Error loading about markdown files: {e}')
+        return None
+
 # def get_organization_list(data_dict):
 #     '''Returns a list of organizations.
 #
