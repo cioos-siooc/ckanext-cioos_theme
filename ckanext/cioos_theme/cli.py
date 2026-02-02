@@ -6,7 +6,6 @@ from ckanext.cioos_theme.util.package_relationships import get_relationships_fro
 import re
 import os
 import math
-from past.utils import old_div
 from ckan.plugins.toolkit import config
 import json
 import datetime
@@ -128,7 +127,7 @@ def write_sitemap_files(count, start, filename_number, file_list, page_size,
         'filename_s3': relPath
     })
 
-    for x in range(0, int(math.ceil(old_div(count, page_size))) + 1):
+    for x in range(0, int(math.ceil(count / page_size)) + 1):
         pkgs = package_query.get_paginated_entity_name_modtime(
             max_results=page_size, start=start
         )
@@ -149,7 +148,7 @@ def write_sitemap_files(count, start, filename_number, file_list, page_size,
         start = start + page_size
 
         if start % max_per_page == 0 and \
-                x != int(math.ceil(old_div(count, page_size))):
+            x != int(math.ceil(count / page_size)):
 
             # write footer
             os.write(fd, '</urlset>\n'.encode('utf-8'))
