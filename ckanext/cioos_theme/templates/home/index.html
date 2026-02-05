@@ -1,18 +1,9 @@
-{% extends "page.html" %}
-{% set homepage_style = ( g.homepage_style or '1' ) %}
-
-{% block subtitle %}{% endblock %}
-
-{% block maintag %}{% endblock %}
-{% block toolbar %}{% endblock %}
-
-{% block content %}
-  <div class="homepage layout-{{ homepage_style }}">
-    <div class="container">
-      {{ self.flash() }}
-    </div>
-    {% block primary_content %}
-      {% snippet "home/layout{0}.html".format(homepage_style) %}
-    {% endblock %}
-  </div>
+{% extends "page.html" %} {% set homepage_style = h.cioos_get_homepage_style()
+%} {% block subtitle %}{% endblock %} {% block maintag %}{% endblock %} {% block
+toolbar %}{% endblock %} {% block content %}
+<div class="homepage layout-{{ homepage_style }}">
+  <div class="container">{{ self.flash() }}</div>
+  {% block primary_content %} {% snippet
+  "home/layout{0}.html".format(homepage_style) %} {% endblock %}
+</div>
 {% endblock %}

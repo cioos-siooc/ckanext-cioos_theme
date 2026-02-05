@@ -23,7 +23,7 @@
         (_('Last Modified'), 'metadata_modified desc'),
         (_('Popular'), 'views_recent desc') if g.tracking_enabled else (false, false) ]
       %}
-      {% snippet 'snippets/search_form.html', form_id='organization-datasets-search-form', type='dataset', query=q, sorting=sorting, sorting_selected=sort_by_selected, count=page.item_count, facets=facets, placeholder=_('Search datasets...'), show_empty=request.params, fields=fields %}
+      {% snippet 'snippets/search_form.html', form_id='organization-datasets-search-form', type='dataset', query=q, sorting=sorting, sorting_selected=sort_by_selected, count=page.item_count, facets=facets, placeholder=_('Search datasets...'), show_empty=request.args, fields=fields %}
     {% endblock %}
   {% block packages_list %}
     {% if page.items %}
@@ -38,7 +38,8 @@
 {% block organization_facets %}
   <div class="filters">
     <div>
-      {% snippet "spatial/snippets/spatial_query.html" , default_extent= h.spatial_default_extent() %}
+      {% set default_extent = h.spatial_default_extent() if h.cioos_helper_available('spatial_default_extent') else h.cioos_get_cfg('ckan.spatial.default_extent', '[-180,-90,180,90]') %}
+      {% snippet "spatial/snippets/spatial_query.html" , default_extent= default_extent %}
       {% snippet "snippets/daterange.html" %}
       {% for facet in facet_titles %}
         {{ h.snippet('snippets/facet_list.html', title=facet_titles[facet], name=facet, hide_empty="true", extras={'id':group_dict.id}) }}

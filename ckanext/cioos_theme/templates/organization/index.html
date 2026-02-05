@@ -17,10 +17,10 @@
 {% block primary_content_inner %}
   <h1 class="hide-heading">{% block page_heading %}{{ _('Organizations') }}{% endblock %}</h1>
   {% block organizations_search_form %}
-    {% snippet 'snippets/search_form.html', form_id='organization-search-form', type='organization', query=q, sorting_selected=sort_by_selected, count=page.item_count, placeholder=_('Search organizations...'), show_empty=request.params, no_bottom_border=true if page.items, sorting = [(_('Name Ascending'), 'title asc'), (_('Name Descending'), 'title desc'), (_('Datasets Ascending'), 'package_count asc'), (_('Datasets Descending'), 'package_count desc')] %}
+    {% snippet 'snippets/search_form.html', form_id='organization-search-form', type='organization', query=q, sorting_selected=sort_by_selected, count=page.item_count, placeholder=_('Search organizations...'), show_empty=request.args, no_bottom_border=true if page.items, sorting = [(_('Name Ascending'), 'title asc'), (_('Name Descending'), 'title desc'), (_('Datasets Ascending'), 'package_count asc'), (_('Datasets Descending'), 'package_count desc')] %}
   {% endblock %}
   {% block organizations_list %}
-    {% if page.items or request.params %}
+    {% if page.items or request.args %}
       {% if page.items %}
         {% snippet "organization/snippets/organization_list.html", organizations=page.items %}
       {% endif %}

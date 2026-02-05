@@ -1,8 +1,8 @@
 {% extends "page.html" %}
 {% import 'macros/form.html' as form %}
 {% set lang = h.lang() %}
-{% set default_extent = h.spatial_default_extent() %}
-{% set dataset_extents_url = h.cioos_get_dataset_extents_url(q=c.q, fields=c.fields, bbox_values=dict(request.params).get('ext_bbox'), output='json') %}
+{% set default_extent = h.spatial_default_extent() if h.cioos_helper_available('spatial_default_extent') else h.cioos_get_cfg('ckan.spatial.default_extent', '[-180,-90,180,90]') %}
+{% set dataset_extents_url = h.cioos_get_dataset_extents_url(q=c.q, fields=c.fields, bbox_values=request.args.get('ext_bbox'), output='json') %}
 {% set ra_extents_url = h.cioos_get_ra_extents_url() %}
 
 {% block subtitle %}{{ _("Datasets") }}{% endblock %}
@@ -39,7 +39,7 @@
           (_('Last Modified'), 'metadata_modified desc'),
           (_('Popular'), 'views_recent desc') if g.tracking_enabled else (false, false) ]
         %}
-        {% snippet 'snippets/search_form.html', form_id='dataset-search-form', type=dataset_type, query=c.q, sorting=sorting, sorting_selected=c.sort_by_selected, count=c.page.item_count, placeholder=_('Search ' + dataset_type + 's') + '...', facets=facets, show_empty=request.params, error=c.query_error, fields=c.fields %}
+        {% snippet 'snippets/search_form.html', form_id='dataset-search-form', type=dataset_type, query=c.q, sorting=sorting, sorting_selected=c.sort_by_selected, count=c.page.item_count, placeholder=_('Search ' + dataset_type + 's') + '...', facets=facets, show_empty=request.args, error=c.query_error, fields=c.fields %}
       {% endblock %}
       {% block package_search_results_list %}
         {{ h.snippet('snippets/package_list.html', packages=c.page.items) }}

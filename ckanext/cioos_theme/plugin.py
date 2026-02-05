@@ -316,7 +316,7 @@ def cioos_home_index():
 def dcat_dataset_show(up_func, context, data_dict):
 
     parent_output = up_func(context, data_dict)
-    _frame = toolkit.request.params.get('frame')
+    _frame = toolkit.request.args.get('frame')
     if _frame == 'schemaorg':
         frametext =   {
             "@context": {"@vocab": "http://schema.org/"},
@@ -528,6 +528,8 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             'cioos_get_locale_url': self.get_locale_url,
             'cioos_schema_field_map': cioos_helpers.cioos_schema_field_map,
             'cioos_get_additional_css_path': self.get_additional_css_path,
+            'cioos_get_homepage_style': lambda: toolkit.config.get('ckan.homepage_style', '1'),
+            'cioos_get_cfg': lambda key, default=None: toolkit.config.get(key, default),
             'cioos_get_doi_authority_url': cioos_helpers.get_doi_authority_url,
             'cioos_get_doi_prefix': cioos_helpers.get_doi_prefix,
             'cioos_get_datacite_org': cioos_helpers.get_datacite_org,
@@ -620,7 +622,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
 
         # populate search_extras global if any were used
         search_extras = {}
-        for (param, value) in toolkit.request.params.items():
+        for (param, value) in toolkit.request.args.items():
             if param not in ['q', 'page', 'sort'] \
                     and len(value) and param.startswith('ext_'):
                 search_extras[param] = value

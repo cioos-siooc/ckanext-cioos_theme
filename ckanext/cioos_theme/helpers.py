@@ -141,10 +141,19 @@ def get_dataset_extents_url(q, fields, bbox_values, output=None):
         # ids = toolkit.get_action('spatial_query_geo')(data_dict={'bbox':bbox_values})
         search_params['bbox'] = bbox_values
 
-    search_url = toolkit.h.url_for(
-        'spatial_api.geo_package_search', register='dataset', **search_params)
-
-    return search_url
+    # Try known spatial API endpoints across ckanext-spatial versions
+    endpoints = [
+        'spatial_api.geo_package_search',
+        'spatial_api.package_search',
+        'spatial_api.geojson_package_search',
+    ]
+    for ep in endpoints:
+        try:
+            return toolkit.h.url_for(ep, register='dataset', **search_params)
+        except Exception:
+            continue
+    # Fallback: return empty string to avoid BuildError at render time
+    return ''
 
 
 def merge_dict(d1,d2):

@@ -27,10 +27,10 @@
     <h1 class="hide-heading">{{ _(group_label) }}</h1>
   {% endif %}
   {% block groups_search_form %}
-    {% snippet 'snippets/search_form.html', form_id='group-search-form', type= (group_type if group_type == 'group' else group_label.lower()), query=q, sorting_selected=sort_by_selected, count=page.item_count, placeholder=_('Search ' + group_label.lower() + '...'), show_empty=request.params, no_bottom_border=true if page.items, sorting = [(_('Name Ascending'), 'title asc'), (_('Name Descending'), 'title desc')] %}
+    {% snippet 'snippets/search_form.html', form_id='group-search-form', type= (group_type if group_type == 'group' else group_label.lower()), query=q, sorting_selected=sort_by_selected, count=page.item_count, placeholder=_('Search ' + group_label.lower() + '...'), show_empty=request.args, no_bottom_border=true if page.items, sorting = [(_('Name Ascending'), 'title asc'), (_('Name Descending'), 'title desc')] %}
   {% endblock %}
   {% block groups_list %}
-    {% if page.items or request.params %}
+    {% if page.items or request.args %}
       {% if page.items %}
         {% snippet "group/snippets/group_list.html", groups=page.items, group_label=group_label %}
       {% endif %}
