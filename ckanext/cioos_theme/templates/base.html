@@ -27,15 +27,10 @@
       {% block links -%}
       <link rel="shortcut icon" href="{{ g.favicon }}" />
       {% endblock -%} {%- block styles %} {# Use a safe default for CKAN 2.11
-      where g.main_css may be undefined #}
-      {% if h.is_rtl_language() %}
-      {% asset 'main_rtl' %}
-      {% else %}
-      {% asset 'main' %}
-      {% endif %}
-      {% endblock %}
-      {# render all assets included in styles block #}
-      {{ h.render_assets('style') }}
+      where g.main_css may be undefined #} {% if h.is_rtl_language() %} {% asset
+      'main_rtl' %} {% else %} {% asset 'main' %} {% endif %} {% endblock %} {#
+      render all assets included in styles block #} {{ h.render_assets('style')
+      }}
 
       <link
         rel="stylesheet"
