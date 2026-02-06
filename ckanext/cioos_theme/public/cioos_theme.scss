@@ -1,226 +1,42 @@
 /*
-  CIOOS Theme SCSS (reset)
-  Fresh baseline for CKAN 2.11.
+  CIOOS Theme SCSS
+  For CKAN 2.11
 
   How to build:
   - Ensure dart-sass is installed (eg: `brew install sass/sass/sass` or `npm i -g sass`).
   - From this directory run: `./compile_sass.sh`
-
-  Start adding your styles below. Keep selectors minimal and prefer
-  small, well-scoped overrides. Avoid resetting CKAN core styles
-  unless necessary.
 */
 
-// Example design tokens (add or remove as needed)
+// Design tokens / variables
+$defaultfont: Raleway, Helvetica, Arial;
+$headlinefont: "Montserrat", apple-system, BlinkMacSystemFont, "Segoe UI",
+  Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+$darkestblack: rgba(73, 73, 72, 1);
+$lighttextcolor: lighten($darkestblack, 95%);
+$navbg: #52a79b;
+$accent: #fa7268;
 $color-primary: #0a6cff;
-$color-accent: #fa7268;
 $text-body: #222;
 $font-body: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
 
-// Base (very light touch)
+// Breakpoints
+$papabreak: 1140px;
+$mamabreak: 980px;
+$teenbreak: 770px;
+
+// Base styles
 body {
   font-family: $font-body;
   color: $text-body;
 }
 
-// Example: customize primary buttons
-.btn-primary {
-  background-color: $color-primary;
-  border-color: $color-primary;
-}
-
-// Add new components/styles below
-          margin: 0;
-          width: 100%;
-          background: lighten($navbg, 10%);
-
-          a {
-            color: $lighttextcolor;
-            padding: 0 0 0 40px;
-            border: 0 solid lighten($navbg, 15%);
-
-            &:before {
-              content: "";
-            }
-          }
-        }
-
-        ul.sub-menu {
-          margin: 0;
-          position: relative;
-
-          li {
-            background: lighten($navbg, 20%);
-
-            a {
-              border: 0 solid lighten($navbg, 25%);
-              text-indent: 20px;
-
-              &:before {
-                content: "-- ";
-              }
-            }
-          }
-
-          ul.sub-menu {
-            margin: 0;
-            position: relative;
-
-            li {
-              background: lighten($navbg, 30%);
-
-              a {
-                border: 0 solid lighten($navbg, 35%);
-                text-indent: 30px;
-
-                &:before {
-                  content: "--- ";
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  /* Mobile topbar
-  ======================= */
-  .topbar {
-    margin-top: 30px;
-  }
-
-  .toggle-menu {
-    display: block;
-    text-align: center;
-
-    label {
-      margin: 0;
-      display: block;
-      background: $navbg;
-      overflow: hidden;
-      padding: 2% 5%;
-      color: #fff;
-      font-family: $headlinefont;
-      top: 0;
-      z-index: 1000;
-      box-shadow: 0 6px 19px rgba(0, 0, 0, 0.2);
-      cursor: pointer;
-      text-align: right;
-
-      &:before {
-        margin-right: 0.3333em;
-        content: "\f055";
-        font-family: "FontAwesome";
-        transition: all 0.3s ease;
-      }
-    }
-  }
-
-  .main-nav-check {
-    display: none;
-  }
-
-  .close-menu {
-    display: none;
-  }
-  /* Mobile navigation Animations
-  ================================== */
-  #main-nav-check:checked ~ .toggle-menu label:before {
-    content: "\f056";
-  }
-
-  #main-nav-check:checked ~ .mobile-nav ul.menu ul.subhide li a,
-  #main-nav-check:checked ~ .mobile-nav ul.menu ul.subhide li a.navdrop,
-  #main-nav-check:checked ~ .mobile-nav ul.menu ul.subhide li a.navdropover,
-  #main-nav-check:checked ~ .mobile-nav ul.menu ul.subhide ul.subshow li a,
-  #main-nav-check:checked
-    ~ .mobile-nav
-    ul.menu
-    ul.subhide
-    ul.subshow
-    li
-    a.navdrop,
-  #main-nav-check:checked
-    ~ .mobile-nav
-    ul.menu
-    ul.subhide
-    ul.subshow
-    li
-    a.navdropover,
-  #main-nav-check:checked ~ .mobile-nav ul.menu ul.subshow ul.subhide li a,
-  #main-nav-check:checked
-    ~ .mobile-nav
-    ul.menu
-    ul.subshow
-    ul.subhide
-    li
-    a.navdrop,
-  #main-nav-check:checked
-    ~ .mobile-nav
-    ul.menu
-    ul.subshow
-    ul.subhide
-    li
-    a.navdropover,
-  #main-nav-check ~ .mobile-nav ul.menu li a {
-    border-width: 0;
-    line-height: 0;
-    transition: all 0.2s ease;
-    height: 0;
-  }
-
-  #main-nav-check:checked ~ .mobile-nav ul.menu li a.navdrop,
-  #main-nav-check:checked ~ .mobile-nav ul.menu li a.navdropover,
-  #main-nav-check:checked ~ .mobile-nav ul.menu ul.subshow li a.navdrop,
-  #main-nav-check:checked ~ .mobile-nav ul.menu ul.subshow li a.navdropover {
-    border-width: 1px 0 0 0;
-    line-height: 2.75em;
-    transition: all 0.2s ease;
-    border-bottom: 1px solid transparent;
-  }
-
-  #main-nav-check:checked ~ .mobile-nav ul.menu li a {
-    line-height: 2.5em;
-    border-width: 1px 0 0 0;
-    transition: all 0.2s ease;
-    height: auto;
-    width: 100%;
-  }
-
-  #main-nav-check:checked ~ .mobile-nav ul.menu ul.subshow li a {
-    line-height: 2.5em;
-    border-width: 0 0 1px 0;
-    transition: all 0.2s ease;
-    height: auto;
-  }
-
-  #main-nav-check ~ .mobile-nav form,
-  #main-nav-check ~ .mobile-nav ul.menu li a.icons {
-    height: 0;
-    display: none;
-  }
-
-  #main-nav-check:checked ~ .mobile-nav form,
-  #main-nav-check:checked ~ .mobile-nav ul.menu li a.icons {
-    line-height: 1em;
-    display: block;
-    height: auto;
-    border: none;
-    border-width: 0;
-    transition: all 0.2s ease;
-  }
-
-  #main-nav-check ~ .mobile-nav.headericons {
-    border-top: 0;
-    padding: 0;
-    transition: all 0.2s ease;
-  }
-
-  #main-nav-check:checked ~ .mobile-nav.headericons {
-    border-top: 1px solid darken($navbg, 5%);
-    padding: 1em 0 0 0;
-    transition: all 0.2s ease;
-  }
+// Hide custom mobile navigation elements (defined in header.html)
+// These are custom CIOOS elements, not standard CKAN
+.main-nav-check,
+.mobile-nav,
+.mobileheader,
+.toggle-menu {
+  display: none !important;
 }
 
 .mapbg {
