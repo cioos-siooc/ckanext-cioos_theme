@@ -329,6 +329,7 @@ def dcat_dataset_show(up_func, context, data_dict):
 class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
     plugins.implements(plugins.ITranslation)
     plugins.implements(plugins.IConfigurer)
+    plugins.implements(plugins.IConfigDeclaration)
     plugins.implements(plugins.ITemplateHelpers)
     plugins.implements(plugins.IFacets)
     plugins.implements(plugins.IPackageController, inherit=True)
@@ -346,6 +347,44 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         return {
             u"dcat_dataset_show": dcat_dataset_show
         }
+
+    # IConfigDeclaration
+
+    def declare_config_options(self, declaration, key):
+        # CIOOS theme custom config options
+        declaration.declare(key.ckan.site_heading, "")
+        declaration.declare(key.ckan.site_logo_translated, "")
+        declaration.declare(key.ckan.site_home_url, "")
+        declaration.declare(key.ckan.exclude_eov_category, "")
+        declaration.declare(key.ckan.exclude_eov, "")
+        declaration.declare(key.ckan.eov_icon_base_path, "/base/images/eov-icons-svg/")
+        declaration.declare(key.ckan.header_file_name, "")
+        declaration.declare(key.ckan.footer_file_name, "")
+        declaration.declare(key.ckan.show_social_in_dataset_sidebar, "false")
+        declaration.declare(key.ckan.hide_organization_in_breadcrumb, "false")
+        declaration.declare(key.ckan.hide_organization_in_dataset_sidebar, "false")
+        declaration.declare(key.ckan.show_harvested_from_in_dataset_sidebar, "true")
+        declaration.declare(key.ckan.show_language_picker_in_top_bar, "true")
+        declaration.declare(key.ckan.show_language_picker_in_menu, "true")
+
+        # CIOOS specific config options (cioos.* namespace)
+        declaration.declare(key.cioos.show_responsible_organizations_facet, "True")
+        declaration.declare(key.cioos.hide_organization_in_dataset_sidebar, "True")
+        declaration.declare(key.cioos.contact_email, "info@cioos.ca")
+        declaration.declare(key.cioos.organizations_info_text, "{}")
+        declaration.declare(key.cioos.group_info_text, "{}")
+
+        # CKAN CIOOS config options (ckan.cioos.* namespace)
+        declaration.declare(key.ckan.cioos.ra_css_path, "")
+        declaration.declare(key.ckan.cioos.exclude_facets, "[]")
+        declaration.declare(key.ckan.cioos.doi_authority_url, "https://doi.org/")
+        declaration.declare(key.ckan.cioos.doi_prefix, "")
+        declaration.declare(key.ckan.cioos.datacite_org, "")
+        declaration.declare(key.ckan.cioos.datacite_test_mode, "True")
+        declaration.declare(key.ckan.cioos.ra_json_file, "null")
+
+        # Lang option used in templates
+        declaration.declare(key.lang, "")
 
     # IClick
     def get_commands(self):
@@ -479,7 +518,6 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
     def update_config(self, config_):
         toolkit.add_template_directory(config_, 'templates')
         toolkit.add_public_directory(config_, 'public')
-        toolkit.add_resource('fanstatic', 'cioos_theme')
         toolkit.add_resource('public', 'ckanext-cioos_theme')
 
     def update_config_schema(self, schema):
