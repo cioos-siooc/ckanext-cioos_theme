@@ -31,6 +31,7 @@
       {%- block styles %}
         {% set theme = h.get_rtl_theme() if h.is_rtl_language() else g.theme %}
         {% asset theme %}
+        {% asset 'vendor/fontawesome' %}
       {% endblock %}
 
       {# render all assets included in styles block #}
