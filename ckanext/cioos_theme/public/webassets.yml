@@ -1,3 +1,9 @@
+cioos_theme_css:
+  filters: cssrewrite
+  output: ckanext-cioos_theme/%(version)s_cioos_theme.css
+  contents:
+    - cioos_theme.css
+
 bootstrap_datepicker_js:
   filter: rjsmin
   output: ckanext-cioos_theme/%(version)s_bootstrap_datepicker.js

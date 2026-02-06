@@ -26,17 +26,17 @@
 
       {% block links -%}
       <link rel="shortcut icon" href="{{ g.favicon }}" />
-      {% endblock -%} {%- block styles %} {# Use a safe default for CKAN 2.11
-      where g.main_css may be undefined #} {% if h.is_rtl_language() %} {% asset
-      'main_rtl' %} {% else %} {% asset 'main' %} {% endif %} {% endblock %} {#
-      render all assets included in styles block #} {{ h.render_assets('style')
-      }}
+      {% endblock -%}
 
-      <link
-        rel="stylesheet"
-        type="text/css"
-        href="{{ h.url_for_static('/ckanext-cioos_theme/cioos_theme.css') }}"
-      />
+      {%- block styles %}
+        {% set theme = h.get_rtl_theme() if h.is_rtl_language() else g.theme %}
+        {% asset theme %}
+      {% endblock %}
+
+      {# render all assets included in styles block #}
+      {{ h.render_assets('style') }}
+
+      {% asset 'ckanext-cioos_theme/cioos_theme_css' %}
       {% if h.cioos_get_additional_css_path() %}
       <link
         rel="stylesheet"
