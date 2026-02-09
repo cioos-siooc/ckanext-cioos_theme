@@ -57,19 +57,16 @@
             <span class="username">{{ c.userobj.display_name }}</span>
           </a>
         </li>
-        {% set new_activities = h.new_activities() %}
-        <li
-          class="notifications {% if new_activities > 0 %}notifications-important{% endif %}"
-        >
-          {% set notifications_tooltip = ngettext('Dashboard (%(num)d new
-          item)', 'Dashboard (%(num)d new items)', new_activities) %}
+        {# new_activities helper removed in CKAN 2.11 #}
+        {% set new_activities = 0 %}
+        <li class="notifications">
+          {% set notifications_tooltip = _('Dashboard') %}
           <a
             href="{{ h.url_for('dashboard.index') }}"
             title="{{ notifications_tooltip }}"
           >
             <i class="fas fa-tachometer-alt" aria-hidden="true"></i>
             <span class="text">{{ _('Dashboard') }}</span>
-            <span class="badge">{{ new_activities }}</span>
           </a>
         </li>
         {% block header_account_settings_link %}

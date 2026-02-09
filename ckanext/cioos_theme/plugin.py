@@ -477,6 +477,14 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
 
     # IAuthenticator
 
+    def authenticate(self, identity):
+        """Authenticate a user identity.
+
+        Required by IAuthenticator in CKAN 2.10+.
+        Returns None to allow other authenticators to handle authentication.
+        """
+        return None
+
     def identify(self):
         try:
             remote_addr = toolkit.request.headers['X-Forwarded-For']
@@ -484,8 +492,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             remote_addr = toolkit.request.remote_addr
 
         log_auth.info('Request by %s for %s from %s', toolkit.request.remote_user, toolkit.request.url, remote_addr)
-        g.user = None
-        g.userobj = None
+        # Note: Do not reset g.user/g.userobj here - let CKAN's default authenticator handle it
         return
 
     def login(self, error=None):
