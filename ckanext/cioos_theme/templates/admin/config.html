@@ -27,6 +27,8 @@
 
       {{ form.markdown('ckan.site_about', id='field-ckan-site-about', label=_('About'), value=data['ckan.site_about'], error=error, placeholder=_('About page text')) }}
 
+      {{ form.input('ckan.site_about_markdown_file', id='field-ckan-site-about-markdown-file', label=_('About Markdown Files (JSON)'), value=data['ckan.site_about_markdown_file'], error=error, classes=['control-medium'], placeholder=_('{"en": "/path/to/about_en.md", "fr": "/path/to/about_fr.md"}')) }}
+
       {{ form.markdown('ckan.site_intro_text', id='field-ckan-site-intro-text', label=_('Intro Text'), value=data['ckan.site_intro_text'], error=error, placeholder=_('Text on home page')) }}
 
       {{ form.textarea('ckan.site_custom_css', id='field-ckan-site-custom-css', label=_('Custom CSS'), value=data['ckan.site_custom_css'], error=error, placeholder=_('Customisable css inserted into the page header')) }}
@@ -84,7 +86,8 @@
           <p><strong>Site Tag Logo:</strong> <em>(BL)</em>This is the logo that appears in the
             header of all the CKAN instance templates.</p>
           <p><strong>About:</strong> <em>(BL)</em>This text will appear on this CKAN instances
-            <a href="{{ about_url }}">about page</a>.</p>
+            <a href="{{ about_url }}">about page</a>. This will be overridden if "About Markdown Files" is configured.</p>
+          <p><strong>About Markdown Files:</strong> Optional JSON configuration for loading about page content from external markdown files. Format: <code>{"en": "/path/to/about_en.md", "fr": "/path/to/about_fr.md"}</code>. When configured, this takes priority over the "About" field above. Supports multilingual markdown files stored in version control.</p>
           <p><strong>Intro Text:</strong> <em>(BL)</em>This text will appear on this CKAN instances
             <a href="{{ home_url }}">home page</a> as a welcome to visitors.</p>
           <p><strong>Custom CSS:</strong> This is a block of CSS that appears in

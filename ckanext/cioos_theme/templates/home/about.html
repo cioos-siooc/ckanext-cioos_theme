@@ -1,7 +1,12 @@
 {% extends "page.html" %}
 
 {% set gns = namespace() %}
-{% set gns.site_about = h.render_markdown(h.scheming_language_text(h.cioos_load_json(g.site_about))) %}
+{% set gns.markdown_files = h.cioos_load_about_markdown() %}
+{% if gns.markdown_files %}
+  {% set gns.site_about = h.render_markdown(h.scheming_language_text(gns.markdown_files)) %}
+{% else %}
+  {% set gns.site_about = h.render_markdown(h.scheming_language_text(h.cioos_load_json(g.site_about))) %}
+{% endif %}
 
 {% block subtitle %}{{ _('About') }}{% endblock %}
 

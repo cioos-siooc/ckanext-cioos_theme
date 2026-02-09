@@ -530,6 +530,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             'ckan.site_heading': [ignore_missing, fluent_field_default(None, None), fluent_text(None, None)],
             'ckan.site_description': [ignore_missing, fluent_field_default(None, None), fluent_text(None, None)],
             'ckan.site_about': [ignore_missing, fluent_field_default(None, None), fluent_text(None, None)],
+            'ckan.site_about_markdown_file': [ignore_missing],
             'ckan.site_intro_text': [ignore_missing, fluent_field_default(None, None), fluent_text(None, None)],
             'ckan.site_logo_translated': [ignore_missing, fluent_field_default(None, None), fluent_text(None, None)],
             'ckan.site_home_url': [ignore_missing, url_validator_with_port],
@@ -594,6 +595,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             'cioos_show_harvested_from_in_dataset_sidebar': lambda: toolkit.asbool(toolkit.config.get('ckan.show_harvested_from_in_dataset_sidebar', True)),
             'cioos_show_language_picker_in_top_bar': lambda: toolkit.asbool(toolkit.config.get('ckan.show_language_picker_in_top_bar', True)),
             'cioos_show_language_picker_in_menu': lambda: toolkit.asbool(toolkit.config.get('ckan.show_language_picker_in_menu', True)),
+            'cioos_load_about_markdown': cioos_helpers.load_about_markdown
         }
 
     def get_validators(self):
