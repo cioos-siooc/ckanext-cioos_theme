@@ -20,17 +20,17 @@
           {% block eov_list %}
           {% set eov = h.cioos_get_eovs(show_all=True) %}
           {% for grouper, list in eov|rejectattr('category', 'undefined')|groupby('category') %}
-          {% if grouper and grouper not in g.exclude_eov_category %}
+          {% if grouper and grouper not in h.cioos_get_exclude_eov_category() %}
           <h4>{{ _(grouper) }}</h4>
           <ul class="media-grid">
             {% for item in list|sort(attribute='name') %}
-            {% if item.name not in g.exclude_eov %}
+            {% if item.name not in h.cioos_get_exclude_eov() %}
             {% set href = h.url_for(controller='dataset', action='search', eov=item.name) %}
             {% set label = label_function(item) if label_function else h.scheming_language_text(item.display_name) %}
             {% set label = _(label) %}
             {% set label_truncated = h.truncate(label, 45) if not label_function else label %}
             {% set count = count_label(item['count']) if count_label else ('%d' % item['count']) %}
-            {% set icon_base = g.eov_icon_base_path or '/base/images/eov-icons-svg/' %}
+            {% set icon_base = h.cioos_get_eov_icon_base_path() or '/base/images/eov-icons-svg/' %}
             {% set img_url = item.image_display_url or h.url_for_static(icon_base + item.get('icon')) %}
             <li class="media-item {{ 'media-item-disabled' if count|trim == '0'}}" style="height: 245px;">
               <a class="media-image" href="{{ href }}" title="{{ label if label != label_truncated else '' }}">

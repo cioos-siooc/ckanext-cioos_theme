@@ -50,7 +50,7 @@ show_responsible_organizations = toolkit.asbool(
     toolkit.config.get('cioos.show_responsible_organizations_facet', "True"))
 
 hide_organization_in_dataset_sidebar = toolkit.asbool(
-    toolkit.config.get('cioos.hide_organization_in_dataset_sidebar', "True"))
+    toolkit.config.get('ckan.hide_organization_in_dataset_sidebar', False))
 
 contact_email = toolkit.config.get('cioos.contact_email', "info@cioos.ca")
 organizations_info_text = toolkit.config.get(
@@ -369,7 +369,6 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
 
         # CIOOS specific config options (cioos.* namespace)
         declaration.declare(key.cioos.show_responsible_organizations_facet, "True")
-        declaration.declare(key.cioos.hide_organization_in_dataset_sidebar, "True")
         declaration.declare(key.cioos.contact_email, "info@cioos.ca")
         declaration.declare(key.cioos.organizations_info_text, "{}")
         declaration.declare(key.cioos.group_info_text, "{}")
@@ -582,7 +581,19 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             'cioos_get_ra_extents_url': cioos_helpers.get_ra_extents_url,
             'cioos_get_extra_value': self._get_extra_value,
             'cioos_append_to_homepages': cioos_helpers.append_to_homepages,
-            'cioos_structured_data': cioos_helpers.cioos_structured_data
+            'cioos_structured_data': cioos_helpers.cioos_structured_data,
+            # Config access helpers
+            'cioos_get_header_file_name': lambda: toolkit.config.get('ckan.header_file_name', ''),
+            'cioos_get_footer_file_name': lambda: toolkit.config.get('ckan.footer_file_name', ''),
+            'cioos_get_eov_icon_base_path': lambda: toolkit.config.get('ckan.eov_icon_base_path', '/base/images/eov-icons-svg/'),
+            'cioos_get_exclude_eov': lambda: toolkit.config.get('ckan.exclude_eov', ''),
+            'cioos_get_exclude_eov_category': lambda: toolkit.config.get('ckan.exclude_eov_category', ''),
+            'cioos_show_social_in_dataset_sidebar': lambda: toolkit.asbool(toolkit.config.get('ckan.show_social_in_dataset_sidebar', False)),
+            'cioos_hide_organization_in_breadcrumb': lambda: toolkit.asbool(toolkit.config.get('ckan.hide_organization_in_breadcrumb', False)),
+            'cioos_hide_organization_in_dataset_sidebar': lambda: toolkit.asbool(toolkit.config.get('ckan.hide_organization_in_dataset_sidebar', False)),
+            'cioos_show_harvested_from_in_dataset_sidebar': lambda: toolkit.asbool(toolkit.config.get('ckan.show_harvested_from_in_dataset_sidebar', True)),
+            'cioos_show_language_picker_in_top_bar': lambda: toolkit.asbool(toolkit.config.get('ckan.show_language_picker_in_top_bar', True)),
+            'cioos_show_language_picker_in_menu': lambda: toolkit.asbool(toolkit.config.get('ckan.show_language_picker_in_menu', True)),
         }
 
     def get_validators(self):

@@ -1,8 +1,10 @@
-{# import macros from ra footer file #} {% if
-self._TemplateReference__context.name != g.footer_file_name %} {% from '%s' %
-g.footer_file_name or '/footer/default_footer.html' import include_site_footer
-with context %} {% else %} {% from '/footer/default_footer.html' import
-include_site_footer with context %} {% endif %}
+{# import macros from ra footer file #}
+{% set footer_file = h.cioos_get_footer_file_name() %}
+{% if self._TemplateReference__context.name != footer_file %}
+  {% from footer_file or '/footer/default_footer.html' import include_site_footer with context %}
+{% else %}
+  {% from '/footer/default_footer.html' import include_site_footer with context %}
+{% endif %}
 
 <footer>
   <div id="footer">
