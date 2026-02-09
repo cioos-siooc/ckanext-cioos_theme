@@ -324,22 +324,23 @@ div.search-input-group {
   line-height: 26px;
 
   #header-core {
-    display: block;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     max-width: 1140px;
     margin: 0 auto;
     padding: 0 12.8px;
+    min-height: 80px;
   }
 
   #logo {
-    float: left;
-    margin-top: 21px;
+    flex-shrink: 0;
     transition: all 0.3s ease;
   }
 
   #logo img {
     font-size: 1rem;
-    // width: auto;
-    height: 6em;
+    height: 5em;
     vertical-align: middle;
     border: 0;
     transition: all 0.3s ease;
@@ -363,23 +364,24 @@ div.search-input-group {
   }
 
   #header .header-links {
-    display: table;
-    float: right;
+    display: flex;
+    align-items: center;
   }
 
   #header .menu {
-    display: table-cell;
-    vertical-align: middle;
-    padding: 4em 0 0 1em;
+    display: flex;
+    align-items: center;
+    padding: 0;
+    margin: 0;
   }
 
   #header .menu li {
-    float: left;
+    display: inline-block;
   }
 
   #header .menu > li {
     color: #bebebe;
-    padding: 0 0 1em 0;
+    padding: 0;
   }
 
   #header .menu > li:not(.last) {
@@ -1079,5 +1081,90 @@ section {
   font-family: Raleway, Helvetica, Arial;
 }
 
+
+// Top menu bar (social icons, language picker, CIOOS banner)
+#topmenu {
+  background: $navbg;
+  width: 100%;
+
+  .container {
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: 0 12.8px;
+  }
+
+  nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+  }
+
+  nav ul li {
+    margin-left: 15px;
+  }
+
+  nav ul li a {
+    color: #fff;
+    text-decoration: none;
+  }
+
+  nav ul li a:hover {
+    opacity: 0.8;
+  }
+}
+
+// Account masthead (login bar) - CKAN 2.11 default position at top of page
+.account-masthead {
+  background: $navbg;
+  color: #fff;
+  padding: 8px 0;
+  width: 100%;
+
+  .container {
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: 0 12.8px;
+  }
+
+  .account,
+  .not-authed {
+    float: right;
+  }
+
+  .account ul,
+  .not-authed ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+  }
+
+  .account ul li,
+  .not-authed ul li {
+    border-left: none;
+  }
+
+  .account ul li a,
+  .not-authed ul li a {
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    font-size: 13px;
+  }
+
+  .account ul li a:hover,
+  .not-authed ul li a:hover {
+    color: #fff;
+  }
+
+  img.gravatar {
+    border-radius: 50%;
+    margin-right: 5px;
+    vertical-align: middle;
+  }
+}
 
 @import url(//fonts.googleapis.com/css?family=Montserrat:400,600,700,800,900|Quicksand:300,400,600,700|PT+Sans:400|Raleway:300,400,600,700);
