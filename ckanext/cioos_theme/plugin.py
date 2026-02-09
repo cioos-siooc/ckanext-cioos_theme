@@ -360,6 +360,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         declaration.declare(key.ckan.eov_icon_base_path, "/base/images/eov-icons-svg/")
         declaration.declare(key.ckan.header_file_name, "")
         declaration.declare(key.ckan.footer_file_name, "")
+        declaration.declare(key.ckan.site_about_markdown_file, "")
         declaration.declare(key.ckan.show_social_in_dataset_sidebar, "false")
         declaration.declare(key.ckan.hide_organization_in_breadcrumb, "false")
         declaration.declare(key.ckan.hide_organization_in_dataset_sidebar, "false")
