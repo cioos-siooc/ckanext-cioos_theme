@@ -16,6 +16,8 @@ $headlinefont: "Montserrat", apple-system, BlinkMacSystemFont, "Segoe UI",
 $darkestblack: rgba(73, 73, 72, 1);
 $lighttextcolor: color.adjust($darkestblack, $lightness: 95%);
 $navbg: #52a79b;
+$footerbg: #152F37;
+$lightbg: #F3F0EC;
 $accent: #fa7268;
 $color-primary: #0a6cff;
 $text-body: #222;
@@ -26,6 +28,15 @@ $papabreak: 1140px;
 $mamabreak: 980px;
 $teenbreak: 770px;
 
+// CSS Custom Properties (variables)
+:root {
+  --navbg: #{$navbg};
+  --footerbg: #{$footerbg};
+  --lightbg: #{$lightbg};
+  --accent: #{$accent};
+  --color-primary: #{$color-primary};
+}
+
 // Base styles
 body {
   font-family: $font-body;
@@ -35,6 +46,7 @@ body {
 
 .main {
   background: #fff;
+  min-height: 70vh;
 }
 
 .wrapper {
@@ -90,22 +102,22 @@ body {
 }
 
 .btn {
-  display: inline-block;
-  //text-transform: uppercase;
-  margin-bottom: 0;
-  font-family: $defaultfont;
-  font-weight: normal;
-  text-align: center;
-  vertical-align: middle;
-  touch-action: manipulation;
-  cursor: pointer;
-  background-image: none;
-  border: 1px solid transparent;
-  white-space: nowrap;
-  padding: 6px 12px;
-  font-size: 14px;
-  line-height: 1.42857143;
-  border-radius: 20px;
+  // display: inline-block;
+  // //text-transform: uppercase;
+  // margin-bottom: 0;
+  // font-family: $defaultfont;
+  // font-weight: normal;
+  // text-align: center;
+  // vertical-align: middle;
+  // touch-action: manipulation;
+  // cursor: pointer;
+  // background-image: none;
+  // border: 1px solid transparent;
+  // white-space: nowrap;
+  // padding: 6px 12px;
+  // font-size: 14px;
+  // line-height: 1.42857143;
+  // border-radius: 20px;
 }
 
 ul.formats {
@@ -184,23 +196,23 @@ ul.formats {
   max-width: 30%;
 }
 
-.form-control {
-  border-radius: 30px;
-  border-color: $accent;
-}
+// .form-control {
+//   border-radius: 30px;
+//   border-color: $accent;
+// }
 
-.search-form .search-input.search-giant button {
-  top: 15px;
-  right: 15px;
-  background: $accent;
-  border-radius: 27px;
-  width: 54px;
-  height: 100%;
-}
+// .search-form .search-input.search-giant button {
+//   top: 15px;
+//   right: 15px;
+//   background: $accent;
+//   border-radius: 27px;
+//   width: 54px;
+//   height: 100%;
+// }
 
-.search-form .search-input button i {
-  color: #fff;
-}
+// .search-form .search-input button i {
+//   color: #fff;
+// }
 
 .centertext {
   text-align: center;
@@ -236,41 +248,12 @@ ul.formats {
   text-decoration: none;
 }
 
-.search-form {
-  border-bottom: none;
-}
-
 .rightalign {
   text-align: right;
 }
 /* ===========================================
    homepage content
    =========================================== */
-.homepage .module-content-end {
-  margin-bottom: 100px;
-}
-@media only screen and (max-width: $teenbreak) and (min-width: 0) {
-  .invis,
-  .screen-reader-text {
-    display: none;
-  }
-
-  .logo {
-    margin: 1em;
-    overflow: hidden;
-    display: block;
-  }
-}
-
-.logo img {
-  width: auto;
-  max-height: 85px;
-  -webkit-transition: all 0.3s ease;
-  -moz-transition: all 0.3s ease;
-  -ms-transition: all 0.3s ease;
-  -o-transition: all 0.3s ease;
-  transition: all 0.3s ease;
-}
 
 .composite-control-repeating {
   padding-left: 0;
@@ -290,42 +273,6 @@ ul.formats {
   pointer-events: auto;
   opacity: 0.6;
 }
-
-div.search-input-group {
-  width: 100%;
-  position: relative;
-}
-
-.search-input-group .btn {
-  position: absolute;
-  top: 4px;
-  right: 4px;
-  border-color: $accent;
-  background: $accent;
-  border-radius: 23px;
-  width: 46px;
-  height: 46px;
-}
-
-.search-input-group #field-giant-search {
-  border-radius: 23px;
-  padding-right: 58px;
-}
-
-.search-form .search-input-group button {
-  border-color: $accent;
-}
-
-.search-form .search-input-group button i {
-  color: #fff;
-  font-size: 24px;
-  width: 24px;
-}
-
-.search-form .search-input-group button:hover i {
-  color: #000000;
-}
-
 .toolbar .breadcrumb a {
   color: #505050;
 }
@@ -364,7 +311,7 @@ div.search-input-group {
 
   #logo img {
     font-size: 1rem;
-    height: 5em;
+    height: 4em;
     vertical-align: middle;
     border: 0;
     transition: all 0.3s ease;
@@ -544,11 +491,9 @@ div.search-input-group {
 }
 
 #footer {
-  background-color: $navbg;
-  background-repeat: no-repeat;
-  background-position: 111%;
+  background-color: $footerbg;
   color: #ffffff;
-  padding: 55px 10px 18px;
+  padding: 35px 10px 18px;
   overflow: hidden;
 
   #footer-core {
@@ -1190,7 +1135,7 @@ section {
 
 // Account masthead (login bar)
 .account-masthead {
-  background: $navbg;
+  background: $footerbg;
   color: #fff;
   padding: 8px 0;
   width: 100%;
