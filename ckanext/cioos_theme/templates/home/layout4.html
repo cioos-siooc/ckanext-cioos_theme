@@ -5,13 +5,12 @@
     list-style: none;
     min-height: 205px;
     padding: 0.75rem;
-    background: var(--lightbg);
+    background: var(--cioos-light-bg);
     border: 0;
-    border-radius: 0 0 1rem 1rem;
+    border-radius: 1rem;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    border-top: 1px solid var(--navbg);
   }
   .eov-grid .media-item,
   .module-item {
@@ -21,10 +20,37 @@
     background-color: white;
     border-radius: 3px;
   }
+  .media-heading {
+    font-size: 16px;
+    color: #333;
+    max-width: 212px;
+    width: 100%;
+    word-break: break-word;
+    display: inline-block;
+    margin: 0;
+    vertical-align: middle;
+  }
   h4 {
     width: 100%;
     margin-top: 2rem;
     margin-bottom: 0.5rem;
+  }
+  .centertext {
+    text-align: center;
+  }
+  .title h1 {
+    font-size: 70px;
+    font-weight: 600;
+    color: #707070;
+    margin: 4rem 0 2rem;
+  }
+  .title h2 {
+    font-size: 24px;
+    font-weight: 300;
+    margin: 0 0 3rem;
+  }
+  .accent-color {
+    color: var(--cioos-accent);
   }
 </style>
 
@@ -36,10 +62,12 @@
           {{ h.scheming_language_text(h.cioos_load_json(g.site_heading)) | safe
           or _('<span>CIOOS</span> Data Catalogue') }}
         </h1>
-        <h2>
+        <h2 class="subtitle">
           {{ _('Search, find, download — all of our') }}
           <span
-            ><a href="{{ h.url_for(controller='dataset', action='search') }}"
+            ><a
+              class="accent-color"
+              href="{{ h.url_for(controller='dataset', action='search') }}"
               >{{h.cioos_count_datasets()}}</a
             ></span
           >

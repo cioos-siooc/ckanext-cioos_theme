@@ -28,6 +28,9 @@
       <link rel="shortcut icon" href="{{ g.favicon }}" />
       {% endblock -%}
 
+      {# Load CIOOS theme CSS early to prevent FOUC - this blocks rendering until loaded #}
+      <link rel="stylesheet" href="{{ h.url_for_static('/ckanext/cioos_theme/cioos_theme.css') }}" />
+
       {%- block styles %}
         {% set theme = h.get_rtl_theme() if h.is_rtl_language() else g.theme %}
         {% asset theme %}

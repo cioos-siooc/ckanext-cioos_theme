@@ -19,15 +19,20 @@
   /* CIOOS brand colors */
   --cioos-nav-bg: #52a79b;
   --cioos-footer-bg: #152f37;
-  --cioos-light-bg: #f3f0ec;
+  --cioos-light-bg: #f0f0f0;
   --cioos-accent: #fa7268;
 
   /* Override Bootstrap primary color */
-  --bs-primary: #0a6cff;
-  --bs-primary-rgb: 10, 108, 255;
+  --bs-primary: #52a79b;
+  --bs-primary-rgb: 82, 167, 155;
 
   /* Typography */
   --cioos-header-font: "Montserrat", system-ui, -apple-system, sans-serif;
+}
+
+/* Apply font to body for proper inheritance */
+body {
+  font-family: var(--cioos-header-font);
 }
 
 /* ===========================================
@@ -48,22 +53,150 @@
 /* ===========================================
    Mobile Navigation
    Toggle visibility for responsive nav
+   Use !important to prevent FOUC (flash of unstyled content)
    =========================================== */
 .main-nav-check {
-  display: none;
+  display: none !important;
+  visibility: hidden !important;
 }
 
 .mobile-nav,
 .mobileheader,
 .toggle-menu {
-  display: none;
+  display: none !important;
+  visibility: hidden !important;
 }
 
 @media (max-width: 768px) {
-  .mobile-nav,
-  .mobileheader,
+  /* Show mobile header bar on small screens */
+  .mobileheader {
+    display: flex !important;
+    visibility: visible !important;
+    background: var(--cioos-nav-bg);
+    padding: 10px 15px;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  /* Keep toggle-menu visible as it's part of mobileheader */
   .toggle-menu {
+    visibility: visible;
+  }
+
+  /* Mobile nav menu stays hidden until checkbox is checked */
+  .mobile-nav {
+    display: none !important;
+    visibility: hidden !important;
+    background: #fff;
+    border-bottom: 3px solid var(--cioos-nav-bg);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Show mobile menu when checkbox is checked */
+  .main-nav-check:checked ~ .mobile-nav {
+    display: block !important;
+    visibility: visible !important;
+  }
+
+  /* Hide desktop elements on mobile */
+  #header-core,
+  #topmenu,
+  .account-masthead {
+    display: none !important;
+  }
+
+  /* Mobile header styling */
+  .mobileheader label::after {
+    content: none;
+  }
+
+  .mobileheader .logo img {
+    height: 50px;
+    width: auto;
+    background: #fff;
+    padding: 5px;
+    border-radius: 4px;
+  }
+
+  .mobileheader label[for="main-nav-check"] {
+    color: #fff;
+    font-family: var(--cioos-header-font);
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    padding: 8px 16px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+    text-align: center;
+  }
+
+  .mobileheader label[for="main-nav-check"]:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+
+  /* Mobile menu styling */
+  .mobile-nav .menu {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .mobile-nav .menu li {
+    border-bottom: 1px solid #eee;
+  }
+
+  .mobile-nav .menu li:last-child {
+    border-bottom: none;
+  }
+
+  .mobile-nav .menu a {
     display: block;
+    padding: 12px 20px;
+    color: #333;
+    text-decoration: none;
+    font-family: var(--cioos-header-font);
+    font-size: 14px;
+    transition: background-color 0.2s ease;
+    text-align: center;
+  }
+
+  .mobile-nav .menu a:hover {
+    background-color: var(--cioos-light-bg);
+    color: var(--cioos-nav-bg);
+  }
+
+  .mobile-nav .sub-menu {
+    background: var(--cioos-light-bg);
+    padding-left: 20px;
+  }
+
+  .mobile-nav .sub-menu a {
+    font-size: 13px;
+    padding: 10px 20px;
+  }
+
+  /* Mobile social icons */
+  .mobile-nav .shareicons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    padding: 15px;
+    background: var(--cioos-light-bg);
+    list-style: none;
+    margin: 0;
+  }
+
+  .mobile-nav .shareicons a {
+    padding: 0;
+    color: var(--cioos-nav-bg);
+  }
+
+  /* Language switcher in mobile menu */
+  .mobile-nav .lang-item a {
+    text-align: center;
+    background: var(--cioos-nav-bg);
+    color: #fff !important;
   }
 }
 
