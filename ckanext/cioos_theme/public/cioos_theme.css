@@ -141,10 +141,10 @@ aside .module {
     visibility: visible !important;
   }
 
-  /* Hide desktop elements on mobile */
+  /* Hide desktop elements on mobile - but keep footer login visible */
   #header-core,
   #topmenu,
-  .account-masthead {
+  header.account-masthead:not(.footer-account) {
     display: none !important;
   }
 
@@ -1148,4 +1148,103 @@ ul.formats li a.btn {
 #flDebug,
 #flDebug * {
   overflow-y: auto;
+}
+
+/* ===========================================
+   Mobile Footer Responsiveness
+   Make footer columns stack on mobile devices
+   =========================================== */
+@media (max-width: 768px) {
+  /* Make all footer columns full width and stack */
+  #footer .one_sixth,
+  #footer .one_third,
+  #footer .one_half,
+  #footer .one_fourth,
+  #footer .two_third,
+  #footer .three_fourth,
+  #footer .one_fifth,
+  #footer .two_fifth,
+  #footer .three_fifth,
+  #footer .four_fifth,
+  #footer .five_sixth {
+    width: 100% !important;
+    float: none !important;
+    margin-right: 0 !important;
+    margin-bottom: 30px;
+  }
+
+  #footer .last {
+    float: none !important;
+  }
+
+  /* Adjust footer core padding for mobile */
+  #footer {
+    padding: 25px 15px;
+  }
+
+  /* Make newsletter subscription form responsive */
+  #footer .subcribe_container {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  #footer #mc_embed_signup .mc-field-group {
+    margin-right: 0;
+    margin-bottom: 10px;
+    width: 100%;
+  }
+
+  #footer .mc-field-group {
+    width: 100%;
+  }
+
+  #mc-embedded-subscribe {
+    width: 100%;
+    padding: 10px 22px;
+  }
+
+  /* Adjust footer headings for mobile */
+  #footer h3 {
+    font-size: 18px;
+    margin-bottom: 20px;
+  }
+
+  /* Footer login/account section mobile styles */
+  .footer-account.account-masthead {
+    display: block !important;
+    padding: 15px 0;
+  }
+
+  .footer-account .container {
+    padding: 0 15px;
+  }
+
+  .footer-account .account,
+  .footer-account .not-authed {
+    float: none;
+    text-align: center;
+  }
+
+  .footer-account .account ul,
+  .footer-account .not-authed ul {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+  }
+
+  .footer-account .account ul li,
+  .footer-account .not-authed ul li {
+    margin: 0;
+    width: auto;
+    text-align: center;
+  }
+
+  .footer-account .account ul li a,
+  .footer-account .not-authed ul li a {
+    display: inline-block;
+    padding: 8px 12px;
+    font-size: 14px;
+  }
 }
