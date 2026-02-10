@@ -62,13 +62,20 @@ body {
   box-shadow: none;
 }
 
-// Hide custom mobile navigation elements (defined in header.html)
-// These are custom CIOOS elements, not standard CKAN
-.main-nav-check,
+// Mobile navigation elements (defined in header.html)
+// Hide on desktop, show on mobile
+.main-nav-check {
+  display: none;
+}
+
 .mobile-nav,
 .mobileheader,
 .toggle-menu {
-  display: none !important;
+  display: none;
+  
+  @media (max-width: 768px) {
+    display: block;
+  }
 }
 
 .mapbg {
@@ -302,6 +309,10 @@ ul.formats {
     margin: 0 auto;
     padding: 0 12.8px;
     min-height: 80px;
+    
+    @media (max-width: 768px) {
+      display: none;
+    }
   }
 
   #logo {
@@ -1071,6 +1082,10 @@ section {
 #topmenu {
   background: $navbg;
   width: 100%;
+  
+  @media (max-width: 768px) {
+    display: none;
+  }
 
   .topmenu-inner {
     width: 100%;
@@ -1185,3 +1200,8 @@ section {
 }
 
 @import url(//fonts.googleapis.com/css?family=Montserrat:400,600,700,800,900|Quicksand:300,400,600,700|PT+Sans:400|Raleway:300,400,600,700);
+
+.form-select {
+  border: 0;
+  box-shadow: none;
+}
