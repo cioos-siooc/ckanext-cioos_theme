@@ -7,12 +7,14 @@
   - From this directory run: `./compile_sass.sh`
 */
 
+@use "sass:color";
+
 // Design tokens / variables
 $defaultfont: Raleway, Helvetica, Arial;
 $headlinefont: "Montserrat", apple-system, BlinkMacSystemFont, "Segoe UI",
   Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
 $darkestblack: rgba(73, 73, 72, 1);
-$lighttextcolor: lighten($darkestblack, 95%);
+$lighttextcolor: color.adjust($darkestblack, $lightness: 95%);
 $navbg: #52a79b;
 $accent: #fa7268;
 $color-primary: #0a6cff;
@@ -28,6 +30,24 @@ $teenbreak: 770px;
 body {
   font-family: $font-body;
   color: $text-body;
+  background: #fff;
+}
+
+.main {
+  background: #fff;
+}
+
+.wrapper {
+  border: none;
+  box-shadow: none;
+  background: transparent;
+}
+
+.box,
+.module-content.box {
+  background: #fff;
+  border: none;
+  box-shadow: none;
 }
 
 // Hide custom mobile navigation elements (defined in header.html)
@@ -273,20 +293,23 @@ ul.formats {
 
 div.search-input-group {
   width: 100%;
+  position: relative;
 }
 
 .search-input-group .btn {
   position: absolute;
-  right: 0;
+  top: 4px;
+  right: 4px;
   border-color: $accent;
   background: $accent;
   border-radius: 23px;
   width: 46px;
-  height: 100%;
+  height: 46px;
 }
 
 .search-input-group #field-giant-search {
   border-radius: 23px;
+  padding-right: 58px;
 }
 
 .search-form .search-input-group button {
@@ -328,6 +351,7 @@ div.search-input-group {
     justify-content: space-between;
     align-items: center;
     max-width: 1140px;
+    width: 100%;
     margin: 0 auto;
     padding: 0 12.8px;
     min-height: 80px;
@@ -363,9 +387,17 @@ div.search-input-group {
     padding-left: 0;
   }
 
+  #header-links-inner {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+  }
+
   #header .header-links {
     display: flex;
     align-items: center;
+    flex: 1 1 auto;
+    justify-content: flex-end;
   }
 
   #header .menu {
@@ -517,10 +549,18 @@ div.search-input-group {
   background-position: 111%;
   color: #ffffff;
   padding: 55px 10px 18px;
+  overflow: hidden;
 
   #footer-core {
+    width: 100%;
     padding: 0;
     font-weight: 400;
+  }
+
+  #footer-core::after {
+    content: "";
+    display: table;
+    clear: both;
   }
 
   #mc_embed_signup .mc-field-group {
@@ -1087,36 +1127,68 @@ section {
   background: $navbg;
   width: 100%;
 
-  .container {
+  .topmenu-inner {
+    width: 100%;
     max-width: 1140px;
     margin: 0 auto;
     padding: 0 12.8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
   }
 
-  nav ul {
+  .topmenu-left {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 15px;
+    flex: 1 1 auto;
+  }
+
+  .topmenu-logo {
+    flex-shrink: 0;
+  }
+
+  .topmenu-logo img {
+    max-height: 37px;
+  }
+
+  .topmenu-language {
+    flex-shrink: 0;
+  }
+
+  .top-social {
     list-style: none;
     margin: 0;
     padding: 0;
     display: flex;
-    justify-content: flex-end;
     align-items: center;
+    justify-content: flex-start;
   }
 
-  nav ul li {
+  .top-social li {
     margin-left: 15px;
   }
 
-  nav ul li a {
+  .top-social li:first-child {
+    margin-left: 0;
+  }
+
+  .top-social a,
+  .topmenu-language a {
     color: #fff;
     text-decoration: none;
   }
 
-  nav ul li a:hover {
+  .top-social a:hover,
+  .topmenu-language a:hover {
     opacity: 0.8;
   }
 }
 
-// Account masthead (login bar) - CKAN 2.11 default position at top of page
+// Account masthead (login bar)
 .account-masthead {
   background: $navbg;
   color: #fff;
