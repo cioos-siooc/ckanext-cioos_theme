@@ -553,11 +553,13 @@ aside .module {
   width: 100%;
   padding: 0;
   font-weight: 400;
+  display: flex;
+  flex-wrap: wrap;
 }
 
 #footer #footer-core::after {
   content: "";
-  display: table;
+  display: flex;
   clear: both;
 }
 

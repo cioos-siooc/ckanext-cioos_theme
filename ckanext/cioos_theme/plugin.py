@@ -574,7 +574,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             'cioos_get_locale_url': self.get_locale_url,
             'cioos_schema_field_map': cioos_helpers.cioos_schema_field_map,
             'cioos_get_additional_css_path': self.get_additional_css_path,
-            'cioos_get_homepage_style': lambda: toolkit.config.get('ckan.homepage_style', '1'),
+            'cioos_get_homepage_path': lambda: toolkit.config.get('ckan.homepage_style', '1'),
             'cioos_get_cfg': lambda key, default=None: toolkit.config.get(key, default),
             'cioos_get_doi_authority_url': cioos_helpers.get_doi_authority_url,
             'cioos_get_doi_prefix': cioos_helpers.get_doi_prefix,
