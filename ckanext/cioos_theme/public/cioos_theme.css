@@ -238,8 +238,7 @@ aside .module {
   /* Language switcher in mobile menu */
   .mobile-nav .lang-item a {
     text-align: center;
-    background: var(--cioos-nav-bg);
-    color: #fff !important;
+    color: var(--cioos-nav-bg);
   }
 }
 
