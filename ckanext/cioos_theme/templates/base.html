@@ -26,22 +26,127 @@
 
       {% block links -%}
       <link rel="shortcut icon" href="{{ g.favicon }}" />
-      {% endblock -%}
+      {% endblock -%} {# Critical CSS - prevents FOUC by establishing layout
+      before main CSS loads #}
+      <style>
+        /* Header container base styles */
+        #header-container {
+          font-family:
+            "Montserrat",
+            system-ui,
+            -apple-system,
+            sans-serif;
+          font-weight: 700;
+          font-size: 12.8px;
+        }
 
-      {# Load CIOOS theme CSS early to prevent FOUC - this blocks rendering until loaded #}
-      <link rel="stylesheet" href="{{ h.url_for_static('/ckanext/cioos_theme/cioos_theme.css') }}" />
+        /* Top menu (CIOOS banner) */
+        #topmenu {
+          background: #52a79b;
+        }
+        #topmenu .topmenu-inner {
+          display: flex;
+          justify-content: space-between;
+          max-width: 1140px;
+          margin: 0 auto;
+          padding: 0 12.8px;
+          align-items: center;
+        }
+        #topmenu .topmenu-left {
+          display: flex;
+          justify-content: flex-end;
+          flex: 1;
+          gap: 15px;
+          align-items: center;
+        }
+        #topmenu .top-social {
+          display: flex;
+          list-style: none;
+          margin: 0;
+          padding: 0;
+        }
+        #topmenu a {
+          color: #fff;
+          text-decoration: none;
+        }
 
-      {%- block styles %}
-        {% set theme = h.get_rtl_theme() if h.is_rtl_language() else g.theme %}
-        {% asset theme %}
-        {% asset 'vendor/fontawesome' %}
-      {% endblock %}
+        /* Main header */
+        #header-core {
+          display: flex;
+          justify-content: space-between;
+          max-width: 1140px;
+          margin: 0 auto;
+          padding: 0 12.8px;
+          min-height: 80px;
+          align-items: center;
+        }
+        #header-container #header .menu {
+          display: flex;
+          list-style: none;
+          margin: 0;
+          padding: 0;
+        }
+        #header-container #header .menu li {
+          display: inline-block;
+        }
 
-      {# render all assets included in styles block #}
-      {{ h.render_assets('style') }}
+        /* Hide submenus initially */
+        #header-container #header .sub-menu {
+          display: none;
+          position: absolute;
+          z-index: 9999;
+        }
 
-      {% asset 'ckanext-cioos_theme/cioos_theme_css' %}
-      {% if h.cioos_get_additional_css_path() %}
+        /* Mobile elements - hidden on desktop */
+        .main-nav-check {
+          display: none !important;
+          visibility: hidden !important;
+        }
+        .mobile-nav {
+          display: none !important;
+          visibility: hidden !important;
+        }
+        .mobileheader,
+        .toggle-menu {
+          display: none !important;
+          visibility: hidden !important;
+        }
+
+        /* Mobile breakpoint */
+        @media (max-width: 768px) {
+          /* Hide desktop elements */
+          #topmenu,
+          #header-core,
+          .account-masthead {
+            display: none !important;
+          }
+          /* Show mobile header */
+          .mobileheader,
+          .toggle-menu {
+            display: flex !important;
+            visibility: visible !important;
+            background: #52a79b;
+            padding: 10px 15px;
+            align-items: center;
+            justify-content: space-between;
+          }
+          /* Mobile nav stays hidden until checkbox is checked */
+          .mobile-nav {
+            display: none !important;
+            visibility: hidden !important;
+          }
+          .main-nav-check:checked ~ .mobile-nav {
+            display: block !important;
+            visibility: visible !important;
+          }
+        }
+      </style>
+
+      {%- block styles %} {% set theme = h.get_rtl_theme() if
+      h.is_rtl_language() else g.theme %} {% asset theme %} {% asset
+      'vendor/fontawesome' %} {% asset 'ckanext-cioos_theme/cioos_theme_css' %}
+      {% endblock %} {# render all assets included in styles block #} {{
+      h.render_assets('style') }} {% if h.cioos_get_additional_css_path() %}
       <link
         rel="stylesheet"
         type="text/css"
@@ -75,9 +180,8 @@
       {%- block page %}{% endblock -%} {%- block scripts %} {% endblock -%} {%
       block body_extras -%} {# defined in the config.ini under
       "ckan.template_footer_end" #} {{ g.template_footer_end | safe }} {%-
-      endblock %} {# render all assets included in scripts block and everywhere
-      else #} {# make sure there are no calls to `asset` tag after this point #}
-      {{ h.render_assets('style') }} {{ h.render_assets('script') }}
+      endblock %} {# render script assets - styles already rendered in head #}
+      {{ h.render_assets('script') }}
     </body>
   </html>
 </html>

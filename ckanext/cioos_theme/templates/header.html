@@ -10,9 +10,9 @@ h.render_markdown(h.scheming_language_text(h.cioos_load_json(g.site_description)
 
 <div id="header-container">
   {% block header_wrapper %} {# mobile header menu #}
-  <input type="checkbox" class="main-nav-check" id="main-nav-check" style="display:none" />
+  <input type="checkbox" class="main-nav-check" id="main-nav-check" />
   <!-- Logo (hidden on desktop, shown via CSS on mobile) -->
-  <div class="mobileheader toggle-menu" style="display:none">
+  <div class="mobileheader toggle-menu">
     {% if gns.site_logo %}
     <a class="logo" href="{{ g.site_home_url or h.url_for('home.index') }}"
       ><img
@@ -25,7 +25,7 @@ h.render_markdown(h.scheming_language_text(h.cioos_load_json(g.site_description)
     <label for="main-nav-check">Menu</label>
   </div>
   <!-- Menu (hidden on desktop, shown via CSS on mobile) -->
-  <nav class="menubar mobile-nav" id="mobile-nav" style="display:none">
+  <nav class="menubar mobile-nav" id="mobile-nav">
     <div id="menu-mobile" class="menu">
       <div class="menu-mobile-menu-container">
         <nav>

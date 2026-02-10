@@ -41,11 +41,59 @@ body {
    =========================================== */
 .main {
   min-height: 70vh;
+  background: white;
+}
+
+a {
+  color: var(--cioos-nav-bg);
+}
+
+.wrapper .bpx {
+  background: transparent;
 }
 
 .wrapper,
 .box,
 .module-content.box {
+  border: none;
+  box-shadow: none;
+}
+
+.module:first-child .module-heading {
+  border-radius: 14px 0 0 0;
+}
+
+@media (min-width: 768px) {
+  .wrapper:before {
+    content: "";
+    display: block;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 25%;
+    border-right: none;
+    z-index: 1;
+  }
+}
+
+aside .module-heading {
+  background-color: white;
+  border-radius: 14px 0 0 0;
+  border: 0;
+}
+
+aside .module {
+  border: 1px solid var(--bs-body-color);
+  border-bottom: 0;
+  border-right: 0;
+  border-radius: 14px 0 0 0;
+  padding: 6px;
+  margin: 2px;
+  margin-bottom: 0.75rem;
+}
+
+.form-select {
   border: none;
   box-shadow: none;
 }
@@ -76,11 +124,6 @@ body {
     padding: 10px 15px;
     align-items: center;
     justify-content: space-between;
-  }
-
-  /* Keep toggle-menu visible as it's part of mobileheader */
-  .toggle-menu {
-    visibility: visible;
   }
 
   /* Mobile nav menu stays hidden until checkbox is checked */
@@ -941,12 +984,6 @@ section .panel-heading-thin {
   transition: all 0.3s ease;
 }
 
-/* Filters styling */
-.filters .module-heading {
-  border-right: 1px solid #ddd;
-  background-color: #eaeaea;
-}
-
 /* Breadcrumb */
 .toolbar .breadcrumb a {
   color: #505050;
@@ -975,21 +1012,27 @@ ul.formats li a.btn {
 }
 
 /* Datepicker in sidebar */
-.secondary #datepickernullrange {
-  margin: 10px 0 10px 15px;
+.secondary .input-daterange {
+  margin: 10px 0 10px 0;
+  gap: 0.5rem;
+  align-items: center;
 }
 
+.input-datenullrange {
+  align-items: center;
+  gap: 1rem;
+}
 .secondary #datepickernullrangelabel::after {
   content: "";
 }
 
-.secondary .input-group-addon {
+/* .secondary .input-group-addon {
   color: #555;
   background-color: #fff;
   background-image: none;
   border: 1px solid #ccc;
   border-radius: 0;
-}
+} */
 
 /* Lineage styling */
 .lineage .scheming-subfield-items {
