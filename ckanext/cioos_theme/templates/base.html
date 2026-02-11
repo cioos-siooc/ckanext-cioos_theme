@@ -145,6 +145,7 @@
       {%- block styles %} {% set theme = h.get_rtl_theme() if
       h.is_rtl_language() else g.theme %} {% asset theme %} {% asset
       'vendor/fontawesome' %} {% asset 'ckanext-cioos_theme/cioos_theme_css' %}
+      {% asset 'ckanext-cioos_theme/bootstrap_datepicker_css' %}
       {% endblock %} {# render all assets included in styles block #} {{
       h.render_assets('style') }} {% if h.cioos_get_additional_css_path() %}
       <link
