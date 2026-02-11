@@ -66,10 +66,6 @@ h.render_markdown(h.scheming_language_text(h.cioos_load_json(g.site_description)
     <div class="container topmenu-inner">
       {% block header_topmenu %}
       <div class="topmenu-left">
-        <ul class="shareicons top-social">
-          {% block social_list %} {% snippet "menu/social_list.html" %} {%
-          endblock %}
-        </ul>
         <div class="topmenu-logo">
           <a href="https://cioos.ca">
             <img
@@ -80,6 +76,10 @@ h.render_markdown(h.scheming_language_text(h.cioos_load_json(g.site_description)
             />
           </a>
         </div>
+        <ul class="shareicons top-social">
+          {% block social_list %} {% snippet "menu/social_list.html" %} {%
+          endblock %}
+        </ul>
       </div>
       {% if h.cioos_show_language_picker_in_top_bar() %}
       <div id="language_picker" class="topmenu-language">
