@@ -20,11 +20,9 @@
   --cioos-nav-bg: #52a79b;
   --cioos-footer-bg: #152f37;
   --cioos-light-bg: #f0f0f0;
+  --cioos-primary-color: #52a79b;
+  --cioos-darker-color: #3d7a71;
   --cioos-accent: #fa7268;
-
-  /* Override Bootstrap primary color */
-  --bs-primary: #52a79b;
-  --bs-primary-rgb: 82, 167, 155;
 
   /* Typography */
   --cioos-header-font: "Montserrat", system-ui, -apple-system, sans-serif;
@@ -42,10 +40,6 @@ body {
 .main {
   min-height: 70vh;
   background: white;
-}
-
-a {
-  color: var(--cioos-nav-bg);
 }
 
 .wrapper .bpx {
@@ -96,6 +90,25 @@ aside .module {
 .form-select {
   border: none;
   box-shadow: none;
+}
+
+a {
+  color: var(--cioos-primary-color);
+}
+a:hover {
+  color: var(--cioos-darker-color);
+}
+
+.btn {
+  font-weight: 400;
+}
+.btn-primary {
+  background-color: var(--cioos-primary-color);
+  border-color: var(--cioos-primary-color);
+}
+.btn-primary:hover {
+  background-color: var(--cioos-darker-color);
+  border-color: var(--cioos-darker-color);
 }
 
 /* ===========================================
