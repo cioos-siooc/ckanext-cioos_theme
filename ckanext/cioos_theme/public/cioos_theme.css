@@ -48,6 +48,22 @@ body {
   background: transparent;
 }
 
+.search-giant {
+  width: 90%;
+  max-width: 800px;
+  margin: 0 auto 2rem;
+}
+
+.search-giant input {
+  border-color: var(--bs-body-color);
+  border-radius: 35px;
+  padding: 10px 20px;
+}
+
+.search-form .search-input.search-giant button i {
+  color: var(--bs-body-color);
+}
+
 .wrapper,
 .box,
 .module-content.box {
@@ -84,7 +100,7 @@ aside .module {
   border-bottom: 0;
   border-right: 0;
   border-radius: 14px 0 0 0;
-  padding: 6px;
+  padding: 0 6px;
   margin: 2px;
   margin-bottom: 0.75rem;
 }
@@ -134,6 +150,14 @@ a:hover {
 
 aside #dataset-map {
   padding: 0;
+}
+
+.module > .module-content:nth-child(2n) {
+  padding-top: 0.5rem;
+}
+
+.module > .empty {
+  color: gray;
 }
 
 /* ===========================================
