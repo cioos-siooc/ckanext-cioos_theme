@@ -94,7 +94,7 @@
             h.url_for(controller='dataset', action='search', eov=item.name) %}
             {% set label = label_function(item) if label_function else
             h.scheming_language_text(item.display_name) %} {% set label =
-            _(label) %} {% set label_truncated = h.truncate(label, 45) if not
+            _(label) %} {% set label_truncated = label|truncate(45, killwords=True) if not
             label_function else label %} {% set count =
             count_label(item['count']) if count_label else ('%d' %
             item['count']) %} {% set icon_base =
