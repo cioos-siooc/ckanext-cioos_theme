@@ -132,6 +132,10 @@ a:hover {
   }
 }
 
+aside #dataset-map {
+  padding: 0;
+}
+
 /* ===========================================
    Mobile Navigation
    Toggle visibility for responsive nav
@@ -1048,7 +1052,7 @@ ul.formats li a.btn {
 
 /* Datepicker in sidebar */
 .secondary .input-daterange {
-  margin: 10px 0 10px 0;
+  margin: 0 0 10px 0;
   gap: 0.5rem;
   align-items: center;
 }
@@ -1059,6 +1063,9 @@ ul.formats li a.btn {
 }
 .secondary #datepickernullrangelabel::after {
   content: "";
+}
+.form-check-input {
+  appearance: auto;
 }
 
 /* .secondary .input-group-addon {
