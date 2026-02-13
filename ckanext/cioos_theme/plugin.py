@@ -603,7 +603,9 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             'cioos_show_harvested_from_in_dataset_sidebar': lambda: toolkit.asbool(toolkit.config.get('ckan.show_harvested_from_in_dataset_sidebar', True)),
             'cioos_show_language_picker_in_top_bar': lambda: toolkit.asbool(toolkit.config.get('ckan.show_language_picker_in_top_bar', True)),
             'cioos_show_language_picker_in_menu': lambda: toolkit.asbool(toolkit.config.get('ckan.show_language_picker_in_menu', True)),
-            'cioos_load_about_markdown': cioos_helpers.load_about_markdown
+            'cioos_load_about_markdown': cioos_helpers.load_about_markdown,
+            'composite_separator': cioos_helpers.composite_separator,
+            'scheming_composite_separator': cioos_helpers.composite_separator,
         }
 
     def get_validators(self):
