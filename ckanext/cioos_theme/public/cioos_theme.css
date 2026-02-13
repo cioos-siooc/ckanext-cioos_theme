@@ -1320,3 +1320,15 @@ ul.formats li a.btn {
 .eov-grid .media-item:hover {
   transform: scale(1.07);
 }
+
+/* ===========================================
+   Harvest Form - Vertical Radio Buttons
+   =========================================== */
+.harvest-types label.radio {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.harvest-types label.radio input {
+  margin-right: 8px;
+}
