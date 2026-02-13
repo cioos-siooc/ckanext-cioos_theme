@@ -90,7 +90,7 @@ body {
 }
 
 aside .module-heading {
-  background-color: white;
+  background-color: var(--bs-body-bg);
   border-radius: 14px 0 0 0;
   border: 0;
 }
@@ -459,10 +459,11 @@ aside #dataset-map {
 
 #header-container #header .menu > li a {
   text-decoration: none;
-  color: #0a0a0a;
+  color: var(--bs-body-color);
   font-family: inherit;
   font-weight: inherit;
   transition: all 0.3s ease;
+  text-transform: uppercase;
 }
 
 #header-container #header .menu > li.lang-item a {
@@ -1092,14 +1093,6 @@ ul.formats li a.btn {
   appearance: auto;
 }
 
-/* .secondary .input-group-addon {
-  color: #555;
-  background-color: #fff;
-  background-image: none;
-  border: 1px solid #ccc;
-  border-radius: 0;
-} */
-
 /* Lineage styling */
 .lineage .scheming-subfield-items {
   margin-left: 10px;
@@ -1312,4 +1305,18 @@ ul.formats li a.btn {
     padding: 8px 12px;
     font-size: 14px;
   }
+}
+
+.eov-grid .media-item {
+  transition: transform 0.15s ease-in-out;
+  width: 170px;
+  border: 1px solid #ddd;
+  height: 170px;
+  .media-heading {
+    font-size: 14px;
+  }
+}
+
+.eov-grid .media-item:hover {
+  transform: scale(1.07);
 }
