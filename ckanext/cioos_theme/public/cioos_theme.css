@@ -160,6 +160,13 @@ aside #dataset-map {
   color: gray;
 }
 
+.page-header {
+  background-color: var(--bs-body-bg);
+}
+.nav-link,
+.page-header .nav-tabs li a {
+  color: var(--cioos-primary-color);
+}
 /* ===========================================
    Mobile Navigation
    Toggle visibility for responsive nav
