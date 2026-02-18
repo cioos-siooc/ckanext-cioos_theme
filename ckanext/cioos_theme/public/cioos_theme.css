@@ -217,6 +217,31 @@ aside #dataset-map {
   margin-bottom: 20px;
   border-radius: 14px;
 }
+
+/* Panel polyfill for upstream templates still using Bootstrap 3 classes */
+.panel {
+  margin-bottom: 20px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+}
+
+.panel-heading {
+  padding: 10px 15px;
+  border-bottom: 1px solid #ddd;
+  border-radius: 3px 3px 0 0;
+  background-color: #f5f5f5;
+}
+
+.panel-body {
+  padding: 15px;
+}
+
+.additional-info .card {
+  border-color: #ddd;
+  margin-bottom: 20px;
+}
 /* ===========================================
    Mobile Navigation
    Toggle visibility for responsive nav
@@ -811,7 +836,6 @@ aside #dataset-map {
 .resource-list .resource-item {
   border: 1px solid #ddd;
   margin-bottom: -1px;
-  padding: 0;
   border-radius: 0 20px 20px 0;
   margin-left: 0;
 }
@@ -841,7 +865,6 @@ aside #dataset-map {
 }
 
 .resource-list .resource-item .heading {
-  padding: 10px 0 10px 60px;
   text-decoration: none;
   font-weight: 600;
 }
@@ -859,20 +882,25 @@ aside #dataset-map {
   font-weight: 600;
 }
 
+.additional-info .card .card-header,
 .additional-info .panel-default .panel-heading {
   display: none;
 }
 
+.additional-info .card:last-of-type,
 .additional-info .panel-default:last-of-type,
+.additional-info .card-simple-composite,
 .additional-info .panel-simple-composite {
   margin-bottom: 0;
 }
 
+.additional-info .card-simple-composite,
 .additional-info .panel-simple-composite {
   background-color: inherit;
   border: none;
 }
 
+.additional-info .card-simple-composite .card-body,
 .additional-info .panel-simple-composite .panel-body {
   padding: 0;
 }
@@ -987,11 +1015,11 @@ section a.section_hide_controle_full_width i {
   padding-top: 3px;
 }
 
-section .panel-heading-thin {
+section .card-header-thin {
   padding: unset;
 }
 
-.table.collapse.in {
+.table.collapse.show {
   display: table;
 }
 
@@ -1200,6 +1228,7 @@ ul.formats li a.btn {
 /* Module headings */
 .module h3 {
   font-weight: 400;
+  margin-top: 1rem;
 }
 
 .module strong {

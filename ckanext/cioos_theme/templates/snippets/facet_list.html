@@ -64,7 +64,7 @@ Dictionary with search facets(or `c.search_facets` if not provided)
 			{% with items = items or h.get_facet_items_dict(name, search_facets or c.search_facets) %}
 			    {% if items %}
 				<nav aria-label="{{ title }}">
-				    <ul class="{{ nav_class or 'list-unstyled nav nav-simple nav-facet ' + name + '-collapse collapse in' }}">
+				    <ul class="{{ nav_class or 'list-unstyled nav nav-simple nav-facet ' + name + '-collapse collapse show' }}">
 					{% for item in items %}
 					    {% set href = h.remove_url_param(name, item.name, extras=extras, alternative_url=alternative_url) if item.active else h.add_url_param(new_params={name: item.name}, extras=extras, alternative_url=alternative_url) %}
 					    {% set label = label_function(item) if label_function else item.display_name %}
@@ -81,7 +81,7 @@ Dictionary with search facets(or `c.search_facets` if not provided)
 				    </ul>
 				</nav>
 
-				<p class="module-footer {{name + '-collapse collapse in' }}">
+				<p class="module-footer {{name + '-collapse collapse show' }}">
 				    {% if h.get_param_int('_%s_limit' % name) %}
 					{% if h.has_more_facets(name, search_facets or c.search_facets) %}
 					    <a href="{{ h.remove_url_param('_%s_limit' % name, replace=0, extras=extras, alternative_url=alternative_url) }}" class="read-more">{{ _('Show More {facet_type}').format(facet_type=title) }}</a>
