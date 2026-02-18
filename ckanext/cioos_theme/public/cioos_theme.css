@@ -182,6 +182,7 @@ aside #dataset-map {
   align-content: center;
   gap: 1rem;
   padding: 1rem;
+  min-width: 100%;
 }
 .media-item {
   margin: 0;
@@ -192,6 +193,30 @@ aside #dataset-map {
   border-radius: 15datapx;
 }
 
+.media-item .media-image,
+.module-item .media-image {
+  /* margin-bottom: 5px; */
+  max-width: 100%;
+}
+
+.dataset-resources li a {
+  background-color: var(--cioos-primary-color);
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+.search-form {
+  margin-bottom: 20px;
+  padding-bottom: 25px;
+  border-bottom: none;
+}
+
+.dataset-item {
+  border: 1px solid #ddd;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 14px;
+}
 /* ===========================================
    Mobile Navigation
    Toggle visibility for responsive nav
