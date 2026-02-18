@@ -121,7 +121,7 @@
       {% set field = h.scheming_field_by_name(schema.dataset_fields, 'cited-responsible-party') %}
       {% set cpkg = pkg.copy() %}
       {%- set _ = cpkg.update({"cited-responsible-party": h.cioos_group_contacts(cpkg.get('cited-responsible-party',[]) + cpkg.get('metadata-point-of-contact',[]) + cpkg.get('distributor',[]))}) -%}
-      {%- snippet "scheming/display_snippets/repeating_subfields.html",
+      {%- snippet "package/snippets/contacts.html",
         field=field,
         data=cpkg,
         errors=errors,
