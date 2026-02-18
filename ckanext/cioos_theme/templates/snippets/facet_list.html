@@ -52,7 +52,7 @@ Dictionary with search facets(or `c.search_facets` if not provided)
 	    {% block facet_list_item %}
 		<section class="{{ wrapper_class or 'module module-narrow module-shallow' }}">
 		    {% block facet_list_heading %}
-			<a style="color:inherit; text-decoration:none;" data-toggle="collapse" data-target=".{{name + '-collapse'}}" href="#{{name + '-collapse'}}" aria-expanded="true" aria-controls="{{name + '-collapse'}}">
+			<a style="color:inherit; text-decoration:none;" data-bs-toggle="collapse" data-bs-target=".{{name + '-collapse'}}" href="#{{name + '-collapse'}}" aria-expanded="true" aria-controls="{{name + '-collapse'}}">
 			<h2 class="module-heading">
 			    <i class="fa fa-filter"></i>
 			    {% set title = title or h.get_facet_title(name) %}
