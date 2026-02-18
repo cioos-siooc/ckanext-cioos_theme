@@ -90,19 +90,19 @@ body {
 }
 
 aside .module-heading {
-  background-color: var(--bs-body-bg);
+  background-color: transparent;
   border-radius: 14px 0 0 0;
   border: 0;
 }
 
-aside .module {
-  border: 1px solid var(--bs-body-color);
-  border-bottom: 0;
-  border-right: 0;
-  border-radius: 14px 0 0 0;
+aside .module-narrow {
+  border: 1px solid #ddd;
+  /* border-bottom: 0;
+  border-right: 0; */
+  border-radius: 14px;
   padding: 0 6px;
   margin: 2px;
-  margin-bottom: 0.75rem;
+  margin-bottom: 1rem;
 }
 
 .form-select {
@@ -135,7 +135,7 @@ a:hover {
 }
 
 .search-form .search-input-group {
-  border: 1px solid var(--cioos-light-color);
+  border: 1px solid #ddd;
   border-radius: 14px;
   button,
   input {
@@ -169,7 +169,7 @@ aside #dataset-map {
 }
 
 .module-content {
-  padding: 0 1.5rem;
+  padding: 0;
 }
 .media-grid {
   background: var(--cioos-light-bg);
@@ -214,7 +214,7 @@ aside #dataset-map {
 .dataset-item {
   border: 1px solid #ddd;
   padding: 20px;
-  margin-bottom: 20px;
+  margin-bottom: 1rem;
   border-radius: 14px;
 }
 
@@ -241,6 +241,13 @@ aside #dataset-map {
 .additional-info .card {
   border-color: #ddd;
   margin-bottom: 20px;
+}
+
+.module-narrow #dataset-map-container {
+  border-radius: 0 0 14px 14px;
+}
+.dataset-item .dataset-heading {
+  margin-top: 0;
 }
 /* ===========================================
    Mobile Navigation
