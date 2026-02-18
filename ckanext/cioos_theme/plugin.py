@@ -744,7 +744,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
     #     pass
 
     # modfiey tags, keywords, and eov fields so that they properly index
-    def before_index(self, data_dict):
+    def before_dataset_index(self, data_dict):
         try:
             data_type = data_dict.get('type')
             if data_type != 'dataset':
@@ -973,7 +973,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         return out
 
     # handle custom temporal range search facet
-    def before_search(self, search_params):
+    def before_dataset_search(self, search_params):
         if '-dataset_type:harvest' not in search_params.get('fq', {}):
             return search_params
 
@@ -1002,7 +1002,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
 
 
     def populate_schema_select_display_name(self, search_facets, field_name):
-        facet_field = search_facets['field_name']
+        facet_field = search_facets[field_name]
         items = facet_field.get('items')
         if not items:
             return None
@@ -1084,7 +1084,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
     # update eov search facets with keys from choices list in the scheming extension schema
     # format search results for consistant json output
     # add organization extra fields to results
-    def after_search(self, search_results, search_params):
+    def after_dataset_search(self, search_results, search_params):
         org_dict = {}
         group_dict = {}
         group_dict_by_name = {}
@@ -1230,7 +1230,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
 
     # add organization extras to organization object in package.
     # this will make the show and search endpoints look the same
-    def after_show(self, context, package_dict):
+    def after_dataset_show(self, context, package_dict):
         if toolkit.request and toolkit.request.path.startswith('/dataset/'):
             try:
                 del package_dict['harvest_document_content']
