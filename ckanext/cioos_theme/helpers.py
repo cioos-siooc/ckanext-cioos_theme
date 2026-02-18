@@ -221,7 +221,10 @@ def merge_dict(d1,d2):
 def get_license_def(id, url='', title=''):
     licenses = toolkit.get_action('license_list')()
 
-    default_locale = toolkit.config.get('ckan.locale_default', toolkit.config.get('ckan.locales_offered', ['en'])[0])
+    locales_offered = toolkit.config.get('ckan.locales_offered', [])
+    if isinstance(locales_offered, str):
+        locales_offered = locales_offered.split() if locales_offered.strip() else []
+    default_locale = toolkit.config.get('ckan.locale_default') or (locales_offered[0] if locales_offered else 'en')
     lang = toolkit.h.lang() or default_locale
 
     # check for id first

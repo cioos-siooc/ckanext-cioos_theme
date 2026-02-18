@@ -181,7 +181,9 @@
       {%- block page %}{% endblock -%} {%- block scripts %} {% endblock -%} {%
       block body_extras -%} {# defined in the config.ini under
       "ckan.template_footer_end" #} {{ g.template_footer_end | safe }} {%-
-      endblock %} {# render script assets - styles already rendered in head #}
+      endblock %} {# render any style assets registered by page body snippets #}
+      {{ h.render_assets('style') }}
+      {# render script assets #}
       {{ h.render_assets('script') }}
     </body>
   </html>

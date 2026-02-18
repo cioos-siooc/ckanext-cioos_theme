@@ -1,0 +1,15 @@
+{# Display text with optional URI link.
+   Uses display_uri_field_prefix to find sibling subfields:
+     {prefix}code = the URI/URL
+     {prefix}code-space = base URL (unused here, code should be full URL)
+#}
+{%- set text_value = data[field.field_name] -%}
+{%- set uri_prefix = field.get('display_uri_field_prefix', '') -%}
+{%- set uri = data.get(uri_prefix ~ 'code', '') if uri_prefix else '' -%}
+{%- if text_value -%}
+  {%- if uri -%}
+    <a href="{{ uri }}" target="_blank" rel="nofollow">{{ text_value }}</a>
+  {%- else -%}
+    {{ text_value }}
+  {%- endif -%}
+{%- endif -%}
