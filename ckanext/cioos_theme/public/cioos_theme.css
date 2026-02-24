@@ -1019,6 +1019,13 @@ aside #dataset-map {
   line-height: 1;
 }
 
+.main .secondary {
+    padding: 0;
+    z-index: 1;
+    border: 1px solid #ddd;
+    border-radius: 14px;
+}
+
 /* ===========================================
    Section Collapse Controls
    =========================================== */
