@@ -1005,7 +1005,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         facet_field = search_facets[field_name]
         items = facet_field.get('items')
         if not items:
-            return None
+            return items or []
         schema = toolkit.h.scheming_get_dataset_schema('dataset')
         fields = schema['dataset_fields']
         field = toolkit.h.scheming_field_by_name(fields, field_name)
