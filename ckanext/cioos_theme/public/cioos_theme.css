@@ -95,8 +95,8 @@ aside .module-narrow .module-heading {
   border: none;
   border-radius: 14px 14px 0 0;
   padding: 6px 15px;
-  background-color: var(--cioos-light-bg);
-  color: var(--bs-body-color);
+  background-color: var(--cioos-primary-color);
+  color: white;
   margin: 8px 0 0 0;
 }
 .nav-simple > li, .nav-aside > li {
@@ -211,9 +211,13 @@ aside #dataset-map {
   background-color: var(--cioos-primary-color);
   color: white;
   padding: 0.25rem 0.5rem;
-  border-radius: 4px;
+  border-radius: 14px;
   font-size: 11px;
+  &[data-format="erddap"] {
+    background-color: var(--cioos-accent);
+  }
 }
+
 .search-form {
   margin-bottom: 20px;
   padding-bottom: 25px;
