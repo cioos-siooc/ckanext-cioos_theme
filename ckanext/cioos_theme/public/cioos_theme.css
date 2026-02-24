@@ -95,8 +95,17 @@ aside .module-narrow .module-heading {
   border: none;
   border-radius: 14px 14px 0 0;
   padding: 6px 15px;
-  background-color: var(--cioos-primary-color);
-  color: var(--bs-body-bg);
+  background-color: var(--cioos-light-bg);
+  color: var(--bs-body-color);
+  margin: 8px 0 0 0;
+}
+.nav-simple > li, .nav-aside > li {
+    border-bottom: none;
+}
+.module-footer {
+    padding: 7px 25px 7px;
+    margin: 0 14px;
+    border-top: none;
 }
 
 .module:first-child .module-heading {
