@@ -71,10 +71,6 @@ body {
   box-shadow: none;
 }
 
-.module:first-child .module-heading {
-  border-radius: 14px 0 0 0;
-}
-
 @media (min-width: 768px) {
   .wrapper:before {
     content: "";
@@ -95,14 +91,17 @@ aside .module-heading {
   border: 0;
 }
 
-aside .module-narrow {
-  border: 1px solid #ddd;
-  /* border-bottom: 0;
-  border-right: 0; */
-  border-radius: 14px;
-  padding: 0 6px;
-  margin: 2px;
-  margin-bottom: 1rem;
+aside .module-narrow .module-heading {
+  border: none;
+  border-radius: 14px 14px 0 0;
+  padding: 6px 15px;
+  background-color: var(--cioos-primary-color);
+  color: var(--bs-body-bg);
+}
+
+.module:first-child .module-heading {
+  border-radius: 14px 14px 0 0;
+  border-top-width: 0;
 }
 
 .form-select {
@@ -204,6 +203,7 @@ aside #dataset-map {
   color: white;
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
+  font-size: 11px;
 }
 .search-form {
   margin-bottom: 20px;
@@ -248,6 +248,26 @@ aside #dataset-map {
 }
 .dataset-item .dataset-heading {
   margin-top: 0;
+}
+
+.page-item.active .page-link {
+  z-index: 3;
+  color: #fff;
+  background-color: var(--cioos-primary-color);
+  border-color: var(--cioos-primary-color);
+}
+.page-link {
+  color: var(--cioos-primary-color);
+}
+
+.filters {
+  border: 1px solid #ddd;
+  border-radius: 14px;
+  border-top: 0;
+}
+
+.form-control {
+  border-radius: 14px;
 }
 /* ===========================================
    Mobile Navigation
@@ -1168,15 +1188,21 @@ ul.formats li a.btn {
 }
 
 /* Datepicker in sidebar */
-.secondary .input-daterange {
-  margin: 0 0 10px 0;
-  gap: 0.5rem;
-  align-items: center;
-}
+#year_search_container {
+  padding: 0 15px 15px 15px;
 
-.input-datenullrange {
-  align-items: center;
+  .input-daterange {
+    margin: 10px 0;
+    gap: 0.5rem;
+    align-items: center;
+  }
+  .input-datenullrange {
+    display: flex;
+    flex-wrap: nowrap;
+     align-items: center;
   gap: 1rem;
+}
+  }
 }
 .secondary #datepickernullrangelabel::after {
   content: "";
