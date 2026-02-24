@@ -91,13 +91,31 @@ aside .module-heading {
   border: 0;
 }
 
+aside .module {
+  border: 1px solid #ddd;
+  border-radius: 14px;
+  margin-bottom: 0.25rem;
+  border-top: none;
+}
+
+.module-heading a .action {
+  color: white;
+  text-decoration: none;
+}
+
+.page_primary_action {
+  margin-bottom: 0;
+  .btn {
+    margin-bottom: 20px;
+  }
+}
+
 aside .module-narrow .module-heading {
   border: none;
   border-radius: 14px 14px 0 0;
   padding: 6px 15px;
   background-color: var(--cioos-primary-color);
   color: white;
-  margin: 8px 0 0 0;
 }
 .nav-simple > li, .nav-aside > li {
     border-bottom: none;
@@ -271,12 +289,6 @@ aside #dataset-map {
 }
 .page-link {
   color: var(--cioos-primary-color);
-}
-
-.filters {
-  border: 1px solid #ddd;
-  border-radius: 14px;
-  border-top: 0;
 }
 
 .form-control {
@@ -1019,10 +1031,7 @@ aside #dataset-map {
   line-height: 1;
 }
 
-.main .secondary {
-    padding: 0;
-    z-index: 1;
-    border: 1px solid #ddd;
+.module-narrow  {
     border-radius: 14px;
 }
 
