@@ -105,8 +105,23 @@ endif %}
 <a
   id="scrollUp"
   href="#top"
-  style="position: fixed; z-index: 2147483647; display: block"
-></a>
+  title="{{ _('Back to Top') }}"
+  aria-label="{{ _('Back to Top') }}"
+  style="position: fixed; z-index: 2147483647"
+><i class="fas fa-chevron-up"></i></a>
+<script>
+  (function () {
+    var btn = document.getElementById("scrollUp");
+    var threshold = 200;
+    window.addEventListener("scroll", function () {
+      if (window.scrollY > threshold) {
+        btn.classList.add("visible");
+      } else {
+        btn.classList.remove("visible");
+      }
+    });
+  })();
+</script>
 
 {% block footer_debug %} {# Removed include of 'snippets/debug.html' to avoid
 TemplateNotFound on CKAN 2.11 #} {% endblock %}

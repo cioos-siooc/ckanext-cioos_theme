@@ -1189,22 +1189,31 @@ section .card-header-thin {
 /* Scroll to top button */
 #scrollUp {
   bottom: 20px;
-  right: 20px;
-}
-
-#scrollUp::after {
-  content: "\f106";
-  font-family: "Font Awesome 6 Free";
-  font-weight: 900;
+  left: 50%;
+  transform: translateX(-50%);
   width: 45px;
   height: 45px;
-  display: block;
-  text-align: center;
-  line-height: 45px;
-  font-size: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--cioos-footer-bg);
   color: #fff;
-  background: #202020;
-  transition: all 0.3s ease;
+  text-decoration: none;
+  border-radius: 50%;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease, background 0.3s ease;
+}
+
+#scrollUp.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+#scrollUp:hover {
+  background: #404040;
+  color: #fff;
+  text-decoration: none;
 }
 
 /* Breadcrumb */

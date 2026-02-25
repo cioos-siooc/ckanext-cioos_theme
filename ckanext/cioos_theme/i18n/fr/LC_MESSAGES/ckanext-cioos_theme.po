@@ -783,3 +783,6 @@ msgstr "Travaux connexes"
 
 msgid "Download Citation"
 msgstr "Télécharger la citation"
+
+msgid "Back to Top"
+msgstr "Retour en haut"
