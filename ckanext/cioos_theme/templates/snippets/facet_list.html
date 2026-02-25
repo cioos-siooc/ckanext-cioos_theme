@@ -55,9 +55,10 @@ Dictionary with search facets(or `c.search_facets` if not provided)
 		    {% block facet_list_heading %}
 			<a class="section_hide_controle{% if not has_active %} collapsed{% endif %}" style="color:inherit; text-decoration:none;" data-bs-toggle="collapse" data-bs-target=".{{name + '-collapse'}}" href="#{{name + '-collapse'}}" aria-expanded="{{ 'true' if has_active else 'false' }}" aria-controls="{{name + '-collapse'}}">
 			<h2 class="module-heading">
-			    <i class="fa fa-filter"></i>
+			    <i class="fas fa-filter"></i>
 			    {% set title = title or h.get_facet_title(name) %}
 			    {{ title }}
+			    <i class="collapse-icon"></i>
 			</h2>
 		    </a>
 		    {% endblock %}

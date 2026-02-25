@@ -1061,17 +1061,17 @@ section a.section_hide_controle {
   color: inherit;
 }
 
-section a.section_hide_controle i {
+section a.section_hide_controle .collapse-icon {
   margin-left: 10px;
 }
 
-section a.section_hide_controle.collapsed i::before {
+section a.section_hide_controle.collapsed .collapse-icon::before {
   font-family: "Font Awesome 6 Free";
   font-weight: 900;
   content: "\f0fe";
 }
 
-section a.section_hide_controle:not(.collapsed) i::before {
+section a.section_hide_controle:not(.collapsed) .collapse-icon::before {
   font-family: "Font Awesome 6 Free";
   font-weight: 900;
   content: "\f146";
@@ -1084,7 +1084,7 @@ section a.section_hide_controle_full_width {
   padding: 10px 15px;
 }
 
-section a.section_hide_controle_full_width i {
+section a.section_hide_controle_full_width .collapse-icon {
   float: right;
   padding-top: 3px;
 }
