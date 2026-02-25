@@ -524,15 +524,38 @@ aside #dataset-map {
   top: 0;
   z-index: 1030;
   background: #fff;
-  transition: transform 0.3s ease;
+  transition: background 0.3s ease;
 }
 
+/* When scrolled, container becomes transparent so only header-core floats */
 #header-container.header-scrolled {
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  background: transparent;
+  pointer-events: none;
 }
 
-#header-container.header-hidden {
-  transform: translateY(-100%);
+#header-container.header-scrolled #topmenu {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 0.3s ease, opacity 0.2s ease;
+}
+
+#header-container.header-scrolled #header-core {
+  pointer-events: auto;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+  margin: 12px auto;
+  /* min-height: 70px; */
+  /* padding: 0; */
+}
+
+/* #header-container.header-scrolled #logo img {
+  height: 2.5em;
+} */
+
+#header-container.header-scrolled.header-hidden #header-core {
+  transform: translateY(calc(-100% - 24px));
 }
 
 #header-container #header-core {
@@ -544,6 +567,8 @@ aside #dataset-map {
   margin: 0 auto;
   padding: 0 12.8px;
   min-height: 80px;
+  border-radius: 0;
+  transition: transform 0.3s ease, border-radius 0.3s ease, box-shadow 0.3s ease, margin 0.3s ease, min-height 0.3s ease;
 }
 
 @media (max-width: 768px) {
