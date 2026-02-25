@@ -116,6 +116,11 @@ aside .module-narrow .module-heading {
   padding: 6px 15px;
   background-color: var(--cioos-primary-color);
   color: white;
+  transition: border-radius 0.2s ease;
+}
+aside .module-narrow a.section_hide_controle.collapsed .module-heading {
+  border-radius: 14px;
+  border: none;
 }
 .nav-simple > li, .nav-aside > li {
     border-bottom: none;
