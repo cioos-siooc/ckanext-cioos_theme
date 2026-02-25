@@ -170,5 +170,31 @@ h.render_markdown(h.scheming_language_text(h.cioos_load_json(g.site_description)
     };
   </script>
 
+  <script>
+    (function () {
+      var header = document.getElementById("header-container");
+      var lastScrollY = 0;
+      var threshold = window.innerHeight * 0.33;
+
+      window.addEventListener("scroll", function () {
+        var currentScrollY = window.scrollY;
+
+        if (currentScrollY > 0) {
+          header.classList.add("header-scrolled");
+        } else {
+          header.classList.remove("header-scrolled");
+        }
+
+        if (currentScrollY > threshold && currentScrollY > lastScrollY) {
+          header.classList.add("header-hidden");
+        } else if (currentScrollY < lastScrollY) {
+          header.classList.remove("header-hidden");
+        }
+
+        lastScrollY = currentScrollY;
+      });
+    })();
+  </script>
+
   {% endblock %}
 </div>

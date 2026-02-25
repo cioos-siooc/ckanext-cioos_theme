@@ -520,6 +520,19 @@ aside #dataset-map {
   font-weight: 700;
   font-size: 12.8px;
   line-height: 26px;
+  position: sticky;
+  top: 0;
+  z-index: 1030;
+  background: #fff;
+  transition: transform 0.3s ease;
+}
+
+#header-container.header-scrolled {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+#header-container.header-hidden {
+  transform: translateY(-100%);
 }
 
 #header-container #header-core {
