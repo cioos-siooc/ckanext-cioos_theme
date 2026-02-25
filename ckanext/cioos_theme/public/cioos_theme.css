@@ -546,8 +546,11 @@ aside #dataset-map {
   border-radius: 16px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
   margin: 12px auto;
-  /* min-height: 70px; */
-  /* padding: 0; */
+}
+
+#header-container.header-scrolled .mobileheader,
+#header-container.header-scrolled .mobile-nav {
+  pointer-events: auto;
 }
 
 /* #header-container.header-scrolled #logo img {
