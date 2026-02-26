@@ -221,7 +221,7 @@ aside #dataset-map {
   background-color: var(--bs-body-bg);
 }
 .media-item a {
-  border-radius: 15datapx;
+  border-radius: 14px;
 }
 
 .media-item .media-image,
