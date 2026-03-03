@@ -95,7 +95,6 @@ aside .module {
   border: 1px solid #ddd;
   border-radius: 14px;
   margin-bottom: 0.25rem;
-  border-top: none;
 }
 
 .module-heading a .action {
@@ -117,11 +116,19 @@ aside .module-narrow .module-heading {
   background-color: var(--cioos-primary-color);
   color: white;
   transition: border-radius 0.2s ease;
+  text-wrap: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
+
 aside .module-narrow a.section_hide_controle.collapsed .module-heading {
   border-radius: 14px;
   border: none;
+  background-color: var(--bs-body-bg);
+  color: var(--bs-body-color);
+  transition-duration: 0.2s ease;
 }
+
 .nav-simple > li, .nav-aside > li {
     border-bottom: none;
 }
