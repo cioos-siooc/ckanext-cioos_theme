@@ -260,6 +260,11 @@ aside #dataset-map {
   margin-bottom: 1rem;
   border-radius: 14px;
 }
+.dataset-item:last-of-type {
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 1rem;
+    padding-bottom: 20px;
+}
 
 /* Panel polyfill for upstream templates still using Bootstrap 3 classes */
 .panel {
@@ -1166,6 +1171,7 @@ section .card-header-thin {
 .citation .btn-secondary {
   border-color: #333;
   color: #333;
+  background-color: #ddd;
   height: 28px;
   line-height: 20px;
   padding: 3px 12px;
@@ -1188,6 +1194,22 @@ section .card-header-thin {
   text-align: left;
 }
 
+/* ===========================================
+   Tag List Styling
+   =========================================== */
+.tag-list {
+  padding: 10px 10px 5px 10px;
+  background-color: var(--cioos-light-bg);
+  border: 1px solid #ddd;
+  border-radius: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0 .5rem;
+}
+.tag {
+  background-color: white;
+}
 /* ===========================================
    Organization Images
    =========================================== */
