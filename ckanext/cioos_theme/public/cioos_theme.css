@@ -1541,9 +1541,7 @@ ul.formats li a.btn {
 
 .eov-grid .media-item {
   transition: transform 0.15s ease-in-out;
-  width: 170px;
   border: 1px solid #ddd;
-  height: 170px;
   .media-heading {
     font-size: 14px;
   }
