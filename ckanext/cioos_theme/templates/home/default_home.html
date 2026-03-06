@@ -19,6 +19,29 @@
     background-color: white;
     border-radius: 1rem;
   }
+  .eov-grid .item-count.badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: inline-block;
+    min-width: 2.25rem;
+    padding: 0.4rem 0.7rem;
+    color: white;
+    background: #6e6e6e;
+    border-radius: 999px;
+    box-shadow:
+      0 10px 18px rgba(0, 0, 0, 0.14),
+      0 3px 8px rgba(0, 0, 0, 0.12),
+      inset 0 1px 0 rgba(255, 255, 255, 0.85),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.08);
+    transform: translate(24%, -28%);
+    font-size: 0.8rem;
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+    z-index: 1;
+    overflow: hidden;
+  }
   .media-heading {
     font-size: 16px;
     color: #333;
@@ -95,14 +118,15 @@
             {% set label = label_function(item) if label_function else
             h.scheming_language_text(item.display_name) %} {% set label =
             _(label) %} {% set label_truncated = label|truncate(45,
-            killwords=True) if not label_function else label %} {% set count =
-            count_label(item['count']) if count_label else ('%d' %
-            item['count']) %} {% set icon_base =
-            h.cioos_get_eov_icon_base_path() or '/base/images/eov-icons-svg/' %}
-            {% set img_url = item.image_display_url or
-            h.url_for_static(icon_base + item.get('icon')) %}
+            killwords=True) if not label_function else label %} {% set
+            count_value = item.get('count', 0) or 0 %} {% set count =
+            count_label(count_value) if count_label else ('%d' % count_value) %}
+            {% set icon_base = h.cioos_get_eov_icon_base_path() or
+            '/base/images/eov-icons-svg/' %} {% set img_url =
+            item.image_display_url or h.url_for_static(icon_base +
+            item.get('icon')) %}
             <li
-              class="media-item {{ 'media-item-disabled' if count|trim == '0'}}"
+              class="media-item {{ 'media-item-disabled' if count_value == 0 }}"
               style="height: 245px"
             >
               <a
@@ -119,7 +143,9 @@
                   class="media-image img-responsive"
                 />
                 <div class="media-heading">{{ label_truncated }}</div>
+                {% if count_value > 0 %}
                 <div class="item-count badge">{{ count }}</div>
+                {% endif %}
               </a>
             </li>
             {% endif %} {% endfor %}
