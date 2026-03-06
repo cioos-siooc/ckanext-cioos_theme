@@ -1,16 +1,17 @@
-'''
-  OGSL custom template helper function.
+"""
+OGSL custom template helper function.
 
-  Consists of functions typically used within templates, but also
-  available to Controllers. This module is available to templates as 'h'.
+Consists of functions typically used within templates, but also
+available to Controllers. This module is available to templates as 'h'.
 
-'''
+"""
 
 from ckanext.dcat.processors import RDFSerializer
 import ckan.plugins.toolkit as toolkit
 import ckan.plugins as p
 from collections import OrderedDict
 from ckantoolkit import _, c, config
+
 # from ckantoolkit import h
 import ckan.logic as logic
 import ckan.model as model
@@ -23,6 +24,7 @@ import jsonpickle
 import importlib_metadata as metadata
 import re
 from ckanext.spatial.plugin import SpatialQuery
+
 log = logging.getLogger(__name__)
 
 try:
@@ -32,6 +34,7 @@ except ImportError:
     # CKAN < 2.6
     class HelperError(Exception):
         pass
+
 
 get_action = logic.get_action
 
@@ -45,7 +48,7 @@ def composite_separator():
 
     This can be overridden via the 'scheming.composite.separator' config setting.
     """
-    return config.get('scheming.composite.separator', '-')
+    return config.get("scheming.composite.separator", "-")
 
 
 def load_json(j):
@@ -68,7 +71,7 @@ def load_about_markdown():
     Returns:
         dict: Dictionary with language keys and markdown content, or None if not configured
     """
-    markdown_file_config = config.get('ckan.site_about_markdown_file')
+    markdown_file_config = config.get("ckan.site_about_markdown_file")
 
     if not markdown_file_config:
         return None
@@ -78,7 +81,9 @@ def load_about_markdown():
         file_paths = load_json(markdown_file_config)
 
         if not isinstance(file_paths, dict):
-            log.warning('ckan.site_about_markdown_file must be a JSON object with language keys')
+            log.warning(
+                "ckan.site_about_markdown_file must be a JSON object with language keys"
+            )
             return None
 
         markdown_content = {}
@@ -89,18 +94,19 @@ def load_about_markdown():
                 continue
 
             try:
-                with open(file_path, 'r', encoding='utf-8') as f:
+                with open(file_path, "r", encoding="utf-8") as f:
                     markdown_content[lang] = f.read()
             except FileNotFoundError:
-                log.error(f'About markdown file not found: {file_path}')
+                log.error(f"About markdown file not found: {file_path}")
             except IOError as e:
-                log.error(f'Error reading about markdown file {file_path}: {e}')
+                log.error(f"Error reading about markdown file {file_path}: {e}")
 
         return markdown_content if markdown_content else None
 
     except Exception as e:
-        log.error(f'Error loading about markdown files: {e}')
+        log.error(f"Error loading about markdown files: {e}")
         return None
+
 
 # def get_organization_list(data_dict):
 #     '''Returns a list of organizations.
@@ -143,9 +149,9 @@ def load_about_markdown():
 
 # copied from dcat extension
 def helper_available(helper_name):
-    '''
+    """
     Checks if a given helper name is available on `h`
-    '''
+    """
     try:
         getattr(toolkit.h, helper_name)
     except (AttributeError, HelperError):
@@ -155,105 +161,147 @@ def helper_available(helper_name):
 
 def generate_doi_suffix():
     import random
-    chars = ['a','b','c','d','e','f','g','h','j','k','m','n','p','q','r','s',
-             't','u','v','w','x','y','z','0','1','2','3','4','5','6','7','8','9']
-    str1 = ''.join(random.SystemRandom().choice(chars) for _ in range(4))
-    str2 = ''.join(random.SystemRandom().choice(chars) for _ in range(4))
-    return str1 + '-' + str2
+
+    chars = [
+        "a",
+        "b",
+        "c",
+        "d",
+        "e",
+        "f",
+        "g",
+        "h",
+        "j",
+        "k",
+        "m",
+        "n",
+        "p",
+        "q",
+        "r",
+        "s",
+        "t",
+        "u",
+        "v",
+        "w",
+        "x",
+        "y",
+        "z",
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+    ]
+    str1 = "".join(random.SystemRandom().choice(chars) for _ in range(4))
+    str2 = "".join(random.SystemRandom().choice(chars) for _ in range(4))
+    return str1 + "-" + str2
 
 
 def get_doi_authority_url():
-    return toolkit.config.get('ckan.cioos.doi_authority_url', 'https://doi.org/')
+    return toolkit.config.get("ckan.cioos.doi_authority_url", "https://doi.org/")
 
 
 def get_doi_prefix():
-    return toolkit.config.get('ckan.cioos.doi_prefix')
+    return toolkit.config.get("ckan.cioos.doi_prefix")
 
 
 def get_datacite_org():
-    return toolkit.config.get('ckan.cioos.datacite_org')
+    return toolkit.config.get("ckan.cioos.datacite_org")
 
 
 def get_datacite_test_mode():
-    return toolkit.config.get('ckan.cioos.datacite_test_mode', 'True')
+    return toolkit.config.get("ckan.cioos.datacite_test_mode", "True")
+
 
 def get_ra_extents_url():
     # './ckanext-cioos_theme/ckanext/cioos_theme/public/base/layers/pacific_RA.json'
-    ra_file_url = toolkit.config.get('ckan.cioos.ra_json_file', 'null')
+    ra_file_url = toolkit.config.get("ckan.cioos.ra_json_file", "null")
     return ra_file_url
 
+
 def get_dataset_extents_url(q, fields, bbox_values, output=None):
-    search_params = {'q': q,
-                     'fl': 'spatial',
-                     'fq_list': [],
-                     'facet': 'false',
-                     'rows': 1000}
+    search_params = {
+        "q": q,
+        "fl": "spatial",
+        "fq_list": [],
+        "facet": "false",
+        "rows": 1000,
+    }
 
     clean_fields = [(i, '("%s")' % j) for i, j in fields]
-    search_params['fq_list'] = search_params['fq_list'] + \
-        ['+%s' % ':'.join(x) for x in clean_fields]
-    search_params['fq'] = ''.join(search_params['fq_list'])
-    del (search_params['fq_list'])
+    search_params["fq_list"] = search_params["fq_list"] + [
+        "+%s" % ":".join(x) for x in clean_fields
+    ]
+    search_params["fq"] = "".join(search_params["fq_list"])
+    del search_params["fq_list"]
 
     # search_params['output'] = 'geojson'
     if bbox_values:
         # ids = toolkit.get_action('spatial_query_geo')(data_dict={'bbox':bbox_values})
-        search_params['bbox'] = bbox_values
+        search_params["bbox"] = bbox_values
 
     # Try known spatial API endpoints across ckanext-spatial versions
     endpoints = [
-        'spatial_api.geo_package_search',
-        'spatial_api.package_search',
-        'spatial_api.geojson_package_search',
+        "spatial_api.geo_package_search",
+        "spatial_api.package_search",
+        "spatial_api.geojson_package_search",
     ]
     for ep in endpoints:
         try:
-            return toolkit.h.url_for(ep, register='dataset', **search_params)
+            return toolkit.h.url_for(ep, register="dataset", **search_params)
         except Exception:
             continue
     # Fallback: return empty string to avoid BuildError at render time
-    return ''
+    return ""
 
 
-def merge_dict(d1,d2):
-        return {**d1, **d2}
+def merge_dict(d1, d2):
+    return {**d1, **d2}
 
-def get_license_def(id, url='', title=''):
-    licenses = toolkit.get_action('license_list')()
 
-    locales_offered = toolkit.config.get('ckan.locales_offered', [])
+def get_license_def(id, url="", title=""):
+    licenses = toolkit.get_action("license_list")()
+
+    locales_offered = toolkit.config.get("ckan.locales_offered", [])
     if isinstance(locales_offered, str):
         locales_offered = locales_offered.split() if locales_offered.strip() else []
-    default_locale = toolkit.config.get('ckan.locale_default') or (locales_offered[0] if locales_offered else 'en')
+    default_locale = toolkit.config.get("ckan.locale_default") or (
+        locales_offered[0] if locales_offered else "en"
+    )
     lang = toolkit.h.lang() or default_locale
 
     # check for id first
     for license in licenses:
-        if id.lower() == license['id'].lower() or \
-            id.lower() in [x.lower() for x in license.get('legacy_ids', [])]:
+        if id.lower() == license["id"].lower() or id.lower() in [
+            x.lower() for x in license.get("legacy_ids", [])
+        ]:
             return {
-                "license_id": license['id'],
-                "license_url": license.get('url_' + lang, license['url']),
-                "license_title": license.get('title_' + lang, license['title'])
+                "license_id": license["id"],
+                "license_url": license.get("url_" + lang, license["url"]),
+                "license_title": license.get("title_" + lang, license["title"]),
             }
-        
+
     # if that fails match on url or title next
     if url or title:
         for license in licenses:
-            if url == license.get('url_' + lang, license['url']):
+            if url == license.get("url_" + lang, license["url"]):
                 return {
-                    "license_id": license['id'],
-                    "license_url": license.get('url_' + lang, license['url']),
-                    "license_title": license.get('title_' + lang, license['title'])
+                    "license_id": license["id"],
+                    "license_url": license.get("url_" + lang, license["url"]),
+                    "license_title": license.get("title_" + lang, license["title"]),
                 }
-            if title.lower() == license.get('title_' + lang, license['title']).lower():
+            if title.lower() == license.get("title_" + lang, license["title"]).lower():
                 return {
-                    "license_id": license['id'],
-                    "license_url": license.get('url_' + lang, license['url']),
-                    "license_title": license.get('title_' + lang, license['title'])
+                    "license_id": license["id"],
+                    "license_url": license.get("url_" + lang, license["url"]),
+                    "license_title": license.get("title_" + lang, license["title"]),
                 }
     return None
-        
 
 
 def get_fully_qualified_package_uri(pkg, uri_field, default_code_space=None):
@@ -262,12 +310,18 @@ def get_fully_qualified_package_uri(pkg, uri_field, default_code_space=None):
 
     if not uris:
         # try to build out of flat fields
-        uris = [{
-            "authority": pkg.get(uri_field + 'authority'),
-            "code-space": pkg.get(uri_field + 'code-space'),
-            "code": pkg.get(uri_field + 'code'),
-            "version": pkg.get(uri_field + 'version')
-        }] if pkg.get(uri_field + 'code') else None
+        uris = (
+            [
+                {
+                    "authority": pkg.get(uri_field + "authority"),
+                    "code-space": pkg.get(uri_field + "code-space"),
+                    "code": pkg.get(uri_field + "code"),
+                    "version": pkg.get(uri_field + "version"),
+                }
+            ]
+            if pkg.get(uri_field + "code")
+            else None
+        )
 
     if not uris:
         return fqURI
@@ -279,11 +333,11 @@ def get_fully_qualified_package_uri(pkg, uri_field, default_code_space=None):
         uri = toolkit.h.cioos_load_json(uri)
         if not uri:
             continue
-        code_space = uri.get('code-space') or default_code_space
-        code = uri.get('code')
+        code_space = uri.get("code-space") or default_code_space
+        code = uri.get("code")
         if isinstance(code, list):
             code = code[0]
-        version = uri.get('version')
+        version = uri.get("version")
         if not code:
             continue
         if toolkit.h.is_url(code):
@@ -291,48 +345,48 @@ def get_fully_qualified_package_uri(pkg, uri_field, default_code_space=None):
             continue
         out_code = code
         if code_space not in out_code:
-            out_code = code_space + '/' + out_code
+            out_code = code_space + "/" + out_code
         if not toolkit.h.is_url(out_code):
-            out_code = 'https://' + out_code
+            out_code = "https://" + out_code
 
         fqURI.append(out_code)
     return fqURI
 
 
-
 def get_package_relationships(pkg):
     # compare schema field, here called aggregation-info and
     # package relationships.
-    relationships = pkg.get('aggregation-info', [])
+    relationships = pkg.get("aggregation-info", [])
     rels_from_schema = []
     for rel in relationships:
-        comment = '/'.join(filter(None, [rel.get('initiative-type'), rel.get('association-type')]))
-        comment = re.sub(r'([A-Z])', r' \1', comment)
+        comment = "/".join(
+            filter(None, [rel.get("initiative-type"), rel.get("association-type")])
+        )
+        comment = re.sub(r"([A-Z])", r" \1", comment)
         comment = comment.title()
 
-        rel_uri = rel.get('aggregate-dataset-identifier_code')
-        rel_name = rel.get('aggregate-dataset-name')
+        rel_uri = rel.get("aggregate-dataset-identifier_code")
+        rel_name = rel.get("aggregate-dataset-name")
 
-        map_type ={
+        map_type = {
             "largerWorkCitation": "parent",
             "crossReference": "cross link",
             "dependency": "depends on",
             "revisionOf": "revision of",
             "series": "cross link",
-            "isComposedOf": "child"
+            "isComposedOf": "child",
         }
-        rel_type = map_type.get(rel.get('association-type'), 'links to')
+        rel_type = map_type.get(rel.get("association-type"), "links to")
 
         if rel_uri and rel_name:
-            rels_from_schema.append({
-                "subject": pkg['name'],
-                "type": rel_type,
-                "object": {
-                    "title": rel_name,
-                    "url": rel_uri
-                    },
-                "comment": comment
-            })
+            rels_from_schema.append(
+                {
+                    "subject": pkg["name"],
+                    "type": rel_type,
+                    "object": {"title": rel_name, "url": rel_uri},
+                    "comment": comment,
+                }
+            )
     return rels_from_schema
 
 
@@ -388,7 +442,7 @@ def _merge_lists(key, list1, list2):
 
 
 def cioos_get_eovs(show_all=False):
-    '''Return a list of eov's in a similar format to the facet list
+    """Return a list of eov's in a similar format to the facet list
     If show_all is true then the complete list of eov's is returned. The name
     and display_name fields are updated from the eoc choices list as found in
     ckanext-scheming. If show_all is false only the eov's returned as part of
@@ -396,63 +450,68 @@ def cioos_get_eovs(show_all=False):
 
     param show_all: display all eov fields or only the ones that are currently
                     active.
-       '''
-    schema = toolkit.h.scheming_get_dataset_schema('dataset')
+    """
+    schema = toolkit.h.scheming_get_dataset_schema("dataset")
     choices = []
     # needed to make get_facet_items_dict work
-    facets = toolkit.h.cioos_get_facets(
-        package_type='dataset',
-        facet_list=['eov'])
-    eov = toolkit.h.get_facet_items_dict('eov', limit=None, exclude_active=False)
+    toolkit.h.cioos_get_facets(package_type="dataset", facet_list=["eov"])
+    search_facets = getattr(toolkit.c, "search_facets", {}) or {}
+    eov = search_facets.get("eov", {}).get("items", [])
+    if not eov:
+        eov = toolkit.h.get_facet_items_dict("eov", limit=None, exclude_active=False)
 
     try:
         # retreave a copy of the choices list for the eov field
-        choices = copy.deepcopy(toolkit.h.scheming_field_choices(
-            toolkit.h.scheming_field_by_name(schema['dataset_fields'], 'eov')))
+        choices = copy.deepcopy(
+            toolkit.h.scheming_field_choices(
+                toolkit.h.scheming_field_by_name(schema["dataset_fields"], "eov")
+            )
+        )
         # make choices list more facet like
         for x in choices:
-            x['name'] = x['value']
-            x['display_name'] = x['label']
+            x["name"] = x["value"]
+            x["display_name"] = x["label"]
     except:
         pass
 
     if show_all:
         # TODO: could this be improved?
-        output = _merge_lists('name', eov, choices)
+        output = _merge_lists("name", eov, choices)
     else:
-        lookup = {x['name']: x for x in eov}
+        lookup = {x["name"]: x for x in eov}
         for x in choices:
-            if x['name'] in lookup:
-                lookup[x['name']].update(x)
+            if x["name"] in lookup:
+                lookup[x["name"]].update(x)
         output = list(lookup.values())
 
     for x in output:
         # set count to zero for eov's not in facet list
-        if 'count' not in x:
-            x['count'] = 0
+        if "count" not in x:
+            x["count"] = 0
         # generate icon file name if not set
-        if 'icon' not in x:
-            x['icon'] = 'icon-' + x['name'].lower() + '.png'
+        if "icon" not in x:
+            x["icon"] = "icon-" + x["name"].lower() + ".png"
     return output
 
 
 def cioos_count_datasets():
-    '''Return a count of datasets'''
-    user = logic.get_action('get_site_user')({'model': model, 'ignore_auth': True}, {})
-    context = {'model': model, 'session': model.Session, 'user': user['name']}
+    """Return a count of datasets"""
+    user = logic.get_action("get_site_user")({"model": model, "ignore_auth": True}, {})
+    context = {"model": model, "session": model.Session, "user": user["name"]}
     # Get a list of all the site's datasets from CKAN, no need to return actual data
-    datasets = logic.get_action('package_search')(context, {"fl": "id", "rows": "0"})
-    return datasets['count']
+    datasets = logic.get_action("package_search")(context, {"fl": "id", "rows": "0"})
+    return datasets["count"]
 
 
 def cioos_datasets():
-    '''Return a list of the datasets'''
+    """Return a list of the datasets"""
 
-    user = logic.get_action('get_site_user')({'model': model, 'ignore_auth': True}, {})
-    context = {'model': model, 'session': model.Session, 'user': user['name']}
+    user = logic.get_action("get_site_user")({"model": model, "ignore_auth": True}, {})
+    context = {"model": model, "session": model.Session, "user": user["name"]}
     # Get a list of all the site's datasets from CKAN
-    datasets = logic.get_action('package_search')(context, {"fl": "id"})
+    datasets = logic.get_action("package_search")(context, {"fl": "id"})
     return datasets
+
 
 def cioos_schema_field_map():
     import ckanext.spatial.model as spatial_model
@@ -461,16 +520,21 @@ def cioos_schema_field_map():
 
     # map spatial key to schema field_name {'spatial': 'schema'}
     map = {
-        'title': 'title_translated',
-        'abstract': 'notes_translated',
-        'guid': 'name',
-        'keywords': ['keywords', 'eov'],
-        'bbox': ['bbox-north-lat', 'bbox-south-lat', 'bbox-east-long', 'bbox-west-long'],
-        'license_id': 'use-constraints'
-        }
+        "title": "title_translated",
+        "abstract": "notes_translated",
+        "guid": "name",
+        "keywords": ["keywords", "eov"],
+        "bbox": [
+            "bbox-north-lat",
+            "bbox-south-lat",
+            "bbox-east-long",
+            "bbox-west-long",
+        ],
+        "license_id": "use-constraints",
+    }
 
-    schema = toolkit.h.scheming_get_dataset_schema('dataset')
-    doc = spatial_model.ISODocument('<xml></xml>')
+    schema = toolkit.h.scheming_get_dataset_schema("dataset")
+    doc = spatial_model.ISODocument("<xml></xml>")
 
     # load classes, we have to pre load class defenitions and later update them
     # vecouse pickle dosn't do it properly. Might be becouse our isodocument
@@ -487,34 +551,47 @@ def cioos_schema_field_map():
             try:
                 instanse = class_()
             except Exception:
-                instanse = class_('<xml></xml>')
+                instanse = class_("<xml></xml>")
 
-        class_dict[x[0]]['class'] = jsonpickle.encode(instanse)
+        class_dict[x[0]]["class"] = jsonpickle.encode(instanse)
 
     # Dataset
-    fields = schema['dataset_fields']
+    fields = schema["dataset_fields"]
     j = jsonpickle.encode(doc.elements)
     isodoc_dict = json.loads(j)
-    output = cioos_schema_field_map_parent(fields, isodoc_dict, class_dict, map, 'Dataset Fields')
+    output = cioos_schema_field_map_parent(
+        fields, isodoc_dict, class_dict, map, "Dataset Fields"
+    )
 
     # Resources
-    resource_fields_schema = [{'field_name': 'resource_fields', 'repeating_subfields': schema['resource_fields']}]
-    j = jsonpickle.encode([x for x in doc.elements if isinstance(x, spatial_model.ISOResourceLocator)], unpicklable=False)
-    isodoc_dict = json.loads(j)
-    resource_locator = [x for x in isodoc_dict if x['name'] == 'resource-locator']
-
-    map = {
-        'resource-locator': 'resource_fields'
+    resource_fields_schema = [
+        {
+            "field_name": "resource_fields",
+            "repeating_subfields": schema["resource_fields"],
         }
+    ]
+    j = jsonpickle.encode(
+        [x for x in doc.elements if isinstance(x, spatial_model.ISOResourceLocator)],
+        unpicklable=False,
+    )
+    isodoc_dict = json.loads(j)
+    resource_locator = [x for x in isodoc_dict if x["name"] == "resource-locator"]
 
-    output = output + cioos_schema_field_map_parent(resource_fields_schema, resource_locator, class_dict, map, 'Resource Fields')
+    map = {"resource-locator": "resource_fields"}
+
+    output = output + cioos_schema_field_map_parent(
+        resource_fields_schema, resource_locator, class_dict, map, "Resource Fields"
+    )
     return jinja2.Markup(output)
 
 
 # process any first level fields in the isodocument
 def cioos_schema_field_map_parent(fields, isodoc_dict, class_dict, mapkey, caption):
-    output = '''<table class="table table-bordered table-condensed">
-        <caption>''' + caption + '''</caption>
+    output = (
+        """<table class="table table-bordered table-condensed">
+        <caption>"""
+        + caption
+        + """</caption>
         <thead>
             <tr>
                 <th style="width:40px;">Req</th>
@@ -525,26 +602,31 @@ def cioos_schema_field_map_parent(fields, isodoc_dict, class_dict, mapkey, capti
                 <th>XML Path</th>
 
             </tr>
-        </thead><tbody>'''
+        </thead><tbody>"""
+    )
     matched_schema_fields = []
 
     # loop through spatial harvester isodocument fields
     for item in isodoc_dict:
         # get class name of entry in spatial harvester class
-        (objpath, delimiter, objtype) = item.get('py/object', '').rpartition('.')
+        (objpath, delimiter, objtype) = item.get("py/object", "").rpartition(".")
         # update class with pre determined definition if appropreit
-        if objtype != 'ISOElement' and item.get('elements') and objtype.startswith('ISO'):
-            class_json_def = json.loads(class_dict.get(objtype, {}).get('class', '{}'))
-            elem = class_json_def.get('elements', [])
-            item['elements'] = elem
+        if (
+            objtype != "ISOElement"
+            and item.get("elements")
+            and objtype.startswith("ISO")
+        ):
+            class_json_def = json.loads(class_dict.get(objtype, {}).get("class", "{}"))
+            elem = class_json_def.get("elements", [])
+            item["elements"] = elem
 
         # get the search paths for the current item
-        sp = item['search_paths']
-        if isinstance(item['search_paths'], list):
-            sp = '<br/>'.join(item['search_paths'])
+        sp = item["search_paths"]
+        if isinstance(item["search_paths"], list):
+            sp = "<br/>".join(item["search_paths"])
 
         # map item name to a new name if it is entered in the mapkey dictinary
-        search_item = mapkey.get(item['name'], item['name'])
+        search_item = mapkey.get(item["name"], item["name"])
 
         # get ckan schema field with the same name, if it exists
         field = toolkit.h.scheming_field_by_name(fields, search_item)
@@ -555,122 +637,203 @@ def cioos_schema_field_map_parent(fields, isodoc_dict, class_dict, mapkey, capti
             fl = []
             for x in search_item:
                 field = toolkit.h.scheming_field_by_name(fields, x)
-                fn.append(field['field_name'])
-                fl.append(toolkit.h.scheming_language_text(field.get('label', '')))
-                matched_schema_fields.append(field['field_name'])
+                fn.append(field["field_name"])
+                fl.append(toolkit.h.scheming_language_text(field.get("label", "")))
+                matched_schema_fields.append(field["field_name"])
             field = {}
-            field['field_name'] = ',<br/>'.join(fn)
-            field['label'] = ',<br/>'.join(fl)
+            field["field_name"] = ",<br/>".join(fn)
+            field["label"] = ",<br/>".join(fl)
 
-        schema_name = ''
-        schema_label = ''
-        schema_help = ''
+        schema_name = ""
+        schema_label = ""
+        schema_help = ""
         subfields = None
-        required = ''
+        required = ""
 
         if field:
-            schema_name = field['field_name']
-            schema_label = ' (' + toolkit.h.scheming_language_text(field.get('label', '')) + ')'
-            schema_help = field.get('help_text', '')
-            subfields = field.get('repeating_subfields')
-            if field.get('required'):
+            schema_name = field["field_name"]
+            schema_label = (
+                " (" + toolkit.h.scheming_language_text(field.get("label", "")) + ")"
+            )
+            schema_help = field.get("help_text", "")
+            subfields = field.get("repeating_subfields")
+            if field.get("required"):
                 required = '<span class="required">*</span>'
             matched_schema_fields.append(schema_name)
 
-        output = output + '<tr><td>' + required + '</td><td>' + schema_name + schema_label + '</td><td>' + item['name'] + '</td><td>' + item['multiplicity'] + '</td><td>' + schema_help +'</td><td>' + sp + '</td></tr>'
-        (output_new, matched_schema_fields) = cioos_schema_field_map_child(subfields, None, item.get('elements'), "", 1, matched_schema_fields)
+        output = (
+            output
+            + "<tr><td>"
+            + required
+            + "</td><td>"
+            + schema_name
+            + schema_label
+            + "</td><td>"
+            + item["name"]
+            + "</td><td>"
+            + item["multiplicity"]
+            + "</td><td>"
+            + schema_help
+            + "</td><td>"
+            + sp
+            + "</td></tr>"
+        )
+        (output_new, matched_schema_fields) = cioos_schema_field_map_child(
+            subfields, None, item.get("elements"), "", 1, matched_schema_fields
+        )
         output = output + output_new
 
     # add any fields in schema that have not found a match in spatial harvest
     for field in fields:
-        if field['field_name'] not in matched_schema_fields:
-            schema_name = field['field_name']
-            schema_label = ' (' + toolkit.h.scheming_language_text(field.get('label', '')) + ')'
+        if field["field_name"] not in matched_schema_fields:
+            schema_name = field["field_name"]
+            schema_label = (
+                " (" + toolkit.h.scheming_language_text(field.get("label", "")) + ")"
+            )
             matched_schema_fields.append(schema_name)
-            required = ''
-            if field.get('required'):
+            required = ""
+            if field.get("required"):
                 required = '<span class="required">*</span>'
-            output = output + '<tr><td>' + required + '</td><td>' + schema_name + schema_label + '</td><td></td><td></td><td></td><td></td></tr>'
-    return output + '</tbody></table>'
+            output = (
+                output
+                + "<tr><td>"
+                + required
+                + "</td><td>"
+                + schema_name
+                + schema_label
+                + "</td><td></td><td></td><td></td><td></td></tr>"
+            )
+    return output + "</tbody></table>"
+
 
 # process any child elements of first level or lower isodocument fields.
-def cioos_schema_field_map_child(schema_subfields, schema_parentfields, harvest_elements, path, indent, matched_schema_fields):
-    output = ''
+def cioos_schema_field_map_child(
+    schema_subfields,
+    schema_parentfields,
+    harvest_elements,
+    path,
+    indent,
+    matched_schema_fields,
+):
+    output = ""
     if not harvest_elements:
         return output, matched_schema_fields
     if not isinstance(harvest_elements, list):
         return output, matched_schema_fields
 
     for item in harvest_elements:
-        if not item or not item.get('name'):
+        if not item or not item.get("name"):
             continue
-        sp = item['search_paths']
-        if isinstance(item['search_paths'], list):
-            sp = '<br/>'.join(item['search_paths'])
+        sp = item["search_paths"]
+        if isinstance(item["search_paths"], list):
+            sp = "<br/>".join(item["search_paths"])
 
         field = None
         if schema_subfields:
-            field = toolkit.h.scheming_field_by_name(schema_subfields, item['name']) or \
-                toolkit.h.scheming_field_by_name(schema_subfields, path + item['name'])
+            field = toolkit.h.scheming_field_by_name(
+                schema_subfields, item["name"]
+            ) or toolkit.h.scheming_field_by_name(schema_subfields, path + item["name"])
         if not field and schema_parentfields:
-            field = toolkit.h.scheming_field_by_name(schema_parentfields, item['name']) or \
-                toolkit.h.scheming_field_by_name(schema_parentfields, path + item['name'])
+            field = toolkit.h.scheming_field_by_name(
+                schema_parentfields, item["name"]
+            ) or toolkit.h.scheming_field_by_name(
+                schema_parentfields, path + item["name"]
+            )
 
-        schema_name = ''
-        schema_label = ''
-        schema_help = ''
+        schema_name = ""
+        schema_label = ""
+        schema_help = ""
         subfields = None
         parentfields = schema_subfields
-        required = ''
+        required = ""
 
         if field:
-            schema_name = field['field_name']
-            schema_label = ' (' + toolkit.h.scheming_language_text(field.get('label', '')) + ')'
-            schema_help = field.get('help_text', '')
-            subfields = field.get('repeating_subfields')
+            schema_name = field["field_name"]
+            schema_label = (
+                " (" + toolkit.h.scheming_language_text(field.get("label", "")) + ")"
+            )
+            schema_help = field.get("help_text", "")
+            subfields = field.get("repeating_subfields")
             matched_schema_fields.append(schema_name)
             schema_name = '<i class="fa fa-angle-right"></i>' + schema_name
-            if field.get('required'):
+            if field.get("required"):
                 required = '<span class="required">*</span>'
 
-        harvest_name = ''
-        if item['name']:
-            harvest_name = '<i class="fa fa-angle-right"></i>' + item['name']
+        harvest_name = ""
+        if item["name"]:
+            harvest_name = '<i class="fa fa-angle-right"></i>' + item["name"]
 
-        output = output + '<tr class="child' + str(indent) + '"><td>' + required + '</td><td>' + schema_name + schema_label + '</td><td>' + harvest_name + '</td><td>' + item['multiplicity'] + '</td><td>' + schema_help +'</td><td>' + sp + '</td></tr>'
-        (output_new, matched_schema_fields) = cioos_schema_field_map_child(subfields, parentfields, item.get('elements'), path + item['name'] + '_', indent + 1, matched_schema_fields)
+        output = (
+            output
+            + '<tr class="child'
+            + str(indent)
+            + '"><td>'
+            + required
+            + "</td><td>"
+            + schema_name
+            + schema_label
+            + "</td><td>"
+            + harvest_name
+            + "</td><td>"
+            + item["multiplicity"]
+            + "</td><td>"
+            + schema_help
+            + "</td><td>"
+            + sp
+            + "</td></tr>"
+        )
+        (output_new, matched_schema_fields) = cioos_schema_field_map_child(
+            subfields,
+            parentfields,
+            item.get("elements"),
+            path + item["name"] + "_",
+            indent + 1,
+            matched_schema_fields,
+        )
         output = output + output_new
 
     # outout any schema fields at this sublevel which do not have a match.
     if schema_subfields:
         for field in schema_subfields:
-            if field['field_name'] not in matched_schema_fields:
-                schema_name = field['field_name']
-                schema_label = ' (' + toolkit.h.scheming_language_text(field.get('label', '')) + ')'
+            if field["field_name"] not in matched_schema_fields:
+                schema_name = field["field_name"]
+                schema_label = (
+                    " ("
+                    + toolkit.h.scheming_language_text(field.get("label", ""))
+                    + ")"
+                )
                 matched_schema_fields.append(schema_name)
-                required = ''
-                if field.get('required'):
+                required = ""
+                if field.get("required"):
                     required = '<span class="required">*</span>'
-                output = output + '<tr><td>' + required + '</td><td>' + schema_name + schema_label + '</td><td></td><td></td><td></td><td></td></tr>'
+                output = (
+                    output
+                    + "<tr><td>"
+                    + required
+                    + "</td><td>"
+                    + schema_name
+                    + schema_label
+                    + "</td><td></td><td></td><td></td><td></td></tr>"
+                )
     return output, matched_schema_fields
 
 
-def cioos_get_facets(package_type='dataset', facet_list=['ALL']):
-    ''' get all dataset for the given package type, including private ones.
-        This function works similarly to code found in ckan/ckan/controllers/package.py
-        in that it does a search of all datasets and populates the following
-        globals for later use:
-            c.facet_titles
-            c.search_facets
-    '''
+def cioos_get_facets(package_type="dataset", facet_list=["ALL"]):
+    """get all dataset for the given package type, including private ones.
+    This function works similarly to code found in ckan/ckan/controllers/package.py
+    in that it does a search of all datasets and populates the following
+    globals for later use:
+        c.facet_titles
+        c.search_facets
+    """
     facets = OrderedDict()
 
     default_facet_titles = {
-        'organization': _('Organizations'),
-        'groups': _('Groups'),
-        'tags': _('Tags'),
-        'res_format': _('Formats'),
-        'license_id': _('Licenses'),
+        "organization": _("Organizations"),
+        "groups": _("Groups"),
+        "tags": _("Tags"),
+        "res_format": _("Formats"),
+        "license_id": _("Licenses"),
     }
 
     for facet in toolkit.h.facets():
@@ -684,24 +847,29 @@ def cioos_get_facets(package_type='dataset', facet_list=['ALL']):
         facets = plugin.dataset_facets(facets, package_type)
 
     # filter facets if needed
-    facets = {k: v for k, v in facets.items(
-    ) if 'ALL' in facet_list or k in facet_list}
+    facets = {k: v for k, v in facets.items() if "ALL" in facet_list or k in facet_list}
 
     c.facet_titles = facets
 
     data_dict = {
-        'facet.field': list(facets.keys()),
-        'rows': 0,
-        'include_private': toolkit.asbool(config.get(
-            'ckan.search.default_include_private', True)),
+        "facet.field": list(facets.keys()),
+        "facet.limit": -1,
+        "rows": 0,
+        "include_private": toolkit.asbool(
+            config.get("ckan.search.default_include_private", True)
+        ),
     }
 
-    context = {'model': model, 'session': model.Session,
-               'user': c.user, 'for_view': True,
-               'auth_user_obj': c.userobj}
+    context = {
+        "model": model,
+        "session": model.Session,
+        "user": c.user,
+        "for_view": True,
+        "auth_user_obj": c.userobj,
+    }
 
-    query = get_action('package_search')(context, data_dict)
-    c.search_facets = query['search_facets']
+    query = get_action("package_search")(context, data_dict)
+    c.search_facets = query["search_facets"]
     # return {
     #     'search': c.search_facets,
     #     'titles': c.facet_titles,
@@ -709,23 +877,20 @@ def cioos_get_facets(package_type='dataset', facet_list=['ALL']):
 
 
 def cioos_version():
-    '''Return CIOOS version'''
-    return metadata.version('ckanext.cioos_theme')
+    """Return CIOOS version"""
+    return metadata.version("ckanext.cioos_theme")
 
 
 def append_to_homepages(homepages):
-    homepages.append({'value': '4', 'text': 'CIOOS'})
+    homepages.append({"value": "4", "text": "CIOOS"})
     return homepages
 
 
-
 def cioos_structured_data(data_dict):
+    toolkit.check_access("dcat_dataset_show", {}, data_dict)
 
-    toolkit.check_access('dcat_dataset_show', {}, data_dict)
+    serializer = RDFSerializer(profiles=["schemaorg", "cioos_dcat"])
 
-    serializer = RDFSerializer(profiles=['schemaorg', 'cioos_dcat'])
-
-    output = serializer.serialize_dataset(data_dict,
-                                          _format='jsonld')
+    output = serializer.serialize_dataset(data_dict, _format="jsonld")
 
     return output
