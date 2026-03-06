@@ -454,8 +454,14 @@ class CIOOSDCATProfile(SchemaOrgProfile):
     def _tags_graph(self, dataset_ref, dataset_dict):
         keywords = dataset_dict.get('keywords', [])
         for lang in keywords:
+            # deduplicate keywords within each language before adding to graph
+            seen = set()
             for tag in keywords[lang]:
-                self.g.add((dataset_ref, SCHEMA.keywords, Literal(tag, lang=lang)))
+                # normalize for comparison (case-insensitive)
+                normalized = tag.strip().lower() if isinstance(tag, str) else str(tag).strip().lower()
+                if normalized not in seen:
+                    seen.add(normalized)
+                    self.g.add((dataset_ref, SCHEMA.keywords, Literal(tag, lang=lang)))
 
     def graph_from_dataset(self, dataset_dict, dataset_ref):
 

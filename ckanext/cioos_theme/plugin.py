@@ -696,9 +696,10 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                 tags_dict = {"en": [], "fr": []}
 
             # update tag list by language
-            data_dict['tags_en'] = tags_dict.get('en', [])
-            data_dict['tags_fr'] = tags_dict.get('fr', [])
-            data_dict['tags'] = data_dict['tags_en'] + data_dict['tags_fr']
+            # remove duplicates by converting to a set and back to a list, also remove any empty string tags
+            data_dict['tags_en'] = list({tag.lower().strip() for tag in tags_dict.get('en', []) if tag})
+            data_dict['tags_fr'] = list({tag.lower().strip() for tag in tags_dict.get('fr', []) if tag})
+            data_dict['tags'] = list(set(data_dict['tags_en'] + data_dict['tags_fr']))
 
             # update citation by language
             citation_dict = cioos_helpers.load_json(data_dict.get('citation', '{}'))
