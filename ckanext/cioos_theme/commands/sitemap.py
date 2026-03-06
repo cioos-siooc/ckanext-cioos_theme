@@ -1,15 +1,17 @@
 from ckan.lib.cli import CkanCommand
 
+
 class SiteMap(CkanCommand):
-    '''Generate a sitemap xml file for use by search engine bots.
+    """Generate a sitemap xml file for use by search engine bots.
 
     Usage:
         sitemap create - create sitemap.xml file and write to /tmp/s3sitemap/
 
         sitemap clear  - remove sitemap file
 
-    '''
-    summary = __doc__.split('\n')[0]
+    """
+
+    summary = __doc__.split("\n")[0]
     usage = __doc__
     max_args = 1
     min_args = 0
@@ -29,16 +31,16 @@ class SiteMap(CkanCommand):
         cmd = self.args[0]
 
         self._load_config()
-        if cmd == 'create':
+        if cmd == "create":
             self.create_sitemap()
-        elif cmd == 'clear':
+        elif cmd == "clear":
             self.rebuild(clear=True)
         else:
-            print('Command %s not recognized' % cmd)
+            print("Command %s not recognized" % cmd)
 
     def create_sitemap(self, upload_to_s3=True, page_size=1000, max_per_page=50000):
         # original function taken from https://github.com/GSA/ckanext-geodatagov/blob/ded11ffd3e4c97b8d418e45bfeeea0c3f4f10796/ckanext/geodatagov/commands.py
-        log.info('sitemap is being generated...')
+        log.info("sitemap is being generated...")
 
         # cron job
         # ckan --config=/srv/app/ckan.ini sitemap create
@@ -47,9 +49,9 @@ class SiteMap(CkanCommand):
         package_query = GeoPackageSearchQuery()
 
         count = package_query.get_count()
-        log.info('%s records found', count)
+        log.info("%s records found", count)
         if not count:
-            log.info('Nothing to process, exiting.')
+            log.info("Nothing to process, exiting.")
             return
 
         start = 0
@@ -61,16 +63,20 @@ class SiteMap(CkanCommand):
         if not os.path.exists(DIR_SITEMAP):
             os.makedirs(DIR_SITEMAP)
 
-        fd, path = mkstemp(suffix=".xml",
-                           prefix="sitemap-%s-" % filename_number,
-                           dir=DIR_SITEMAP)
+        fd, path = mkstemp(
+            suffix=".xml", prefix="sitemap-%s-" % filename_number, dir=DIR_SITEMAP
+        )
         # write header
-        os.write(fd, '<?xml version="1.0" encoding="UTF-8"?>\n'.encode('utf-8'))
-        os.write(fd, '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'.encode('utf-8'))
-        file_list.append({
-            'path': path,
-            'filename_s3': "sitemap-%s.xml" % filename_number
-        })
+        os.write(fd, '<?xml version="1.0" encoding="UTF-8"?>\n'.encode("utf-8"))
+        os.write(
+            fd,
+            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'.encode(
+                "utf-8"
+            ),
+        )
+        file_list.append(
+            {"path": path, "filename_s3": "sitemap-%s.xml" % filename_number}
+        )
 
         for x in range(0, int(math.ceil(old_div(count, page_size))) + 1):
             pkgs = package_query.get_paginated_entity_name_modtime(
@@ -78,48 +84,70 @@ class SiteMap(CkanCommand):
             )
 
             for pkg in pkgs:
-                os.write(fd, '    <url>\n'.encode('utf-8'))
-                os.write(fd, ('        <loc>%s</loc>\n' % (
-                    '%s/dataset/%s' % (config.get('ckan.site_url'), pkg.get('name')),
-                )).encode('utf-8'))
-                os.write(fd, ('        <lastmod>%s</lastmod>\n' % (
-                    pkg.get('metadata_modified').strftime('%Y-%m-%d'),
-                )).encode('utf-8'))
-                os.write(fd, '    </url>\n'.encode('utf-8'))
-            log.info('%i to %i of %i records done.', start + 1, min(start + page_size, count), count)
+                os.write(fd, "    <url>\n".encode("utf-8"))
+                os.write(
+                    fd,
+                    (
+                        "        <loc>%s</loc>\n"
+                        % (
+                            "%s/dataset/%s"
+                            % (config.get("ckan.site_url"), pkg.get("name")),
+                        )
+                    ).encode("utf-8"),
+                )
+                os.write(
+                    fd,
+                    (
+                        "        <lastmod>%s</lastmod>\n"
+                        % (pkg.get("metadata_modified").strftime("%Y-%m-%d"),)
+                    ).encode("utf-8"),
+                )
+                os.write(fd, "    </url>\n".encode("utf-8"))
+            log.info(
+                "%i to %i of %i records done.",
+                start + 1,
+                min(start + page_size, count),
+                count,
+            )
             start = start + page_size
 
-            if start % max_per_page == 0 and \
-                    x != int(math.ceil(old_div(count, page_size))):
-
+            if start % max_per_page == 0 and x != int(
+                math.ceil(old_div(count, page_size))
+            ):
                 # write footer
-                os.write(fd, '</urlset>\n'.encode('utf-8'))
+                os.write(fd, "</urlset>\n".encode("utf-8"))
                 os.close(fd)
 
-                log.info('done with %s.', path)
+                log.info("done with %s.", path)
 
                 filename_number = filename_number + 1
-                fd, path = mkstemp(suffix=".xml",
-                                   prefix="sitemap-%s-" % filename_number,
-                                   dir=DIR_SITEMAP)
+                fd, path = mkstemp(
+                    suffix=".xml",
+                    prefix="sitemap-%s-" % filename_number,
+                    dir=DIR_SITEMAP,
+                )
                 # write header
-                os.write(fd, '<?xml version="1.0" encoding="UTF-8"?>\n'.encode('utf-8'))
-                os.write(fd, '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'.encode('utf-8'))
+                os.write(fd, '<?xml version="1.0" encoding="UTF-8"?>\n'.encode("utf-8"))
+                os.write(
+                    fd,
+                    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'.encode(
+                        "utf-8"
+                    ),
+                )
 
-                file_list.append({
-                    'path': path,
-                    'filename_s3': "sitemap-%s.xml" % filename_number
-                })
+                file_list.append(
+                    {"path": path, "filename_s3": "sitemap-%s.xml" % filename_number}
+                )
 
         # write footer
-        os.write(fd, '</urlset>\n'.encode('utf-8'))
+        os.write(fd, "</urlset>\n".encode("utf-8"))
         os.close(fd)
 
-        log.info('done with %s.', path)
+        log.info("done with %s.", path)
 
         # if not upload_to_s3:
-            # log.info('Skip upload and finish.')
-        print('Done locally: File list\n{}'.format(json.dumps(file_list, indent=4)))
+        # log.info('Skip upload and finish.')
+        print("Done locally: File list\n{}".format(json.dumps(file_list, indent=4)))
         return file_list
 
         # bucket_name = config.get('ckanext.geodatagov.aws_bucket_name')

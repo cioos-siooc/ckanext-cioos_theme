@@ -6,24 +6,23 @@ available to Controllers. This module is available to templates as 'h'.
 
 """
 
-from ckanext.dcat.processors import RDFSerializer
-import ckan.plugins.toolkit as toolkit
-import ckan.plugins as p
+import copy
+import json
+import logging
+import re
 from collections import OrderedDict
-from ckantoolkit import _, c, config
 
 # from ckantoolkit import h
 import ckan.logic as logic
 import ckan.model as model
-from ckan.model import PackageRelationship
-from ckan.common import config
-import copy
-import logging
-import json
-import jsonpickle
+import ckan.plugins as p
+import ckan.plugins.toolkit as toolkit
 import importlib_metadata as metadata
-import re
-from ckanext.spatial.plugin import SpatialQuery
+import jsonpickle
+from ckan.common import config
+from ckantoolkit import _, c, config
+
+from ckanext.dcat.processors import RDFSerializer
 
 log = logging.getLogger(__name__)
 
@@ -514,9 +513,11 @@ def cioos_datasets():
 
 
 def cioos_schema_field_map():
-    import ckanext.spatial.model as spatial_model
-    import jinja2
     import inspect
+
+    import jinja2
+
+    import ckanext.spatial.model as spatial_model
 
     # map spatial key to schema field_name {'spatial': 'schema'}
     map = {
