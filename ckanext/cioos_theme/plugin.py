@@ -912,9 +912,6 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
 
     # handle custom temporal range search facet
     def before_search(self, search_params):
-        if '-dataset_type:harvest' not in search_params.get('fq', {}):
-            return search_params
-
         if toolkit.request:
             lang = toolkit.h.lang()
             search_params['qf'] = 'name^4 title_%s^4 tags_%s^2 text_%s text' % (lang,lang,lang)
