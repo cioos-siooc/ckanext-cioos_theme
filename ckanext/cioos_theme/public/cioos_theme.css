@@ -1172,16 +1172,13 @@ section .card-header-thin {
   border-color: var(--bs-body-color);
   color: var(--bs-body-color);
   background-color: var(--bs-body-bg);
+  border: 1px solid #ddd;
   height: 28px;
   padding: 3px 12px;
 }
 
-.citation .btn-secondary:hover {
+.citation .btn-secondary:hover, .citation button.dropdown-item:hover {
   color: #fff;
-  background-color: var(--cioos-accent);
-}
-
-.citation button.dropdown-item:hover {
   background-color: var(--cioos-accent);
 }
 
@@ -1196,10 +1193,10 @@ section .card-header-thin {
   align-items: center;
 }
 .rounded-left {
-  border-radius: 14px 0 0 14px;
+  border-radius: 10px 0 0 10px;
 }
 .rounded-right {
-  border-radius: 0 14px 14px 0; 
+  border-radius: 0 10px 10px 0; 
 }
 
   /* ===========================================
