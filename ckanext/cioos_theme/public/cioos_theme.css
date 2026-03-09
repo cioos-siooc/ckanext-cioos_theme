@@ -991,7 +991,6 @@ aside #dataset-map {
   border-spacing: 0;
   border: 1px solid #ddd;
   border-radius: 14px;
-  overflow: hidden;
 }
 
 .table-bordered > thead > tr:first-child > th:first-child,
