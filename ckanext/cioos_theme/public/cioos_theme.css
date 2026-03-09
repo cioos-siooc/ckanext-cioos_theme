@@ -1046,7 +1046,7 @@ aside #dataset-map {
    Dataset Map Styling
    =========================================== */
 
-.dataset-map {
+.primary .dataset-map {
   border-radius: 14px;
   overflow: hidden;
 }
