@@ -696,9 +696,10 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                 tags_dict = {"en": [], "fr": []}
 
             # update tag list by language
-            data_dict['tags_en'] = tags_dict.get('en', [])
-            data_dict['tags_fr'] = tags_dict.get('fr', [])
-            data_dict['tags'] = data_dict['tags_en'] + data_dict['tags_fr']
+            # remove duplicates by converting to a set and back to a list, also remove any empty string tags
+            data_dict['tags_en'] = list({tag.lower().strip() for tag in tags_dict.get('en', []) if tag})
+            data_dict['tags_fr'] = list({tag.lower().strip() for tag in tags_dict.get('fr', []) if tag})
+            data_dict['tags'] = list(set(data_dict['tags_en'] + data_dict['tags_fr']))
 
             # update citation by language
             citation_dict = cioos_helpers.load_json(data_dict.get('citation', '{}'))
@@ -911,9 +912,6 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
 
     # handle custom temporal range search facet
     def before_search(self, search_params):
-        if '-dataset_type:harvest' not in search_params.get('fq', {}):
-            return search_params
-
         if toolkit.request:
             lang = toolkit.h.lang()
             search_params['qf'] = 'name^4 title_%s^4 tags_%s^2 text_%s text' % (lang,lang,lang)
@@ -1168,6 +1166,24 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
     # add organization extras to organization object in package.
     # this will make the show and search endpoints look the same
     def after_show(self, context, package_dict):
+        # Deduplicate keywords within each language for display
+        # This handles existing data that may have duplicate taxa keywords
+        if package_dict.get('type') == 'dataset':
+            keywords = package_dict.get('keywords', {})
+            if isinstance(keywords, dict):
+                for lang in ['en', 'fr']:
+                    if lang in keywords and isinstance(keywords[lang], list):
+                        seen = set()
+                        deduplicated = []
+                        for keyword in keywords[lang]:
+                            # normalize for comparison (case-insensitive)
+                            normalized = keyword.strip().lower() if isinstance(keyword, str) else str(keyword).strip().lower()
+                            if normalized and normalized not in seen:
+                                seen.add(normalized)
+                                deduplicated.append(keyword)
+                        keywords[lang] = deduplicated
+                package_dict['keywords'] = keywords
+        
         if toolkit.request and toolkit.request.path.startswith('/dataset/'):
             try:
                 del package_dict['harvest_document_content']
