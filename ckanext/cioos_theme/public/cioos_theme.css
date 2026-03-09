@@ -949,20 +949,9 @@ aside #dataset-map {
 
 .resource-list .resource-item {
   border: 1px solid #ddd;
-  margin-bottom: -1px;
-  border-radius: 0 20px 20px 0;
+  margin-bottom: 7px;
+  border-radius: 14px;
   margin-left: 0;
-}
-
-.resource-list .resource-item:first-child {
-  border-top-right-radius: 20px;
-  border-top-left-radius: 0;
-}
-
-.resource-list .resource-item:last-child {
-  margin-bottom: 0;
-  border-bottom-right-radius: 20px;
-  border-bottom-left-radius: 0;
 }
 
 .resource-list .resource-item .btn-group {
@@ -973,9 +962,8 @@ aside #dataset-map {
 }
 
 .resource-list .resource-item .btn-group .btn {
-  border-radius: 0 20px 20px 0;
+  border-radius: 0 14px 14px 0;
   height: 100%;
-  border: 1px solid #ddd;
 }
 
 .resource-list .resource-item .heading {
