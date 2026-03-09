@@ -1037,6 +1037,11 @@ aside #dataset-map {
   border-bottom: 0;
 }
 
+/* Keep 1px vertical borders between cells (remove left, keep right except on last cell) */
+.table-bordered > :not(caption) > * > * {
+  border-left: 0;
+}
+
 /* ===========================================
    Dataset Map Styling
    =========================================== */
