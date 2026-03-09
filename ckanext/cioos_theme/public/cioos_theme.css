@@ -190,10 +190,6 @@ aside #dataset-map {
   padding: 0;
 }
 
-.module > .module-content:nth-child(2n) {
-  padding-top: 0.5rem;
-}
-
 .module > .empty {
   color: gray;
 }
@@ -207,7 +203,7 @@ aside #dataset-map {
 }
 
 .module-content {
-  padding: 0;
+  padding: 2rem;
 }
 .media-grid {
   background: var(--cioos-light-bg);
@@ -235,6 +231,14 @@ aside #dataset-map {
 .module-item .media-image {
   /* margin-bottom: 5px; */
   max-width: 100%;
+}
+
+.module > .module-content:nth-child(2n) {
+    padding-top: 10px;
+}
+.module-shallow .module-content {
+    padding: 10px;
+    margin: 0;
 }
 
 .dataset-resources li a {
