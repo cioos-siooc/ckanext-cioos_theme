@@ -1166,6 +1166,24 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
     # add organization extras to organization object in package.
     # this will make the show and search endpoints look the same
     def after_show(self, context, package_dict):
+        # Deduplicate keywords within each language for display
+        # This handles existing data that may have duplicate taxa keywords
+        if package_dict.get('type') == 'dataset':
+            keywords = package_dict.get('keywords', {})
+            if isinstance(keywords, dict):
+                for lang in ['en', 'fr']:
+                    if lang in keywords and isinstance(keywords[lang], list):
+                        seen = set()
+                        deduplicated = []
+                        for keyword in keywords[lang]:
+                            # normalize for comparison (case-insensitive)
+                            normalized = keyword.strip().lower() if isinstance(keyword, str) else str(keyword).strip().lower()
+                            if normalized and normalized not in seen:
+                                seen.add(normalized)
+                                deduplicated.append(keyword)
+                        keywords[lang] = deduplicated
+                package_dict['keywords'] = keywords
+        
         if toolkit.request and toolkit.request.path.startswith('/dataset/'):
             try:
                 del package_dict['harvest_document_content']
