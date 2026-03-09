@@ -276,19 +276,22 @@ aside #dataset-map {
   margin-bottom: 20px;
   background-color: #fff;
   border: 1px solid #ddd;
-  border-radius: 4px;
+  border-radius: 14px;
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
 }
 
 .panel-heading {
   padding: 10px 15px;
   border-bottom: 1px solid #ddd;
-  border-radius: 3px 3px 0 0;
+  border-radius: 14px 14px 0 0;
   background-color: #f5f5f5;
 }
 
 .panel-body {
   padding: 15px;
+  display: flow-root;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .additional-info .card {
@@ -1237,7 +1240,8 @@ section .card-header-thin {
   padding: 3px 12px;
 }
 
-.citation .btn-secondary:hover, .citation button.dropdown-item:hover {
+.citation .btn-secondary:hover,
+.citation button.dropdown-item:hover {
   color: #fff;
   background-color: var(--cioos-accent);
 }
@@ -1256,32 +1260,61 @@ section .card-header-thin {
   border-radius: 10px 0 0 10px;
 }
 .rounded-right {
-  border-radius: 0 10px 10px 0; 
+  border-radius: 0 10px 10px 0;
 }
 
-  /* ===========================================
+/* ===========================================
    Tag List Styling
    =========================================== */
-  .tag-list {
-    padding: 10px 10px 5px 10px;
-    background-color: var(--cioos-light-bg);
-    border: 1px solid #ddd;
-    border-radius: 14px;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 0 0.5rem;
-  }
-  .tag {
-    background-color: white;
-  }
-  a.tag:hover  {
-    background-color: var(--cioos-accent);
-    border: none;
-    color: white;
-    box-shadow: none;
-  }
+.tag-list {
+  padding: 10px 10px 5px 10px;
+  background-color: var(--cioos-light-bg);
+  border: 1px solid #ddd;
+  border-radius: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0 0.5rem;
+}
+.tag {
+  background-color: white;
+}
+a.tag:hover {
+  background-color: var(--cioos-accent);
+  border: none;
+  color: white;
+  box-shadow: none;
+}
 
+.card {
+  border-radius: 14px;
+  border: 1px solid #ddd;
+}
+td .panel-default,
+td .panel {
+  border: none;
+  border-bottom: 1px solid #ddd;
+  padding: 0;
+  margin: 0;
+  box-shadow: none;
+  background-color: transparent;
+  border-radius: 0;
+  .panel-body {
+    padding: 7px 3px;
+  }
+}
+.additional-info .panel-default:last-of-type {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+  ol,
+  ul,
+  dl,
+  dd {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
   /* ===========================================
    Organization Images
    =========================================== */
