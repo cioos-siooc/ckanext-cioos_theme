@@ -1009,26 +1009,32 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                 log.error(err)
 
             # create temporal extent index.
+            # Composite field path: temporal-extent is a JSON string {"begin": ..., "end": ...}
+            # Fallback path: harvested datasets may store temporal-extent-begin / temporal-extent-end
+            # as separate extras (the harvester flattened the composite before storing).
             te = data_dict.get("temporal-extent", "{}")
-            if te:
-                temporal_extent = cioos_helpers.load_json(te)
-                if isinstance(temporal_extent, list):
-                    temporal_extent = temporal_extent[0]
-                temporal_extent_begin = temporal_extent.get("begin")
-                temporal_extent_end = temporal_extent.get("end")
-                if temporal_extent_begin:
-                    data_dict["temporal-extent-begin"] = temporal_extent_begin
-                if temporal_extent_end:
-                    data_dict["temporal-extent-end"] = temporal_extent_end
-                # If end is not set then we will still include these dataset in temporal searches by giving them an end time of 'NOW'
-                if temporal_extent_begin:
-                    data_dict["temporal-extent-range"] = (
-                        "["
-                        + temporal_extent_begin
-                        + " TO "
-                        + (temporal_extent_end or "*")
-                        + "]"
-                    )
+            temporal_extent = cioos_helpers.load_json(te) if te else {}
+            if isinstance(temporal_extent, list):
+                temporal_extent = temporal_extent[0]
+            temporal_extent_begin = temporal_extent.get("begin") or data_dict.get(
+                "temporal-extent-begin"
+            )
+            temporal_extent_end = temporal_extent.get("end") or data_dict.get(
+                "temporal-extent-end"
+            )
+            if temporal_extent_begin:
+                data_dict["temporal-extent-begin"] = temporal_extent_begin
+            if temporal_extent_end:
+                data_dict["temporal-extent-end"] = temporal_extent_end
+            # If end is not set then we will still include these dataset in temporal searches by giving them an end time of 'NOW'
+            if temporal_extent_begin:
+                data_dict["temporal-extent-range"] = (
+                    "["
+                    + temporal_extent_begin
+                    + " TO "
+                    + (temporal_extent_end or "*")
+                    + "]"
+                )
 
             # create vertical extent index
             ve = data_dict.get("vertical-extent", "{}")
