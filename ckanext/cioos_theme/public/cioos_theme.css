@@ -1275,6 +1275,13 @@ section .card-header-thin {
   .tag {
     background-color: white;
   }
+  a.tag:hover  {
+    background-color: var(--cioos-accent);
+    border: none;
+    color: white;
+    box-shadow: none;
+  }
+
   /* ===========================================
    Organization Images
    =========================================== */
