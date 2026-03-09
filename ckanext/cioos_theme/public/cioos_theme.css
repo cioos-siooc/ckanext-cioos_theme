@@ -984,6 +984,67 @@ aside #dataset-map {
 }
 
 /* ===========================================
+   Bordered Tables - Rounded Corners
+   =========================================== */
+.table-bordered {
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 1px solid #ddd;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.table-bordered > thead > tr:first-child > th:first-child,
+.table-bordered > tbody > tr:first-child > td:first-child,
+.table-bordered > tbody > tr:first-child > th:first-child {
+  border-top-left-radius: 14px;
+}
+
+.table-bordered > thead > tr:first-child > th:last-child,
+.table-bordered > tbody > tr:first-child > td:last-child,
+.table-bordered > tbody > tr:first-child > th:last-child {
+  border-top-right-radius: 14px;
+}
+
+.table-bordered > tbody > tr:last-child > td:first-child,
+.table-bordered > tbody > tr:last-child > th:first-child,
+.table-bordered > tfoot > tr:last-child > td:first-child {
+  border-bottom-left-radius: 14px;
+}
+
+.table-bordered > tbody > tr:last-child > td:last-child,
+.table-bordered > tbody > tr:last-child > th:last-child,
+.table-bordered > tfoot > tr:last-child > td:last-child {
+  border-bottom-right-radius: 14px;
+}
+
+/* Remove cell borders that double up with the table border */
+.table-bordered > :not(caption) > * > :first-child {
+  border-left: 0;
+}
+
+.table-bordered > :not(caption) > * > :last-child {
+  border-right: 0;
+}
+
+.table-bordered > :not(caption) > :first-child > * {
+  border-top: 0;
+}
+
+.table-bordered > :not(caption) > :last-child > * {
+  border-bottom: 0;
+}
+
+/* ===========================================
+   Dataset Map Styling
+   =========================================== */
+
+.dataset-map {
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+/* ===========================================
    Additional Info Tables
    =========================================== */
 .additional-info tr th:first-child,
