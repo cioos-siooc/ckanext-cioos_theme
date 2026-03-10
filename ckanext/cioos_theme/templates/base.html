@@ -59,7 +59,6 @@
           border-radius: 16px;
           box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
           margin: 12px auto;
-          max-width: calc(1140px - 48px);
         }
         #header-container.header-scrolled.header-hidden #header-core {
           transform: translateY(calc(-100% - 24px));
@@ -104,7 +103,11 @@
           padding: 0 12.8px;
           min-height: 80px;
           align-items: center;
-          transition: transform 0.3s ease, border-radius 0.3s ease, box-shadow 0.3s ease, margin 0.3s ease;
+          transition:
+            transform 0.3s ease,
+            border-radius 0.3s ease,
+            box-shadow 0.3s ease,
+            margin 0.3s ease;
         }
         #header-container #header .menu {
           display: flex;
@@ -193,8 +196,8 @@
       {%- block styles %} {% set theme = h.get_rtl_theme() if
       h.is_rtl_language() else g.theme %} {% asset theme %} {% asset
       'vendor/fontawesome' %} {% asset 'ckanext-cioos_theme/cioos_theme_css' %}
-      {% asset 'ckanext-cioos_theme/bootstrap_datepicker_css' %}
-      {% endblock %} {# render all assets included in styles block #} {{
+      {% asset 'ckanext-cioos_theme/bootstrap_datepicker_css' %} {% endblock %}
+      {# render all assets included in styles block #} {{
       h.render_assets('style') }} {% if h.cioos_get_additional_css_path() %}
       <link
         rel="stylesheet"
@@ -230,9 +233,8 @@
       block body_extras -%} {# defined in the config.ini under
       "ckan.template_footer_end" #} {{ g.template_footer_end | safe }} {%-
       endblock %} {# render any style assets registered by page body snippets #}
-      {{ h.render_assets('style') }}
-      {# render script assets #}
-      {{ h.render_assets('script') }}
+      {{ h.render_assets('style') }} {# render script assets #} {{
+      h.render_assets('script') }}
     </body>
   </html>
 </html>
