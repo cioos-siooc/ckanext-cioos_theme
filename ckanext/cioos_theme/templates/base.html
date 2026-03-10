@@ -132,6 +132,9 @@
           display: none !important;
           visibility: hidden !important;
         }
+        .mobile-nav-close {
+          display: none;
+        }
         .mobileheader,
         .toggle-menu {
           display: none !important;
@@ -156,14 +159,33 @@
             align-items: center;
             justify-content: space-between;
           }
-          /* Mobile nav stays hidden until checkbox is checked */
+          /* Full-screen overlay — hidden until checkbox checked */
           .mobile-nav {
             display: none !important;
             visibility: hidden !important;
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: #152f37;
           }
           .main-nav-check:checked ~ .mobile-nav {
-            display: block !important;
+            display: flex !important;
             visibility: visible !important;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+          }
+          .mobile-nav-close {
+            display: block;
+            position: absolute;
+            top: 16px;
+            right: 20px;
+            z-index: 10000;
+          }
+          .mobile-nav-close label {
+            color: #fff;
+            font-size: 32px;
+            cursor: pointer;
           }
         }
       </style>

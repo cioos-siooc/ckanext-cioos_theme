@@ -330,7 +330,7 @@ aside #dataset-map {
 }
 /* ===========================================
    Mobile Navigation
-   Toggle visibility for responsive nav
+   Full-screen overlay menu for mobile
    Use !important to prevent FOUC (flash of unstyled content)
    =========================================== */
 .main-nav-check {
@@ -345,6 +345,11 @@ aside #dataset-map {
   visibility: hidden !important;
 }
 
+/* Close button inside overlay — hidden on desktop */
+.mobile-nav-close {
+  display: none;
+}
+
 @media (max-width: 768px) {
   /* Show mobile header bar on small screens */
   .mobileheader {
@@ -356,22 +361,30 @@ aside #dataset-map {
     justify-content: space-between;
   }
 
-  /* Mobile nav menu stays hidden until checkbox is checked */
+  /* Full-screen overlay — hidden by default */
   .mobile-nav {
     display: none !important;
     visibility: hidden !important;
-    background: #fff;
-    border-bottom: 3px solid var(--cioos-nav-bg);
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: var(--cioos-footer-bg);
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    overflow-y: auto;
+    opacity: 0;
+    transition: opacity 0.3s ease;
   }
 
-  /* Show mobile menu when checkbox is checked */
+  /* Show overlay when checkbox is checked */
   .main-nav-check:checked ~ .mobile-nav {
-    display: block !important;
+    display: flex !important;
     visibility: visible !important;
+    opacity: 1;
   }
 
-  /* Hide desktop elements on mobile - but keep footer login visible */
+  /* Hide desktop elements on mobile — keep footer login visible */
   #header-core,
   #topmenu,
   header.account-masthead:not(.footer-account) {
@@ -393,82 +406,163 @@ aside #dataset-map {
 
   .mobileheader label[for="main-nav-check"] {
     color: #fff;
-    font-family: var(--cioos-header-font);
-    font-weight: 600;
-    font-size: 14px;
     cursor: pointer;
-    padding: 8px 16px;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 4px;
-    transition: background-color 0.2s ease;
-    text-align: center;
+    padding: 8px;
+    font-size: 22px;
+    line-height: 1;
+    background: none;
+    border: none;
+    transition: opacity 0.2s ease;
   }
 
   .mobileheader label[for="main-nav-check"]:hover {
+    opacity: 0.7;
+  }
+
+  /* Close button inside the overlay */
+  .mobile-nav-close {
+    display: block;
+    position: absolute;
+    top: 16px;
+    right: 20px;
+    z-index: 10000;
+  }
+
+  .mobile-nav-close label[for="main-nav-check"] {
+    color: #fff;
+    font-size: 32px;
+    line-height: 1;
+    cursor: pointer;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.2s ease;
+  }
+
+  .mobile-nav-close label[for="main-nav-check"]::after {
+    content: none;
+  }
+
+  .mobile-nav-close label[for="main-nav-check"]:hover {
     background-color: rgba(255, 255, 255, 0.1);
   }
 
-  /* Mobile menu styling */
+  /* Menu items in overlay */
   .mobile-nav .menu {
     list-style: none;
     margin: 0;
     padding: 0;
-  }
-
-  .mobile-nav .menu li {
-    border-bottom: 1px solid #eee;
-  }
-
-  .mobile-nav .menu li:last-child {
-    border-bottom: none;
-  }
-
-  .mobile-nav .menu a {
-    display: block;
-    padding: 12px 20px;
-    color: #333;
-    text-decoration: none;
-    font-family: var(--cioos-header-font);
-    font-size: 14px;
-    transition: background-color 0.2s ease;
     text-align: center;
   }
 
-  .mobile-nav .menu a:hover {
-    background-color: var(--cioos-light-bg);
-    color: var(--cioos-nav-bg);
+  .mobile-nav .menu > li {
+    border-bottom: none;
   }
 
+  .mobile-nav .menu > li > a,
+  .mobile-nav .menu > li > span > a {
+    display: block;
+    padding: 14px 24px;
+    color: #fff;
+    text-decoration: none;
+    font-family: var(--cioos-heading-font);
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    transition: color 0.2s ease, transform 0.2s ease;
+  }
+
+  .mobile-nav .menu > li > a:hover,
+  .mobile-nav .menu > li > span > a:hover {
+    color: var(--cioos-accent);
+    transform: scale(1.05);
+  }
+
+  /* Submenu items — slightly smaller */
   .mobile-nav .sub-menu {
-    background: var(--cioos-light-bg);
-    padding-left: 20px;
+    background: transparent;
+    padding-left: 0;
+  }
+
+  .mobile-nav .sub-menu li {
+    border-bottom: none;
   }
 
   .mobile-nav .sub-menu a {
-    font-size: 13px;
-    padding: 10px 20px;
+    display: block;
+    padding: 8px 24px;
+    color: rgba(255, 255, 255, 0.65);
+    text-decoration: none;
+    font-family: var(--cioos-heading-font);
+    font-size: 16px;
+    font-weight: 400;
+    transition: color 0.2s ease;
   }
 
-  /* Mobile social icons */
+  .mobile-nav .sub-menu a:hover {
+    color: var(--cioos-accent);
+  }
+
+  /* Social icons at bottom of overlay */
   .mobile-nav .shareicons {
     display: flex;
     justify-content: center;
-    gap: 20px;
-    padding: 15px;
-    background: var(--cioos-light-bg);
+    gap: 24px;
+    padding: 30px 15px 15px;
+    background: transparent;
     list-style: none;
     margin: 0;
   }
 
   .mobile-nav .shareicons a {
     padding: 0;
-    color: var(--cioos-nav-bg);
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 20px;
+    transition: color 0.2s ease;
   }
 
-  /* Language switcher in mobile menu */
+  .mobile-nav .shareicons a:hover {
+    color: var(--cioos-accent);
+  }
+
+  /* Language switcher in overlay */
   .mobile-nav .lang-item a {
     text-align: center;
-    color: var(--cioos-nav-bg);
+    color: var(--cioos-accent);
+    font-family: var(--cioos-heading-font);
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: 0.05em;
+  }
+
+  /* Staggered fade-in animation for menu items */
+  .main-nav-check:checked ~ .mobile-nav .menu > li {
+    animation: mobileMenuFadeIn 0.4s ease forwards;
+    opacity: 0;
+  }
+  .main-nav-check:checked ~ .mobile-nav .menu > li:nth-child(1) { animation-delay: 0.05s; }
+  .main-nav-check:checked ~ .mobile-nav .menu > li:nth-child(2) { animation-delay: 0.1s; }
+  .main-nav-check:checked ~ .mobile-nav .menu > li:nth-child(3) { animation-delay: 0.15s; }
+  .main-nav-check:checked ~ .mobile-nav .menu > li:nth-child(4) { animation-delay: 0.2s; }
+  .main-nav-check:checked ~ .mobile-nav .menu > li:nth-child(5) { animation-delay: 0.25s; }
+  .main-nav-check:checked ~ .mobile-nav .menu > li:nth-child(6) { animation-delay: 0.3s; }
+  .main-nav-check:checked ~ .mobile-nav .shareicons {
+    animation: mobileMenuFadeIn 0.4s ease 0.35s forwards;
+    opacity: 0;
+  }
+}
+
+@keyframes mobileMenuFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 

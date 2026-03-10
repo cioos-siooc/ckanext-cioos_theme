@@ -22,10 +22,13 @@ h.render_markdown(h.scheming_language_text(h.cioos_load_json(g.site_description)
         height="60"
     /></a>
     {% endif %}
-    <label for="main-nav-check">Menu</label>
+    <label for="main-nav-check"><i class="fas fa-bars"></i></label>
   </div>
-  <!-- Menu (hidden on desktop, shown via CSS on mobile) -->
+  <!-- Full-screen overlay menu (mobile only) -->
   <nav class="menubar mobile-nav" id="mobile-nav">
+    <div class="mobile-nav-close">
+      <label for="main-nav-check"><i class="fas fa-xmark"></i></label>
+    </div>
     <div id="menu-mobile" class="menu">
       <div class="menu-mobile-menu-container">
         <nav>
