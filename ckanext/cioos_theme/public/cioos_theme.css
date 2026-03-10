@@ -8,8 +8,9 @@
   No build step required - this is plain CSS.
 */
 
-/* Google Fonts - Montserrat for headers */
+/* Google Fonts - Montserrat for body, Sora for headings */
 @import url(//fonts.googleapis.com/css?family=Montserrat:400,600,700);
+@import url(//fonts.googleapis.com/css2?family=Sora:wght@400;600;700&display=swap);
 
 /* ===========================================
    CSS Custom Properties (Theme Colors)
@@ -27,12 +28,20 @@
   --cioos-light-color: #333333;
 
   /* Typography */
-  --cioos-header-font: "Montserrat", system-ui, -apple-system, sans-serif;
+  --cioos-base-font: "Montserrat", system-ui, -apple-system, sans-serif;
+  --cioos-heading-font: "Montserrat", system-ui, -apple-system, sans-serif;
+  /* --cioos-heading-font: "Sora", system-ui, -apple-system, sans-serif; */
 }
 
 /* Apply font to body for proper inheritance */
 body {
-  font-family: var(--cioos-header-font);
+  font-family: var(--cioos-base-font);
+}
+
+/* Sora font for all headings */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--cioos-heading-font);
+  /* font-weight: 400; */
 }
 
 /* ===========================================
@@ -536,7 +545,7 @@ aside #dataset-map {
    Header Container (Main Navigation)
    =========================================== */
 #header-container {
-  font-family: var(--cioos-header-font);
+  font-family: var(--cioos-base-font);
   font-weight: 700;
   font-size: 12.8px;
   line-height: 26px;
