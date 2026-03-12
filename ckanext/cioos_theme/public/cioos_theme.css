@@ -213,7 +213,7 @@ aside #dataset-map {
 }
 
 .module-content {
-  padding: 2rem;
+  padding: 0 2rem;
 }
 .media-grid {
   background: var(--cioos-light-bg);
