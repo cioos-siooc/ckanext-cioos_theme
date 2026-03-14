@@ -71,18 +71,16 @@ def create(page_size, max_per_page):
     fd = os.open(path, os.O_WRONLY | os.O_CREAT)
 
     # write header
-    os.write(fd, '<?xml version="1.0" encoding="UTF-8"?>\n'.encode("utf-8"))
+    os.write(fd, b'<?xml version="1.0" encoding="UTF-8"?>\n')
     os.write(
         fd,
-        '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'.encode(
-            "utf-8"
-        ),
+        b'<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n',
     )
 
     current_time = datetime.datetime.now().strftime("%Y-%m-%d")
     for item in file_list:
         # add to sitemap index file
-        os.write(fd, "    <sitemap>\n".encode("utf-8"))
+        os.write(fd, b"    <sitemap>\n")
         os.write(
             fd,
             (
@@ -96,8 +94,8 @@ def create(page_size, max_per_page):
         os.write(
             fd, ("        <lastmod>%s</lastmod>\n" % (current_time,)).encode("utf-8")
         )
-        os.write(fd, "    </sitemap>\n".encode("utf-8"))
-    os.write(fd, "</sitemapindex>\n".encode("utf-8"))
+        os.write(fd, b"    </sitemap>\n")
+    os.write(fd, b"</sitemapindex>\n")
     os.close(fd)
 
     click.echo("Sitemap complete.")
@@ -134,12 +132,10 @@ def write_sitemap_files(
     fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC)
 
     # write header
-    os.write(fd, '<?xml version="1.0" encoding="UTF-8"?>\n'.encode("utf-8"))
+    os.write(fd, b'<?xml version="1.0" encoding="UTF-8"?>\n')
     os.write(
         fd,
-        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'.encode(
-            "utf-8"
-        ),
+        b'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n',
     )
     file_list.append({"path": path, "filename_s3": relPath})
 
@@ -149,7 +145,7 @@ def write_sitemap_files(
         )
 
         for pkg in pkgs:
-            os.write(fd, "    <url>\n".encode("utf-8"))
+            os.write(fd, b"    <url>\n")
             os.write(
                 fd,
                 (
@@ -167,7 +163,7 @@ def write_sitemap_files(
                     % (pkg.get("metadata_modified").strftime("%Y-%m-%d"),)
                 ).encode("utf-8"),
             )
-            os.write(fd, "    </url>\n".encode("utf-8"))
+            os.write(fd, b"    </url>\n")
         click.echo(
             "%i to %i of %i records done."
             % (start + 1, min(start + page_size, count), count)
@@ -176,7 +172,7 @@ def write_sitemap_files(
 
         if start % max_per_page == 0 and x != int(math.ceil(count / page_size)):
             # write footer
-            os.write(fd, "</urlset>\n".encode("utf-8"))
+            os.write(fd, b"</urlset>\n")
             os.close(fd)
 
             click.echo("done with %s.", path)
@@ -194,18 +190,16 @@ def write_sitemap_files(
             fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC)
 
             # write header
-            os.write(fd, '<?xml version="1.0" encoding="UTF-8"?>\n'.encode("utf-8"))
+            os.write(fd, b'<?xml version="1.0" encoding="UTF-8"?>\n')
             os.write(
                 fd,
-                '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'.encode(
-                    "utf-8"
-                ),
+                b'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n',
             )
 
             file_list.append({"path": path, "filename_s3": relPath})
 
     # write footer
-    os.write(fd, "</urlset>\n".encode("utf-8"))
+    os.write(fd, b"</urlset>\n")
     os.close(fd)
 
     click.echo("done with %s." % path)

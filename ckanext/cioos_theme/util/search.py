@@ -1,6 +1,5 @@
 # original found at https://github.com/GSA/ckanext-geodatagov/blob/fcc67b131da102d5b4612e6ad8225ebe17b9548e/ckanext/geodatagov/search.py
 
-from __future__ import print_function
 
 import logging
 
@@ -27,7 +26,7 @@ class GeoPackageSearchQuery(PackageSearchQuery):
         try:
             data = conn.search(query, fq=fq, rows=0)
         except Exception as e:
-            error = "Error in GeoPackageSearchQuery.get_count: {}".format(e)
+            error = f"Error in GeoPackageSearchQuery.get_count: {e}"
             log.error(error)
             print(error)
 
@@ -52,9 +51,7 @@ class GeoPackageSearchQuery(PackageSearchQuery):
                 sort="metadata_created asc",
             )
         except Exception as e:
-            error = "Error in GeoPackageSearchQuery.get_paginated_entity_name_modtime: {}".format(
-                e
-            )
+            error = f"Error in GeoPackageSearchQuery.get_paginated_entity_name_modtime: {e}"
             log.error(error)
             print(error)
 

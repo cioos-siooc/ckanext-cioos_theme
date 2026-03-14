@@ -1,4 +1,3 @@
-# encoding: utf-8
 
 import json
 import logging
@@ -1165,13 +1164,11 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
 
         if show_null_range == "true":
             search_params["fq_list"].append(
-                "+(temporal-extent-range:[{begin} TO {end}] OR (*:* NOT temporal-extent-range:[* TO *]))".format(
-                    begin=begin, end=end
-                )
+                f"+(temporal-extent-range:[{begin} TO {end}] OR (*:* NOT temporal-extent-range:[* TO *]))"
             )
         else:
             search_params["fq_list"].append(
-                "+temporal-extent-range:[{begin} TO {end}]".format(begin=begin, end=end)
+                f"+temporal-extent-range:[{begin} TO {end}]"
             )
 
         return search_params

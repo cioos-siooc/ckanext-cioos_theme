@@ -93,11 +93,11 @@ def load_about_markdown():
                 continue
 
             try:
-                with open(file_path, "r", encoding="utf-8") as f:
+                with open(file_path, encoding="utf-8") as f:
                     markdown_content[lang] = f.read()
             except FileNotFoundError:
                 log.error(f"About markdown file not found: {file_path}")
-            except IOError as e:
+            except OSError as e:
                 log.error(f"Error reading about markdown file {file_path}: {e}")
 
         return markdown_content if markdown_content else None

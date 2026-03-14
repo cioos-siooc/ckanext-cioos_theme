@@ -134,7 +134,7 @@ class CIOOSDCATProfile(SchemaOrgProfile):
             for key in ("uri", "name", "email"):
                 if contact.get(key):
                     dataset_dict["extras"].append(
-                        {"key": "contact_{0}".format(key), "value": contact.get(key)}
+                        {"key": f"contact_{key}", "value": contact.get(key)}
                     )
 
         # Publisher
@@ -142,7 +142,7 @@ class CIOOSDCATProfile(SchemaOrgProfile):
         for key in ("uri", "name", "email", "url", "type"):
             if publisher.get(key):
                 dataset_dict["extras"].append(
-                    {"key": "publisher_{0}".format(key), "value": publisher.get(key)}
+                    {"key": f"publisher_{key}", "value": publisher.get(key)}
                 )
 
         # Temporal
@@ -158,7 +158,7 @@ class CIOOSDCATProfile(SchemaOrgProfile):
             if spatial.get(key):
                 dataset_dict["extras"].append(
                     {
-                        "key": "spatial_{0}".format(key)
+                        "key": f"spatial_{key}"
                         if key != "geom"
                         else "spatial",
                         "value": spatial.get(key),

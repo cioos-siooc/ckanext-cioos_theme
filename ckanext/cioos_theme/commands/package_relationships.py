@@ -36,10 +36,10 @@ class PackageRelationships(CkanCommand):
     min_args = 0
 
     def __init__(self, name):
-        super(PackageRelationships, self).__init__(name)
+        super().__init__(name)
 
     def _load_config(self):
-        super(PackageRelationships, self)._load_config()
+        super()._load_config()
 
     def command(self):
         if not self.args:

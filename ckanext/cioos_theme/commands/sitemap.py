@@ -17,10 +17,10 @@ class SiteMap(CkanCommand):
     min_args = 0
 
     def __init__(self, name):
-        super(SiteMap, self).__init__(name)
+        super().__init__(name)
 
     def _load_config(self):
-        super(SiteMap, self)._load_config()
+        super()._load_config()
 
     def command(self):
         if not self.args:
@@ -67,12 +67,10 @@ class SiteMap(CkanCommand):
             suffix=".xml", prefix="sitemap-%s-" % filename_number, dir=DIR_SITEMAP
         )
         # write header
-        os.write(fd, '<?xml version="1.0" encoding="UTF-8"?>\n'.encode("utf-8"))
+        os.write(fd, b'<?xml version="1.0" encoding="UTF-8"?>\n')
         os.write(
             fd,
-            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'.encode(
-                "utf-8"
-            ),
+            b'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n',
         )
         file_list.append(
             {"path": path, "filename_s3": "sitemap-%s.xml" % filename_number}
@@ -84,7 +82,7 @@ class SiteMap(CkanCommand):
             )
 
             for pkg in pkgs:
-                os.write(fd, "    <url>\n".encode("utf-8"))
+                os.write(fd, b"    <url>\n")
                 os.write(
                     fd,
                     (
@@ -102,7 +100,7 @@ class SiteMap(CkanCommand):
                         % (pkg.get("metadata_modified").strftime("%Y-%m-%d"),)
                     ).encode("utf-8"),
                 )
-                os.write(fd, "    </url>\n".encode("utf-8"))
+                os.write(fd, b"    </url>\n")
             log.info(
                 "%i to %i of %i records done.",
                 start + 1,
@@ -115,7 +113,7 @@ class SiteMap(CkanCommand):
                 math.ceil(old_div(count, page_size))
             ):
                 # write footer
-                os.write(fd, "</urlset>\n".encode("utf-8"))
+                os.write(fd, b"</urlset>\n")
                 os.close(fd)
 
                 log.info("done with %s.", path)
@@ -127,12 +125,10 @@ class SiteMap(CkanCommand):
                     dir=DIR_SITEMAP,
                 )
                 # write header
-                os.write(fd, '<?xml version="1.0" encoding="UTF-8"?>\n'.encode("utf-8"))
+                os.write(fd, b'<?xml version="1.0" encoding="UTF-8"?>\n')
                 os.write(
                     fd,
-                    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'.encode(
-                        "utf-8"
-                    ),
+                    b'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n',
                 )
 
                 file_list.append(
@@ -140,14 +136,14 @@ class SiteMap(CkanCommand):
                 )
 
         # write footer
-        os.write(fd, "</urlset>\n".encode("utf-8"))
+        os.write(fd, b"</urlset>\n")
         os.close(fd)
 
         log.info("done with %s.", path)
 
         # if not upload_to_s3:
         # log.info('Skip upload and finish.')
-        print("Done locally: File list\n{}".format(json.dumps(file_list, indent=4)))
+        print(f"Done locally: File list\n{json.dumps(file_list, indent=4)}")
         return file_list
 
         # bucket_name = config.get('ckanext.geodatagov.aws_bucket_name')
