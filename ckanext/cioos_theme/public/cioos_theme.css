@@ -33,11 +33,7 @@
   /* --cioos-heading-font: "Sora", system-ui, -apple-system, sans-serif; */
 }
 
-/* Topmenu color fills the top overscroll area */
-html, body {
-  background-color: var(--cioos-nav-bg);
-}
-
+/* Apply font to body for proper inheritance */
 body {
   font-family: var(--cioos-base-font);
 }
@@ -660,6 +656,15 @@ aside #dataset-map {
   pointer-events: none;
 }
 
+#header-container.header-scrolled #topmenu {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition:
+    max-height 0.3s ease,
+    opacity 0.2s ease;
+}
+
 #header-container.header-scrolled #header-core {
   pointer-events: auto;
   background: #fff;
@@ -910,11 +915,6 @@ aside #dataset-map {
 /* ===========================================
    Footer
    =========================================== */
-footer {
-  /* Extend footer color into bottom overscroll area */
-  box-shadow: 0 50vh 0 50vh var(--cioos-footer-bg);
-}
-
 #footer {
   background-color: var(--cioos-footer-bg);
   color: #fff;
