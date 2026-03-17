@@ -33,7 +33,11 @@
   /* --cioos-heading-font: "Sora", system-ui, -apple-system, sans-serif; */
 }
 
-/* Apply font to body for proper inheritance */
+/* Disable elastic overscroll bounce */
+html {
+  overscroll-behavior: none;
+}
+
 body {
   font-family: var(--cioos-base-font);
 }
