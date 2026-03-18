@@ -223,17 +223,10 @@ aside #dataset-map {
   background: var(--cioos-light-bg);
   border: 1px solid #ddd;
   border-radius: 18px;
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  align-items: center;
-  align-content: center;
-  gap: 1rem;
-  padding: 1rem;
   min-width: 100%;
 }
 .media-item {
-  margin: 0;
+  margin: 0.25rem;
   border-radius: 18px;
   background-color: var(--bs-body-bg);
 }
