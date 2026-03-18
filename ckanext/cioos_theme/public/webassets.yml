@@ -32,3 +32,19 @@ truncate_js:
       - vendor/jquery
   contents:
     - js/modules/truncate.js
+
+home_search_js:
+  filter: rjsmin
+  output: ckanext-cioos_theme/%(version)s_home_search.js
+  extra:
+    preload:
+      - base/main
+      - vendor/jquery
+  contents:
+    - js/modules/home-search.js
+
+home_v2_css:
+  filters: cssrewrite
+  output: ckanext-cioos_theme/%(version)s_home_v2.css
+  contents:
+    - home_v2.css

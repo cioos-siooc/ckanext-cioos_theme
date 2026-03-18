@@ -1,0 +1,132 @@
+{#
+  CIOOS Home Page v2 — Enhanced with map search, filters, and compact EOV grid.
+
+  To use this template, set in .env:
+    CKAN__HOMEPAGE_TEMPLATE=home/default_home_v2.html
+#}
+
+{# Load required assets — only active when this template is selected #}
+{% asset 'ckanext-cioos_theme/home_v2_css' %}
+{% asset 'ckanext-spatial/spatial_query_css' %}
+{% asset 'ckanext-spatial/spatial_query_js' %}
+{% asset 'ckanext-cioos_theme/bootstrap_datepicker_css' %}
+{% asset 'ckanext-cioos_theme/home_search_js' %}
+
+<div role="main" data-module="home-search">
+  <div class="container">
+    {# ── Section A: Compact Hero ── #}
+    <section class="home-hero text-center">
+      <h1 class="home-hero-title">
+        {{ h.scheming_language_text(h.cioos_load_json(g.site_heading)) | safe
+        or _('<span>CIOOS</span> Data Catalogue') }}
+      </h1>
+      <p class="home-hero-subtitle">
+        {{ _('Search, find, download — all of our') }}
+        <a class="home-hero-count" href="{{ h.url_for(controller='dataset', action='search') }}">{{ h.cioos_count_datasets() }}</a>
+        {{ _('datasets') }}.
+      </p>
+    </section>
+
+    {# ── Section B+C: Search Form (wraps everything) ── #}
+    <form class="home-search-form search-form" method="get" action="{% url_for controller='dataset', action='search' %}">
+
+      {# ── Search Bar ── #}
+      {% block search %}
+        {% snippet 'home/snippets/search_v2.html' %}
+      {% endblock %}
+
+      {# ── Advanced Filters Toggle ── #}
+      <div class="text-center mb-3">
+        <button
+          class="btn home-filters-toggle"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#homeAdvancedFilters"
+          aria-expanded="false"
+          aria-controls="homeAdvancedFilters"
+        >
+          <i class="fas fa-sliders-h"></i> {{ _('Advanced Filters') }}
+          <i class="fas fa-chevron-down home-filters-chevron"></i>
+        </button>
+      </div>
+
+      {# ── Advanced Filters Panel (collapsible) ── #}
+      <div class="collapse" id="homeAdvancedFilters">
+        <div class="home-filters-panel">
+          {% snippet 'home/snippets/home_filters.html' %}
+
+          {# Search button inside the filters panel #}
+          <div class="text-center mt-3">
+            <button type="submit" class="btn home-search-submit-btn">
+              <i class="fas fa-search"></i> {{ _('Search Datasets') }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
+
+    {# ── Section D: EOV Cards ── #}
+    <section class="home-eov-section">
+      <div class="d-flex align-items-center justify-content-between mb-2">
+        <h3 class="home-section-heading mb-0">{{ _('Browse by Ocean Variable') }}</h3>
+        {# Mobile collapse toggle #}
+        <button
+          class="btn btn-sm home-eov-toggle d-lg-none"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#homeEovGrid"
+          aria-expanded="true"
+          aria-controls="homeEovGrid"
+        >
+          <i class="fas fa-chevron-down"></i>
+        </button>
+      </div>
+
+      {# EOV filter input #}
+      <div class="home-eov-filter-bar">
+        <input type="text" class="home-eov-filter-input" placeholder="{{ _('Filter variables...') }}" id="homeEovFilter" />
+      </div>
+
+      {# EOV grid — visible on desktop, collapsible on mobile #}
+      <div class="collapse show" id="homeEovGrid">
+        {% block eov_list %}
+          {% set eov = h.cioos_get_eovs(show_all=True) %}
+          {% for grouper, list in eov|rejectattr('category', 'undefined')|groupby('category') %}
+            {% if grouper and grouper not in h.cioos_get_exclude_eov_category() %}
+              <div class="home-eov-category-label">{{ _(grouper) }}</div>
+              <ul class="home-eov-grid">
+                {% for item in list|sort(attribute='name') %}
+                  {% if item.name not in h.cioos_get_exclude_eov() %}
+                    {% set href = h.url_for(controller='dataset', action='search', eov=item.name) %}
+                    {% set label = label_function(item) if label_function else h.scheming_language_text(item.display_name) %}
+                    {% set label = _(label) %}
+                    {% set label_truncated = label|truncate(35, killwords=True) if not label_function else label %}
+                    {% set count_value = item.get('count', 0) or 0 %}
+                    {% set count = count_label(count_value) if count_label else ('%d' % count_value) %}
+                    {% set icon_base = h.cioos_get_eov_icon_base_path() or '/base/images/eov-icons-svg/' %}
+                    {% set img_url = item.image_display_url or h.url_for_static(icon_base + item.get('icon')) %}
+                    <li class="home-eov-item {{ 'home-eov-item-disabled' if count_value == 0 }}">
+                      <a class="home-eov-link" href="{{ href }}" title="{{ label }}">
+                        <img
+                          src="{{ img_url }}"
+                          alt="{{ item.name }}"
+                          class="home-eov-icon"
+                          loading="lazy"
+                        />
+                        <span class="home-eov-label">{{ label_truncated }}</span>
+                        {% if count_value > 0 %}
+                          <span class="home-eov-badge">{{ count }}</span>
+                        {% endif %}
+                      </a>
+                    </li>
+                  {% endif %}
+                {% endfor %}
+              </ul>
+            {% endif %}
+          {% endfor %}
+        {% endblock %}
+      </div>
+    </section>
+
+  </div>
+</div>

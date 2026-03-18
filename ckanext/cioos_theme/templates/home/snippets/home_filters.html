@@ -1,0 +1,106 @@
+{#
+  Advanced filters panel for the home page.
+  Contains: spatial map (left), organization/project/date range filters (right).
+  Must be placed inside a <form> element.
+#}
+{% set lang = h.lang() %}
+{% set resorg_facet = 'resorg_groups_' + lang %}
+{% set default_extent = h.spatial_default_extent() if h.cioos_helper_available('spatial_default_extent') else h.cioos_get_cfg('ckan.spatial.default_extent', '[-180,-90,180,90]') %}
+{# Populate c.search_facets using the existing helper (same as search page).
+   cioos_get_eovs also reads c.search_facets directly — get_facet_items_dict
+   can silently return [] on the home page, so we do the same here. #}
+{% set _unused = h.cioos_get_facets(facet_list=[resorg_facet, 'projects']) %}
+{% set search_facets = c.search_facets or {} %}
+
+<div class="row home-filters-row">
+  {# Left column: Spatial map + time range #}
+  <div class="col-lg-7 col-md-12 mb-3">
+    <label class="home-filter-label">
+      <i class="fas fa-map-marker-alt"></i> {{ _('Search by Location') }}
+    </label>
+    <div class="home-map-container">
+      {% snippet "spatial/snippets/spatial_query.html", default_extent=default_extent %}
+    </div>
+
+    {# Date range picker — below the map #}
+    <div class="mt-3">
+      <label class="home-filter-label">
+        <i class="fas fa-calendar"></i> {{ _('Time Range') }}
+      </label>
+      <div id="year_search_container" data-module="date-query">
+        <div
+          class="input-group input-daterange"
+          data-provide="datepicker"
+          data-date-format="yyyy"
+          data-date-clear-btn="true"
+          data-date-min-view-mode="2"
+          data-date-autoclose="true"
+          data-date-end-date="+0d"
+          data-date-keep-empty-values="true"
+          data-date-language="{{ lang }}"
+        >
+          <input type="text" id="datepickerbegin" class="form-control datepicker" placeholder="{{ _('From') }}" />
+          <span class="input-group-text">{{ _('to') }}</span>
+          <input type="text" id="datepickerend" class="form-control datepicker" placeholder="{{ _('To') }}" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {# Right column: Organization + Project filters #}
+  <div class="col-lg-5 col-md-12">
+    {# Organization multi-select #}
+    <div class="mb-3">
+      <label class="home-filter-label">
+        <i class="fas fa-building"></i> {{ _('Organization') }}
+      </label>
+      {% set org_items = search_facets.get(resorg_facet, {}).get('items', []) %}
+      {% if org_items %}
+        <div class="home-filter-searchable">
+          <input type="text" class="home-filter-search-input" placeholder="{{ _('Filter organizations...') }}" data-filter-target="org" />
+          <div class="home-filter-checklist" data-filter-list="org">
+            {% for item in org_items %}
+              {% if item.count > 0 %}
+                <label class="home-filter-check-item">
+                  <input type="checkbox" name="{{ resorg_facet }}" value="{{ item.name }}" />
+                  <span class="home-filter-check-label">{{ item.display_name }}</span>
+                  <span class="home-filter-check-count">{{ item.count }}</span>
+                </label>
+              {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+      {% else %}
+        <p class="text-muted small">{{ _('No organizations available') }}</p>
+      {% endif %}
+    </div>
+
+    {# Project multi-select #}
+    <div class="mb-3">
+      <label class="home-filter-label">
+        <i class="fas fa-folder-open"></i> {{ _('Project') }}
+      </label>
+      {% set project_items = search_facets.get('projects', {}).get('items', []) %}
+      {% if project_items %}
+        <div class="home-filter-searchable">
+          <input type="text" class="home-filter-search-input" placeholder="{{ _('Filter projects...') }}" data-filter-target="project" />
+          <div class="home-filter-checklist" data-filter-list="project">
+            {% for item in project_items %}
+              {% if item.count > 0 %}
+                <label class="home-filter-check-item">
+                  <input type="checkbox" name="projects" value="{{ item.name }}" />
+                  <span class="home-filter-check-label">{{ item.display_name }}</span>
+                  <span class="home-filter-check-count">{{ item.count }}</span>
+                </label>
+              {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+      {% else %}
+        <p class="text-muted small">{{ _('No projects available') }}</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% asset 'ckanext-cioos_theme/bootstrap_datepicker_js' %}
