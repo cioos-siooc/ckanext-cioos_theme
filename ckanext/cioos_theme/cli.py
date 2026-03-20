@@ -39,7 +39,7 @@ def create(page_size, max_per_page):
     # ckan --config=/srv/app/ckan.ini sitemap create
     # sql = '''Select id from package where id not in (select pkg_id from miscs_solr_sync); '''
 
-    DIR_SITEMAP = "/srv/app/src/ckan/ckan/public/sitemap/"
+    DIR_SITEMAP = "/var/lib/ckan/sitemap/"
 
     package_query = GeoPackageSearchQuery()
     count = package_query.get_count()
