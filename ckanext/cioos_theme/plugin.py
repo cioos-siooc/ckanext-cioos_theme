@@ -20,6 +20,8 @@ from pyld import jsonld
 from shapely.geometry import shape
 from six.moves.urllib.parse import urlparse
 
+from ckanext.dcat.processors import RDFSerializer
+
 import ckanext.cioos_theme.cli as cli
 import ckanext.cioos_theme.helpers as cioos_helpers
 from ckanext.scheming.helpers import scheming_language_text
@@ -348,13 +350,17 @@ def cioos_home_index():
 @toolkit.side_effect_free
 def dcat_dataset_show(up_func, context, data_dict):
 
-    parent_output = up_func(context, data_dict)
     _frame = toolkit.request.args.get("frame")
     if _frame == "schemaorg":
+        # Re-serialize with Schema.org profiles instead of framing DCAT output
+        toolkit.check_access("dcat_dataset_show", context, data_dict)
+        dataset_dict = toolkit.get_action("package_show")(context, data_dict)
+        serializer = RDFSerializer(profiles=["schemaorg", "cioos_dcat"])
+        output = serializer.serialize_dataset(dataset_dict, _format="jsonld")
         frametext = {"@context": {"@vocab": "http://schema.org/"}, "@type": "Dataset"}
-        framed_output = jsonld.frame(json.loads(parent_output), frametext)
-        return framed_output
-    return parent_output
+        framed_output = jsonld.frame(json.loads(output), frametext)
+        return json.dumps(framed_output, separators=(",", ":"))
+    return up_func(context, data_dict)
 
 
 class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
