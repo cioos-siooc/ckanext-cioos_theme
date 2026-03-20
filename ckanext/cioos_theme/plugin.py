@@ -1151,25 +1151,31 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                 lang,
             )
 
-        begin = search_params.get("extras", {}).get("ext_year_begin", "*")
-        end = search_params.get("extras", {}).get("ext_year_end", "*")
-        if begin == end == "*":
-            return search_params
-
+        extras = search_params.get("extras", {})
         search_params["fq_list"] = search_params.get("fq_list", [])
 
-        show_null_range = search_params.get("extras", {}).get(
-            "ext_show_empty_range", "false"
-        )
+        # Temporal extent range filter
+        begin = extras.get("ext_year_begin", "*")
+        end = extras.get("ext_year_end", "*")
+        if begin != "*" or end != "*":
+            show_null_range = extras.get("ext_show_empty_range", "false")
+            if show_null_range == "true":
+                search_params["fq_list"].append(
+                    f"+(temporal-extent-range:[{begin} TO {end}] OR (*:* NOT temporal-extent-range:[* TO *]))"
+                )
+            else:
+                search_params["fq_list"].append(
+                    f"+temporal-extent-range:[{begin} TO {end}]"
+                )
 
-        if show_null_range == "true":
-            search_params["fq_list"].append(
-                f"+(temporal-extent-range:[{begin} TO {end}] OR (*:* NOT temporal-extent-range:[* TO *]))"
-            )
-        else:
-            search_params["fq_list"].append(
-                f"+temporal-extent-range:[{begin} TO {end}]"
-            )
+        # Metadata date range filters (ext_created_begin/end, ext_modified_begin/end)
+        for field, solr_field in [("created", "metadata_created"), ("modified", "metadata_modified")]:
+            b = extras.get(f"ext_{field}_begin", "")
+            e = extras.get(f"ext_{field}_end", "")
+            if b or e:
+                search_params["fq_list"].append(
+                    f"+{solr_field}:[{b + 'T00:00:00Z' if b else '*'} TO {e + 'T23:59:59Z' if e else '*'}]"
+                )
 
         return search_params
 

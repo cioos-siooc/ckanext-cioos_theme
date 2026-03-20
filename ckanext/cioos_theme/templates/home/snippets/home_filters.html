@@ -9,97 +9,244 @@
 {# Populate c.search_facets using the existing helper (same as search page).
    cioos_get_eovs also reads c.search_facets directly — get_facet_items_dict
    can silently return [] on the home page, so we do the same here. #}
-{% set _unused = h.cioos_get_facets(facet_list=[resorg_facet, 'projects']) %}
+{% set _unused = h.cioos_get_facets(facet_list=[resorg_facet, 'projects', 'license_id', 'eov', 'ecv', 'resource-type']) %}
 {% set search_facets = c.search_facets or {} %}
+{# Build display name lookups for scheming-defined facets (eov/ecv).
+   cioos_get_facets uses rows=0, so after_dataset_search skips display name
+   population — we resolve labels from scheming choices instead. #}
+{% set schema_fields = h.scheming_get_dataset_schema('dataset')['dataset_fields'] %}
+{% set eov_choices = h.scheming_field_choices(h.scheming_field_by_name(schema_fields, 'eov')) or [] %}
+{% set ecv_choices = h.scheming_field_choices(h.scheming_field_by_name(schema_fields, 'ecv')) or [] %}
 
-<div class="row home-filters-row">
-  {# Left column: Spatial map + time range #}
-  <div class="col-lg-7 col-md-12 mb-3">
+{# ── Top row: Spatial map + time range ── #}
+<div class="row home-filters-row mb-3">
+  <div class="col-lg-6 col-md-12 mb-3 mb-lg-0">
     <label class="home-filter-label">
       <i class="fas fa-map-marker-alt"></i> {{ _('Search by Location') }}
     </label>
     <div class="home-map-container">
       {% snippet "spatial/snippets/spatial_query.html", default_extent=default_extent %}
     </div>
-
-    {# Date range picker — below the map #}
-    <div class="mt-3">
-      <label class="home-filter-label">
-        <i class="fas fa-calendar"></i> {{ _('Time Range') }}
-      </label>
-      <div id="year_search_container" data-module="date-query">
-        <div
-          class="input-group input-daterange"
-          data-provide="datepicker"
-          data-date-format="yyyy"
-          data-date-clear-btn="true"
-          data-date-min-view-mode="2"
-          data-date-autoclose="true"
-          data-date-end-date="+0d"
-          data-date-keep-empty-values="true"
-          data-date-language="{{ lang }}"
-        >
-          <input type="text" id="datepickerbegin" class="form-control datepicker" placeholder="{{ _('From') }}" />
-          <span class="input-group-text">{{ _('to') }}</span>
-          <input type="text" id="datepickerend" class="form-control datepicker" placeholder="{{ _('To') }}" />
-        </div>
-      </div>
-    </div>
   </div>
 
-  {# Right column: Organization + Project filters #}
-  <div class="col-lg-5 col-md-12">
-    {# Organization multi-select #}
-    <div class="mb-3">
-      <label class="home-filter-label">
-        <i class="fas fa-building"></i> {{ _('Organization') }}
-      </label>
-      {% set org_items = search_facets.get(resorg_facet, {}).get('items', []) %}
-      {% if org_items %}
-        <div class="home-filter-searchable">
-          <input type="text" class="home-filter-search-input" placeholder="{{ _('Filter organizations...') }}" data-filter-target="org" />
-          <div class="home-filter-checklist" data-filter-list="org">
-            {% for item in org_items %}
-              {% if item.count > 0 %}
-                <label class="home-filter-check-item">
-                  <input type="checkbox" name="{{ resorg_facet }}" value="{{ item.name }}" />
-                  <span class="home-filter-check-label">{{ item.display_name }}</span>
-                  <span class="home-filter-check-count">{{ item.count }}</span>
-                </label>
-              {% endif %}
-            {% endfor %}
-          </div>
-        </div>
-      {% else %}
-        <p class="text-muted small">{{ _('No organizations available') }}</p>
-      {% endif %}
+  <div class="col-lg-6 col-md-12">
+    {# Data time range #}
+    <label class="home-filter-label">
+      <i class="fas fa-calendar"></i> {{ _('Data Time Range') }}
+    </label>
+    <div id="year_search_container" data-module="date-query">
+      <div
+        class="input-group input-daterange"
+        data-provide="datepicker"
+        data-date-format="yyyy-mm-dd"
+        data-date-clear-btn="true"
+        data-date-autoclose="true"
+        data-date-end-date="+0d"
+        data-date-keep-empty-values="true"
+        data-date-language="{{ lang }}"
+      >
+        <input type="text" id="datepickerbegin" class="form-control datepicker" placeholder="{{ _('From') }}" />
+        <span class="input-group-text">{{ _('to') }}</span>
+        <input type="text" id="datepickerend" class="form-control datepicker" placeholder="{{ _('To') }}" />
+      </div>
     </div>
 
-    {# Project multi-select #}
-    <div class="mb-3">
-      <label class="home-filter-label">
-        <i class="fas fa-folder-open"></i> {{ _('Project') }}
-      </label>
-      {% set project_items = search_facets.get('projects', {}).get('items', []) %}
-      {% if project_items %}
-        <div class="home-filter-searchable">
-          <input type="text" class="home-filter-search-input" placeholder="{{ _('Filter projects...') }}" data-filter-target="project" />
-          <div class="home-filter-checklist" data-filter-list="project">
-            {% for item in project_items %}
-              {% if item.count > 0 %}
-                <label class="home-filter-check-item">
-                  <input type="checkbox" name="projects" value="{{ item.name }}" />
-                  <span class="home-filter-check-label">{{ item.display_name }}</span>
-                  <span class="home-filter-check-count">{{ item.count }}</span>
-                </label>
-              {% endif %}
-            {% endfor %}
-          </div>
-        </div>
-      {% else %}
-        <p class="text-muted small">{{ _('No projects available') }}</p>
-      {% endif %}
+    {# Initial submission date range #}
+    <label class="home-filter-label mt-3">
+      <i class="fas fa-upload"></i> {{ _('Initial Submission') }}
+    </label>
+    <div
+      class="input-group input-daterange"
+      data-provide="datepicker"
+      data-date-format="yyyy-mm-dd"
+      data-date-clear-btn="true"
+      data-date-autoclose="true"
+      data-date-end-date="+0d"
+      data-date-keep-empty-values="true"
+      data-date-language="{{ lang }}"
+    >
+      <input type="text" name="ext_created_begin" class="form-control datepicker" placeholder="{{ _('From') }}" />
+      <span class="input-group-text">{{ _('to') }}</span>
+      <input type="text" name="ext_created_end" class="form-control datepicker" placeholder="{{ _('To') }}" />
     </div>
+
+    {# Last updated date range #}
+    <label class="home-filter-label mt-3">
+      <i class="fas fa-sync-alt"></i> {{ _('Last Updated') }}
+    </label>
+    <div
+      class="input-group input-daterange"
+      data-provide="datepicker"
+      data-date-format="yyyy-mm-dd"
+      data-date-clear-btn="true"
+      data-date-autoclose="true"
+      data-date-end-date="+0d"
+      data-date-keep-empty-values="true"
+      data-date-language="{{ lang }}"
+    >
+      <input type="text" name="ext_modified_begin" class="form-control datepicker" placeholder="{{ _('From') }}" />
+      <span class="input-group-text">{{ _('to') }}</span>
+      <input type="text" name="ext_modified_end" class="form-control datepicker" placeholder="{{ _('To') }}" />
+    </div>
+  </div>
+</div>
+
+{# ── Bottom section: Facet filters flowing in CSS columns ── #}
+<div class="home-filters-facets">
+  {# Organization multi-select #}
+  <div class="home-filters-facet-block">
+    <label class="home-filter-label">
+      <i class="fas fa-building"></i> {{ _('Organization') }}
+    </label>
+    {% set org_items = search_facets.get(resorg_facet, {}).get('items', []) %}
+    {% if org_items %}
+      <div class="home-filter-searchable">
+        <input type="text" class="home-filter-search-input" placeholder="{{ _('Filter organizations...') }}" data-filter-target="org" />
+        <div class="home-filter-checklist" data-filter-list="org">
+          {% for item in org_items|sort(attribute='count', reverse=True) %}
+            {% if item.count > 0 %}
+              <label class="home-filter-check-item">
+                <input type="checkbox" name="{{ resorg_facet }}" value="{{ item.name }}" />
+                <span class="home-filter-check-label">{{ item.display_name }}</span>
+                <span class="home-filter-check-count">{{ item.count }}</span>
+              </label>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    {% else %}
+      <p class="text-muted small">{{ _('No organizations available') }}</p>
+    {% endif %}
+  </div>
+
+  {# Project multi-select #}
+  <div class="home-filters-facet-block">
+    <label class="home-filter-label">
+      <i class="fas fa-folder-open"></i> {{ _('Project') }}
+    </label>
+    {% set project_items = search_facets.get('projects', {}).get('items', []) %}
+    {% if project_items %}
+      <div class="home-filter-searchable">
+        <input type="text" class="home-filter-search-input" placeholder="{{ _('Filter projects...') }}" data-filter-target="project" />
+        <div class="home-filter-checklist" data-filter-list="project">
+          {% for item in project_items|sort(attribute='count', reverse=True) %}
+            {% if item.count > 0 %}
+              <label class="home-filter-check-item">
+                <input type="checkbox" name="projects" value="{{ item.name }}" />
+                <span class="home-filter-check-label">{{ item.display_name }}</span>
+                <span class="home-filter-check-count">{{ item.count }}</span>
+              </label>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    {% else %}
+      <p class="text-muted small">{{ _('No projects available') }}</p>
+    {% endif %}
+  </div>
+
+  {# License multi-select #}
+  <div class="home-filters-facet-block">
+    <label class="home-filter-label">
+      <i class="fas fa-balance-scale"></i> {{ _('License') }}
+    </label>
+    {% set license_items = search_facets.get('license_id', {}).get('items', []) %}
+    {% if license_items %}
+      <div class="home-filter-searchable">
+        <input type="text" class="home-filter-search-input" placeholder="{{ _('Filter licenses...') }}" data-filter-target="license" />
+        <div class="home-filter-checklist" data-filter-list="license">
+          {% for item in license_items|sort(attribute='count', reverse=True) %}
+            {% if item.count > 0 %}
+              <label class="home-filter-check-item">
+                <input type="checkbox" name="license_id" value="{{ item.name }}" />
+                <span class="home-filter-check-label">{{ item.display_name }}</span>
+                <span class="home-filter-check-count">{{ item.count }}</span>
+              </label>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    {% else %}
+      <p class="text-muted small">{{ _('No licenses available') }}</p>
+    {% endif %}
+  </div>
+
+  {# Essential Ocean Variables multi-select #}
+  <div class="home-filters-facet-block">
+    <label class="home-filter-label">
+      <i class="fas fa-water"></i> {{ _('Ocean Variables') }}
+    </label>
+    {% set eov_items = search_facets.get('eov', {}).get('items', []) %}
+    {% if eov_items %}
+      <div class="home-filter-searchable">
+        <input type="text" class="home-filter-search-input" placeholder="{{ _('Filter ocean variables...') }}" data-filter-target="eov" />
+        <div class="home-filter-checklist" data-filter-list="eov">
+          {% for item in eov_items|sort(attribute='count', reverse=True) %}
+            {% if item.count > 0 %}
+              <label class="home-filter-check-item">
+                <input type="checkbox" name="eov" value="{{ item.name }}" />
+                <span class="home-filter-check-label">{{ h.scheming_choices_label(eov_choices, item.name) or item.display_name }}</span>
+                <span class="home-filter-check-count">{{ item.count }}</span>
+              </label>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    {% else %}
+      <p class="text-muted small">{{ _('No ocean variables available') }}</p>
+    {% endif %}
+  </div>
+
+  {# Essential Climate Variables multi-select #}
+  <div class="home-filters-facet-block">
+    <label class="home-filter-label">
+      <i class="fas fa-cloud-sun"></i> {{ _('Climate Variables') }}
+    </label>
+    {% set ecv_items = search_facets.get('ecv', {}).get('items', []) %}
+    {% if ecv_items %}
+      <div class="home-filter-searchable">
+        <input type="text" class="home-filter-search-input" placeholder="{{ _('Filter climate variables...') }}" data-filter-target="ecv" />
+        <div class="home-filter-checklist" data-filter-list="ecv">
+          {% for item in ecv_items|sort(attribute='count', reverse=True) %}
+            {% if item.count > 0 %}
+              <label class="home-filter-check-item">
+                <input type="checkbox" name="ecv" value="{{ item.name }}" />
+                <span class="home-filter-check-label">{{ h.scheming_choices_label(ecv_choices, item.name) or item.display_name }}</span>
+                <span class="home-filter-check-count">{{ item.count }}</span>
+              </label>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    {% else %}
+      <p class="text-muted small">{{ _('No climate variables available') }}</p>
+    {% endif %}
+  </div>
+
+  {# Resource Type multi-select #}
+  <div class="home-filters-facet-block">
+    <label class="home-filter-label">
+      <i class="fas fa-file-alt"></i> {{ _('Resource Type') }}
+    </label>
+    {% set restype_items = search_facets.get('resource-type', {}).get('items', []) %}
+    {% if restype_items %}
+      <div class="home-filter-searchable">
+        <input type="text" class="home-filter-search-input" placeholder="{{ _('Filter resource types...') }}" data-filter-target="restype" />
+        <div class="home-filter-checklist" data-filter-list="restype">
+          {% for item in restype_items|sort(attribute='count', reverse=True) %}
+            {% if item.count > 0 %}
+              <label class="home-filter-check-item">
+                <input type="checkbox" name="resource-type" value="{{ item.name }}" />
+                <span class="home-filter-check-label">{{ item.display_name }}</span>
+                <span class="home-filter-check-count">{{ item.count }}</span>
+              </label>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    {% else %}
+      <p class="text-muted small">{{ _('No resource types available') }}</p>
+    {% endif %}
   </div>
 </div>
 

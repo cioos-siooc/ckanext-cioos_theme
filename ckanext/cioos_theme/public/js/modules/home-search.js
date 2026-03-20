@@ -26,7 +26,8 @@ ckan.module('home-search', function (jQuery) {
           e.preventDefault();
           return false;
         }
-        // Real user submit — allow and clean up empty fields
+        // Real user submit — sync date-query hidden fields, then clean up
+        self._syncDateQueryFields();
         self._cleanEmptyFields();
         return true;
       });
@@ -52,27 +53,6 @@ ckan.module('home-search', function (jQuery) {
         window.dispatchEvent(new Event('resize'));
       });
 
-      // EOV grid filter — hide non-matching cards and empty category headers
-      jQuery('#homeEovFilter').on('input', function () {
-        var query = jQuery(this).val().toLowerCase();
-        var grid = jQuery('#homeEovGrid');
-        // First, show all category grids so :visible checks work on items
-        grid.find('.home-eov-category-label, .home-eov-grid').show();
-        // Toggle individual cards by label match
-        grid.find('.home-eov-item').each(function () {
-          var label = jQuery(this).find('.home-eov-label').text().toLowerCase();
-          jQuery(this).toggle(label.indexOf(query) !== -1);
-        });
-        // Then hide category sections where all cards are filtered out
-        grid.find('.home-eov-category-label').each(function () {
-          var $label = jQuery(this);
-          var $ul = $label.next('.home-eov-grid');
-          var hasVisible = $ul.find('.home-eov-item:visible').length > 0;
-          $label.toggle(hasVisible);
-          $ul.toggle(hasVisible);
-        });
-      });
-
       // Checklist filter inputs — hide non-matching items as user types
       this.el.find('.home-filter-search-input').on('input', function () {
         var query = jQuery(this).val().toLowerCase();
@@ -88,6 +68,17 @@ ckan.module('home-search', function (jQuery) {
     _isInputFocused: function () {
       var tag = document.activeElement && document.activeElement.tagName;
       return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
+    },
+
+    _syncDateQueryFields: function () {
+      // The date-query module creates hidden ext_year_begin / ext_year_end
+      // fields and only syncs them on changeDate events.  If the user typed
+      // a date manually (no changeDate) or if the blocked programmatic submit
+      // left stale values, re-sync now before the real submit.
+      var begin = jQuery('#datepickerbegin').val();
+      var end   = jQuery('#datepickerend').val();
+      if (begin !== undefined) jQuery('#ext_year_begin').val(begin);
+      if (end   !== undefined) jQuery('#ext_year_end').val(end);
     },
 
     _cleanEmptyFields: function () {
