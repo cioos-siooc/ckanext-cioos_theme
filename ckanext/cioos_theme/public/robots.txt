@@ -34,6 +34,16 @@ Disallow: /fr/resorg*
 
 Disallow: /erddap*?
 
+Allow: /sitemap/
+Allow: /dataset/*.jsonld?frame=schemaorg
+Allow: /dataset/*.jsonld$
+Allow: /dataset/*.xml
+Allow: /dataset/*.ttl
+Allow: /dataset/*.n3
+Allow: /dataset/*.basic
+Allow: /dataset/*.iso19115
+Allow: /dataset/*.iso19139
+
 Disallow: /*.xml
 Disallow: /*.ttl
 Disallow: /*.n3
