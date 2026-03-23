@@ -44,6 +44,24 @@ Allow: /dataset/*.basic
 Allow: /dataset/*.iso19115
 Allow: /dataset/*.iso19139
 
+Allow: /en/dataset/*.jsonld?frame=schemaorg
+Allow: /en/dataset/*.jsonld$
+Allow: /en/dataset/*.xml
+Allow: /en/dataset/*.ttl
+Allow: /en/dataset/*.n3
+Allow: /en/dataset/*.basic
+Allow: /en/dataset/*.iso19115
+Allow: /en/dataset/*.iso19139
+
+Allow: /fr/dataset/*.jsonld?frame=schemaorg
+Allow: /fr/dataset/*.jsonld$
+Allow: /fr/dataset/*.xml
+Allow: /fr/dataset/*.ttl
+Allow: /fr/dataset/*.n3
+Allow: /fr/dataset/*.basic
+Allow: /fr/dataset/*.iso19115
+Allow: /fr/dataset/*.iso19139
+
 Disallow: /*.xml
 Disallow: /*.ttl
 Disallow: /*.n3
