@@ -315,8 +315,10 @@ def cioos_home_index():
 @toolkit.side_effect_free
 def dcat_dataset_show(up_func, context, data_dict):
 
-    parent_output = up_func(context, data_dict)
     _frame = toolkit.request.params.get('frame')
+    if _frame == 'schemaorg':
+        data_dict['profiles'] = ['schemaorg']
+    parent_output = up_func(context, data_dict)
     if _frame == 'schemaorg':
         frametext =   {
             "@context": {"@vocab": "http://schema.org/"},
