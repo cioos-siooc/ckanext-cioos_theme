@@ -19,6 +19,7 @@ from ckan.common import config
 import copy
 import logging
 import json
+import os
 import jsonpickle
 import importlib_metadata as metadata
 import re
@@ -640,7 +641,7 @@ def cioos_get_facets(package_type='dataset', facet_list=['ALL']):
 
 def cioos_version():
     '''Return CIOOS version'''
-    return metadata.version('ckanext.cioos_theme')
+    return os.environ.get('CIOOS_CKAN_TAG', metadata.version('ckanext.cioos_theme'))
 
 
 def append_to_homepages(homepages):
