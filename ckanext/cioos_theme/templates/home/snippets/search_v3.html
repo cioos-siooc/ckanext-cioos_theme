@@ -1,0 +1,42 @@
+{#
+  Mid-fi v3 hero search.
+  Designed to be wrapped by a <form method="get" action="/dataset"> in
+  default_home_v3.html — no <form> here so blocks above/below can extend it.
+
+  Popular tag pills below the input link directly to a pre-filled search
+  (?q=<term>) so they work without JavaScript.
+#}
+{% set placeholder = _('try "sea surface temperature Gulf of St. Lawrence"...') %}
+{% set popular = popular_terms or [
+  ('temperature', _('temperature')),
+  ('ERDDAP', _('ERDDAP')),
+  ('Atlantic', _('Atlantic')),
+  ('real-time', _('real-time')),
+  ('phytoplankton', _('phytoplankton')),
+  ('acoustic', _('acoustic')),
+] %}
+
+<div class="v3-search">
+  <span class="v3-search-icon" aria-hidden="true">
+    <i class="fas fa-search"></i>
+  </span>
+  <input
+    aria-label="{{ _('Search datasets') }}"
+    id="field-main-search"
+    type="text"
+    class="v3-search-input"
+    name="q"
+    value=""
+    autocomplete="off"
+    placeholder="{{ placeholder }}"
+  />
+  <button type="submit" class="v3-search-btn">{{ _('Search') }}</button>
+</div>
+
+<div class="v3-popular">
+  <span class="v3-popular-label">{{ _('Popular:') }}</span>
+  {% for term, label in popular %}
+    <a class="v3-popular-pill"
+       href="{{ h.url_for(controller='dataset', action='search', q=term) }}">{{ label }}</a>
+  {% endfor %}
+</div>

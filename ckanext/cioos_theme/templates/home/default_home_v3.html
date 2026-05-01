@@ -1,0 +1,276 @@
+{#
+  CIOOS Home Page v3 — mid-fi "search-first + regional map".
+
+  Activate by setting in .env:
+    CKAN__HOMEPAGE_TEMPLATE=home/default_home_v3.html
+
+  Visual reference: CIOOS Catalogue Mid-Fi mockup (Direction B).
+  Typography: Sora (headings) · Montserrat (body) · JetBrains Mono (numerals/eyebrows)
+  Palette:    teal #52A79B · navy #152F37 · cream #f3f0ec
+#}
+
+{% asset 'ckanext-cioos_theme/home_v3_css' %}
+
+{# ── Stats inputs ───────────────────────────────────────────────
+   These use real helpers where they exist; constants are flagged
+   so an admin can wire them up later (e.g. via a ckanext-cioos
+   helper or env var). #}
+{% set dataset_count = h.cioos_count_datasets() %}
+{% set eov_list = h.cioos_get_eovs(show_all=True) %}
+{% set search_facets = c.search_facets or {} %}
+{% set org_items = search_facets.get(resorg_facet, {}).get('items', []) %}
+{% set excluded_eovs = h.cioos_get_exclude_eov() or [] %}
+{% set excluded_categories = h.cioos_get_exclude_eov_category() or [] %}
+{% set visible_eovs = eov_list
+   | rejectattr('category', 'undefined')
+   | rejectattr('name', 'in', excluded_eovs)
+   | list %}
+{% set visible_eov_count = visible_eovs | length %}
+{# Responsible organizations are stored as CKAN groups of type=resorg. #}
+{% set org_count = (org_items or []) | length %}
+{# Number of CIOOS regional associations — see https://cioos.ca for the
+   current count. Override per deployment if/when this changes. #}
+{% set regional_associations = 3 %}
+
+{# ── Region bbox links ──────────────────────────────────────────
+   ckanext-spatial reads ?ext_bbox=west,south,east,north on the
+   dataset search page. Approximate envelopes for the three CIOOS
+   coast regions; tighten per deployment as needed. #}
+{% set search_url = h.url_for(controller='dataset', action='search') %}
+{% set pacific_url     = search_url ~ '?ext_bbox=-145,45,-122,60' %}
+{% set st_lawrence_url = search_url ~ '?ext_bbox=-72,44,-56,52' %}
+{% set atlantic_url    = search_url ~ '?ext_bbox=-70,40,-50,55' %}
+
+<div role="main" class="home-v3" data-module="home-search">
+
+  {# ─────────────────────────────────────────────
+     NAVBAR  ·  compact, mockup-style
+     Replaces the global #header-container only on this page
+     (hidden via `body:has(.home-v3)` rule in home_v3.css).
+  ───────────────────────────────────────────── #}
+  {% set site_title = h.scheming_language_text(h.cioos_load_json(g.site_title)) or 'CIOOS' %}
+  <nav class="v3-bleed v3-nav" aria-label="{{ _('Primary') }}">
+    <div class="v3-nav-inner">
+      <a class="v3-brand" href="{{ g.site_home_url or h.url_for('home.index') }}">
+        <span class="v3-brand-mark" aria-hidden="true">~</span>
+        <span class="v3-brand-name">{{ site_title }}</span>
+        <span class="v3-brand-sep" aria-hidden="true"></span>
+        <span class="v3-brand-tag">{{ _('Data Catalogue') }}</span>
+      </a>
+
+      <ul class="v3-nav-links">
+        <li><a class="v3-nav-link is-active" aria-current="page"
+               href="{{ h.url_for('home.index') }}">{{ _('Catalogue') }}</a></li>
+        <li><a class="v3-nav-link"
+               href="{{ h.url_for(controller='dataset', action='search') }}">{{ _('Datasets') }}</a></li>
+        <li><a class="v3-nav-link"
+               href="{{ h.url_for('organization.index') }}">{{ _('Organizations') }}</a></li>
+        <li><a class="v3-nav-link"
+               href="{{ h.url_for('home.about') }}">{{ _('About') }}</a></li>
+      </ul>
+
+      <div class="v3-nav-utils">
+        <a class="v3-nav-pill v3-nav-lang"
+           href="{% url_for h.current_url(), locale=('fr' if h.lang() == 'en' else 'en') %}"
+           aria-label="{{ _('Switch language') }}">
+          <span class="{{ 'is-active' if h.lang() == 'en' }}">EN</span>
+          <span class="v3-nav-lang-sep">/</span>
+          <span class="{{ 'is-active' if h.lang() == 'fr' }}">FR</span>
+        </a>
+        <a class="v3-nav-pill v3-nav-api"
+           href="{{ h.url_for('api.action', logic_function='status_show', ver=3) }}">
+          {{ _('API') }} <span aria-hidden="true">↗</span>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  {# ─────────────────────────────────────────────
+     HERO  ·  full-bleed navy
+  ───────────────────────────────────────────── #}
+  <section class="v3-bleed v3-hero">
+    <div class="v3-hero-inner">
+      <p class="v3-eyebrow v3-eyebrow-onnavy">
+        {{ _('THE CIOOS DATA CATALOGUE') }}
+      </p>
+
+      <h1 class="v3-hero-title">
+        {%- set custom_heading = h.scheming_language_text(h.cioos_load_json(g.site_heading)) -%}
+        {%- if custom_heading -%}
+          {{ custom_heading | safe }}
+        {%- else -%}
+          {{ _('Search') }}
+          <a class="v3-hero-count" href="{{ search_url }}">{{ dataset_count }} {{ _('datasets') }}</a>
+          {{ _('from coast to coast to coast.') }}
+        {%- endif -%}
+      </h1>
+
+      <p class="v3-hero-sub">
+        {{ _("Temperature · salinity · oxygen · fish · ice · phytoplankton · carbon <br/> all of Canada's ocean data in one place.") }}
+      </p>
+
+      <form class="v3-hero-form" method="get" action="{{ search_url }}">
+        {% block search %}
+          {% snippet 'home/snippets/search_v3.html' %}
+        {% endblock %}
+      </form>
+
+      <div class="v3-stats" aria-label="{{ _('Catalogue at a glance') }}">
+        <div class="v3-stat">
+          <div class="v3-stat-value">{{ dataset_count }}</div>
+          <div class="v3-stat-label">{{ _('datasets') }}</div>
+        </div>
+        <div class="v3-stat">
+          <div class="v3-stat-value">{{ org_count }}</div>
+          <div class="v3-stat-label">{{ _('organizations') }}</div>
+        </div>
+        <div class="v3-stat">
+          <div class="v3-stat-value">{{ visible_eov_count }}</div>
+          <div class="v3-stat-label">{{ _('ocean variables') }}</div>
+        </div>
+        <div class="v3-stat">
+          <div class="v3-stat-value">{{ regional_associations }}</div>
+          <div class="v3-stat-label">{{ _('regional associations') }}</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {# ─────────────────────────────────────────────
+     EXPLORE BY REGION  ·  stylized map
+  ───────────────────────────────────────────── #}
+  <section class="v3-section">
+    <div class="v3-section-inner">
+      <div class="v3-section-head">
+        <div>
+          <p class="v3-eyebrow">{{ _('WHERE THE DATA IS') }}</p>
+          <h2 class="v3-section-title">{{ _('Explore by region') }}</h2>
+          <p class="v3-section-sub">
+            {{ _('Click a region to filter the catalogue, or draw a bounding box to focus on a specific area.') }}
+          </p>
+        </div>
+        <a class="v3-btn-ghost" href="{{ search_url }}">
+          {{ _('Open full map') }} <span aria-hidden="true">→</span>
+        </a>
+      </div>
+
+      <div class="v3-map" role="group" aria-label="{{ _('CIOOS regions map') }}">
+        {# Decorative SVG basemap: faint grid + three region blobs.
+           Real interactivity comes from the <a> labels overlaid on top. #}
+        <svg viewBox="0 0 1600 700" preserveAspectRatio="none" aria-hidden="true">
+          <defs>
+            <pattern id="v3grid" width="40" height="40" patternUnits="userSpaceOnUse">
+              <path d="M 40 0 L 0 0 0 40" fill="none"
+                    stroke="#e3ddd2" stroke-width="1"/>
+            </pattern>
+          </defs>
+          <rect width="1600" height="700" fill="url(#v3grid)"/>
+
+          {# Pacific blob (west) #}
+          <a href="{{ pacific_url }}" aria-label="{{ _('Pacific region') }}">
+            <ellipse class="v3-map-blob" cx="280" cy="380" rx="240" ry="160"/>
+            <circle class="v3-map-pin" cx="320" cy="270" r="6"/>
+            <circle class="v3-map-pin" cx="220" cy="470" r="6"/>
+          </a>
+
+          {# St. Lawrence blob (centre) #}
+          <a href="{{ st_lawrence_url }}" aria-label="{{ _('St. Lawrence region') }}">
+            <ellipse class="v3-map-blob" cx="820" cy="340" rx="320" ry="180"/>
+            <circle class="v3-map-pin" cx="700" cy="280" r="6"/>
+            <circle class="v3-map-pin" cx="940" cy="420" r="6"/>
+          </a>
+
+          {# Atlantic blob (east) #}
+          <a href="{{ atlantic_url }}" aria-label="{{ _('Atlantic region') }}">
+            <ellipse class="v3-map-blob" cx="1300" cy="430" rx="280" ry="170"/>
+            <circle class="v3-map-pin" cx="1320" cy="360" r="6"/>
+          </a>
+        </svg>
+
+        {# Floating region labels — positioned in % over the SVG #}
+        <a class="v3-map-label" href="{{ pacific_url }}"
+           style="left: 18%; top: 56%;">
+          <span class="dot dot-pac"></span>{{ _('Pacific') }}
+        </a>
+        <a class="v3-map-label" href="{{ st_lawrence_url }}"
+           style="left: 51%; top: 46%;">
+          <span class="dot dot-stl"></span>{{ _('St. Lawrence') }}
+        </a>
+        <a class="v3-map-label" href="{{ atlantic_url }}"
+           style="left: 81%; top: 60%;">
+          <span class="dot dot-atl"></span>{{ _('Atlantic') }}
+        </a>
+
+        <div class="v3-map-zoom" aria-hidden="true">
+          <button type="button" tabindex="-1">+</button>
+          <button type="button" tabindex="-1">−</button>
+        </div>
+
+        <div class="v3-map-legend">
+          <div class="v3-map-legend-title">{{ _('Regions') }}</div>
+          <ul>
+            <li><span class="dot dot-pac"></span>{{ _('Pacific') }}</li>
+            <li><span class="dot dot-stl"></span>{{ _('St. Lawrence') }}</li>
+            <li><span class="dot dot-atl"></span>{{ _('Atlantic') }}</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {# ─────────────────────────────────────────────
+     BROWSE BY THEME  ·  EOV cards
+  ───────────────────────────────────────────── #}
+  <section class="v3-section v3-section-cream">
+    <div class="v3-section-inner">
+      <div class="v3-section-head">
+        <div>
+          <p class="v3-eyebrow">{{ _('ESSENTIAL OCEAN VARIABLES') }}</p>
+          <h2 class="v3-section-title">{{ _('Browse by theme') }}</h2>
+        </div>
+        <span class="v3-section-aside">
+          {{ _('Organized following the GOOS framework') }}
+        </span>
+      </div>
+
+      {% block eov_list %}
+        <div class="v3-theme-grid">
+          {% for grouper, items in visible_eovs | groupby('category') %}
+            {% if grouper and grouper not in excluded_categories %}
+              {% set items_list = items | list %}
+              {% set sorted_items = items_list
+                 | sort(attribute='count', reverse=True) %}
+              {% set top_items = sorted_items[:5] %}
+              {% set total = items_list | sum(attribute='count') %}
+              {% set category_url = search_url ~ '?eov_category=' ~ grouper %}
+
+              <article class="v3-theme-card">
+                <header class="v3-theme-head">
+                  <h3 class="v3-theme-name">{{ _(grouper) }}</h3>
+                  <span class="v3-theme-total">{{ total }}</span>
+                </header>
+
+                <ul class="v3-theme-list">
+                  {% for item in top_items %}
+                    {% set href = h.url_for(controller='dataset', action='search', eov=item.name) %}
+                    {% set raw_label = h.scheming_language_text(item.display_name) or item.name %}
+                    {% set label = _(raw_label) %}
+                    <li class="v3-theme-row">
+                      <a href="{{ href }}" title="{{ label }}">{{ label }}</a>
+                      <span class="v3-theme-row-count">{{ item.get('count', 0) or 0 }}</span>
+                    </li>
+                  {% endfor %}
+                </ul>
+
+                <a class="v3-theme-seeall" href="{{ category_url }}">
+                  {{ _('See all') }} <span aria-hidden="true">→</span>
+                </a>
+              </article>
+            {% endif %}
+          {% endfor %}
+        </div>
+      {% endblock %}
+    </div>
+  </section>
+
+</div>

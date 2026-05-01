@@ -48,3 +48,9 @@ home_v2_css:
   output: ckanext-cioos_theme/%(version)s_home_v2.css
   contents:
     - home_v2.css
+
+home_v3_css:
+  filters: cssrewrite
+  output: ckanext-cioos_theme/%(version)s_home_v3.css
+  contents:
+    - home_v3.css
