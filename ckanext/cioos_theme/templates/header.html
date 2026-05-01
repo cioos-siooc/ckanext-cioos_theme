@@ -5,11 +5,41 @@ or '{"fr": "/base/images/ckan-logo.png", "en": "/base/images/ckan-logo.png"}' ))
 h.scheming_language_text(h.cioos_load_json(g.site_title)) %} {% set
 gns.site_description =
 h.render_markdown(h.scheming_language_text(h.cioos_load_json(g.site_description)))
-%} {% if h.is_url(gns.site_logo) %} {% set logo_url = gns.site_logo %} {% else
+%} {% set homepage_template = h.cioos_get_homepage_path() %} {% set current_endpoint = request.endpoint if request else '' %} {% set current_path = request.path if request else '' %} {% set is_home_route = current_endpoint == 'home.index' or current_path in ['/', '/en', '/en/', '/fr', '/fr/'] %} {% set is_dataset_route = current_path.startswith('/dataset') %} {% set use_v3_header = homepage_template == 'home/default_home_v3.html' and (is_home_route or is_dataset_route) %} {% set v3_brand_mark_path = '/base/images/logos/cioos-national_FR_min-01.png' if h.lang() == 'fr' else '/base/images/logos/cioos-national_EN_min-01.png' %} {% set v3_brand_mark_url = h.url_for_static_or_external(v3_brand_mark_path) %} {% if use_v3_header %}{% asset 'ckanext-cioos_theme/home_v3_css' %}{% endif %} {% if h.is_url(gns.site_logo) %} {% set logo_url = gns.site_logo %} {% else
 %} {% set logo_url = h.url_for_static_or_external(gns.site_logo) %} {% endif %}
 
-<div id="header-container">
-  {% block header_wrapper %} {# mobile header menu #}
+<div id="header-container"{% if use_v3_header %} class="header-v3"{% endif %}>
+  {% block header_wrapper %} {% if use_v3_header %} {% set site_title = gns.site_title or 'CIOOS' %}
+  <nav class="v3-bleed v3-nav" aria-label="{{ _('Primary') }}">
+    <div class="v3-nav-inner">
+      <a class="v3-brand" href="{{ g.site_home_url or h.url_for('home.index') }}">
+        <img class="v3-brand-mark" src="{{ v3_brand_mark_url }}" alt="" aria-hidden="true" />
+        <span class="v3-brand-sep" aria-hidden="true"></span>
+      </a>
+
+      <ul class="v3-nav-links">
+   <li><a class="v3-nav-link{% if is_home_route %} is-active{% endif %}"{% if is_home_route %} aria-current="page"{% endif %}
+               href="{{ h.url_for('home.index') }}">{{ _('Catalogue') }}</a></li>
+   <li><a class="v3-nav-link{% if is_dataset_route %} is-active{% endif %}"{% if is_dataset_route %} aria-current="page"{% endif %}
+               href="{{ h.url_for(controller='dataset', action='search') }}">{{ _('Datasets') }}</a></li>
+        <li><a class="v3-nav-link"
+               href="{{ h.url_for('organization.index') }}">{{ _('Organizations') }}</a></li>
+        <li><a class="v3-nav-link"
+               href="{{ h.url_for('home.about') }}">{{ _('About') }}</a></li>
+      </ul>
+
+      <div class="v3-nav-utils">
+        <a class="v3-nav-pill v3-nav-lang"
+           href="{% url_for h.current_url(), locale=('fr' if h.lang() == 'en' else 'en') %}"
+           aria-label="{{ _('Switch language') }}">
+          <span class="{{ 'is-active' if h.lang() == 'en' }}">EN</span>
+          <span class="v3-nav-lang-sep">/</span>
+          <span class="{{ 'is-active' if h.lang() == 'fr' }}">FR</span>
+        </a>
+      </div>
+    </div>
+  </nav>
+  {% else %} {# mobile header menu #}
   <input type="checkbox" class="main-nav-check" id="main-nav-check" />
   <!-- Logo (hidden on desktop, shown via CSS on mobile) -->
   <div class="mobileheader toggle-menu">
@@ -199,5 +229,5 @@ h.render_markdown(h.scheming_language_text(h.cioos_load_json(g.site_description)
     })();
   </script>
 
-  {% endblock %}
+  {% endif %} {% endblock %}
 </div>

@@ -44,48 +44,6 @@
 <div role="main" class="home-v3" data-module="home-search">
 
   {# ─────────────────────────────────────────────
-     NAVBAR  ·  compact, mockup-style
-     Replaces the global #header-container only on this page
-     (hidden via `body:has(.home-v3)` rule in home_v3.css).
-  ───────────────────────────────────────────── #}
-  {% set site_title = h.scheming_language_text(h.cioos_load_json(g.site_title)) or 'CIOOS' %}
-  <nav class="v3-bleed v3-nav" aria-label="{{ _('Primary') }}">
-    <div class="v3-nav-inner">
-      <a class="v3-brand" href="{{ g.site_home_url or h.url_for('home.index') }}">
-        <span class="v3-brand-mark" aria-hidden="true">~</span>
-        <span class="v3-brand-name">{{ site_title }}</span>
-        <span class="v3-brand-sep" aria-hidden="true"></span>
-        <span class="v3-brand-tag">{{ _('Data Catalogue') }}</span>
-      </a>
-
-      <ul class="v3-nav-links">
-        <li><a class="v3-nav-link is-active" aria-current="page"
-               href="{{ h.url_for('home.index') }}">{{ _('Catalogue') }}</a></li>
-        <li><a class="v3-nav-link"
-               href="{{ h.url_for(controller='dataset', action='search') }}">{{ _('Datasets') }}</a></li>
-        <li><a class="v3-nav-link"
-               href="{{ h.url_for('organization.index') }}">{{ _('Organizations') }}</a></li>
-        <li><a class="v3-nav-link"
-               href="{{ h.url_for('home.about') }}">{{ _('About') }}</a></li>
-      </ul>
-
-      <div class="v3-nav-utils">
-        <a class="v3-nav-pill v3-nav-lang"
-           href="{% url_for h.current_url(), locale=('fr' if h.lang() == 'en' else 'en') %}"
-           aria-label="{{ _('Switch language') }}">
-          <span class="{{ 'is-active' if h.lang() == 'en' }}">EN</span>
-          <span class="v3-nav-lang-sep">/</span>
-          <span class="{{ 'is-active' if h.lang() == 'fr' }}">FR</span>
-        </a>
-        <a class="v3-nav-pill v3-nav-api"
-           href="{{ h.url_for('api.action', logic_function='status_show', ver=3) }}">
-          {{ _('API') }} <span aria-hidden="true">↗</span>
-        </a>
-      </div>
-    </div>
-  </nav>
-
-  {# ─────────────────────────────────────────────
      HERO  ·  full-bleed navy
   ───────────────────────────────────────────── #}
   <section class="v3-bleed v3-hero">
