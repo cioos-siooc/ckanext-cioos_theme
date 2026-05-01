@@ -17,7 +17,9 @@
   Home v3 reuses the global header container and other pages can opt
   into the same navbar via #header-container.header-v3.
 ───────────────────────────────────────────── */
-body:has(.home-v3) { padding-top: 0 !important; }
+body:has(.home-v3) {
+  padding-top: 0 !important;
+}
 /* CKAN's <main class="container"> wraps the home body in a centred
    max-width column. v3 needs to render edge-to-edge, so flatten it. */
 body:has(.home-v3) main.container,
@@ -76,7 +78,10 @@ body:has(.home-v3) #header-container .v3-brand {
 }
 
 #header-container.header-v3 .v3-brand:hover,
-body:has(.home-v3) #header-container .v3-brand:hover { text-decoration: none; color: var(--v3-navy); }
+body:has(.home-v3) #header-container .v3-brand:hover {
+  text-decoration: none;
+  color: var(--v3-navy);
+}
 
 #header-container.header-v3 .v3-brand-mark,
 body:has(.home-v3) #header-container .v3-brand-mark {
@@ -135,7 +140,10 @@ body:has(.home-v3) #header-container .v3-nav-link {
 }
 
 #header-container.header-v3 .v3-nav-link:hover,
-body:has(.home-v3) #header-container .v3-nav-link:hover { color: var(--v3-teal); text-decoration: none; }
+body:has(.home-v3) #header-container .v3-nav-link:hover {
+  color: var(--v3-teal);
+  text-decoration: none;
+}
 
 #header-container.header-v3 .v3-nav-link.is-active,
 body:has(.home-v3) #header-container .v3-nav-link.is-active {
@@ -175,7 +183,9 @@ body:has(.home-v3) #header-container .v3-nav-pill {
   border-radius: 999px;
   padding: 7px 14px;
   text-decoration: none;
-  transition: border-color 0.15s, color 0.15s;
+  transition:
+    border-color 0.15s,
+    color 0.15s;
 }
 
 #header-container.header-v3 .v3-nav-pill:hover,
@@ -186,25 +196,44 @@ body:has(.home-v3) #header-container .v3-nav-pill:hover {
 }
 
 #header-container.header-v3 .v3-nav-lang span,
-body:has(.home-v3) #header-container .v3-nav-lang span { color: var(--v3-muted); }
+body:has(.home-v3) #header-container .v3-nav-lang span {
+  color: var(--v3-muted);
+}
 #header-container.header-v3 .v3-nav-lang span.is-active,
-body:has(.home-v3) #header-container .v3-nav-lang span.is-active { color: var(--v3-navy); font-weight: 600; }
+body:has(.home-v3) #header-container .v3-nav-lang span.is-active {
+  color: var(--v3-navy);
+  font-weight: 600;
+}
 #header-container.header-v3 .v3-nav-lang-sep,
-body:has(.home-v3) #header-container .v3-nav-lang-sep { margin: 0 2px; }
+body:has(.home-v3) #header-container .v3-nav-lang-sep {
+  margin: 0 2px;
+}
 
 @media (max-width: 900px) {
   #header-container.header-v3 .v3-nav-inner,
-  body:has(.home-v3) #header-container .v3-nav-inner { gap: 1rem; padding: 12px 16px; flex-wrap: wrap; }
+  body:has(.home-v3) #header-container .v3-nav-inner {
+    gap: 1rem;
+    padding: 12px 16px;
+    flex-wrap: wrap;
+  }
   #header-container.header-v3 .v3-nav-links,
-  body:has(.home-v3) #header-container .v3-nav-links { gap: 1rem; order: 3; flex-basis: 100%; justify-content: center; }
+  body:has(.home-v3) #header-container .v3-nav-links {
+    gap: 1rem;
+    order: 3;
+    flex-basis: 100%;
+    justify-content: center;
+  }
   #header-container.header-v3 .v3-nav-link.is-active::after,
-  body:has(.home-v3) #header-container .v3-nav-link.is-active::after { bottom: -12px; }
+  body:has(.home-v3) #header-container .v3-nav-link.is-active::after {
+    bottom: -12px;
+  }
   #header-container.header-v3 .v3-brand-tag,
   body:has(.home-v3) #header-container .v3-brand-tag,
   #header-container.header-v3 .v3-brand-sep,
-  body:has(.home-v3) #header-container .v3-brand-sep { display: none; }
+  body:has(.home-v3) #header-container .v3-brand-sep {
+    display: none;
+  }
 }
-
 
 .home-v3 {
   font-family: var(--v3-font-body);
