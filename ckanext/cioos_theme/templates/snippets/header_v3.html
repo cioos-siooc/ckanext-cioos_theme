@@ -1,0 +1,193 @@
+<input type="checkbox" class="v3-nav-check" id="v3-nav-check" />
+<nav class="v3-bleed v3-nav" aria-label="{{ _('Primary') }}">
+  <div class="v3-nav-inner">
+    <a class="v3-brand" href="{{ g.site_home_url or h.url_for('home.index') }}">
+      <img
+        class="v3-brand-mark"
+        src="{{ v3_brand_mark_url }}"
+        alt=""
+        aria-hidden="true"
+      />
+      <span class="v3-brand-sep" aria-hidden="true"></span>
+    </a>
+
+    <ul class="v3-nav-links">
+      <li>
+        <a
+          class="v3-nav-link{% if is_home_route %} is-active{% endif %}"
+          {%
+          if
+          is_home_route
+          %}aria-current="page"
+          {%
+          endif
+          %}
+          href="{{ h.url_for('home.index') }}"
+          >{{ _('Catalogue') }}</a
+        >
+      </li>
+      <li>
+        <a
+          class="v3-nav-link{% if is_dataset_route %} is-active{% endif %}"
+          {%
+          if
+          is_dataset_route
+          %}aria-current="page"
+          {%
+          endif
+          %}
+          href="{{ h.url_for(controller='dataset', action='search') }}"
+          >{{ _('Datasets') }}</a
+        >
+      </li>
+      <li>
+        <a
+          class="v3-nav-link{% if is_organization_route %} is-active{% endif %}"
+          {%
+          if
+          is_organization_route
+          %}aria-current="page"
+          {%
+          endif
+          %}
+          href="{{ h.url_for('organization.index') }}"
+          >{{ _('Organizations') }}</a
+        >
+      </li>
+      <li>
+        <a
+          class="v3-nav-link{% if is_about_route %} is-active{% endif %}"
+          {%
+          if
+          is_about_route
+          %}aria-current="page"
+          {%
+          endif
+          %}
+          href="{{ h.url_for('home.about') }}"
+          >{{ _('About') }}</a
+        >
+      </li>
+    </ul>
+
+    <div class="v3-nav-utils">
+      <a
+        class="v3-nav-pill v3-nav-lang"
+        href="{% url_for h.current_url(), locale=('fr' if h.lang() == 'en' else 'en') %}"
+        aria-label="{{ _('Switch language') }}"
+      >
+        <span class="{{ 'is-active' if h.lang() == 'en' }}">EN</span>
+        <span class="v3-nav-lang-sep">/</span>
+        <span class="{{ 'is-active' if h.lang() == 'fr' }}">FR</span>
+      </a>
+      <label
+        class="v3-nav-burger"
+        for="v3-nav-check"
+        aria-label="{{ _('Open navigation menu') }}"
+      >
+        <i class="fas fa-bars" aria-hidden="true"></i>
+      </label>
+    </div>
+  </div>
+</nav>
+<div class="v3-nav-overlay">
+  <div class="v3-nav-overlay-backdrop" aria-hidden="true"></div>
+  <div class="v3-nav-overlay-inner">
+    <div class="v3-nav-overlay-top">
+      <a
+        class="v3-brand v3-brand-overlay"
+        href="{{ g.site_home_url or h.url_for('home.index') }}"
+      >
+        <img
+          class="v3-brand-mark"
+          src="{{ v3_brand_mark_url }}"
+          alt=""
+          aria-hidden="true"
+        />
+        <span class="v3-brand-sep" aria-hidden="true"></span>
+      </a>
+      <label
+        class="v3-nav-close"
+        for="v3-nav-check"
+        aria-label="{{ _('Close navigation menu') }}"
+      >
+        <i class="fas fa-xmark" aria-hidden="true"></i>
+      </label>
+    </div>
+
+    <div class="v3-nav-overlay-body">
+      <ul class="v3-nav-overlay-links">
+        <li>
+          <a
+            class="v3-nav-overlay-link{% if is_home_route %} is-active{% endif %}"
+            href="{{ h.url_for('home.index') }}"
+            >{{ _('Catalogue') }}</a
+          >
+        </li>
+        <li>
+          <a
+            class="v3-nav-overlay-link{% if is_dataset_route %} is-active{% endif %}"
+            href="{{ h.url_for(controller='dataset', action='search') }}"
+            >{{ _('Datasets') }}</a
+          >
+        </li>
+        <li>
+          <a
+            class="v3-nav-overlay-link{% if is_organization_route %} is-active{% endif %}"
+            href="{{ h.url_for('organization.index') }}"
+            >{{ _('Organizations') }}</a
+          >
+        </li>
+        <li>
+          <a
+            class="v3-nav-overlay-link{% if is_about_route %} is-active{% endif %}"
+            href="{{ h.url_for('home.about') }}"
+            >{{ _('About') }}</a
+          >
+        </li>
+      </ul>
+
+      <div class="v3-nav-overlay-actions">
+        <a
+          class="v3-nav-overlay-pill"
+          href="{% url_for h.current_url(), locale=('fr' if h.lang() == 'en' else 'en') %}"
+          aria-label="{{ _('Switch language') }}"
+        >
+          <span class="{{ 'is-active' if h.lang() == 'en' }}">EN</span>
+          <span class="v3-nav-lang-sep">/</span>
+          <span class="{{ 'is-active' if h.lang() == 'fr' }}">FR</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  (function () {
+    var v3NavCheck = document.getElementById("v3-nav-check");
+    var v3NavBackdrop = document.querySelector(".v3-nav-overlay-backdrop");
+    var v3NavOverlayBody = document.querySelector(".v3-nav-overlay-body");
+    if (!v3NavCheck) {
+      return;
+    }
+
+    if (v3NavBackdrop) {
+      v3NavBackdrop.addEventListener("click", function () {
+        v3NavCheck.checked = false;
+      });
+    }
+
+    if (v3NavOverlayBody) {
+      v3NavOverlayBody.addEventListener("click", function (event) {
+        if (event.target === v3NavOverlayBody) {
+          v3NavCheck.checked = false;
+        }
+      });
+    }
+
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape" && v3NavCheck.checked) {
+        v3NavCheck.checked = false;
+      }
+    });
+  })();
+</script>

@@ -55,6 +55,8 @@ body:has(.home-v3) #header-container .v3-nav {
   background: #fff;
   border-bottom: 1px solid var(--v3-line);
   font-family: var(--v3-font-body);
+  position: relative;
+  z-index: 0;
 }
 
 #header-container.header-v3 .v3-nav-inner,
@@ -209,29 +211,287 @@ body:has(.home-v3) #header-container .v3-nav-lang-sep {
   margin: 0 2px;
 }
 
+#header-container.header-v3 .v3-nav-check,
+body:has(.home-v3) #header-container .v3-nav-check,
+#header-container.header-v3 .v3-nav-burger,
+body:has(.home-v3) #header-container .v3-nav-burger,
+#header-container.header-v3 .v3-nav-overlay,
+body:has(.home-v3) #header-container .v3-nav-overlay {
+  display: none;
+}
+
+#header-container.header-v3 .v3-nav-check,
+body:has(.home-v3) #header-container .v3-nav-check {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
 @media (max-width: 900px) {
   #header-container.header-v3 .v3-nav-inner,
   body:has(.home-v3) #header-container .v3-nav-inner {
-    gap: 1rem;
-    padding: 12px 16px;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: 12px;
+    row-gap: 10px;
+    padding: 12px 16px 10px;
   }
+
+  #header-container.header-v3 .v3-brand,
+  body:has(.home-v3) #header-container .v3-brand {
+    min-width: 0;
+  }
+
+  #header-container.header-v3 .v3-brand-mark,
+  body:has(.home-v3) #header-container .v3-brand-mark {
+    height: 28px;
+  }
+
+  #header-container.header-v3 .v3-nav-utils,
+  body:has(.home-v3) #header-container .v3-nav-utils {
+    justify-self: end;
+  }
+
+  #header-container.header-v3 .v3-nav-lang,
+  body:has(.home-v3) #header-container .v3-nav-lang {
+    display: none;
+  }
+
+  #header-container.header-v3 .v3-nav-burger,
+  body:has(.home-v3) #header-container .v3-nav-burger {
+    display: inline-flex;
+    width: 44px;
+    height: 44px;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background: transparent;
+    transition:
+      color 0.15s ease,
+      opacity 0.15s ease;
+  }
+
+  #header-container.header-v3 .v3-nav-burger:hover,
+  body:has(.home-v3) #header-container .v3-nav-burger:hover {
+    opacity: 0.75;
+  }
+
+  #header-container.header-v3 .v3-nav-burger i,
+  body:has(.home-v3) #header-container .v3-nav-burger i {
+    font-size: 17px;
+    color: var(--v3-navy);
+    line-height: 1;
+  }
+
+  #header-container.header-v3 .v3-nav-pill,
+  body:has(.home-v3) #header-container .v3-nav-pill {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+
   #header-container.header-v3 .v3-nav-links,
   body:has(.home-v3) #header-container .v3-nav-links {
+    display: none;
+  }
+
+  #header-container.header-v3 .v3-nav-overlay,
+  body:has(.home-v3) #header-container .v3-nav-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 1200;
+    background: rgba(16, 33, 39, 0.96);
+    color: #fff;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+      opacity 0.2s ease,
+      visibility 0.2s ease;
+  }
+
+  #header-container.header-v3 .v3-nav-check:checked ~ .v3-nav,
+  body:has(.home-v3) #header-container .v3-nav-check:checked ~ .v3-nav {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  #header-container.header-v3 .v3-nav-overlay-backdrop,
+  body:has(.home-v3) #header-container .v3-nav-overlay-backdrop {
+    position: absolute;
+    inset: 0;
+    display: block;
+    cursor: pointer;
+  }
+
+  #header-container.header-v3 .v3-nav-overlay-inner,
+  body:has(.home-v3) #header-container .v3-nav-overlay-inner {
+    position: relative;
+    z-index: 1;
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 16px 18px 24px;
+  }
+
+  #header-container.header-v3 .v3-nav-overlay-top,
+  body:has(.home-v3) #header-container .v3-nav-overlay-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  #header-container.header-v3 .v3-brand-overlay,
+  body:has(.home-v3) #header-container .v3-brand-overlay {
+    color: #fff;
+  }
+
+  #header-container.header-v3 .v3-brand-overlay .v3-brand-sep,
+  body:has(.home-v3) #header-container .v3-brand-overlay .v3-brand-sep {
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  #header-container.header-v3 .v3-nav-close,
+  body:has(.home-v3) #header-container .v3-nav-close {
+    width: 44px;
+    height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    cursor: pointer;
+    flex-shrink: 0;
+    background: transparent;
+  }
+
+  #header-container.header-v3 .v3-nav-close i,
+  body:has(.home-v3) #header-container .v3-nav-close i {
+    font-size: 22px;
+    color: #fff;
+    line-height: 1;
+  }
+
+  #header-container.header-v3 .v3-nav-overlay-body,
+  body:has(.home-v3) #header-container .v3-nav-overlay-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 3rem;
+    text-align: center;
+  }
+
+  #header-container.header-v3 .v3-nav-overlay-links,
+  body:has(.home-v3) #header-container .v3-nav-overlay-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    align-items: center;
+  }
+
+  #header-container.header-v3 .v3-nav-overlay-link,
+  body:has(.home-v3) #header-container .v3-nav-overlay-link {
+    display: inline-block;
+    color: rgba(255, 255, 255, 0.92);
+    text-decoration: none;
+    font-family: var(--v3-font-head);
+    font-size: clamp(2rem, 7vw, 3rem);
+    font-weight: 600;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+  }
+
+  #header-container.header-v3 .v3-nav-overlay-link.is-active,
+  body:has(.home-v3) #header-container .v3-nav-overlay-link.is-active {
+    color: var(--v3-teal-soft);
+  }
+
+  #header-container.header-v3 .v3-nav-overlay-actions,
+  body:has(.home-v3) #header-container .v3-nav-overlay-actions {
+    display: flex;
+    flex-wrap: wrap;
     gap: 1rem;
-    order: 3;
-    flex-basis: 100%;
+    align-items: center;
     justify-content: center;
   }
+
+  #header-container.header-v3 .v3-nav-overlay-pill,
+  body:has(.home-v3) #header-container .v3-nav-overlay-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 44px;
+    padding: 0 16px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    color: #fff;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  #header-container.header-v3 .v3-nav-overlay-pill .is-active,
+  body:has(.home-v3) #header-container .v3-nav-overlay-pill .is-active {
+    color: var(--v3-teal-soft);
+  }
+
+  body:has(#header-container.header-v3 .v3-nav-check:checked) {
+    overflow: hidden;
+  }
+
+  #header-container.header-v3 .v3-nav-check:checked ~ .v3-nav-overlay,
+  body:has(.home-v3) #header-container .v3-nav-check:checked ~ .v3-nav-overlay {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+
   #header-container.header-v3 .v3-nav-link.is-active::after,
   body:has(.home-v3) #header-container .v3-nav-link.is-active::after {
-    bottom: -12px;
+    bottom: -6px;
   }
+
   #header-container.header-v3 .v3-brand-tag,
   body:has(.home-v3) #header-container .v3-brand-tag,
   #header-container.header-v3 .v3-brand-sep,
   body:has(.home-v3) #header-container .v3-brand-sep {
     display: none;
+  }
+}
+
+@media (max-width: 520px) {
+  #header-container.header-v3 .v3-nav-inner,
+  body:has(.home-v3) #header-container .v3-nav-inner {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  #header-container.header-v3 .v3-brand-mark,
+  body:has(.home-v3) #header-container .v3-brand-mark {
+    height: 24px;
+  }
+
+  #header-container.header-v3 .v3-nav-links,
+  body:has(.home-v3) #header-container .v3-nav-links {
+    gap: 1rem;
+  }
+
+  #header-container.header-v3 .v3-nav-overlay-inner,
+  body:has(.home-v3) #header-container .v3-nav-overlay-inner {
+    padding: 12px 14px 20px;
+  }
+
+  #header-container.header-v3 .v3-nav-overlay-link,
+  body:has(.home-v3) #header-container .v3-nav-overlay-link {
+    font-size: clamp(1.75rem, 8.5vw, 2.5rem);
   }
 }
 
