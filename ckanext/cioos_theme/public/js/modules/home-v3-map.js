@@ -65,6 +65,46 @@ ckan.module('home-v3-map', function (jQuery) {
 
       this.map = map;
 
+      // ── Fullscreen toggle ─────────────────────────────────────
+      // Custom L.Control using the standard Fullscreen API. We avoid
+      // the leaflet.fullscreen plugin to keep the asset bundle small;
+      // the API works in all evergreen browsers.
+      var fsTarget = this.el.parent()[0] || this.el[0];  // expand the wrapper, not just the map div
+      var FullscreenCtl = L.Control.extend({
+        options: { position: 'topleft' },
+        onAdd: function () {
+          var c = L.DomUtil.create(
+            'div', 'leaflet-bar leaflet-control v3-map-fs'
+          );
+          var a = L.DomUtil.create('a', '', c);
+          a.href = '#';
+          a.title = 'Toggle fullscreen';
+          a.setAttribute('role', 'button');
+          a.setAttribute('aria-label', 'Toggle fullscreen');
+          a.innerHTML = '⛶';
+          L.DomEvent.on(a, 'click', L.DomEvent.stop)
+                    .on(a, 'click', function () {
+            var fsEl = document.fullscreenElement || document.webkitFullscreenElement;
+            if (fsEl) {
+              (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+            } else {
+              var req = fsTarget.requestFullscreen || fsTarget.webkitRequestFullscreen;
+              if (req) req.call(fsTarget);
+            }
+          });
+          return c;
+        }
+      });
+      map.addControl(new FullscreenCtl());
+
+      // When entering/leaving fullscreen, the map container resizes — Leaflet
+      // doesn't notice without an explicit invalidateSize() call.
+      function onFsChange() {
+        setTimeout(function () { map.invalidateSize(); }, 50);
+      }
+      document.addEventListener('fullscreenchange', onFsChange);
+      document.addEventListener('webkitfullscreenchange', onFsChange);
+
       var datasetUrl = this.options.dataset_url;
       var cluster = L.markerClusterGroup({
         chunkedLoading: true,
@@ -151,20 +191,52 @@ ckan.module('home-v3-map', function (jQuery) {
         }
       });
 
-      // "Filter by current view" → dataset search with ext_bbox.
       var searchUrl = this.options.search_url;
-      var $btn = this.el.parent().find('[data-v3-map-filter]');
-      $btn.on('click', function (e) {
-        e.preventDefault();
-        var b = map.getBounds();
-        var bbox = [
+      function bboxFromBounds(b) {
+        return [
           b.getWest().toFixed(4),
           b.getSouth().toFixed(4),
           b.getEast().toFixed(4),
           b.getNorth().toFixed(4)
         ].join(',');
+      }
+      function gotoSearch(bbox) {
         window.location = searchUrl + '?ext_bbox=' + bbox;
-      });
+      }
+
+      // ── Draw-a-bbox-to-filter tool ──────────────────────────────
+      // ckanext-spatial bundles leaflet.draw alongside Leaflet, so
+      // L.Control.Draw is available here. We expose only the rectangle
+      // tool; on completion we navigate to /dataset?ext_bbox=…
+      if (L.Control && L.Control.Draw) {
+        var drawnItems = new L.FeatureGroup();
+        map.addLayer(drawnItems);
+        var drawControl = new L.Control.Draw({
+          position: 'topright',
+          draw: {
+            polyline: false,
+            polygon: false,
+            circle: false,
+            marker: false,
+            circlemarker: false,
+            rectangle: {
+              shapeOptions: {
+                color: '#d97c4a', weight: 2, fillOpacity: 0.15
+              }
+            }
+          },
+          edit: { featureGroup: drawnItems, remove: false, edit: false }
+        });
+        map.addControl(drawControl);
+
+        map.on(L.Draw.Event.CREATED, function (e) {
+          drawnItems.clearLayers();
+          drawnItems.addLayer(e.layer);
+          gotoSearch(bboxFromBounds(e.layer.getBounds()));
+        });
+      } else {
+        console.warn('home-v3-map: leaflet.draw unavailable — draw tool disabled');
+      }
 
       // The map lives inside a section that may render before its final size
       // (fonts, sidebars). Force a recalc once the layout settles.
