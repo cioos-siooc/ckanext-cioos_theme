@@ -200,7 +200,6 @@
               <article class="v3-theme-card">
                 <header class="v3-theme-head">
                   <h3 class="v3-theme-name">{{ _(grouper) }}</h3>
-                  <span class="v3-theme-total">{{ total }}</span>
                 </header>
 
                 <ul class="v3-theme-list">
@@ -214,10 +213,6 @@
                     </li>
                   {% endfor %}
                 </ul>
-
-                <a class="v3-theme-seeall" href="{{ category_url }}">
-                  {{ _('See all') }} <span aria-hidden="true">→</span>
-                </a>
               </article>
             {% endif %}
           {% endfor %}
