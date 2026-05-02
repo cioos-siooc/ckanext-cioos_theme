@@ -686,9 +686,9 @@ body:has(.home-v3) #header-container .v3-bleed,
 /* stats card */
 .home-v3 .v3-stats {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 0;
-  max-width: 760px;
+  max-width: 900px;
   margin: 0 auto;
   padding: 1.4rem 2rem;
   border-radius: 18px;
@@ -1037,7 +1037,8 @@ body:has(.home-v3) #header-container .v3-bleed,
     grid-template-columns: repeat(2, 1fr);
     row-gap: 1rem;
   }
-  .home-v3 .v3-stat:nth-child(3)::before {
+  /* In 2-col layout, hide the left divider on items that start a new row. */
+  .home-v3 .v3-stat:nth-child(odd)::before {
     display: none;
   }
   .home-v3 .v3-section-head {

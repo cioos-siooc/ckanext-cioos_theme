@@ -667,6 +667,8 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             "cioos_get_package_relationships": cioos_helpers.get_package_relationships,
             "cioos_datasets": cioos_helpers.cioos_datasets,
             "cioos_count_datasets": cioos_helpers.cioos_count_datasets,
+            "cioos_count_resorgs": cioos_helpers.cioos_count_resorgs,
+            "cioos_count_projects": cioos_helpers.cioos_count_projects,
             "cioos_get_eovs": cioos_helpers.cioos_get_eovs,
             "cioos_get_locale_url": self.get_locale_url,
             "cioos_schema_field_map": cioos_helpers.cioos_schema_field_map,

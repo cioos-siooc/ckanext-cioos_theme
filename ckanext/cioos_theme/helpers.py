@@ -502,6 +502,45 @@ def cioos_count_datasets():
     return datasets["count"]
 
 
+def cioos_count_resorgs(group_type="resorg"):
+    """Return a count of CIOOS responsible-organization groups."""
+    user = logic.get_action("get_site_user")({"model": model, "ignore_auth": True}, {})
+    context = {"model": model, "session": model.Session, "user": user["name"]}
+    try:
+        groups = logic.get_action("group_list")(context, {"type": group_type, "all_fields": False})
+        return len(groups or [])
+    except Exception:
+        return 0
+
+
+def cioos_count_projects(facet_field="projects"):
+    """Return the number of distinct projects across all datasets.
+
+    `projects` is a multi-value field on packages indexed in Solr; this
+    counts the unique facet values rather than calling group_list (it
+    isn't a group type in CIOOS).
+    """
+    user = logic.get_action("get_site_user")({"model": model, "ignore_auth": True}, {})
+    context = {"model": model, "session": model.Session, "user": user["name"]}
+    try:
+        result = logic.get_action("package_search")(
+            context,
+            {
+                "rows": 0,
+                "facet.field": '["%s"]' % facet_field,
+                "facet.limit": -1,
+                "facet.mincount": 1,
+            },
+        )
+        facets = result.get("search_facets") or result.get("facets") or {}
+        items = facets.get(facet_field, {})
+        if isinstance(items, dict):
+            items = items.get("items", [])
+        return len(items or [])
+    except Exception:
+        return 0
+
+
 def cioos_datasets():
     """Return a list of the datasets"""
 

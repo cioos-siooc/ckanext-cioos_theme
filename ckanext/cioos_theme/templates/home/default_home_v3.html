@@ -17,8 +17,6 @@
    helper or env var). #}
 {% set dataset_count = h.cioos_count_datasets() %}
 {% set eov_list = h.cioos_get_eovs(show_all=True) %}
-{% set search_facets = c.search_facets or {} %}
-{% set org_items = search_facets.get(resorg_facet, {}).get('items', []) %}
 {% set excluded_eovs = h.cioos_get_exclude_eov() or [] %}
 {% set excluded_categories = h.cioos_get_exclude_eov_category() or [] %}
 {% set visible_eovs = eov_list
@@ -26,11 +24,8 @@
    | rejectattr('name', 'in', excluded_eovs)
    | list %}
 {% set visible_eov_count = visible_eovs | length %}
-{# Responsible organizations are stored as CKAN groups of type=resorg. #}
-{% set org_count = (org_items or []) | length %}
-{# Number of CIOOS regional associations — see https://cioos.ca for the
-   current count. Override per deployment if/when this changes. #}
-{% set regional_associations = 3 %}
+{% set org_count = h.cioos_count_resorgs() %}
+{% set project_count = h.cioos_count_projects() %}
 
 {# ── Region bbox links ──────────────────────────────────────────
    ckanext-spatial reads ?ext_bbox=west,south,east,north on the
@@ -87,8 +82,8 @@
           <div class="v3-stat-label">{{ _('ocean variables') }}</div>
         </div>
         <div class="v3-stat">
-          <div class="v3-stat-value">{{ regional_associations }}</div>
-          <div class="v3-stat-label">{{ _('regional associations') }}</div>
+          <div class="v3-stat-value">{{ project_count }}</div>
+          <div class="v3-stat-label">{{ _('projects') }}</div>
         </div>
       </div>
     </div>
