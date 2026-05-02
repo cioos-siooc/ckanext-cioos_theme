@@ -667,6 +667,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             "cioos_get_package_relationships": cioos_helpers.get_package_relationships,
             "cioos_datasets": cioos_helpers.cioos_datasets,
             "cioos_count_datasets": cioos_helpers.cioos_count_datasets,
+            "cioos_get_dataset_centroids": cioos_helpers.cioos_get_dataset_centroids,
             "cioos_count_resorgs": cioos_helpers.cioos_count_resorgs,
             "cioos_count_projects": cioos_helpers.cioos_count_projects,
             "cioos_get_eovs": cioos_helpers.cioos_get_eovs,
@@ -870,6 +871,19 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
     # def after_update(self, context, data_dict):
     #     #pr.update_package_relationships(context, data_dict, is_create=False)
     #     pass
+
+    # Invalidate the home-page centroid cache whenever a dataset's spatial
+    # data could have changed. CKAN 2.10+ uses the `_dataset_` prefixed names;
+    # both forms are kept for backward compat (older harvest extensions still
+    # call the unprefixed variants).
+    def after_dataset_create(self, context, pkg_dict):
+        cioos_helpers.cioos_invalidate_dataset_centroids()
+
+    def after_dataset_update(self, context, pkg_dict):
+        cioos_helpers.cioos_invalidate_dataset_centroids()
+
+    def after_dataset_delete(self, context, pkg_dict):
+        cioos_helpers.cioos_invalidate_dataset_centroids()
 
     # modfiey tags, keywords, and eov fields so that they properly index
     def before_dataset_index(self, data_dict):

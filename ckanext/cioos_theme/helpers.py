@@ -502,6 +502,182 @@ def cioos_count_datasets():
     return datasets["count"]
 
 
+_CENTROID_CACHE = {"key": None, "value": None}
+
+
+def _centroid_and_bbox_from_spatial(spatial_str):
+    """Compute centroid + bbox from a GeoJSON `spatial` value.
+
+    Returns ([lon, lat], [west, south, east, north]) or (None, None) on failure.
+    Points return a degenerate bbox (the point's coords repeated).
+    """
+    try:
+        geom = json.loads(spatial_str) if isinstance(spatial_str, str) else spatial_str
+    except (TypeError, ValueError):
+        return None, None
+    if not geom:
+        return None, None
+    gtype = geom.get("type")
+    coords = geom.get("coordinates")
+    if not coords:
+        return None, None
+    try:
+        if gtype == "Point":
+            lon, lat = coords[0], coords[1]
+            if not (-180 <= lon <= 180 and -90 <= lat <= 90):
+                return None, None
+            return (
+                [round(lon, 4), round(lat, 4)],
+                [round(lon, 4), round(lat, 4), round(lon, 4), round(lat, 4)],
+            )
+        # Flatten arbitrarily nested coordinate arrays to leaf [lon, lat] pairs.
+        stack = [coords]
+        xs, ys = [], []
+        while stack:
+            node = stack.pop()
+            if (
+                isinstance(node, (list, tuple))
+                and len(node) >= 2
+                and isinstance(node[0], (int, float))
+                and isinstance(node[1], (int, float))
+            ):
+                xs.append(node[0])
+                ys.append(node[1])
+            elif isinstance(node, (list, tuple)):
+                stack.extend(node)
+        if not xs:
+            return None, None
+        west, east = min(xs), max(xs)
+        south, north = min(ys), max(ys)
+        lon = (west + east) / 2.0
+        lat = (south + north) / 2.0
+        if not (-180 <= lon <= 180 and -90 <= lat <= 90):
+            return None, None
+        return (
+            [round(lon, 4), round(lat, 4)],
+            [round(west, 4), round(south, 4), round(east, 4), round(north, 4)],
+        )
+    except (TypeError, ValueError, IndexError):
+        return None, None
+
+
+def _centroid_from_spatial(spatial_str):
+    """Back-compat wrapper — returns just the centroid."""
+    centroid, _bbox = _centroid_and_bbox_from_spatial(spatial_str)
+    return centroid
+
+
+def _extract_spatial_from_pkg(pkg):
+    """Find the GeoJSON spatial value on a package_search result, regardless
+    of whether ckanext-spatial promoted it to a top-level Solr field, kept it
+    as a flattened extra, or left it inside the `extras` list."""
+    for key in ("extras_spatial", "spatial"):
+        val = pkg.get(key)
+        if val:
+            return val
+    for extra in pkg.get("extras", []) or []:
+        if extra.get("key") == "spatial" and extra.get("value"):
+            return extra["value"]
+    return None
+
+
+def cioos_get_dataset_centroids(max_rows=15000, force_refresh=False):
+    """Return a JSON string of dataset centroids for the home-page filter map.
+
+    Output shape (positional, to keep the payload small for 10k+ points):
+        [[name, title, lon, lat, [west, south, east, north]], ...]
+    The bbox is included so the client can render the dataset's spatial
+    extent on click without a follow-up fetch.
+
+    Cache invalidation:
+      - Dataset count change (add/delete) — keyed on Solr `numFound`.
+      - Explicit invalidation via `cioos_invalidate_dataset_centroids()`,
+        called from IPackageController after_dataset_create/update/delete
+        hooks so edits to `spatial` on existing datasets propagate
+        immediately.
+
+    Pass `force_refresh=True` to bypass the cache (e.g. from a CLI command).
+    """
+    user = logic.get_action("get_site_user")({"model": model, "ignore_auth": True}, {})
+    context = {"model": model, "session": model.Session, "user": user["name"]}
+
+    # Get total count first (cheap, just for cache keying). No spatial filter
+    # here — Solr field naming for the spatial extra varies between CKAN
+    # versions and we'd rather over-fetch + filter in Python than miss rows.
+    try:
+        head = logic.get_action("package_search")(
+            context, {"fl": "id", "rows": "0"}
+        )
+    except Exception:
+        log.exception("centroids: package_search count failed")
+        return "[]"
+    count = head.get("count", 0)
+
+    cached = _CENTROID_CACHE
+    if (
+        not force_refresh
+        and cached["key"] == count
+        and cached["value"] is not None
+    ):
+        return cached["value"]
+
+    # CKAN caps `package_search` at `ckan.search.rows_max` (default 1000) and
+    # silently strips post-processed fields like `spatial` when `fl` is set,
+    # so we paginate full-record fetches.
+    page_size = 1000
+    target = min(count, max_rows)
+    points = []
+    skipped_no_spatial = 0
+    skipped_bad_geom = 0
+    start = 0
+    while start < target:
+        try:
+            result = logic.get_action("package_search")(
+                context,
+                {"rows": str(min(page_size, target - start)), "start": str(start)},
+            )
+        except Exception:
+            log.exception("centroids: package_search page start=%d failed", start)
+            return cached["value"] if cached["value"] is not None else "[]"
+        results = result.get("results", []) or []
+        if not results:
+            break
+        for pkg in results:
+            spatial = _extract_spatial_from_pkg(pkg)
+            if not spatial:
+                skipped_no_spatial += 1
+                continue
+            c, bbox = _centroid_and_bbox_from_spatial(spatial)
+            if c is None:
+                skipped_bad_geom += 1
+                continue
+            # Title may be a fluent dict ({en: ..., fr: ...}) on this site;
+            # render in the active language and fall back to the slug.
+            raw_title = pkg.get("title") or pkg.get("name") or ""
+            try:
+                title = toolkit.h.scheming_language_text(raw_title) or raw_title
+            except Exception:
+                title = raw_title if isinstance(raw_title, str) else pkg.get("name") or ""
+            points.append([pkg.get("name"), title, c[0], c[1], bbox])
+        start += len(results)
+
+    log.info(
+        "centroids: total=%d fetched=%d kept=%d no_spatial=%d bad_geom=%d",
+        count, start, len(points), skipped_no_spatial, skipped_bad_geom,
+    )
+
+    payload = json.dumps(points, separators=(",", ":"))
+    _CENTROID_CACHE["key"] = count
+    _CENTROID_CACHE["value"] = payload
+    return payload
+
+
+def cioos_invalidate_dataset_centroids():
+    """Invalidate the centroid cache. Safe to call from IPackageController hooks."""
+    _CENTROID_CACHE["key"] = None
+    _CENTROID_CACHE["value"] = None
+
+
 def cioos_count_resorgs(group_type="resorg"):
     """Return a count of CIOOS responsible-organization groups."""
     user = logic.get_action("get_site_user")({"model": model, "ignore_auth": True}, {})

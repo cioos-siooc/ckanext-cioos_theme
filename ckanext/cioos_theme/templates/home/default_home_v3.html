@@ -10,6 +10,8 @@
 #}
 
 {% asset 'ckanext-cioos_theme/home_v3_css' %}
+{% asset 'ckanext-cioos_theme/home_v3_map_css' %}
+{% asset 'ckanext-cioos_theme/home_v3_map_js' %}
 
 {# ── Stats inputs ───────────────────────────────────────────────
    These use real helpers where they exist; constants are flagged
@@ -18,7 +20,7 @@
 {% set dataset_count = h.cioos_count_datasets() %}
 {% set eov_list = h.cioos_get_eovs(show_all=True) %}
 {% set excluded_eovs = h.cioos_get_exclude_eov() or [] %}
-{% set excluded_categories = h.cioos_get_exclude_eov_category() or [] %}
+{% set excluded_categories = h.cioos_get_exclude_eov_category() or ['Other'] %}
 {% set visible_eovs = eov_list
    | rejectattr('category', 'undefined')
    | rejectattr('name', 'in', excluded_eovs)
@@ -107,66 +109,21 @@
         </a>
       </div>
 
-      <div class="v3-map" role="group" aria-label="{{ _('CIOOS regions map') }}">
-        {# Decorative SVG basemap: faint grid + three region blobs.
-           Real interactivity comes from the <a> labels overlaid on top. #}
-        <svg viewBox="0 0 1600 700" preserveAspectRatio="none" aria-hidden="true">
-          <defs>
-            <pattern id="v3grid" width="40" height="40" patternUnits="userSpaceOnUse">
-              <path d="M 40 0 L 0 0 0 40" fill="none"
-                    stroke="#e3ddd2" stroke-width="1"/>
-            </pattern>
-          </defs>
-          <rect width="1600" height="700" fill="url(#v3grid)"/>
-
-          {# Pacific blob (west) #}
-          <a href="{{ pacific_url }}" aria-label="{{ _('Pacific region') }}">
-            <ellipse class="v3-map-blob" cx="280" cy="380" rx="240" ry="160"/>
-            <circle class="v3-map-pin" cx="320" cy="270" r="6"/>
-            <circle class="v3-map-pin" cx="220" cy="470" r="6"/>
-          </a>
-
-          {# St. Lawrence blob (centre) #}
-          <a href="{{ st_lawrence_url }}" aria-label="{{ _('St. Lawrence region') }}">
-            <ellipse class="v3-map-blob" cx="820" cy="340" rx="320" ry="180"/>
-            <circle class="v3-map-pin" cx="700" cy="280" r="6"/>
-            <circle class="v3-map-pin" cx="940" cy="420" r="6"/>
-          </a>
-
-          {# Atlantic blob (east) #}
-          <a href="{{ atlantic_url }}" aria-label="{{ _('Atlantic region') }}">
-            <ellipse class="v3-map-blob" cx="1300" cy="430" rx="280" ry="170"/>
-            <circle class="v3-map-pin" cx="1320" cy="360" r="6"/>
-          </a>
-        </svg>
-
-        {# Floating region labels — positioned in % over the SVG #}
-        <a class="v3-map-label" href="{{ pacific_url }}"
-           style="left: 18%; top: 56%;">
-          <span class="dot dot-pac"></span>{{ _('Pacific') }}
-        </a>
-        <a class="v3-map-label" href="{{ st_lawrence_url }}"
-           style="left: 51%; top: 46%;">
-          <span class="dot dot-stl"></span>{{ _('St. Lawrence') }}
-        </a>
-        <a class="v3-map-label" href="{{ atlantic_url }}"
-           style="left: 81%; top: 60%;">
-          <span class="dot dot-atl"></span>{{ _('Atlantic') }}
-        </a>
-
-        <div class="v3-map-zoom" aria-hidden="true">
-          <button type="button" tabindex="-1">+</button>
-          <button type="button" tabindex="-1">−</button>
-        </div>
-
-        <div class="v3-map-legend">
-          <div class="v3-map-legend-title">{{ _('Regions') }}</div>
-          <ul>
-            <li><span class="dot dot-pac"></span>{{ _('Pacific') }}</li>
-            <li><span class="dot dot-stl"></span>{{ _('St. Lawrence') }}</li>
-            <li><span class="dot dot-atl"></span>{{ _('Atlantic') }}</li>
-          </ul>
-        </div>
+      {# Interactive Leaflet + markercluster map of dataset centroids.
+         The centroid payload is shape [[name, lon, lat], ...] — positional
+         arrays keep the JSON small for 10k+ points. The home-v3-map module
+         renders them with chunkedLoading so the main thread stays responsive. #}
+      {% set v3_map_points = h.cioos_get_dataset_centroids() %}
+      <div class="v3-map-wrap">
+        {# CKAN's JS module loader maps `data-module-<opt>` → this.options.<opt>.
+           The bare `data-` form is *not* picked up. #}
+        <div class="v3-map"
+             role="group"
+             aria-label="{{ _('CIOOS dataset locations map') }}"
+             data-module="home-v3-map"
+             data-module-points="{{ v3_map_points }}"
+             data-module-dataset_url="{{ h.url_for(controller='dataset', action='read', id='') }}"
+             data-module-search_url="{{ search_url }}"></div>
       </div>
     </div>
   </section>

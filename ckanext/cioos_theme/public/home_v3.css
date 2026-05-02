@@ -797,7 +797,13 @@ body:has(.home-v3) #header-container .v3-bleed,
   text-decoration: none;
 }
 
-/* stylized regional map (inline SVG) */
+/* interactive Leaflet filter map (replaces previous SVG mockup) */
+.home-v3 .v3-map-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
 .home-v3 .v3-map {
   position: relative;
   background: #f7f4ee;
@@ -805,8 +811,185 @@ body:has(.home-v3) #header-container .v3-bleed,
   border-radius: 18px;
   overflow: hidden;
   aspect-ratio: 16 / 7;
+  min-height: 360px;
 }
 
+/* Leaflet sets z-index aggressively; rein it in so it can't escape the card. */
+.home-v3 .v3-map .leaflet-container {
+  width: 100%;
+  height: 100%;
+  border-radius: 18px;
+  background: #f7f4ee;
+  font-family: var(--v3-font-body);
+}
+
+/* ── Marker cluster recolor (override leaflet.markercluster defaults) ──
+   The plugin assigns three size buckets (small/medium/large) which we
+   remap to a teal → navy → orange ramp drawn from the v3 palette. */
+.home-v3 .v3-map .marker-cluster {
+  background-clip: padding-box;
+  border-radius: 20px;
+  font-family: var(--v3-font-mono);
+  font-weight: 600;
+  color: #fff;
+  text-shadow: 0 1px 1px rgba(21, 47, 55, 0.35);
+}
+
+.home-v3 .v3-map .marker-cluster div {
+  width: 30px;
+  height: 30px;
+  margin-left: 5px;
+  margin-top: 5px;
+  text-align: center;
+  border-radius: 15px;
+  font-size: 12px;
+  line-height: 30px;
+  color: #fff;
+}
+
+.home-v3 .v3-map .marker-cluster-small {
+  background-color: rgba(82, 167, 155, 0.35);  /* teal halo */
+}
+.home-v3 .v3-map .marker-cluster-small div {
+  background-color: var(--v3-teal);
+}
+
+.home-v3 .v3-map .marker-cluster-medium {
+  background-color: rgba(21, 47, 55, 0.3);     /* navy halo */
+}
+.home-v3 .v3-map .marker-cluster-medium div {
+  background-color: var(--v3-navy);
+}
+
+.home-v3 .v3-map .marker-cluster-large {
+  background-color: rgba(217, 124, 74, 0.35);  /* orange halo */
+}
+.home-v3 .v3-map .marker-cluster-large div {
+  background-color: #d97c4a;
+}
+
+/* Popup + attribution: use the v3 surface tokens so they stop looking like
+   stock Leaflet on the otherwise heavily-themed home page. */
+.home-v3 .v3-map .leaflet-popup-content-wrapper {
+  background: #fff;
+  border: 1px solid var(--v3-line);
+  border-radius: 12px;
+  box-shadow: 0 6px 22px rgba(21, 47, 55, 0.14);
+  color: var(--v3-navy);
+  font-family: var(--v3-font-body);
+}
+.home-v3 .v3-map .leaflet-popup-content {
+  margin: 10px 14px;
+  font-size: 13px;
+  line-height: 1.4;
+}
+.home-v3 .v3-map .leaflet-popup-content a {
+  color: var(--v3-teal);
+  font-weight: 500;
+}
+.home-v3 .v3-map .leaflet-popup-tip {
+  background: #fff;
+  border: 1px solid var(--v3-line);
+}
+
+.home-v3 .v3-map .leaflet-control-attribution {
+  background: rgba(255, 255, 255, 0.75);
+  color: var(--v3-muted);
+  font-family: var(--v3-font-body);
+  font-size: 10px;
+  padding: 2px 6px;
+  border-top-left-radius: 6px;
+}
+.home-v3 .v3-map .leaflet-control-attribution a {
+  color: var(--v3-navy);
+}
+
+/* Zoom buttons: white card style consistent with v3 nav pills. */
+.home-v3 .v3-map .leaflet-bar a,
+.home-v3 .v3-map .leaflet-bar a:hover {
+  background: #fff;
+  color: var(--v3-navy);
+  border-color: var(--v3-line);
+}
+.home-v3 .v3-map .leaflet-bar a:hover {
+  background: var(--v3-cream);
+  color: var(--v3-teal);
+}
+.home-v3 .v3-map .leaflet-bar {
+  border-radius: 8px;
+  box-shadow: 0 4px 14px rgba(21, 47, 55, 0.08);
+}
+
+/* Tooltip on hover (dataset title) */
+.home-v3 .v3-map .leaflet-tooltip {
+  background: var(--v3-navy);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-family: var(--v3-font-body);
+  font-size: 12px;
+  padding: 4px 10px;
+  box-shadow: 0 4px 14px rgba(21, 47, 55, 0.18);
+}
+.home-v3 .v3-map .leaflet-tooltip-top::before { border-top-color: var(--v3-navy); }
+.home-v3 .v3-map .leaflet-tooltip-bottom::before { border-bottom-color: var(--v3-navy); }
+.home-v3 .v3-map .leaflet-tooltip-left::before { border-left-color: var(--v3-navy); }
+.home-v3 .v3-map .leaflet-tooltip-right::before { border-right-color: var(--v3-navy); }
+
+.home-v3 .v3-map-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.home-v3 .v3-map-quicklinks {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.home-v3 .v3-map-label-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  background: #fff;
+  border: 1px solid var(--v3-line);
+  border-radius: 999px;
+  font-size: 13px;
+  color: var(--v3-navy);
+  text-decoration: none;
+  transition:
+    box-shadow 0.15s,
+    transform 0.15s;
+}
+
+.home-v3 .v3-map-label-inline:hover {
+  text-decoration: none;
+  color: var(--v3-navy);
+  box-shadow: 0 4px 14px rgba(21, 47, 55, 0.1);
+  transform: translateY(-1px);
+}
+
+.home-v3 .v3-map-label-inline .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.home-v3 .v3-map-label-inline .dot-atl {
+  background: #d97c4a;
+}
+.home-v3 .v3-map-label-inline .dot-pac {
+  background: var(--v3-teal);
+}
+.home-v3 .v3-map-label-inline .dot-stl {
+  background: var(--v3-navy);
+}
+
+/* legacy SVG-mockup styles (kept for any other v3 surface that still uses them) */
 .home-v3 .v3-map svg {
   display: block;
   width: 100%;
