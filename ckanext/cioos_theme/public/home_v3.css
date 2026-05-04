@@ -686,7 +686,7 @@ body:has(.home-v3) #header-container .v3-bleed,
 /* stats card */
 .home-v3 .v3-stats {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 0;
   max-width: 900px;
   margin: 0 auto;
@@ -1188,6 +1188,65 @@ body:has(.home-v3) #header-container .v3-bleed,
   font-size: 12px;
   padding: 6px 9px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+}
+
+/* ─────────────────────────────────────────────
+   BROWSE-FILTER INPUT  ·  shared by org/project sections
+───────────────────────────────────────────── */
+.home-v3 .v3-browse-filter {
+  position: relative;
+  margin: 0 0 1.25rem;
+  max-width: 420px;
+}
+
+.home-v3 .v3-browse-filter-icon {
+  position: absolute;
+  top: 50%;
+  left: 14px;
+  transform: translateY(-50%);
+  color: var(--v3-muted);
+  font-size: 13px;
+  pointer-events: none;
+}
+
+.home-v3 .v3-browse-filter-input {
+  width: 100%;
+  padding: 0.6rem 1rem 0.6rem 2.4rem;
+  font-family: var(--v3-font-body);
+  font-size: 14px;
+  color: var(--v3-navy);
+  background: #fff;
+  border: 1px solid var(--v3-line);
+  border-radius: 999px;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+
+.home-v3 .v3-browse-filter-input:focus {
+  outline: none;
+  border-color: var(--v3-teal);
+  box-shadow: 0 0 0 3px rgba(82, 167, 155, 0.18);
+}
+
+/* Strip the default magnifier WebKit adds to type="search" — we render our own. */
+.home-v3 .v3-browse-filter-input::-webkit-search-decoration,
+.home-v3 .v3-browse-filter-input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.home-v3 .v3-browse-filter-empty {
+  margin-top: 1rem;
+  font-size: 13px;
+  color: var(--v3-muted);
+  font-style: italic;
+}
+
+/* Generic visibility toggle used by the JS module to hide non-matching items
+   while preserving original DOM order. */
+.home-v3 .is-hidden {
+  display: none !important;
 }
 
 /* ─────────────────────────────────────────────

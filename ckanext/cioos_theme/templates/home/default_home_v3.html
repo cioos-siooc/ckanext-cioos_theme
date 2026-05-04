@@ -12,6 +12,7 @@
 {% asset 'ckanext-cioos_theme/home_v3_css' %}
 {% asset 'ckanext-cioos_theme/home_v3_map_css' %}
 {% asset 'ckanext-cioos_theme/home_v3_map_js' %}
+{% asset 'ckanext-cioos_theme/home_v3_browse_filter_js' %}
 
 {# ── Stats inputs ───────────────────────────────────────────────
    These use real helpers where they exist; constants are flagged
@@ -203,7 +204,10 @@
      BROWSE BY ORGANIZATION  ·  resorg groups
   ───────────────────────────────────────────── #}
   {% if browse_resorgs %}
-  <section class="v3-section">
+  <section class="v3-section"
+           data-module="home-v3-browse-filter"
+           data-module-target=".v3-org-item"
+           data-module-label-selector=".v3-org-name">
     <div class="v3-section-inner">
       <div class="v3-section-head">
         <div>
@@ -216,6 +220,14 @@
         <a class="v3-btn-ghost" href="/resorg">
           {{ _('All organizations') }} <i class="fas fa-arrow-right"></i>
         </a>
+      </div>
+
+      <div class="v3-browse-filter">
+        <i class="fas fa-search v3-browse-filter-icon" aria-hidden="true"></i>
+        <input type="search"
+               class="v3-browse-filter-input"
+               placeholder="{{ _('Filter organizations…') }}"
+               aria-label="{{ _('Filter organizations') }}" />
       </div>
 
       <ul class="v3-org-grid">
@@ -238,6 +250,7 @@
           </li>
         {% endfor %}
       </ul>
+      <p class="v3-browse-filter-empty is-hidden">{{ _('No organizations match your filter.') }}</p>
     </div>
   </section>
   {% endif %}
@@ -246,7 +259,10 @@
      BROWSE BY PROJECT  ·  multi-value facet
   ───────────────────────────────────────────── #}
   {% if browse_projects %}
-  <section class="v3-section v3-section-cream">
+  <section class="v3-section v3-section-cream"
+           data-module="home-v3-browse-filter"
+           data-module-target=".v3-project-item"
+           data-module-label-selector=".v3-project-name">
     <div class="v3-section-inner">
       <div class="v3-section-head">
         <div>
@@ -256,6 +272,14 @@
             {{ _('Find datasets grouped under collaborative projects and programs.') }}
           </p>
         </div>
+      </div>
+
+      <div class="v3-browse-filter">
+        <i class="fas fa-search v3-browse-filter-icon" aria-hidden="true"></i>
+        <input type="search"
+               class="v3-browse-filter-input"
+               placeholder="{{ _('Filter projects…') }}"
+               aria-label="{{ _('Filter projects') }}" />
       </div>
 
       <ul class="v3-project-grid">
@@ -270,6 +294,7 @@
           </li>
         {% endfor %}
       </ul>
+      <p class="v3-browse-filter-empty is-hidden">{{ _('No projects match your filter.') }}</p>
     </div>
   </section>
   {% endif %}

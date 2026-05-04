@@ -55,6 +55,16 @@ home_v3_css:
   contents:
     - home_v3.css
 
+home_v3_browse_filter_js:
+  filter: rjsmin
+  output: ckanext-cioos_theme/%(version)s_home_v3_browse_filter.js
+  extra:
+    preload:
+      - base/main
+      - vendor/jquery
+  contents:
+    - js/modules/home-v3-browse-filter.js
+
 home_v3_map_js:
   filter: rjsmin
   output: ckanext-cioos_theme/%(version)s_home_v3_map.js
