@@ -954,6 +954,63 @@ def cioos_count_projects(facet_field="projects"):
         return 0
 
 
+def cioos_get_resorgs(group_type="resorg", limit=None):
+    """Return CIOOS responsible-organization groups with logos and dataset counts.
+
+    Sorted by package_count descending. Used by the home page's "Browse by
+    Organization" section to deep-link into each group's canonical page.
+    """
+    user = logic.get_action("get_site_user")({"model": model, "ignore_auth": True}, {})
+    context = {"model": model, "session": model.Session, "user": user["name"]}
+    try:
+        groups = logic.get_action("group_list")(
+            context,
+            {
+                "type": group_type,
+                "all_fields": True,
+                "include_extras": True,
+                "include_dataset_count": True,
+                "sort": "package_count desc",
+            },
+        ) or []
+    except Exception:
+        return []
+    groups = [g for g in groups if (g.get("package_count") or 0) > 0]
+    if limit:
+        groups = groups[:limit]
+    return groups
+
+
+def cioos_get_projects(facet_field="projects", limit=None):
+    """Return distinct project facet values with dataset counts.
+
+    Sorted by count descending. Used by the home page's "Browse by Project"
+    section to deep-link into a filtered dataset search.
+    """
+    user = logic.get_action("get_site_user")({"model": model, "ignore_auth": True}, {})
+    context = {"model": model, "session": model.Session, "user": user["name"]}
+    try:
+        result = logic.get_action("package_search")(
+            context,
+            {
+                "rows": 0,
+                "facet.field": '["%s"]' % facet_field,
+                "facet.limit": -1,
+                "facet.mincount": 1,
+            },
+        )
+    except Exception:
+        return []
+    facets = result.get("search_facets") or result.get("facets") or {}
+    items = facets.get(facet_field, {})
+    if isinstance(items, dict):
+        items = items.get("items", [])
+    items = sorted(items or [], key=lambda x: x.get("count", 0), reverse=True)
+    if limit:
+        items = items[:limit]
+    return items
+
+
 def cioos_datasets():
     """Return a list of the datasets"""
 

@@ -38,6 +38,12 @@
 {% set st_lawrence_url = search_url ~ '?ext_bbox=-72,44,-56,52' %}
 {% set atlantic_url    = search_url ~ '?ext_bbox=-70,40,-50,55' %}
 
+{# Browse-section data — shown below the EOV theme cards #}
+{% set browse_resorgs  = h.cioos_get_resorgs(limit=12) %}
+{% set browse_projects = h.cioos_get_projects(limit=24) %}
+{# Filter param name for projects matches the multi-value Solr field #}
+{% set projects_param = 'projects' %}
+
 <div role="main" class="home-v3" data-module="home-search">
 
   {# ─────────────────────────────────────────────
@@ -192,5 +198,80 @@
       {% endblock %}
     </div>
   </section>
+
+  {# ─────────────────────────────────────────────
+     BROWSE BY ORGANIZATION  ·  resorg groups
+  ───────────────────────────────────────────── #}
+  {% if browse_resorgs %}
+  <section class="v3-section">
+    <div class="v3-section-inner">
+      <div class="v3-section-head">
+        <div>
+          <p class="v3-eyebrow">{{ _('WHO CONTRIBUTES THE DATA') }}</p>
+          <h2 class="v3-section-title">{{ _('Browse by organization') }}</h2>
+          <p class="v3-section-sub">
+            {{ _('Discover datasets from CIOOS responsible organizations.') }}
+          </p>
+        </div>
+        <a class="v3-btn-ghost" href="/resorg">
+          {{ _('All organizations') }} <i class="fas fa-arrow-right"></i>
+        </a>
+      </div>
+
+      <ul class="v3-org-grid">
+        {% for org in browse_resorgs %}
+          {% set org_url = h.url_for('cioos.resorg', package_type='dataset', id=org.name) %}
+          {% set org_title = h.get_translated(org, 'title') or org.display_name or org.name %}
+          {% set org_img = org.image_display_url or h.get_translated(org, 'image_url') %}
+          <li class="v3-org-item">
+            <a class="v3-org-link" href="{{ org_url }}" title="{{ org_title }}">
+              <span class="v3-org-logo">
+                {% if org_img %}
+                  <img src="{{ org_img }}" alt="{{ org_title }}" loading="lazy" />
+                {% else %}
+                  <i class="fas fa-building" aria-hidden="true"></i>
+                {% endif %}
+              </span>
+              <span class="v3-org-name">{{ org_title }}</span>
+              <span class="v3-org-count">{{ org.package_count or 0 }}</span>
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </section>
+  {% endif %}
+
+  {# ─────────────────────────────────────────────
+     BROWSE BY PROJECT  ·  multi-value facet
+  ───────────────────────────────────────────── #}
+  {% if browse_projects %}
+  <section class="v3-section v3-section-cream">
+    <div class="v3-section-inner">
+      <div class="v3-section-head">
+        <div>
+          <p class="v3-eyebrow">{{ _('PROGRAMS &amp; INITIATIVES') }}</p>
+          <h2 class="v3-section-title">{{ _('Browse by project') }}</h2>
+          <p class="v3-section-sub">
+            {{ _('Find datasets grouped under collaborative projects and programs.') }}
+          </p>
+        </div>
+      </div>
+
+      <ul class="v3-project-grid">
+        {% for project in browse_projects %}
+          {% set project_label = project.display_name or project.name %}
+          {% set project_url = search_url ~ '?' ~ projects_param ~ '=' ~ project.name|urlencode %}
+          <li class="v3-project-item">
+            <a class="v3-project-chip" href="{{ project_url }}" title="{{ project_label }}">
+              <span class="v3-project-name">{{ project_label }}</span>
+              <span class="v3-project-count">{{ project.count or 0 }}</span>
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </section>
+  {% endif %}
 
 </div>
