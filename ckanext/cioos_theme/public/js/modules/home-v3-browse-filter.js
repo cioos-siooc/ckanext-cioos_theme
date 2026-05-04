@@ -5,6 +5,10 @@
  *   data-module-target=".v3-org-item"   (CSS selector for filterable rows)
  *   data-module-label-selector=".v3-org-name"   (CSS selector inside each row
  *                                                that holds the searchable text)
+ *   data-module-collapsed-after="12"    (optional: when no query is active,
+ *                                        only the first N items are visible.
+ *                                        Typing a query reveals matches across
+ *                                        the entire list.)
  *
  * Filters items in-place by toggling a `.is-hidden` class on each match
  * candidate — no DOM removal, so the original order is preserved when the
@@ -16,6 +20,7 @@ this.ckan.module("home-v3-browse-filter", function ($) {
     options: {
       target: "li",
       labelSelector: null,
+      collapsedAfter: null,
     },
 
     initialize: function () {
@@ -40,22 +45,43 @@ this.ckan.module("home-v3-browse-filter", function ($) {
         })
         .get();
 
+      // Parse cap once. `null`/missing means "no cap — render everything".
+      var collapsedAfter = parseInt(this.options.collapsedAfter, 10);
+      if (isNaN(collapsedAfter) || collapsedAfter < 0) {
+        collapsedAfter = null;
+      }
+
       var $empty = this.el.find(".v3-browse-filter-empty");
 
       var apply = function () {
         var query = module._normalize(input.val());
+        var hasQuery = query.length > 0;
         var visibleCount = 0;
         for (var i = 0; i < entries.length; i++) {
-          var match = !query || entries[i].label.indexOf(query) !== -1;
+          var match;
+          if (hasQuery) {
+            // Active filter: search the whole list, ignore the visual cap.
+            match = entries[i].label.indexOf(query) !== -1;
+          } else if (collapsedAfter !== null) {
+            // Idle: enforce the visual cap (first-N only).
+            match = i < collapsedAfter;
+          } else {
+            match = true;
+          }
           entries[i].$node.toggleClass("is-hidden", !match);
           if (match) {
             visibleCount++;
           }
         }
+        // The empty-state copy ("No organizations match…") is only meaningful
+        // when the user is actively filtering and nothing matched. Idle
+        // collapsing past the cap is intentional, not "no matches".
         if ($empty.length) {
-          $empty.toggleClass("is-hidden", visibleCount > 0);
+          $empty.toggleClass("is-hidden", !hasQuery || visibleCount > 0);
         }
       };
+
+      apply();
 
       input.on("input", apply);
 

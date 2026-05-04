@@ -1195,8 +1195,11 @@ body:has(.home-v3) #header-container .v3-bleed,
 ───────────────────────────────────────────── */
 .home-v3 .v3-browse-filter {
   position: relative;
-  margin: 0 0 1.25rem;
-  max-width: 420px;
+  margin: 0;
+  width: 320px;
+  max-width: 100%;
+  white-space: normal;
+  flex-shrink: 0;
 }
 
 .home-v3 .v3-browse-filter-icon {

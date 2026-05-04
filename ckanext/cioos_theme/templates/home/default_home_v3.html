@@ -39,9 +39,14 @@
 {% set st_lawrence_url = search_url ~ '?ext_bbox=-72,44,-56,52' %}
 {% set atlantic_url    = search_url ~ '?ext_bbox=-70,40,-50,55' %}
 
-{# Browse-section data — shown below the EOV theme cards #}
-{% set browse_resorgs  = h.cioos_get_resorgs(limit=12) %}
-{% set browse_projects = h.cioos_get_projects(limit=24) %}
+{# Browse-section data — shown below the EOV theme cards.
+   Pass no `limit` so the full list is rendered in the DOM; the home-v3-browse-filter
+   JS module collapses items past `collapsed-after` until the user types a query,
+   so the filter can match across the entire list (not just the visible top-N). #}
+{% set browse_resorgs  = h.cioos_get_resorgs() %}
+{% set browse_projects = h.cioos_get_projects() %}
+{% set browse_resorgs_visible = 12 %}
+{% set browse_projects_visible = 24 %}
 {# Filter param name for projects matches the multi-value Solr field #}
 {% set projects_param = 'projects' %}
 
@@ -207,7 +212,8 @@
   <section class="v3-section"
            data-module="home-v3-browse-filter"
            data-module-target=".v3-org-item"
-           data-module-label-selector=".v3-org-name">
+           data-module-label-selector=".v3-org-name"
+           data-module-collapsed-after="{{ browse_resorgs_visible }}">
     <div class="v3-section-inner">
       <div class="v3-section-head">
         <div>
@@ -217,17 +223,13 @@
             {{ _('Discover datasets from CIOOS responsible organizations.') }}
           </p>
         </div>
-        <a class="v3-btn-ghost" href="/resorg">
-          {{ _('All organizations') }} <i class="fas fa-arrow-right"></i>
-        </a>
-      </div>
-
-      <div class="v3-browse-filter">
-        <i class="fas fa-search v3-browse-filter-icon" aria-hidden="true"></i>
-        <input type="search"
-               class="v3-browse-filter-input"
-               placeholder="{{ _('Filter organizations…') }}"
-               aria-label="{{ _('Filter organizations') }}" />
+        <div class="v3-section-aside v3-browse-filter">
+          <i class="fas fa-search v3-browse-filter-icon" aria-hidden="true"></i>
+          <input type="search"
+                 class="v3-browse-filter-input"
+                 placeholder="{{ _('Filter organizations…') }}"
+                 aria-label="{{ _('Filter organizations') }}" />
+        </div>
       </div>
 
       <ul class="v3-org-grid">
@@ -262,7 +264,8 @@
   <section class="v3-section v3-section-cream"
            data-module="home-v3-browse-filter"
            data-module-target=".v3-project-item"
-           data-module-label-selector=".v3-project-name">
+           data-module-label-selector=".v3-project-name"
+           data-module-collapsed-after="{{ browse_projects_visible }}">
     <div class="v3-section-inner">
       <div class="v3-section-head">
         <div>
@@ -272,14 +275,13 @@
             {{ _('Find datasets grouped under collaborative projects and programs.') }}
           </p>
         </div>
-      </div>
-
-      <div class="v3-browse-filter">
-        <i class="fas fa-search v3-browse-filter-icon" aria-hidden="true"></i>
-        <input type="search"
-               class="v3-browse-filter-input"
-               placeholder="{{ _('Filter projects…') }}"
-               aria-label="{{ _('Filter projects') }}" />
+        <div class="v3-section-aside v3-browse-filter">
+          <i class="fas fa-search v3-browse-filter-icon" aria-hidden="true"></i>
+          <input type="search"
+                 class="v3-browse-filter-input"
+                 placeholder="{{ _('Filter projects…') }}"
+                 aria-label="{{ _('Filter projects') }}" />
+        </div>
       </div>
 
       <ul class="v3-project-grid">
