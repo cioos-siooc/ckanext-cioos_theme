@@ -668,6 +668,8 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             "cioos_datasets": cioos_helpers.cioos_datasets,
             "cioos_count_datasets": cioos_helpers.cioos_count_datasets,
             "cioos_get_dataset_centroids": cioos_helpers.cioos_get_dataset_centroids,
+            "cioos_get_dataset_hexbins": cioos_helpers.cioos_get_dataset_hexbins,
+            "cioos_get_hexmap_config": cioos_helpers.cioos_get_hexmap_config,
             "cioos_count_resorgs": cioos_helpers.cioos_count_resorgs,
             "cioos_count_projects": cioos_helpers.cioos_count_projects,
             "cioos_get_eovs": cioos_helpers.cioos_get_eovs,
@@ -878,12 +880,15 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
     # call the unprefixed variants).
     def after_dataset_create(self, context, pkg_dict):
         cioos_helpers.cioos_invalidate_dataset_centroids()
+        cioos_helpers.cioos_invalidate_dataset_hexbins()
 
     def after_dataset_update(self, context, pkg_dict):
         cioos_helpers.cioos_invalidate_dataset_centroids()
+        cioos_helpers.cioos_invalidate_dataset_hexbins()
 
     def after_dataset_delete(self, context, pkg_dict):
         cioos_helpers.cioos_invalidate_dataset_centroids()
+        cioos_helpers.cioos_invalidate_dataset_hexbins()
 
     # modfiey tags, keywords, and eov fields so that they properly index
     def before_dataset_index(self, data_dict):

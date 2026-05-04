@@ -106,19 +106,37 @@
         </div>
       </div>
 
-      {# Interactive Leaflet + markercluster map of dataset centroids.
-         The centroid payload is shape [[name, lon, lat], ...] — positional
-         arrays keep the JSON small for 10k+ points. The home-v3-map module
-         renders them with chunkedLoading so the main thread stays responsive. #}
+      {# Interactive Leaflet map with two togglable layers:
+
+         · Centroids — one point per dataset, clustered with markercluster.
+           Payload shape: [[name, title, lon, lat, [w,s,e,n]], ...] (positional
+           to keep JSON small for 10k+ points).
+
+         · Hex density — H3 cells aggregated server-side from every dataset's
+           spatial footprint. Payload shape: [[cell_id, count], ...]. The
+           client rebuilds polygons via h3-js cellToBoundary; clicking a cell
+           passes its GeoJSON polygon to /dataset?ext_geometry=… for an exact
+           PostGIS polygon search.
+
+         Resolution + color ramp are deployment-tunable via env vars
+         (CKAN__CIOOS__HEXMAP__RESOLUTION etc.) — see cioos_get_hexmap_config. #}
       {% set v3_map_points = h.cioos_get_dataset_centroids() %}
+      {% set v3_hex_config = h.cioos_get_hexmap_config() %}
+      {% set v3_hex_cells  = h.cioos_get_dataset_hexbins(resolution=v3_hex_config.resolution) %}
       <div class="v3-map-wrap">
         {# CKAN's JS module loader maps `data-module-<opt>` → this.options.<opt>.
            The bare `data-` form is *not* picked up. #}
+        {# JSON payloads use single-quote attribute delimiters: Jinja's
+           `tojson` (and json.dumps) emit unescaped `"` characters, which
+           would terminate a double-quoted attribute at the first brace.
+           Single quotes let the inner `"` pass through cleanly. #}
         <div class="v3-map"
              role="group"
              aria-label="{{ _('CIOOS dataset locations map') }}"
              data-module="home-v3-map"
-             data-module-points="{{ v3_map_points }}"
+             data-module-points='{{ v3_map_points | safe }}'
+             data-module-hex_cells='{{ v3_hex_cells | safe }}'
+             data-module-hex_config='{{ v3_hex_config | tojson }}'
              data-module-dataset_url="{{ h.url_for(controller='dataset', action='read', id='') }}"
              data-module-search_url="{{ search_url }}"></div>
       </div>

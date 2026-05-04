@@ -67,6 +67,10 @@ home_v3_map_js:
       - ckanext-spatial/spatial_query_js
   contents:
     - js/markercluster/leaflet.markercluster.min.js
+    # h3-js v4 UMD bundle (asm.js, no external .wasm). Exposes window.h3
+    # with cellToBoundary / latLngToCell / polygonToCells used by the
+    # hex-density layer in home-v3-map.js.
+    - js/h3-js/h3-js.umd.js
     - js/modules/home-v3-map.js
 
 home_v3_map_css:

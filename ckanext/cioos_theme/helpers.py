@@ -666,7 +666,14 @@ def cioos_get_dataset_centroids(max_rows=15000, force_refresh=False):
         count, start, len(points), skipped_no_spatial, skipped_bad_geom,
     )
 
-    payload = json.dumps(points, separators=(",", ":"))
+    # The template embeds this payload inside a single-quoted HTML attribute
+    # (`data-module-points='...'`). json.dumps does not escape `'`, so a title
+    # containing an apostrophe ("Newfoundland's …") would terminate the
+    # attribute early and silently break the centroid layer (the hex layer is
+    # unaffected because its payload is purely numeric/hex IDs). Encode `'` as
+    # a numeric entity — the browser decodes it back to `'` before the JSON is
+    # parsed in JS, so the round-trip is lossless.
+    payload = json.dumps(points, separators=(",", ":")).replace("'", "&#39;")
     _CENTROID_CACHE["key"] = count
     _CENTROID_CACHE["value"] = payload
     return payload
@@ -676,6 +683,236 @@ def cioos_invalidate_dataset_centroids():
     """Invalidate the centroid cache. Safe to call from IPackageController hooks."""
     _CENTROID_CACHE["key"] = None
     _CENTROID_CACHE["value"] = None
+
+
+# ── Hex-bin density layer ─────────────────────────────────────────
+# Server-side aggregation of every dataset's spatial footprint into Uber
+# H3 cells. The browser rebuilds the cell polygons from `cellToBoundary`
+# (single source of truth — same vertex set used for the map render and
+# for the click-through `ext_geometry` URL).
+#
+# Resolution and color ramp are deployment-tunable via env vars (see
+# `cioos_get_hexmap_config`) so non-Canada-wide deployments can crank up
+# the resolution without a code change.
+_HEXBIN_CACHE = {"key": None, "value": None}
+
+try:
+    import h3 as _h3
+except ImportError:  # pragma: no cover — extension still imports without h3
+    _h3 = None
+
+
+def _h3_cells_for_geom(geom, resolution):
+    """Return the set of H3 cell IDs that cover a GeoJSON geometry.
+
+    - Point     → single cell containing the point.
+    - Polygon   / MultiPolygon → all cells whose centers fall inside (h3 v4
+      `geo_to_cells`), plus boundary cells via `polygon_to_cells_experimental`
+      when available (so a small polygon never returns the empty set).
+    - Anything else (LineString etc.) → centroid of the bbox as a fallback.
+
+    Defensive against malformed coords; returns an empty set on failure.
+    """
+    if _h3 is None:
+        return set()
+    try:
+        gtype = geom.get("type")
+        coords = geom.get("coordinates")
+        if not gtype or coords is None:
+            return set()
+
+        if gtype == "Point":
+            lon, lat = coords[0], coords[1]
+            if not (-180 <= lon <= 180 and -90 <= lat <= 90):
+                return set()
+            return {_h3.latlng_to_cell(lat, lon, resolution)}
+
+        if gtype in ("Polygon", "MultiPolygon"):
+            # h3 v4 expects a GeoJSON-like dict via `LatLngPoly` / `geo_to_cells`.
+            # Use the high-level `geo_to_cells(geometry, res)` which accepts
+            # GeoJSON-like dicts directly. Fallback to bbox if the call fails
+            # (e.g. self-intersecting ring rejected by h3).
+            try:
+                cells = _h3.geo_to_cells(geom, resolution)
+                if cells:
+                    return set(cells)
+            except Exception:
+                pass
+
+        # Fallback: bbox center → single cell. Keeps the dataset visible
+        # on the map even when its geometry is unparseable by h3.
+        _c, bbox = _centroid_and_bbox_from_spatial(json.dumps(geom))
+        if not bbox:
+            return set()
+        west, south, east, north = bbox
+        lon = (west + east) / 2.0
+        lat = (south + north) / 2.0
+        return {_h3.latlng_to_cell(lat, lon, resolution)}
+    except Exception:
+        log.exception("hexbins: cell computation failed for geom type=%s", geom.get("type"))
+        return set()
+
+
+def cioos_get_hexmap_config():
+    """Return the deployment-tunable hex-map config dict for the template.
+
+    Read from CKAN config (env-mapped via ckanext-envvars):
+      ckanext.cioos.hexmap.resolution   default 3
+      ckanext.cioos.hexmap.color_low    default '#f3f0ec' (cream)
+      ckanext.cioos.hexmap.color_high   default '#152f37' (navy)
+      ckanext.cioos.hexmap.color_steps  default 5
+      ckanext.cioos.hexmap.opacity      default 0.75
+      ckanext.cioos.hexmap.stroke       default '#152f37'
+    """
+    def _cfg(key, default, cast=str):
+        val = config.get("ckanext.cioos.hexmap." + key, default)
+        try:
+            return cast(val)
+        except (TypeError, ValueError):
+            return default
+
+    # Color resolution order (highest priority first):
+    #   1. color_stops  — explicit comma-separated multi-stop palette
+    #                     e.g. "#fff7bc,#fec44f,#d95f0e"
+    #   2. color_preset — named built-in palette resolved client-side
+    #                     (e.g. "viridis", "ylgnbu", "ylorrd", "cioos")
+    #   3. color_low + color_high — legacy two-color ramp
+    color_stops_raw = _cfg("color_stops", "")
+    color_stops = [s.strip() for s in color_stops_raw.split(",") if s.strip()] if color_stops_raw else None
+
+    # Custom percentile breakpoints (in (0, 1)). When set, overrides the
+    # uniform 1/N split derived from `color_steps`. Lets deployments push
+    # bin boundaries into the tail (e.g. 0.5,0.8,0.95,0.99 reserves the
+    # accent for only the top 1% of cells). Implicitly determines bin
+    # count: N quantiles → N+1 bins, palette is built with steps=N+1.
+    quantiles_raw = _cfg("color_quantiles", "")
+    color_quantiles = []
+    if quantiles_raw:
+        for tok in quantiles_raw.split(","):
+            try:
+                q = float(tok.strip())
+                if 0.0 < q < 1.0:
+                    color_quantiles.append(q)
+            except (TypeError, ValueError):
+                continue
+        color_quantiles = sorted(set(color_quantiles))
+
+    # `accent_color` (optional) overrides the topmost quantile bin's color
+    # as a post-processing step — sidesteps gradient-interpolation muddiness
+    # and guarantees the densest cells always pop with a fixed accent.
+    # Empty string disables the override entirely (pure gradient).
+    accent_raw = _cfg("accent_color", "#d97c4a")
+    accent_color = accent_raw if accent_raw else None
+
+    return {
+        "resolution": _cfg("resolution", 3, int),
+        "color_preset": _cfg("color_preset", "cioos"),
+        "color_stops": color_stops,
+        "color_quantiles": color_quantiles,
+        "accent_color": accent_color,
+        "color_low": _cfg("color_low", "#f3f0ec"),
+        "color_high": _cfg("color_high", "#152f37"),
+        "color_steps": _cfg("color_steps", 7, int),
+        "color_scale": _cfg("color_scale", "log"),
+        "opacity": _cfg("opacity", 0.75, float),
+        "stroke": _cfg("stroke", "#152f37"),
+    }
+
+
+def cioos_get_dataset_hexbins(resolution=None, max_rows=15000, force_refresh=False):
+    """Return a JSON string of H3 hex-bin counts for the home-page map.
+
+    Output shape (positional, compact):
+        [[cell_id, count], ...]
+
+    `cell_id` is an H3 v4 string ID; the client converts it to a polygon
+    via `h3-js`'s `cellToBoundary`. `count` is the number of datasets whose
+    `spatial` footprint touches that cell.
+
+    Cache invalidation:
+      - Keyed on (Solr numFound, resolution) so changing resolution
+        forces a rebuild without touching the centroid cache.
+      - `cioos_invalidate_dataset_hexbins()` from IPackageController hooks.
+    """
+    if _h3 is None:
+        log.warning("hexbins: h3 package not installed — returning empty payload")
+        return "[]"
+
+    if resolution is None:
+        resolution = cioos_get_hexmap_config()["resolution"]
+
+    user = logic.get_action("get_site_user")({"model": model, "ignore_auth": True}, {})
+    context = {"model": model, "session": model.Session, "user": user["name"]}
+
+    try:
+        head = logic.get_action("package_search")(context, {"fl": "id", "rows": "0"})
+    except Exception:
+        log.exception("hexbins: package_search count failed")
+        return "[]"
+    count = head.get("count", 0)
+
+    cache_key = (count, resolution)
+    cached = _HEXBIN_CACHE
+    if (
+        not force_refresh
+        and cached["key"] == cache_key
+        and cached["value"] is not None
+    ):
+        return cached["value"]
+
+    page_size = 1000
+    target = min(count, max_rows)
+    cell_counts = {}
+    skipped_no_spatial = 0
+    skipped_no_cells = 0
+    start = 0
+    while start < target:
+        try:
+            result = logic.get_action("package_search")(
+                context,
+                {"rows": str(min(page_size, target - start)), "start": str(start)},
+            )
+        except Exception:
+            log.exception("hexbins: package_search page start=%d failed", start)
+            return cached["value"] if cached["value"] is not None else "[]"
+        results = result.get("results", []) or []
+        if not results:
+            break
+        for pkg in results:
+            spatial = _extract_spatial_from_pkg(pkg)
+            if not spatial:
+                skipped_no_spatial += 1
+                continue
+            try:
+                geom = json.loads(spatial) if isinstance(spatial, str) else spatial
+            except (TypeError, ValueError):
+                skipped_no_cells += 1
+                continue
+            cells = _h3_cells_for_geom(geom, resolution)
+            if not cells:
+                skipped_no_cells += 1
+                continue
+            # +1 per cell — a dataset spanning N cells contributes to all N.
+            for cell in cells:
+                cell_counts[cell] = cell_counts.get(cell, 0) + 1
+        start += len(results)
+
+    payload_list = [[cell, n] for cell, n in cell_counts.items()]
+    log.info(
+        "hexbins: total=%d fetched=%d cells=%d no_spatial=%d no_cells=%d res=%d",
+        count, start, len(payload_list), skipped_no_spatial, skipped_no_cells, resolution,
+    )
+
+    payload = json.dumps(payload_list, separators=(",", ":"))
+    _HEXBIN_CACHE["key"] = cache_key
+    _HEXBIN_CACHE["value"] = payload
+    return payload
+
+
+def cioos_invalidate_dataset_hexbins():
+    """Invalidate the hex-bin cache. Safe to call from IPackageController hooks."""
+    _HEXBIN_CACHE["key"] = None
+    _HEXBIN_CACHE["value"] = None
 
 
 def cioos_count_resorgs(group_type="resorg"):
