@@ -1051,6 +1051,446 @@ aside #dataset-map {
 }
 
 /* ===========================================
+   CIOOS footer redesign (mid-fi)
+   - Regional associations band
+   - Brand + 4 link columns + newsletter
+   - Funders strip
+   - Legal bar
+   The legacy `#footer .one_half / .one_third / .one_sixth` rules above
+   stay in place so regional footer macros (pacific/atlantic/mapp) keep
+   working. This block scopes all new selectors under `#footer` so they
+   beat the legacy `#footer a { color: #fff }` on specificity.
+   =========================================== */
+#footer.cioos-footer-redesigned,
+#footer:has(.cioos-footer-regional) {
+  padding: 0;
+  overflow: hidden;
+}
+#footer:has(.cioos-footer-regional) #footer-core {
+  padding: 0;
+  display: block;
+  max-width: none;
+  width: 100%;
+}
+
+/* Full-bleed sections — escape `.option15.container` (max-width 1140) */
+#footer .cioos-footer-regional,
+#footer .cioos-footer-grid,
+#footer .cioos-footer-funders,
+#footer .cioos-footer-legal {
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  color: #c8d2d6;
+  font-family: var(--cioos-base-font);
+  font-size: 13px;
+}
+#footer .cioos-footer-regional-inner,
+#footer .cioos-footer-grid-inner,
+#footer .cioos-footer-funders-inner,
+#footer .cioos-footer-legal-inner {
+  max-width: 1140px;
+  margin: 0 auto;
+  padding-left: 32px;
+  padding-right: 32px;
+  position: relative;
+}
+
+#footer .cioos-footer-eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: #8aa0a8;
+}
+#footer .cioos-footer-eyebrow.accent {
+  color: #8cdccf;
+}
+
+/* --- Regional associations band --- */
+#footer .cioos-footer-regional {
+  background: linear-gradient(180deg, #2d6c63 0%, #1f4a54 55%, var(--cioos-footer-bg) 100%);
+  position: relative;
+  overflow: hidden;
+}
+#footer .cioos-footer-regional-inner {
+  padding-top: 32px;
+  padding-bottom: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+#footer .cioos-footer-regional-heading {
+  max-width: 540px;
+}
+#footer .cioos-footer-tagline {
+  font-family: var(--cioos-heading-font);
+  font-size: 22px;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 8px 0 0;
+  line-height: 1.3;
+}
+#footer .cioos-footer-regional-cards {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+#footer .cioos-footer-ra-card {
+  display: block;
+  padding: 12px 16px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  min-width: 200px;
+  text-decoration: none;
+  color: #ffffff;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+}
+#footer .cioos-footer-ra-card:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.22);
+  transform: translateY(-1px);
+  color: #ffffff;
+  text-decoration: none;
+}
+#footer .cioos-footer-ra-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+#footer .cioos-footer-ra-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--cioos-primary-color);
+  flex-shrink: 0;
+}
+#footer .cioos-footer-ra-card[data-accent="pacific"] .cioos-footer-ra-dot {
+  background: #52a79b;
+}
+#footer .cioos-footer-ra-card[data-accent="stlawrence"] .cioos-footer-ra-dot {
+  background: #b8623a;
+}
+#footer .cioos-footer-ra-card[data-accent="atlantic"] .cioos-footer-ra-dot {
+  background: #8cdccf;
+}
+#footer .cioos-footer-ra-name {
+  font-family: var(--cioos-heading-font);
+  font-size: 13px;
+  font-weight: 600;
+  color: #ffffff;
+}
+#footer .cioos-footer-ra-sub {
+  display: block;
+  margin-top: 4px;
+  font-size: 11px;
+  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  color: #a9c5c0;
+  letter-spacing: 0;
+}
+
+/* --- Main link grid --- */
+#footer .cioos-footer-grid {
+  background: var(--cioos-footer-bg);
+}
+#footer .cioos-footer-grid-inner {
+  padding-top: 40px;
+  padding-bottom: 28px;
+  display: grid;
+  grid-template-columns: 1.6fr 1fr 1fr 1fr 1fr;
+  gap: 40px;
+}
+@media (max-width: 992px) {
+  #footer .cioos-footer-grid-inner {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+@media (max-width: 600px) {
+  #footer .cioos-footer-grid-inner {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+  #footer .cioos-footer-regional-inner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* Brand column */
+#footer .cioos-footer-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--cioos-heading-font);
+  font-weight: 700;
+  font-size: 20px;
+  color: #ffffff;
+}
+#footer .cioos-footer-logo-mark {
+  width: 32px;
+  height: 32px;
+  background: var(--cioos-primary-color);
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+#footer .cioos-footer-logo-text {
+  letter-spacing: -0.01em;
+}
+#footer .cioos-footer-logo-sub {
+  font-size: 12px;
+  font-weight: 500;
+  color: #8aa0a8;
+  padding-left: 8px;
+  border-left: 1px solid #2a4a52;
+  margin-left: 4px;
+}
+#footer .cioos-footer-blurb {
+  margin: 14px 0 0;
+  max-width: 340px;
+  line-height: 1.65;
+  color: #a9c5c0;
+  font-size: 13px;
+}
+#footer .cioos-footer-newsletter {
+  margin-top: 20px;
+}
+#footer .cioos-footer-newsletter .cioos-footer-eyebrow {
+  margin-bottom: 8px;
+  display: block;
+}
+#footer .cioos-footer-newsletter-form {
+  margin: 0;
+}
+#footer .cioos-footer-newsletter-control {
+  display: flex;
+  align-items: stretch;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+  max-width: 320px;
+  height: 40px;
+  padding: 0;
+  margin: 0;
+}
+#footer .cioos-footer-newsletter-input {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  padding: 0 14px;
+  margin: 0;
+  font-size: 13px;
+  line-height: 38px;
+  color: #ffffff;
+  font-family: inherit;
+  border-radius: 0;
+  float: none;
+  width: auto;
+  height: 100%;
+  box-shadow: none;
+}
+#footer .cioos-footer-newsletter-input:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.04);
+}
+#footer .cioos-footer-newsletter-input::placeholder {
+  color: #8aa0a8;
+  opacity: 1;
+}
+#footer .cioos-footer-newsletter-submit {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 16px;
+  margin: 0;
+  height: 100%;
+  background: var(--cioos-primary-color);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  text-transform: none;
+  letter-spacing: 0;
+  border-radius: 0;
+  white-space: nowrap;
+  line-height: 1;
+  flex-shrink: 0;
+}
+#footer .cioos-footer-newsletter-submit:hover,
+#footer .cioos-footer-newsletter-submit:focus {
+  background: var(--cioos-darker-color);
+  outline: none;
+}
+
+/* Link columns */
+#footer .cioos-footer-col .cioos-footer-eyebrow {
+  margin-bottom: 14px;
+  display: block;
+}
+#footer .cioos-footer-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  line-height: 1.4;
+}
+#footer .cioos-footer-links li {
+  margin: 0;
+  padding: 0;
+}
+#footer .cioos-footer-links a {
+  color: #d7e6e3;
+  font-size: 13px;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+#footer .cioos-footer-links a:hover {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
+/* --- Funders strip --- */
+#footer .cioos-footer-funders {
+  background: var(--cioos-footer-bg);
+  position: relative;
+}
+#footer .cioos-footer-funders-inner {
+  padding-top: 20px;
+  padding-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  flex-wrap: wrap;
+}
+#footer .cioos-footer-funders-label {
+  white-space: nowrap;
+}
+#footer .cioos-footer-funders-list {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+  flex: 1;
+  flex-wrap: wrap;
+}
+#footer .cioos-footer-funder {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+#footer .cioos-footer-funder-mark {
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--cioos-heading-font);
+  font-size: 10px;
+  font-weight: 700;
+  color: #ffffff;
+  flex-shrink: 0;
+}
+#footer .cioos-footer-funder-text {
+  display: flex;
+  flex-direction: column;
+}
+#footer .cioos-footer-funder-name {
+  font-size: 12px;
+  color: #ffffff;
+  font-weight: 500;
+  line-height: 1.3;
+}
+#footer .cioos-footer-funder-fr {
+  font-size: 10px;
+  color: #8aa0a8;
+  font-style: italic;
+  margin-top: 2px;
+}
+#footer .cioos-footer-pills {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+#footer .cioos-footer-pill {
+  padding: 4px 10px;
+  border-radius: 100px;
+  font-size: 10px;
+  color: #a9c5c0;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+/* --- Legal bar --- */
+#footer .cioos-footer-legal {
+  background: var(--cioos-footer-bg);
+}
+#footer .cioos-footer-legal-inner {
+  padding-top: 16px;
+  padding-bottom: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #6b8289;
+  font-size: 12px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+#footer .cioos-footer-legal-copy {
+  color: #6b8289;
+}
+#footer .cioos-footer-legal-links {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+#footer .cioos-footer-legal-links a {
+  color: #6b8289;
+  text-decoration: none;
+  font-size: 12px;
+  transition: color 0.15s ease;
+}
+#footer .cioos-footer-legal-links a:hover {
+  color: #ffffff;
+}
+#footer .cioos-footer-lang {
+  display: inline-flex;
+  gap: 4px;
+}
+#footer .cioos-footer-lang-pill {
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 11px;
+  text-decoration: none;
+  color: #6b8289;
+}
+#footer .cioos-footer-lang-pill.active {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+
+/* ===========================================
    Resource List (Dataset Resources)
    Rounded corners for resource items
    =========================================== */

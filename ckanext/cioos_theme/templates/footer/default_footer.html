@@ -1,82 +1,193 @@
 {% macro include_site_footer() %}
 {% block footer_core %}
-<div id="footer-col1" class="widget-area one_sixth">
-	<aside class="widget widget_text">
-		<h3 class="footer-widget-title">
-			<span> {{_('CONTACT US')}}</span>
-		</h3>
-		<div class="textwidget">
-			<p>
-				<a href="mailto:info@cioos.ca">info@cioos.ca</a><br>
-				{%- if h.lang() == 'en' -%}
-				<a
-					href="https://docs.google.com/forms/d/e/1FAIpQLSeVJNzjk2AKJJ2IowUKPGH_ci9IfzWJvH8vvQL7tf3BfHFB2A/viewform?usp=header">
-					{{_('Submit feedback')}}
-				</a>
-				{%- else -%}
-				<a
-					href="https://docs.google.com/forms/d/e/1FAIpQLSeptvtJUnvoeDGWDiW6K7OjoBYQSfrsmFP6HWhxUBCgWCr-tA/viewform?usp=header">
-					{{_('Submit feedback')}}
-				</a>
-				{%- endif -%}
-			</p>
-		</div>
-	</aside>
-</div>
-<div id="footer-col2" class="widget-area one_third">
-	<aside class="widget widget_text">
-		<h3 class="footer-widget-title">
-			<span> {{_('CIOOS')}}</span>
-		</h3>
-		<div class="textwidget">
-			<div class="widget-area width_auto">
-				<aside class="widget_text widget widget_custom_html">
-					<div class="textwidget custom-html-widget">
-						<a href="https://cioospacific.ca/"> {{_('Pacific Region')}}</a>
-						<br>
-						<a href="https://ogsl.ca"> {{_('St. Lawrence Region')}}</a>
-						<br>
-						<a href="https://cioosatlantic.ca/"> {{_('Atlantic Region')}}</a>
-					</div>
-				</aside>
-			</div>
-		</div>
-	</aside>
-</div>
-<div id="footer-col3" class="widget-area last one_half width_auto">
-	<aside class="widget_text widget widget_custom_html">
-		<h3 class="footer-widget-title">
-			<span> {{_('SUBSCRIBE TO CIOOS VIA EMAIL')}}</span>
-		</h3>
-		<div class="textwidget custom-html-widget">
-			<div id="mc_embed_signup">
-				<form
-					action="https://cioos.us4.list-manage.com/subscribe/post?u=878a48e5216df1dd94addb795&id=a3c7b19b1e"
-					method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate"
-					target="_blank" novalidate="">
-					<div id="mc_embed_signup_scroll">
-						<div id="mce-responses" class="clear">
-							<div class="response" id="mce-error-response" style="display:none"></div>
-							<div class="response" id="mce-success-response" style="display:none"></div>
-						</div>
-						<div class="subcribe_container">
-							<div style="position: absolute; left: -5000px;" aria-hidden="true">
-								<input type="text" name="b_bbfb1b3442ef6556f2c6cdfff_da0cc8ed40" tabindex="-1" value="">
-							</div>
-							<div class="mc-field-group email">
-								<input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL"
-									placeholder="{{_('Email Address')}}">
-							</div>
-							<div class="clear">
-								<input type="submit" value="{{_('SUBSCRIBE')}}" name="subscribe"
-									id="mc-embedded-subscribe" class="subscribe">
-							</div>
-						</div>
-					</div>
-				</form>
-			</div>
-		</div>
-	</aside>
-</div>
+
+{# ============================================================
+   Regional associations band — top of footer
+   ============================================================ #}
+<section class="cioos-footer-regional">
+  <div class="cioos-footer-regional-inner">
+    <div class="cioos-footer-regional-heading">
+      <div class="cioos-footer-eyebrow accent">{{ _('Three Regional Associations') }}</div>
+      <div class="cioos-footer-tagline">
+        {{ _('Engaging locally · connecting regionally · coordinating nationally') }}
+      </div>
+    </div>
+    <div class="cioos-footer-regional-cards">
+      <a class="cioos-footer-ra-card" href="https://cioospacific.ca/" data-accent="pacific">
+        <span class="cioos-footer-ra-row">
+          <span class="cioos-footer-ra-dot"></span>
+          <span class="cioos-footer-ra-name">{{ _('CIOOS Pacific') }}</span>
+        </span>
+        <span class="cioos-footer-ra-sub">cioospacific.ca <span aria-hidden="true">↗</span></span>
+      </a>
+      <a class="cioos-footer-ra-card" href="https://ogsl.ca" data-accent="stlawrence">
+        <span class="cioos-footer-ra-row">
+          <span class="cioos-footer-ra-dot"></span>
+          <span class="cioos-footer-ra-name">{{ _('St. Lawrence Global Observatory') }}</span>
+        </span>
+        <span class="cioos-footer-ra-sub">ogsl.ca <span aria-hidden="true">↗</span></span>
+      </a>
+      <a class="cioos-footer-ra-card" href="https://cioosatlantic.ca/" data-accent="atlantic">
+        <span class="cioos-footer-ra-row">
+          <span class="cioos-footer-ra-dot"></span>
+          <span class="cioos-footer-ra-name">{{ _('CIOOS Atlantic') }}</span>
+        </span>
+        <span class="cioos-footer-ra-sub">cioosatlantic.ca <span aria-hidden="true">↗</span></span>
+      </a>
+    </div>
+  </div>
+</section>
+
+{# ============================================================
+   Main link grid — branding + 4 link columns
+   ============================================================ #}
+<section class="cioos-footer-grid">
+  <div class="cioos-footer-grid-inner">
+
+    <div class="cioos-footer-brand">
+      <div class="cioos-footer-logo">
+        <span class="cioos-footer-logo-mark">~</span>
+        <span class="cioos-footer-logo-text">CIOOS</span>
+        <span class="cioos-footer-logo-sub">{{ _('Data Catalogue') }}</span>
+      </div>
+      <p class="cioos-footer-blurb">
+        {{ _('The Canadian Integrated Ocean Observing System — open-access ocean data from coast to coast to coast. Established 2019.') }}
+      </p>
+
+      <div class="cioos-footer-newsletter">
+        <div class="cioos-footer-eyebrow accent">{{ _('Stay informed') }}</div>
+        <div id="mc_embed_signup">
+          <form
+            action="https://cioos.us4.list-manage.com/subscribe/post?u=878a48e5216df1dd94addb795&id=a3c7b19b1e"
+            method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate cioos-footer-newsletter-form"
+            target="_blank" novalidate="">
+            <div id="mc_embed_signup_scroll">
+              <div id="mce-responses" class="clear">
+                <div class="response" id="mce-error-response" style="display:none"></div>
+                <div class="response" id="mce-success-response" style="display:none"></div>
+              </div>
+              <div style="position: absolute; left: -5000px;" aria-hidden="true">
+                <input type="text" name="b_bbfb1b3442ef6556f2c6cdfff_da0cc8ed40" tabindex="-1" value="">
+              </div>
+              <div class="cioos-footer-newsletter-control">
+                <input type="email" value="" name="EMAIL" class="required email cioos-footer-newsletter-input"
+                       id="mce-EMAIL" placeholder="{{ _('your@email.ca') }}">
+                <button type="submit" name="subscribe" id="mc-embedded-subscribe"
+                        class="cioos-footer-newsletter-submit">
+                  {{ _('Subscribe') }} <span aria-hidden="true">→</span>
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="cioos-footer-col">
+      <div class="cioos-footer-eyebrow accent">{{ _('Catalogue') }}</div>
+      <ul class="cioos-footer-links">
+        <li><a href="{{ h.url_for('dataset.search') }}">{{ _('Browse datasets') }}</a></li>
+        <li><a href="{{ h.url_for('organization.index') }}">{{ _('Organizations') }}</a></li>
+        <li><a href="{{ h.url_for('group.index') }}">{{ _('Essential Ocean Variables') }}</a></li>
+        <li><a href="{{ h.url_for('home.index') }}#map">{{ _('Map explorer') }}</a></li>
+        <li><a href="/harvest">{{ _('Harvest sources') }}</a></li>
+      </ul>
+    </div>
+
+    <div class="cioos-footer-col">
+      <div class="cioos-footer-eyebrow accent">{{ _('Developers') }}</div>
+      <ul class="cioos-footer-links">
+        <li><a href="https://docs.ckan.org/en/2.11/api/">{{ _('API documentation') }}</a></li>
+        <li><a href="/api/3/action/package_search">{{ _('CKAN endpoint') }}</a></li>
+        <li><a href="https://catalogue.cioos.ca/erddap/">{{ _('ERDDAP') }}</a></li>
+        <li><a href="https://cioos-siooc.github.io/metadata-profile/">{{ _('Metadata profile') }}</a></li>
+        <li><a href="https://github.com/cioos-siooc">{{ _('GitHub') }} <span aria-hidden="true">↗</span></a></li>
+      </ul>
+    </div>
+
+    <div class="cioos-footer-col">
+      <div class="cioos-footer-eyebrow accent">{{ _('About') }}</div>
+      <ul class="cioos-footer-links">
+        <li><a href="https://cioos.ca/about/">{{ _('About CIOOS') }}</a></li>
+        <li><a href="https://cioos.ca/governance/">{{ _('Governance') }}</a></li>
+        <li><a href="https://cioos.ca/partners/">{{ _('Partners') }}</a></li>
+        <li><a href="https://cioos.ca/news/">{{ _('News & events') }}</a></li>
+        <li><a href="mailto:info@cioos.ca">{{ _('Contact us') }}</a></li>
+      </ul>
+    </div>
+
+    <div class="cioos-footer-col">
+      <div class="cioos-footer-eyebrow accent">{{ _('Resources') }}</div>
+      <ul class="cioos-footer-links">
+        <li><a href="https://cioos.ca/data-standards/">{{ _('Data standards') }}</a></li>
+        <li><a href="https://cioos.ca/publication-guide/">{{ _('Publication guide') }}</a></li>
+        <li><a href="https://www.go-fair.org/fair-principles/">{{ _('FAIR principles') }}</a></li>
+        <li><a href="https://www.gida-global.org/care">{{ _('CARE principles') }}</a></li>
+        <li><a href="https://cioos.ca/citation/">{{ _('Citation policy') }}</a></li>
+        <li>
+          {%- if h.lang() == 'en' -%}
+          <a href="https://docs.google.com/forms/d/e/1FAIpQLSeVJNzjk2AKJJ2IowUKPGH_ci9IfzWJvH8vvQL7tf3BfHFB2A/viewform?usp=header">{{ _('Submit feedback') }}</a>
+          {%- else -%}
+          <a href="https://docs.google.com/forms/d/e/1FAIpQLSeptvtJUnvoeDGWDiW6K7OjoBYQSfrsmFP6HWhxUBCgWCr-tA/viewform?usp=header">{{ _('Submit feedback') }}</a>
+          {%- endif -%}
+        </li>
+      </ul>
+    </div>
+
+  </div>
+</section>
+
+{# ============================================================
+   Funders strip
+   ============================================================ #}
+<section class="cioos-footer-funders">
+  <div class="cioos-footer-funders-inner">
+    <span class="cioos-footer-eyebrow accent cioos-footer-funders-label">{{ _('Funded by') }}</span>
+    <div class="cioos-footer-funders-list">
+      <div class="cioos-footer-funder">
+        <div class="cioos-footer-funder-mark">DFO</div>
+        <div class="cioos-footer-funder-text">
+          <div class="cioos-footer-funder-name">{{ _('Fisheries and Oceans Canada') }}</div>
+          <div class="cioos-footer-funder-fr">Pêches et Océans Canada</div>
+        </div>
+      </div>
+      <div class="cioos-footer-funder">
+        <div class="cioos-footer-funder-mark">MEOPAR</div>
+        <div class="cioos-footer-funder-text">
+          <div class="cioos-footer-funder-name">{{ _('Marine Environmental Observation, Prediction & Response Network') }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="cioos-footer-pills">
+      <span class="cioos-footer-pill">FAIR</span>
+      <span class="cioos-footer-pill">CARE</span>
+      <span class="cioos-footer-pill">{{ _('Open Data') }}</span>
+      <span class="cioos-footer-pill">GOOS</span>
+    </div>
+  </div>
+</section>
+
+{# ============================================================
+   Legal bar
+   ============================================================ #}
+<section class="cioos-footer-legal">
+  <div class="cioos-footer-legal-inner">
+    <span class="cioos-footer-legal-copy">
+      © 2026 CIOOS / SIOOC ·
+      {{ _('Hosted by MEOPAR Coordination Office') }} ·
+      {{ _('Powered by CKAN') }}
+    </span>
+    <div class="cioos-footer-legal-links">
+      <a href="https://cioos.ca/privacy/">{{ _('Privacy') }}</a>
+      <a href="https://cioos.ca/accessibility/">{{ _('Accessibility') }}</a>
+      <a href="https://cioos.ca/terms/">{{ _('Terms') }}</a>
+      <span class="cioos-footer-lang">
+        <a href="?locale=en" class="cioos-footer-lang-pill {% if h.lang() == 'en' %}active{% endif %}">EN</a>
+        <a href="?locale=fr" class="cioos-footer-lang-pill {% if h.lang() == 'fr' %}active{% endif %}">FR</a>
+      </span>
+    </div>
+  </div>
+</section>
+
 {% endblock %}
 {% endmacro %}
