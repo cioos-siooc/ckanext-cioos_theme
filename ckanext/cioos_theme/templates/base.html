@@ -230,7 +230,7 @@
       %}
     >
       {%- block page %}{% endblock -%} {%- block scripts %} {% endblock -%} {%
-      block body_extras -%} {# defined in the config.ini under
+      include "snippets/sentry_feedback.html" %} {% block body_extras -%} {# defined in the config.ini under
       "ckan.template_footer_end" #} {{ g.template_footer_end | safe }} {%-
       endblock %} {# render any style assets registered by page body snippets #}
       {{ h.render_assets('style') }} {# render script assets #} {{
