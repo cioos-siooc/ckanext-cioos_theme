@@ -682,6 +682,9 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                 "ckan.homepage_template", "home/default_home.html"
             ),
             "cioos_get_cfg": lambda key, default=None: toolkit.config.get(key, default),
+            "cioos_get_cfg_bool": lambda key, default=False: toolkit.asbool(
+                toolkit.config.get(key, default)
+            ),
             "cioos_get_doi_authority_url": cioos_helpers.get_doi_authority_url,
             "cioos_get_doi_prefix": cioos_helpers.get_doi_prefix,
             "cioos_get_datacite_org": cioos_helpers.get_datacite_org,
