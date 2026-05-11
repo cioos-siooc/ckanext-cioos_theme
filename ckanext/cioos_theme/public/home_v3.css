@@ -61,7 +61,7 @@ body:has(.home-v3) #header-container .v3-nav {
 
 #header-container.header-v3 .v3-nav-inner,
 body:has(.home-v3) #header-container .v3-nav-inner {
-  max-width: 1140px;
+  max-width: 1440px;
   margin: 0 auto;
   padding: 14px 12.8px;
   display: flex;
@@ -549,7 +549,7 @@ body:has(.home-v3) #header-container .v3-bleed,
 }
 
 .home-v3 .v3-hero-inner {
-  max-width: 1080px;
+  max-width: 1440px;
   margin: 0 auto;
   position: relative;
   text-align: center;
@@ -738,7 +738,7 @@ body:has(.home-v3) #header-container .v3-bleed,
 }
 
 .home-v3 .v3-section-inner {
-  max-width: 1180px;
+  max-width: 1440px;
   margin: 0 auto;
 }
 

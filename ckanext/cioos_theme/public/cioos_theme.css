@@ -579,7 +579,7 @@ aside #dataset-map {
 
 #topmenu .topmenu-inner {
   width: 100%;
-  max-width: 1140px;
+  max-width: 1440px;
   margin: 0 auto;
   padding: 0 12.8px;
   display: flex;
@@ -687,7 +687,7 @@ aside #dataset-map {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  max-width: 1140px;
+  max-width: 1440px;
   width: 100%;
   margin: 0 auto;
   padding: 0 12.8px;
@@ -867,7 +867,7 @@ aside #dataset-map {
 }
 
 .account-masthead .container {
-  max-width: 1140px;
+  max-width: 1440px;
   margin: 0 auto;
   padding: 0 12.8px;
 }
@@ -1089,10 +1089,8 @@ aside #dataset-map {
 #footer .cioos-footer-grid-inner,
 #footer .cioos-footer-funders-inner,
 #footer .cioos-footer-legal-inner {
-  max-width: 1140px;
+  max-width: 1440px;
   margin: 0 auto;
-  padding-left: 32px;
-  padding-right: 32px;
   position: relative;
 }
 
