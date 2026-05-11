@@ -1,0 +1,24 @@
+{#
+Renders the dataset list as a table-style grid. Used by package/search.html.
+
+packages - The list of packages to render.
+
+Example:
+
+  {% snippet 'snippets/package_list.html', packages=c.page.items %}
+#}
+{% if packages %}
+  <div class="dataset-list" role="list">
+    <div class="db-table-header" aria-hidden="true">
+      <span>{{ _('Dataset') }}</span>
+      <span>{{ _('Organizations') }}</span>
+      <span>{{ _('Updated') }} ↓</span>
+      <span>{{ _('Access') }}</span>
+    </div>
+    {% for package in packages %}
+      {% snippet 'snippets/package_item.html', package=package %}
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="db-empty">{{ _('No datasets match the current filters.') }}</div>
+{% endif %}

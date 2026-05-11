@@ -92,3 +92,18 @@ home_v3_map_css:
   contents:
     - js/markercluster/MarkerCluster.css
     - js/markercluster/MarkerCluster.Default.css
+
+dataset_browser_css:
+  filters: cssrewrite
+  output: ckanext-cioos_theme/%(version)s_dataset_browser.css
+  contents:
+    - dataset_browser.css
+
+dataset_browser_js:
+  filter: rjsmin
+  output: ckanext-cioos_theme/%(version)s_dataset_browser.js
+  extra:
+    preload:
+      - base/main
+  contents:
+    - js/modules/dataset-browser.js

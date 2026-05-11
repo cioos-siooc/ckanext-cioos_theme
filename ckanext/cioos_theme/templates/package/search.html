@@ -1,78 +1,248 @@
-{% extends "page.html" %} {% import 'macros/form.html' as form %} {% block
-styles %} {{ super() }} {% asset 'ckanext-spatial/spatial_query_css' %} {%
-endblock %} {% block scripts %} {{ super() }} {% asset
-'ckanext-spatial/spatial_query_js' %} {% asset
-'ckanext-cioos_theme/spatial_fix_js' %} {% endblock %} {% set lang = h.lang() %}
-{% set default_extent = h.spatial_default_extent() if
-h.cioos_helper_available('spatial_default_extent') else
-h.cioos_get_cfg('ckan.spatial.default_extent', '[-180,-90,180,90]') %} {% set
-dataset_extents_url = h.cioos_get_dataset_extents_url(q=c.q, fields=c.fields,
-bbox_values=request.args.get('ext_bbox'), output='json') %} {% set
-ra_extents_url = h.cioos_get_ra_extents_url() %} {% block subtitle %}{{
-_("Datasets") }}{% endblock %} {% block breadcrumb_content %}
-<li class="active">
-  {% link_for _(dataset_type.title() + 's'), named_route=dataset_type +
-  '_search' %}
-</li>
-{% endblock %} {% block primary_content %}
+{% extends "page.html" %}
+{% import 'macros/form.html' as form %}
+
+{% block styles %}
+  {{ super() }}
+  {% asset 'ckanext-spatial/spatial_query_css' %}
+  {% asset 'ckanext-cioos_theme/dataset_browser_css' %}
+{% endblock %}
+
+{% block scripts %}
+  {{ super() }}
+  {% asset 'ckanext-spatial/spatial_query_js' %}
+  {% asset 'ckanext-cioos_theme/spatial_fix_js' %}
+  {% asset 'ckanext-cioos_theme/dataset_browser_js' %}
+{% endblock %}
+
+{% block bodytag %}{{ super() }} class="dataset-browser"{% endblock %}
+
+{% set lang = h.lang() %}
+{% set default_extent = h.spatial_default_extent() if h.cioos_helper_available('spatial_default_extent') else h.cioos_get_cfg('ckan.spatial.default_extent', '[-180,-90,180,90]') %}
+{% set dataset_extents_url = h.cioos_get_dataset_extents_url(q=c.q, fields=c.fields, bbox_values=request.args.get('ext_bbox'), output='json') %}
+{% set ra_extents_url = h.cioos_get_ra_extents_url() %}
+
+{% set sorting = [
+    (_('Relevance'), 'score desc, metadata_modified desc'),
+    (_('Name Ascending'), 'title_' + lang + ' asc'),
+    (_('Name Descending'), 'title_' + lang + ' desc'),
+    (_('Oldest First'), 'temporal-extent-begin asc'),
+    (_('Newest First'), 'temporal-extent-end desc'),
+    (_('Last Modified'), 'metadata_modified desc'),
+    (_('Popular'), 'views_recent desc') if g.tracking_enabled else (false, false)
+  ]
+%}
+
+{# Count applied filters: each (field, value) pair plus extras #}
+{% set applied_ns = namespace(count=0) %}
+{% for field, values in c.fields_grouped.items() %}{% set applied_ns.count = applied_ns.count + values|length %}{% endfor %}
+{% if c.search_extras and c.search_extras.get('ext_bbox') %}{% set applied_ns.count = applied_ns.count + 1 %}{% endif %}
+{% if c.search_extras and (c.search_extras.get('ext_year_begin') or c.search_extras.get('ext_year_end')) %}{% set applied_ns.count = applied_ns.count + 1 %}{% endif %}
+
+{% set total_count = h.cioos_count_datasets() if h.cioos_helper_available('cioos_count_datasets') else c.page.item_count %}
+
+{% block subtitle %}{{ _("Datasets") }}{% endblock %}
+
+{% block toolbar %}{% endblock %}
+{% block breadcrumb %}{% endblock %}
+
+{% block primary_content %}
 <section class="module">
   <div class="module-content">
-    {% block page_primary_action %} {% if h.check_access('package_create') %}
-    <div class="page_primary_action">
-      {{ h.snippet ('snippets/add_dataset.html', dataset_type=dataset_type) }}
+
+    {# ---- Hero ---- #}
+    <div class="db-hero">
+      <svg class="db-hero-bg" viewBox="0 0 1280 220" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <defs>
+          <linearGradient id="oceanDepthL" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#8cc9bf" stop-opacity="0.7"/>
+            <stop offset="100%" stop-color="#0b1f26" stop-opacity="0.9"/>
+          </linearGradient>
+          <linearGradient id="sunBeamL" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#ffffff" stop-opacity="0.3"/>
+            <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <rect width="1280" height="220" fill="url(#oceanDepthL)"/>
+        <polygon points="200,0 240,220 160,220" fill="url(#sunBeamL)" opacity="0.5"/>
+        <polygon points="640,0 700,220 580,220" fill="url(#sunBeamL)" opacity="0.3"/>
+        <polygon points="1050,0 1100,220 1000,220" fill="url(#sunBeamL)" opacity="0.4"/>
+        <path d="M0,50 Q320,44 640,50 T1280,50" stroke="white" stroke-width="0.8" fill="none" opacity="0.12"/>
+        <path d="M0,100 Q320,94 640,100 T1280,100" stroke="white" stroke-width="0.8" fill="none" opacity="0.15"/>
+        <path d="M0,160 Q320,154 640,160 T1280,160" stroke="white" stroke-width="0.8" fill="none" opacity="0.18"/>
+      </svg>
+
+      <div class="db-hero-inner">
+        <div class="db-hero-breadcrumb">
+          <a href="{{ h.url_for('/') }}">{{ _('Catalogue') }}</a>
+          <span class="sep">›</span>
+          <span class="current">{{ _('Datasets') }}</span>
+        </div>
+
+        <div class="db-hero-row">
+          <div>
+            <h1 class="db-hero-title">{{ _('Dataset browser') }}</h1>
+            <div class="db-hero-counts">
+              <b>{{ '{:,}'.format(total_count) }}</b> {{ _('datasets') }} ·
+              <b class="matching">{{ '{:,}'.format(c.page.item_count) }}</b> {{ _('matching current filters') }}
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-    {% endif %} {% endblock %} {% block form %} {% set facets = { 'fields':
-    c.fields_grouped, 'search': c.search_facets, 'titles': c.facet_titles,
-    'translated_fields': c.translated_fields, 'extras': c.search_extras,
-    'remove_field': c.remove_field } %} {% set sorting = [ (_('Relevance'),
-    'score desc, metadata_modified desc'), (_('Name Ascending'), 'title_' + lang
-    + ' asc'), (_('Name Descending'), 'title_' + lang + ' desc'), (_('Oldest
-    First'), 'temporal-extent-begin asc'), (_('Newest First'),
-    'temporal-extent-end desc'), (_('Last Modified'), 'metadata_modified desc'),
-    (_('Popular'), 'views_recent desc') if g.tracking_enabled else (false,
-    false) ] %} {% snippet 'snippets/search_form.html',
-    form_id='dataset-search-form', type=dataset_type, query=c.q,
-    sorting=sorting, sorting_selected=c.sort_by_selected,
-    count=c.page.item_count, placeholder=_('Search ' + dataset_type + 's') +
-    '...', facets=facets, show_empty=request.args, error=c.query_error,
-    fields=c.fields %} {% endblock %} {% block package_search_results_list %} {{
-    h.snippet('snippets/package_list.html', packages=c.page.items) }} {%
-    endblock %}
-  </div>
 
-  {% block page_pagination %} {{ c.page.pager(q=c.q) }} {% endblock %}
+    {# ---- Main grid: table + preview ---- #}
+    <div class="db-grid">
+
+      {# ---- Left column: refine bar, applied chips, list, pagination ---- #}
+      <div class="db-table-col">
+
+        <form id="dataset-search-form" class="search-form" method="get" data-module="select-switch">
+          <div class="db-refine-bar">
+            <div class="db-refine-input">
+              <span class="icon">⌕</span>
+              <input
+                aria-label="{{ _('Refine within') }} {{ '{:,}'.format(total_count) }} {{ _('datasets') }}"
+                type="text"
+                class="mf-input"
+                name="q"
+                value="{{ c.q }}"
+                autocomplete="off"
+                placeholder="{{ _('Refine within') }} {{ '{:,}'.format(total_count) }} {{ _('datasets') }}…"
+              />
+            </div>
+
+            <button type="button" class="mf-btn db-filters-btn" data-bs-toggle="modal" data-bs-target="#datasetFilterModal">
+              {{ _('Filters') }}
+              {% if applied_ns.count > 0 %}<span class="badge-count">{{ applied_ns.count }}</span>{% endif %}
+              <span aria-hidden="true">▾</span>
+            </button>
+
+            {% if sorting %}
+              <span class="form-group control-order-by mb-0">
+                <label for="field-order-by" class="visually-hidden">{{ _('Order by') }}</label>
+                <select id="field-order-by" name="sort" class="mf-input" style="width: auto; padding-right: 32px;">
+                  {% for label, value in sorting %}
+                    {% if label and value %}
+                      <option value="{{ value }}"{% if c.sort_by_selected == value %} selected="selected"{% endif %}>{{ _('Sort:') }} {{ label }}</option>
+                    {% endif %}
+                  {% endfor %}
+                </select>
+                <button class="btn btn-default js-hide" type="submit">{{ _('Go') }}</button>
+              </span>
+            {% endif %}
+
+            {% if c.fields %}
+              <span class="visually-hidden">{{ form.hidden_from_list(fields=c.fields) }}</span>
+            {% endif %}
+          </div>
+        </form>
+
+        {# ---- Applied filter chips (outside form — chip links are GETs) ---- #}
+        {% if applied_ns.count > 0 %}
+          <div class="db-applied">
+            <span class="applied-label">{{ _('Applied') }}</span>
+
+            {% for field in c.fields_grouped %}
+              {% set search_facets_items = c.search_facets.get(field, {}).get('items', []) %}
+              {% for value in c.fields_grouped[field] %}
+                <span class="mf-tag teal">
+                  {{ c.facet_titles.get(field, field) }}:
+                  {%- if c.translated_fields and ((field, value) in c.translated_fields) -%}
+                    {{ c.translated_fields[(field, value)] }}
+                  {%- else -%}
+                    {{ h.list_dict_filter(search_facets_items, 'name', 'display_name', value) }}
+                  {%- endif %}
+                  <a href="{{ c.remove_field(field, value) }}" title="{{ _('Remove') }}">✕</a>
+                </span>
+              {% endfor %}
+            {% endfor %}
+
+            {% if c.search_extras and c.search_extras.get('ext_bbox') %}
+              <span class="mf-tag teal">
+                {{ _('Location') }}: {{ _('bbox') }}
+                <a href="{{ c.remove_field(['ext_bbox','ext_prev_extent','ext_location']) }}" title="{{ _('Remove') }}">✕</a>
+              </span>
+            {% endif %}
+
+            {% if c.search_extras and (c.search_extras.get('ext_year_begin') or c.search_extras.get('ext_year_end')) %}
+              <span class="mf-tag teal">
+                {{ _('Year') }}:
+                {{ c.search_extras.get('ext_year_begin', '*') }}–{{ c.search_extras.get('ext_year_end', '*') }}
+                <a href="{{ c.remove_field(['ext_year_begin','ext_year_end','ext_show_empty_range']) }}" title="{{ _('Remove') }}">✕</a>
+              </span>
+            {% endif %}
+
+            <a class="clear-all" href="{{ h.url_for(c.dataset_type ~ '.search') }}">{{ _('clear all') }}</a>
+          </div>
+        {% endif %}
+
+        {# ---- Dataset list (table-style) ---- #}
+        {% block package_search_results_list %}
+          {{ h.snippet('snippets/package_list.html', packages=c.page.items) }}
+        {% endblock %}
+
+        {# ---- Pagination ---- #}
+        {% block page_pagination %}
+          {% if c.page.items and c.page.page_count > 1 %}
+            <div class="db-pagination">
+              <span class="summary">
+                {{ _('Showing') }}
+                {{ ((c.page.page - 1) * c.page.items_per_page) + 1 }}–{{ ((c.page.page - 1) * c.page.items_per_page) + c.page.items|length }}
+                {{ _('of') }} {{ '{:,}'.format(c.page.item_count) }}
+              </span>
+              <div class="pages">
+                {{ c.page.pager(q=c.q, format='$link_previous $link_first $link_last $link_next', symbol_previous='‹', symbol_next='›') }}
+              </div>
+            </div>
+          {% elif c.page.items %}
+            <div class="db-pagination">
+              <span class="summary">
+                {{ _('Showing') }} {{ c.page.items|length }} {{ _('of') }} {{ '{:,}'.format(c.page.item_count) }}
+              </span>
+            </div>
+          {% endif %}
+        {% endblock %}
+
+      </div>
+
+    </div>{# /.db-grid #}
+
+    {# ---- Preview overlay (sits above the page, hidden until a row is clicked) ---- #}
+    <div class="db-preview-backdrop" id="dataset-preview-backdrop"></div>
+    <aside class="db-preview-col" id="dataset-preview-col" role="dialog" aria-modal="true" aria-live="polite" aria-label="{{ _('Dataset preview') }}"></aside>
+
+  </div>{# /.module-content #}
 </section>
 
-{% block package_search_results_api %}
-<section class="module">
-  <div class="module-content">
-    {% block package_search_results_api_inner %}
-    <small>
-      {% set api_link = h.link_to(_('API'), h.url_for(controller='api',
-      action='get_api', ver=3)) %} {% set api_doc_link = h.link_to(_('API
-      Docs'), 'http://docs.ckan.org/en/{0}/api/'.format(g.ckan_doc_version)) %}
-      {% if g.dumps_url -%} {% set dump_link = h.link_to(_('full {format}
-      dump').format(format=g.dumps_format), g.dumps_url) %} {% trans %} You can
-      also access this registry using the {{ api_link }} (see {{ api_doc_link
-      }}) or download a {{ dump_link }}. {% endtrans %} {% else %} {% trans %}
-      You can also access this registry using the {{ api_link }} (see {{
-      api_doc_link }}). {% endtrans %} {%- endif %}
-    </small>
-    {% endblock %}
+{# ---- Filter modal ---- #}
+<div class="modal fade db-filter-modal" id="datasetFilterModal" tabindex="-1" aria-labelledby="datasetFilterModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="datasetFilterModalLabel">{{ _('Refine results') }}</h2>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Close') }}"></button>
+      </div>
+      <div class="modal-body">
+        {% snippet "spatial/snippets/spatial_query.html",
+          default_extent=default_extent,
+          dataset_extents_url=dataset_extents_url,
+          ra_extents_url=ra_extents_url
+        %}
+        {% snippet "snippets/daterange.html" %}
+        {% for facet in c.facet_titles %}
+          {{ h.snippet('snippets/facet_list.html', title=c.facet_titles[facet], name=facet, hide_empty='true') }}
+        {% endfor %}
+      </div>
+      <div class="modal-footer">
+        {% if applied_ns.count > 0 %}
+          <a href="{{ h.url_for(c.dataset_type ~ '.search') }}" class="mf-btn ghost">{{ _('Clear all') }}</a>
+        {% endif %}
+        <button type="button" class="mf-btn primary" data-bs-dismiss="modal">{{ _('Done') }}</button>
+      </div>
+    </div>
   </div>
-</section>
-{% endblock %} {% endblock %} {% block secondary_content %}
-<div class="filters">
-  <div>
-    {% snippet "spatial/snippets/spatial_query.html",
-    default_extent=default_extent, dataset_extents_url=dataset_extents_url,
-    ra_extents_url=ra_extents_url %} {% snippet "snippets/daterange.html" %} {%
-    for facet in c.facet_titles %} {{ h.snippet('snippets/facet_list.html',
-    title=c.facet_titles[facet], name=facet, hide_empty='true') }} {% endfor %}
-  </div>
-  <a class="close no-text hide-filters">
-    <i class="fa fa-times-circle"></i>
-    <span class="text">close</span>
-  </a>
 </div>
 {% endblock %}
+
+{# Suppress the right-rail filters — they live in the modal now. #}
+{% block secondary_content %}{% endblock %}

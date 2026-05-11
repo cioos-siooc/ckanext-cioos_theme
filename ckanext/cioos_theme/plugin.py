@@ -334,6 +334,16 @@ def render_basic_package_view(id):
     return toolkit.render("package/basic.html", extra_vars={"pkg_dict": pkg})
 
 
+def render_package_preview(id):
+    try:
+        pkg = toolkit.get_action("package_show")(data_dict={"id": id})
+    except (toolkit.ObjectNotFound, NotFound):
+        toolkit.abort(404, _("Dataset not found"))
+    except toolkit.NotAuthorized:
+        toolkit.abort(403, _("Not authorized"))
+    return toolkit.render("snippets/package_preview.html", extra_vars={"package": pkg})
+
+
 def cioos_home_index():
     if g.userobj and not g.userobj.email:
         url = toolkit.h.url_for(controller="user", action="edit")
@@ -498,6 +508,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             ("/schemamap", "schemamap", render_schemamap),
             ("/dataset/<id>.dcxml", "datacite_xml", render_datacite_xml),
             ("/dataset/<id>.basic", "package_basic", render_basic_package_view),
+            ("/dataset/<id>.preview", "package_preview", render_package_preview),
             ("/", "home", cioos_home_index),
         ]
         for rule in rules:
@@ -1366,6 +1377,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                     or toolkit.request.path == "/dataset"
                 ) and search_params["fl"] == "id validated_data_dict":
                     fields_to_keep = [
+                        "id",
                         "title_translated",
                         "notes_translated",
                         "resources",
@@ -1375,6 +1387,19 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                         "name",
                         "private",
                         "unique-resource-identifier-full",
+                        # Required by the dataset-browser layout:
+                        "metadata_modified",
+                        "eov",
+                        "keywords",
+                        "groups",
+                        "owner_org",
+                        "organization",
+                        "temporal-extent-begin",
+                        "temporal-extent-end",
+                        "license_id",
+                        "license_title",
+                        "license_url",
+                        "frequency-of-update",
                     ]
                     result = {k: v for k, v in result.items() if k in fields_to_keep}
                     try:

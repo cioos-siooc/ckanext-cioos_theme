@@ -1,88 +1,134 @@
 {#
-Displays a single of dataset.
+Displays a single dataset as a row in the dataset browser table.
 
-package        - A package to display.
-item_class     - The class name to use on the list item.
-hide_resources - If true hides the resources (default: false).
-banner         - If true displays a popular banner (default: false).
-truncate       - The length to trucate the description to (default: 180)
-truncate_title - The length to truncate the title to (default: 80).
+package - A package to display.
 
 Example:
 
   {% snippet 'snippets/package_item.html', package=c.datasets[0] %}
-
 #}
-{% set truncate = truncate or 180 %}
-{% set truncate_title = truncate_title or 80 %}
-{% set title = h.get_translated(package, 'title') or h.get_translated(package, 'name') %}
-{% set notes = h.markdown_extract(h.get_translated(package, 'notes'), extract_length=truncate) %}
+{% set title = h.get_translated(package, 'title') or h.get_translated(package, 'name') or package.name %}
+{% set href = h.url_for(package.type + '.read', id=package.name) %}
 
-{% block package_item %}
-  <li class="{{ item_class or "dataset-item" }}">
-    {% block content %}
-      <div class="dataset-content">
-        {% block heading %}
-          <h3 class="dataset-heading">
-            {% block heading_private %}
-              {% if package.private %}
-                <span class="dataset-private label label-inverse">
-                  <i class="fa fa-lock"></i>
-                  {{ _('Private') }}
-                </span>
-              {% endif %}
-            {% endblock %}
-            {% block heading_title %}
-              {{ h.link_to(title|truncate(truncate_title, killwords=True), h.url_for(package.type + '.read', controller='dataset', action='read', id=package.name)) }}
-            {% endblock %}
-            {% block heading_meta %}
-              {% if package.get('state', '').startswith('draft') %}
-                <span class="label label-info">{{ _('Draft') }}</span>
-              {% elif package.get('state', '').startswith('deleted') %}
-                <span class="label label-danger">{{ _('Deleted') }}</span>
-              {% endif %}
-              {{ h.popular('recent views', package.tracking_summary.recent, min=10) if package.tracking_summary }}
-            {% endblock %}
-          </h3>
-        {% endblock %}
-        {% block banner %}
-          {% if banner %}
-            <span class="banner">{{ _('Popular') }}</span>
-          {% endif %}
-        {% endblock %}
-        {% block notes %}
-          {% if notes and notes != 'Not Available' %}
-            <div>{{ notes|urlize }}</div>
-          {% else %}
-            <p class="empty">{{ _("This dataset has no description") }}</p>
-          {% endif %}
-        {% endblock %}
-        {% block identifier %}
-          {{ h.snippet('snippets/identifier_list.html',
-              container = 'div',
-              uri = h.cioos_get_fully_qualified_package_uri(
-                package,
-                uri_field='unique-resource-identifier-full',
-                default_code_space='doi.org')
-              )
-          }}
-        {% endblock %}
-      </div>
-      {% block resources %}
-        {% if package.resources and not hide_resources %}
-          {% block resources_outer %}
-            <ul class="dataset-resources list-unstyled">
-              {% block resources_inner %}
-                {% for resource in h.dict_list_reduce(package.resources, 'format') %}
-                <li>
-                  <a href="{{ h.url_for(package.type ~ '.read', id=package.name) }}" class="label label-default" data-format="{{ resource.lower() }}">{{ _(resource) }}</a>
-                </li>
-                {% endfor %}
-              {% endblock %}
-            </ul>
-          {% endblock %}
+{# --- Meta line: year range · license · DOI --- #}
+{% set t_begin = (package.get('temporal-extent-begin') or '') | string %}
+{% set t_end = (package.get('temporal-extent-end') or '') | string %}
+{% set year_range = '' %}
+{% if t_begin and t_end %}{% set year_range = t_begin[:4] ~ '–' ~ t_end[:4] %}
+{% elif t_begin %}{% set year_range = t_begin[:4] ~ '–' %}
+{% elif t_end %}{% set year_range = '–' ~ t_end[:4] %}
+{% endif %}
+
+{% set license_label = package.get('license_title') or package.get('license_id') or '' %}
+{% set license_url = package.get('license_url') or '' %}
+
+{% set doi_full = '' %}
+{% set doi_display = '' %}
+{% if package.get('unique-resource-identifier-full') %}
+  {% set doi_list = h.cioos_get_fully_qualified_package_uri(package, uri_field='unique-resource-identifier-full', default_code_space='doi.org') %}
+  {% if doi_list and doi_list|length > 0 %}
+    {% set doi_full = doi_list[0]|string %}
+    {% set doi_display = doi_full|replace('https://doi.org/', '')|replace('http://doi.org/', '')|replace('https://', '')|replace('http://', '') %}
+  {% endif %}
+{% endif %}
+
+{# --- Org list: prefer responsible-org groups (resorg), fall back to owner org --- #}
+{% set resorg_groups = [] %}
+{% set pkg_groups = package.get('groups') or [] %}
+{% for grp in pkg_groups %}
+  {% set gname = grp.get('name', '') if grp is mapping else '' %}
+  {% set gtype = grp.get('type', '') if grp is mapping else '' %}
+  {% if gtype == 'resorg' or gname.startswith('resorg') %}
+    {% set _x = resorg_groups.append(grp) %}
+  {% endif %}
+{% endfor %}
+{% set owner_org = package.get('organization') %}
+{% set orgs_to_show = resorg_groups if resorg_groups else ([owner_org] if owner_org else []) %}
+
+{# --- Access formats --- #}
+{% set formats_list = h.dict_list_reduce(package.get('resources') or [], 'format') | list %}
+{% set access_label = formats_list[:2] | map('upper') | join(' · ') if formats_list else '' %}
+
+{# --- Updated --- #}
+{% set updated_ts = package.get('metadata_modified') %}
+
+<div class="db-row"
+     role="button"
+     tabindex="0"
+     data-package-name="{{ package.name }}"
+     data-package-id="{{ package.id }}"
+     data-package-href="{{ href }}">
+
+  <div>
+    <a class="db-row-title" href="{{ href }}">{{ title|truncate(90, killwords=True) }}</a>
+    {% if year_range or license_label or doi_display %}
+      <div class="db-row-meta">
+        {% set meta_ns = namespace(any=false) %}
+
+        {% if year_range %}
+          {% if meta_ns.any %}<span class="db-row-meta-sep" aria-hidden="true">·</span>{% endif %}
+          <span class="db-row-meta-item">{{ year_range }}</span>
+          {% set meta_ns.any = true %}
         {% endif %}
-      {% endblock %}
-    {% endblock %}
-  </li>
-{% endblock %}
+
+        {% if license_label %}
+          {% if meta_ns.any %}<span class="db-row-meta-sep" aria-hidden="true">·</span>{% endif %}
+          {% if license_url %}
+            <a class="db-row-meta-link db-row-meta-license" href="{{ license_url }}" target="_blank" rel="noopener">{{ license_label }}</a>
+          {% else %}
+            <span class="db-row-meta-item">{{ license_label }}</span>
+          {% endif %}
+          {% set meta_ns.any = true %}
+        {% endif %}
+
+        {% if doi_full and doi_display %}
+          {% if meta_ns.any %}<span class="db-row-meta-sep" aria-hidden="true">·</span>{% endif %}
+          <a class="db-row-meta-link" href="{{ doi_full }}" target="_blank" rel="noopener">{{ doi_display }}</a>
+          {% set meta_ns.any = true %}
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="db-row-orgs">
+    {% if orgs_to_show %}
+      <div class="db-org-stack">
+        {% for org in orgs_to_show[:3] %}
+          {% set org_title = h.get_translated(org, 'title') or org.get('display_name') or org.get('title') or org.get('name') or '' %}
+          {% set words = org_title.split() if org_title else [] %}
+          {% set first_letter = (words[0][:1] if words else '') %}
+          {% set second_letter = (words[1][:1] if words|length > 1 else (org_title[1:2] if org_title|length > 1 else '')) %}
+          {% set initials = (first_letter ~ second_letter)|upper %}
+          {% set img = org.get('image_display_url') or org.get('image_url') %}
+          <span class="db-org-avatar" title="{{ org_title }}">
+            {% if img %}
+              {% if img.startswith('http://') or img.startswith('https://') %}
+                <img src="{{ img }}" alt="" loading="lazy" />
+              {% else %}
+                <img src="{{ h.url_for_static_or_external('/uploads/group/' ~ img) }}" alt="" loading="lazy" />
+              {% endif %}
+            {% else %}
+              {{ initials or '··' }}
+            {% endif %}
+          </span>
+        {% endfor %}
+      </div>
+      {% set primary_org = orgs_to_show[0] %}
+      {% set primary_title = h.get_translated(primary_org, 'title') or primary_org.get('display_name') or primary_org.get('title') or primary_org.get('name') or '' %}
+      <div class="db-org-text">
+        <span class="name">{{ primary_title|truncate(22, killwords=True) }}</span>
+        {% if orgs_to_show|length > 1 %}
+          <span class="more">+{{ orgs_to_show|length - 1 }} {{ _('more') }}</span>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="db-row-updated">
+    {% if updated_ts %}{{ h.time_ago_from_timestamp(updated_ts) }}{% endif %}
+  </div>
+
+  <div class="db-row-access">
+    {% if access_label %}<span class="mf-tag outline">{{ access_label }}</span>{% endif %}
+  </div>
+</div>

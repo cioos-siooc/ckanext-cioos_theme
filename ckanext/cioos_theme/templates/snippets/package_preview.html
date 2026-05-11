@@ -1,0 +1,258 @@
+{#
+Renders the right-rail preview for a single dataset on the dataset-browser page.
+
+package - The package dict (result of package_show / a search result item).
+
+Used both as the initial-render snippet inside package/search.html, and via the
+/dataset/<id>.preview endpoint when a row is clicked client-side.
+#}
+{% set lang = h.lang() %}
+{% set title = h.get_translated(package, 'title') or package.name %}
+{% set href = h.url_for(package.type + '.read', id=package.name) %}
+{% set notes_html = h.render_markdown(h.get_translated(package, 'notes')) if package.get('notes') or package.get('notes_translated') else '' %}
+
+{% set eovs_raw = package.get('eov') %}
+{% set eovs = eovs_raw if (eovs_raw is iterable and eovs_raw is not string and eovs_raw is not mapping) else [] %}
+
+{% set ecvs_raw = package.get('ecv') %}
+{% set ecvs = ecvs_raw if (ecvs_raw is iterable and ecvs_raw is not string and ecvs_raw is not mapping) else [] %}
+
+{% set kw_raw = package.get('keywords') %}
+{% set keywords_lang = kw_raw.get(lang, []) if kw_raw is mapping else [] %}
+
+{% set projects_raw = package.get('projects') %}
+{% set projects = projects_raw if (projects_raw is iterable and projects_raw is not string and projects_raw is not mapping) else [] %}
+
+{% set t_begin = (package.get('temporal-extent-begin') or '') | string %}
+{% set t_end = (package.get('temporal-extent-end') or '') | string %}
+
+{% set resources = package.get('resources') or [] %}
+{% set formats_list = h.dict_list_reduce(resources, 'format') | list %}
+{% set first_format = (formats_list[0] | upper) if formats_list else '' %}
+
+{% set licence_label = package.get('license_title') or package.get('license_id') or '' %}
+{% set licence_url = package.get('license_url') or '' %}
+{% set frequency = package.get('frequency-of-update') or '' %}
+
+{% set doi_full = '' %}
+{% set doi_display = '' %}
+{% if package.get('unique-resource-identifier-full') %}
+  {% set doi_list = h.cioos_get_fully_qualified_package_uri(package, uri_field='unique-resource-identifier-full', default_code_space='doi.org') %}
+  {% if doi_list and doi_list|length > 0 %}
+    {% set doi_full = doi_list[0]|string %}
+    {% set doi_display = doi_full|replace('https://doi.org/', '')|replace('http://doi.org/', '')|replace('https://', '')|replace('http://', '') %}
+  {% endif %}
+{% endif %}
+
+{% set crp = package.get('cited-responsible-party') or [] %}
+{% set mpoc = package.get('metadata-point-of-contact') or [] %}
+
+{% set spatial_data = package.get('spatial') %}
+{% set bbox_w = package.get('bbox-west-long') %}
+{% set bbox_e = package.get('bbox-east-long') %}
+{% set bbox_n = package.get('bbox-north-lat') %}
+{% set bbox_s = package.get('bbox-south-lat') %}
+
+{# --- Resorg groups for "Responsible organizations" panel --- #}
+{% set resorg_groups = [] %}
+{% for grp in (package.get('groups') or []) %}
+  {% set gname = grp.get('name', '') if grp is mapping else '' %}
+  {% set gtype = grp.get('type', '') if grp is mapping else '' %}
+  {% if gtype == 'resorg' or gname.startswith('resorg') %}
+    {% set _x = resorg_groups.append(grp) %}
+  {% endif %}
+{% endfor %}
+
+<div class="db-preview" data-package-id="{{ package.id }}">
+
+  {# ---- Pinned header (always visible at top of preview pane) ---- #}
+  <div class="db-preview-head">
+    <div class="mf-eyebrow">{{ _('Preview') }}</div>
+    <button type="button" class="db-preview-close" aria-label="{{ _('Close preview') }}">✕ {{ _('Close') }}</button>
+  </div>
+
+  {# ---- Scrolling body: head and actions stay pinned outside this region ---- #}
+  <div class="db-preview-body">
+
+  <h2 class="db-preview-title">{{ title }}</h2>
+
+  {# ---- Responsible organizations (compact byline under title) ---- #}
+  {% if resorg_groups %}
+    <div class="db-preview-orgs-inline">
+      {% for org in resorg_groups %}
+        {% set org_title = h.get_translated(org, 'title') or org.get('display_name') or org.get('title') or org.get('name') or '' %}
+        {% set words = org_title.split() if org_title else [] %}
+        {% set initials = ((words[0][:1] if words else '') ~ (words[1][:1] if words|length > 1 else (org_title[1:2] if org_title|length > 1 else '')))|upper %}
+        {% set img = org.get('image_display_url') or org.get('image_url') %}
+        <span class="db-org-chip" title="{{ org_title }}">
+          <span class="db-org-avatar">
+            {% if img %}
+              {% if img.startswith('http://') or img.startswith('https://') %}<img src="{{ img }}" alt="" loading="lazy" />
+              {% else %}<img src="{{ h.url_for_static_or_external('/uploads/group/' ~ img) }}" alt="" loading="lazy" />{% endif %}
+            {% else %}{{ initials or '··' }}{% endif %}
+          </span>
+          <span class="org-name">{{ org_title }}</span>
+        </span>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  {# ---- Tag cluster: EOVs (teal) + top keywords (cream) ---- #}
+  {% if eovs or ecvs or keywords_lang %}
+    <div class="db-preview-tags">
+      {% for code in eovs %}
+        <span class="mf-tag teal">{{ code|string|replace('_',' ')|title }}</span>
+      {% endfor %}
+      {% for code in ecvs %}
+        <span class="mf-tag teal">{{ code|string|replace('_',' ')|title }}</span>
+      {% endfor %}
+      {% for kw in keywords_lang[:8] %}
+        <span class="mf-tag">{{ kw }}</span>
+      {% endfor %}
+      {% if keywords_lang|length > 8 %}
+        <span class="mf-tag outline">+{{ keywords_lang|length - 8 }}</span>
+      {% endif %}
+    </div>
+  {% endif %}
+
+  {# ---- Map ---- #}
+  <div class="db-preview-map mf-map"
+       {% if spatial_data %}data-spatial='{{ spatial_data | tojson }}'{% endif %}>
+    {% if not spatial_data %}
+      <div class="db-preview-map-empty">{{ _('No spatial extent available') }}</div>
+    {% endif %}
+  </div>
+
+  {# ---- Description ---- #}
+  {% if notes_html %}
+    <section class="db-preview-section">
+      <div class="mf-eyebrow">{{ _('Description') }}</div>
+      <div class="db-preview-prose">{{ notes_html|safe }}</div>
+    </section>
+  {% endif %}
+
+  {# ---- Key facts grid ---- #}
+  <section class="db-preview-section">
+    <div class="db-preview-meta-grid">
+      <div>
+        <div class="mf-eyebrow">{{ _('Time range') }}</div>
+        <div class="v">
+          {% if t_begin or t_end %}
+            {{ t_begin[:4] if t_begin else '—' }} — {{ t_end[:4] if t_end else '—' }}
+          {% else %}—{% endif %}
+        </div>
+      </div>
+      <div>
+        <div class="mf-eyebrow">{{ _('Resources') }}</div>
+        <div class="v">{{ resources | length }}</div>
+      </div>
+      <div>
+        <div class="mf-eyebrow">{{ _('Primary format') }}</div>
+        <div class="v">{{ first_format or '—' }}</div>
+      </div>
+      <div>
+        <div class="mf-eyebrow">{{ _('Licence') }}</div>
+        <div class="v">
+          {% if licence_url %}
+            <a href="{{ licence_url }}" target="_blank" rel="noopener">{{ licence_label or '—' }}</a>
+          {% else %}{{ licence_label or '—' }}{% endif %}
+        </div>
+      </div>
+      {% if frequency %}
+        <div>
+          <div class="mf-eyebrow">{{ _('Frequency') }}</div>
+          <div class="v">{{ frequency|replace('_', ' ')|title }}</div>
+        </div>
+      {% endif %}
+      {% if package.get('metadata_modified') %}
+        <div>
+          <div class="mf-eyebrow">{{ _('Updated') }}</div>
+          <div class="v">{{ h.time_ago_from_timestamp(package.metadata_modified) }}</div>
+        </div>
+      {% endif %}
+    </div>
+  </section>
+
+  {# ---- Resources list ---- #}
+  {% if resources %}
+    <section class="db-preview-section">
+      <div class="mf-eyebrow">{{ _('Resources') }} <span class="count">{{ resources|length }}</span></div>
+      <ul class="db-preview-resources">
+        {% for r in resources %}
+          {% set r_name = h.get_translated(r, 'name') or r.get('format') or r.get('url') or _('Resource') %}
+          <li>
+            <a href="{{ r.get('url') or href }}" target="_blank" rel="noopener" class="resource-link">
+              <span class="resource-name">{{ r_name|truncate(80, killwords=True) }}</span>
+              {% if r.get('format') %}<span class="mf-tag outline">{{ r.format|upper }}</span>{% endif %}
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+    </section>
+  {% endif %}
+
+  {# ---- Contacts ---- #}
+  {% if crp or mpoc %}
+    {% set seen = [] %}
+    {% set contacts_to_show = [] %}
+    {% for c in (crp + mpoc) %}
+      {% set name = c.get('individual-name') or c.get('organisation-name') %}
+      {% set email = c.get('contact-info_email') %}
+      {% if name and (name not in seen) %}
+        {% set _x = seen.append(name) %}
+        {% set _x = contacts_to_show.append(c) %}
+      {% endif %}
+    {% endfor %}
+    {% if contacts_to_show %}
+      <section class="db-preview-section">
+        <div class="mf-eyebrow">{{ _('Contacts') }}</div>
+        <ul class="db-preview-contacts">
+          {% for c in contacts_to_show[:5] %}
+            {% set ind = c.get('individual-name') %}
+            {% set org_n = c.get('organisation-name') %}
+            {% set email = c.get('contact-info_email') %}
+            {% set role = c.get('role') %}
+            <li>
+              <div class="contact-name">
+                {{ ind or org_n }}{% if ind and org_n %} <span class="org">· {{ org_n }}</span>{% endif %}
+              </div>
+              {% if role %}
+                <div class="contact-role">
+                  {% if role is string %}{{ role|title }}{% else %}{{ role|join(', ')|title }}{% endif %}
+                </div>
+              {% endif %}
+              {% if email %}<a class="contact-email" href="mailto:{{ email }}">{{ email }}</a>{% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      </section>
+    {% endif %}
+  {% endif %}
+
+  {# ---- Projects ---- #}
+  {% if projects %}
+    <section class="db-preview-section">
+      <div class="mf-eyebrow">{{ _('Projects') }}</div>
+      <div class="db-preview-tags">
+        {% for p in projects %}
+          <span class="mf-tag">{{ p }}</span>
+        {% endfor %}
+      </div>
+    </section>
+  {% endif %}
+
+  {# ---- DOI ---- #}
+  {% if doi_full %}
+    <section class="db-preview-section">
+      <div class="mf-eyebrow">{{ _('Identifier') }} <span class="db-row-meta-doi-prefix">DOI</span></div>
+      <a class="db-preview-doi-link" href="{{ doi_full }}" target="_blank" rel="noopener">{{ doi_display }}</a>
+    </section>
+  {% endif %}
+
+  </div>{# /.db-preview-body #}
+
+  {# ---- Pinned action bar (always visible at bottom of preview pane) ---- #}
+  <div class="db-preview-actions">
+    <a class="mf-btn primary" href="{{ href }}">{{ _('Open dataset') }} →</a>
+  </div>
+</div>
