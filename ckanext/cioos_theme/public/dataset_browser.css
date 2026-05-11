@@ -545,6 +545,51 @@ body.dataset-browser .db-org-text .name {
 }
 body.dataset-browser .db-org-text .more { color: var(--muted); }
 
+/* ---- Card layout for the dataset list on mobile ---- */
+@media (max-width: 768px) {
+  /* Column headings are meaningless once rows are cards. */
+  body.dataset-browser .db-table-header { display: none; }
+
+  /* Trim the surrounding padding so cards have more breathing room. */
+  body.dataset-browser .db-table-col { padding: 12px 12px 24px; }
+
+  /* Stack rows with a small gap; remove their own bottom borders. */
+  body.dataset-browser .dataset-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-top: 4px;
+  }
+
+  /* Each row becomes a card: full border, rounded corners, soft shadow.
+     The four DOM children reflow into a 2-column grid:
+       row 1: title+meta (spans both columns)
+       row 2: orgs       (spans both columns)
+       row 3: updated    (left)   |  access (right) */
+  body.dataset-browser .db-row {
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "title   title"
+      "orgs    orgs"
+      "updated access";
+    gap: 8px 12px;
+    padding: 14px 14px;
+    margin-left: 0;
+    background: white;
+    border: 1px solid var(--line);
+    border-left: 3px solid transparent;
+    border-radius: 12px;
+    box-shadow: 0 1px 2px rgba(11, 31, 38, 0.04);
+  }
+  body.dataset-browser .db-row > div:first-child { grid-area: title; min-width: 0; }
+  body.dataset-browser .db-row-orgs              { grid-area: orgs; }
+  body.dataset-browser .db-row-updated           { grid-area: updated; align-self: center; }
+  body.dataset-browser .db-row-access            { grid-area: access; justify-self: end; align-self: center; }
+
+  /* Slightly larger title for touch targets. */
+  body.dataset-browser .db-row-title { font-size: 15px; }
+}
+
 /* Pagination */
 body.dataset-browser .db-pagination {
   display: flex;
