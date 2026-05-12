@@ -204,8 +204,6 @@
         {% endblock %}
 
       </div>
-
-  {% block page_pagination %} {{ c.page.pager(q=c.q) }} {% endblock %}
 </section>
 
 {% block package_search_results_api %}
@@ -238,5 +236,3 @@
 </div>
 {% endblock %}
 
-{# Suppress the right-rail filters — they live in the modal now. #}
-{% block secondary_content %}{% endblock %}
