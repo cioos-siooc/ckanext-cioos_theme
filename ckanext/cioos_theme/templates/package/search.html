@@ -40,11 +40,13 @@ _("Datasets") }}{% endblock %} {% block breadcrumb_content %}
     endblock %}
   </div>
 
-  {% block page_pagination %} {{ c.page.pager(q=c.q) }} {% endblock %}
+  {% block page_pagination %}
+  <div class="pagination-wrapper">{{ c.page.pager(q=c.q) }}</div>
+  {% endblock %}
 </section>
 
 {% block package_search_results_api %}
-<section class="module">
+<section class="module package-search-api-info">
   <div class="module-content">
     {% block package_search_results_api_inner %}
     <small>
