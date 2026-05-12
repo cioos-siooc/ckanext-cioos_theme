@@ -205,41 +205,35 @@
 
       </div>
 
-    </div>{# /.db-grid #}
-
-    {# ---- Preview overlay (sits above the page, hidden until a row is clicked) ---- #}
-    <div class="db-preview-backdrop" id="dataset-preview-backdrop"></div>
-    <aside class="db-preview-col" id="dataset-preview-col" role="dialog" aria-modal="true" aria-live="polite" aria-label="{{ _('Dataset preview') }}"></aside>
-
-  </div>{# /.module-content #}
+  {% block page_pagination %} {{ c.page.pager(q=c.q) }} {% endblock %}
 </section>
 
-{# ---- Filter modal ---- #}
-<div class="modal fade db-filter-modal" id="datasetFilterModal" tabindex="-1" aria-labelledby="datasetFilterModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2 class="modal-title" id="datasetFilterModalLabel">{{ _('Refine results') }}</h2>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Close') }}"></button>
-      </div>
-      <div class="modal-body">
-        {% snippet "spatial/snippets/spatial_query.html",
-          default_extent=default_extent,
-          dataset_extents_url=dataset_extents_url,
-          ra_extents_url=ra_extents_url
-        %}
-        {% snippet "snippets/daterange.html" %}
-        {% for facet in c.facet_titles %}
-          {{ h.snippet('snippets/facet_list.html', title=c.facet_titles[facet], name=facet, hide_empty='true') }}
-        {% endfor %}
-      </div>
-      <div class="modal-footer">
-        {% if applied_ns.count > 0 %}
-          <a href="{{ h.url_for(c.dataset_type ~ '.search') }}" class="mf-btn ghost">{{ _('Clear all') }}</a>
-        {% endif %}
-        <button type="button" class="mf-btn primary" data-bs-dismiss="modal">{{ _('Done') }}</button>
-      </div>
-    </div>
+{% block package_search_results_api %}
+<section class="module">
+  <div class="module-content">
+    {% block package_search_results_api_inner %}
+    <small>
+      {% set api_link = h.link_to(_('API'), h.url_for(controller='api',
+      action='get_api', ver=3)) %} {% set api_doc_link = h.link_to(_('API
+      Docs'), 'http://docs.ckan.org/en/{0}/api/'.format(g.ckan_doc_version)) %}
+      {% if g.dumps_url -%} {% set dump_link = h.link_to(_('full {format}
+      dump').format(format=g.dumps_format), g.dumps_url) %} {% trans %} You can
+      also access this registry using the {{ api_link }} (see {{ api_doc_link
+      }}) or download a {{ dump_link }}. {% endtrans %} {% else %} {% trans %}
+      You can also access this registry using the {{ api_link }} (see {{
+      api_doc_link }}). {% endtrans %} {%- endif %}
+    </small>
+    {% endblock %}
+  </div>
+</section>
+{% endblock %} {% endblock %} {% block secondary_content %}
+<div class="filters">
+  <div>
+    {% snippet "spatial/snippets/spatial_query.html",
+    default_extent=default_extent, dataset_extents_url=dataset_extents_url,
+    ra_extents_url=ra_extents_url %} {% snippet "snippets/daterange.html" %} {%
+    for facet in c.facet_titles %} {{ h.snippet('snippets/facet_list.html',
+    title=c.facet_titles[facet], name=facet, hide_empty='true') }} {% endfor %}
   </div>
 </div>
 {% endblock %}
