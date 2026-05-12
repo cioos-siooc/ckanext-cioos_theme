@@ -1,33 +1,64 @@
+{# Mid-Fi contact cards — avatar + name + role/org + email #}
 {% set fields = data[field.field_name] %}
 
 {% block subfield_display %}
-  {% for field_data in fields %}
-    <div class="card">
-        <header class="card-header">
-          {{ h.scheming_language_text(field.repeating_label or field.label) }} {{ loop.index }}
-        </header>
-      <div class="card-body">
-        <dl class="scheming-subfield-list">
-          {% for subfield in field.repeating_subfields %}
-            {% if subfield.display_snippet is not none %}
-            {% set value = field_data.get(subfield.field_name) %}
-            {% if value is not none and value != '' and value != [] and value != {} %}
-            <dt class="dataset-label">
-              {{ h.scheming_language_text(subfield.label) }}
-            </dt>
-            <dd>
-            {%- snippet 'scheming/snippets/display_field.html',
-              field=subfield,
-              data=field_data,
-              entity_type=entity_type,
-              object_type=object_type
-            -%}
-            </dd>
-            {% endif %}
-            {% endif %}
-          {% endfor %}
-        </dl>
+  <div class="mf-contacts-grid">
+    {% for field_data in fields %}
+      {%- set _name = field_data.get('individual-name') or field_data.get('organisation-name') or field_data.get('name') or '' -%}
+      {%- set _org = field_data.get('organisation-name') if field_data.get('individual-name') else '' -%}
+      {%- set _role = field_data.get('role') or '' -%}
+      {%- if _role is mapping %}{% set _role = _role.values()|list|first %}{% endif -%}
+      {%- if _role is iterable and _role is not string %}{% set _role = _role|join(', ') %}{% endif -%}
+      {%- set _email = field_data.get('contact-info_email') or field_data.get('email') or '' -%}
+      {%- set _phone = field_data.get('contact-info_phone') or field_data.get('phone') or '' -%}
+      {%- set _position = field_data.get('position-name') or '' -%}
+      {%- set _initials = (_name|trim).split(' ')|map('first')|join('')|upper|truncate(2, true, '') -%}
+      {%- if not _initials %}{% set _initials = (_name or '?')[:2]|upper %}{% endif -%}
+
+      <div class="mf-contact-card">
+        <div class="mf-contact-avatar">{{ _initials }}</div>
+        <div class="mf-contact-body">
+          <div class="mf-contact-name">{{ _name or _('Contact') ~ ' ' ~ loop.index }}</div>
+          {% if _org or _position %}
+            <div class="mf-contact-org">
+              {%- if _position %}<span class="position">{{ _position }}</span>{% if _org %} · {% endif %}{% endif -%}
+              {%- if _org %}<span class="org">{{ _org }}</span>{% endif -%}
+            </div>
+          {% endif %}
+          {% if _role %}
+            <div class="mf-contact-role"><span class="role">{{ _role|title }}</span></div>
+          {% endif %}
+          {% if _email %}
+            <a class="mf-contact-email" href="mailto:{{ _email }}" title="{{ _email }}">
+              <i class="fa fa-envelope-o" aria-hidden="true"></i> {{ _email }}
+            </a>
+          {% endif %}
+          {% if _phone %}
+            <div class="mf-contact-phone"><i class="fa fa-phone" aria-hidden="true"></i> {{ _phone }}</div>
+          {% endif %}
+
+          {# Remaining fields not handled above (e.g. address, online-resource) #}
+          {% set _shown = ['individual-name','organisation-name','name','role','contact-info_email','email','contact-info_phone','phone','position-name'] %}
+          <dl class="mf-contact-extra">
+            {% for subfield in field.repeating_subfields %}
+              {% if subfield.display_snippet is not none and subfield.field_name not in _shown %}
+                {% set value = field_data.get(subfield.field_name) %}
+                {% if value is not none and value != '' and value != [] and value != {} %}
+                  <dt>{{ h.scheming_language_text(subfield.label) }}</dt>
+                  <dd>
+                    {%- snippet 'scheming/snippets/display_field.html',
+                      field=subfield,
+                      data=field_data,
+                      entity_type=entity_type,
+                      object_type=object_type
+                    -%}
+                  </dd>
+                {% endif %}
+              {% endif %}
+            {% endfor %}
+          </dl>
+        </div>
       </div>
-    </div>
-  {% endfor %}
+    {% endfor %}
+  </div>
 {% endblock %}

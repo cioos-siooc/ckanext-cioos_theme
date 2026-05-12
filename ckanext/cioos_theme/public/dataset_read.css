@@ -1,0 +1,994 @@
+/* =========================================================================
+   Dataset detail — Mid-Fi restyle
+   Source: CIOOS Catalogue Mid-Fi (mf-detail.jsx + midfi.css)
+   Scoped to .mf-detail so it only applies to the dataset read page.
+   ========================================================================= */
+
+/* Widen the page container on dataset detail pages */
+body:has(.mf-detail) .container,
+body:has(.mf-detail) .wrapper,
+body:has(.mf-detail) .row.wrapper {
+  max-width: 1440px;
+  width: 100%;
+}
+body:has(.mf-detail) .primary,
+body:has(.mf-detail) .col-md-9,
+body:has(.mf-detail) [class*="col-md-9"] {
+  width: 100%;
+  flex: 0 0 100%;
+  max-width: 100%;
+}
+
+.mf-detail {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 40px;
+  align-items: start;
+  --teal: #52A79B;
+  --teal-dark: #3f8a80;
+  --teal-soft: #dcebe8;
+  --cream: #f3f0ec;
+  --cream-dark: #e6e1d7;
+  --navy: #152F37;
+  --navy-soft: #4a6670;
+  --ink: #152F37;
+  --paper: #ffffff;
+  --line: #e2dfd8;
+  --line-strong: #152F37;
+  --muted: #6b7a80;
+  --accent-warm: #b8623a;
+
+  font-family: 'Montserrat', system-ui, sans-serif;
+  color: var(--ink);
+  background: var(--paper);
+  font-size: 14px;
+  line-height: 1.5;
+  box-sizing: border-box;
+}
+.mf-detail *,
+.mf-detail *::before,
+.mf-detail *::after { box-sizing: border-box; }
+
+/* -- Typography ----------------------------------------------------------- */
+.mf-detail .mf-title,
+.mf-detail h1,
+.mf-detail h2,
+.mf-detail h3 {
+  font-family: 'Sora', 'Montserrat', system-ui, sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  color: var(--navy);
+  margin: 0;
+}
+.mf-detail .mf-eyebrow {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+/* -- Left column (title + body sections) --------------------------------- */
+.mf-detail .mf-left { min-width: 0; }
+.mf-detail .mf-right {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-width: 0;
+  position: sticky;
+  top: 100px;
+  align-self: start;
+}
+@media (max-width: 900px) {
+  .mf-detail { grid-template-columns: 1fr; }
+  .mf-detail .mf-right { position: static; }
+}
+
+/* -- Hero (no longer 2-col; aside moved to top-level .mf-right) ---------- */
+.mf-detail .mf-hero {
+  padding: 20px 0 8px;
+  margin-bottom: 16px;
+}
+
+.mf-detail .mf-hero h1 {
+  font-size: 44px;
+  line-height: 1.1;
+  margin-bottom: 0;
+}
+.mf-detail .mf-hero .mf-description {
+  font-size: 16px;
+  color: var(--navy-soft);
+  margin-top: 16px;
+  max-width: 640px;
+  line-height: 1.6;
+}
+
+/* attribution row */
+.mf-detail .mf-attribution {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 24px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+.mf-detail .mf-projects {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.mf-detail .mf-attribution-label {
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 600;
+}
+.mf-detail .mf-org-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px 3px 3px;
+  border-radius: 100px;
+  border: 1px solid var(--line);
+  background: white;
+  text-decoration: none;
+  color: var(--navy);
+}
+.mf-detail .mf-org-chip .mf-org-avatar {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--teal);
+  color: white;
+  font-family: 'Sora', sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.mf-detail .mf-org-chip .mf-org-name {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* key stats */
+.mf-detail .mf-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  margin-top: 22px;
+  padding: 20px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+@media (max-width: 700px) {
+  .mf-detail .mf-stats { grid-template-columns: repeat(2, 1fr); }
+}
+.mf-detail .mf-stat-value {
+  font-family: 'Sora', sans-serif;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--teal);
+  margin-top: 4px;
+}
+
+/* action row */
+.mf-detail .mf-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 22px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* hero map */
+.mf-detail .mf-hero-map {
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+.mf-detail .mf-hero-map .dataset-map-section > h3 { display: none; }
+
+/* hero right-column aside — map + metadata + EOV + cite + license stacked */
+.mf-detail .mf-hero-aside {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-width: 0;
+}
+.mf-detail .mf-hero-aside .mf-hero-map { margin-bottom: 0; }
+.mf-detail .mf-hero-map #dataset-map-container,
+.mf-detail .mf-hero-map .dataset-map-container {
+  border-radius: 12px;
+  overflow: hidden;
+}
+.mf-detail .mf-hero-coords {
+  font-size: 11px;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  color: var(--muted);
+  margin-top: 8px;
+  display: flex;
+  justify-content: space-between;
+}
+
+/* -- Tags / chips --------------------------------------------------------- */
+.mf-detail .mf-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 500;
+  background: var(--cream);
+  color: var(--navy);
+  border: 1px solid transparent;
+  white-space: nowrap;
+  text-decoration: none;
+  margin-right: 4px;
+  margin-bottom: 4px;
+}
+.mf-detail .mf-tag.outline { background: white; border-color: var(--line); }
+.mf-detail .mf-tag.teal    { background: var(--teal-soft); color: var(--teal-dark); }
+.mf-detail .mf-tag.navy    { background: var(--navy); color: white; }
+
+.mf-detail .mf-tags-row {
+  display: flex;
+  gap: 6px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+
+
+/* Map existing CKAN tag-list markup onto Mid-Fi tag chips */
+.mf-detail .tag-list,
+.mf-detail .tags {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.mf-detail .tag-list .tag,
+.mf-detail .tags a,
+.mf-detail .label-tag,
+.mf-detail .label {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px !important;
+  border-radius: 100px !important;
+  font-size: 11px !important;
+  font-weight: 500;
+  background: var(--cream);
+  color: var(--navy);
+  border: 1px solid transparent;
+  white-space: nowrap;
+  text-decoration: none;
+  text-transform: none;
+}
+.mf-detail .tag-list .tag:hover,
+.mf-detail .tags a:hover {
+  background: var(--teal-soft);
+  color: var(--teal-dark);
+}
+
+/* -- Buttons -------------------------------------------------------------- */
+.mf-detail .mf-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: 8px;
+  border: 1px solid var(--line-strong);
+  background: white;
+  color: var(--navy);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-decoration: none;
+}
+.mf-detail .mf-btn:hover { background: var(--cream); color: var(--navy); }
+.mf-detail .mf-btn.primary {
+  background: var(--teal);
+  color: white;
+  border-color: var(--teal);
+}
+.mf-detail .mf-btn.primary:hover { background: var(--teal-dark); color: white; }
+.mf-detail .mf-btn.ghost {
+  border-color: var(--line);
+  background: transparent;
+}
+
+/* metadata dropdown */
+.mf-detail .mf-meta-dropdown {
+  position: relative;
+}
+.mf-detail .mf-meta-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 12px 32px rgba(21, 47, 55, 0.18);
+  min-width: 280px;
+  z-index: 20;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  display: none;
+}
+.mf-detail .mf-meta-dropdown.open .mf-meta-dropdown-menu { display: block; }
+.mf-detail .mf-meta-dropdown-header {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line);
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 600;
+}
+.mf-detail .mf-meta-dropdown-item {
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--line);
+  color: var(--navy);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 500;
+}
+.mf-detail .mf-meta-dropdown-item:last-child { border-bottom: none; }
+.mf-detail .mf-meta-dropdown-item:hover { background: var(--cream); }
+.mf-detail .mf-meta-dropdown-item .fmt { flex: 1; }
+.mf-detail .mf-meta-dropdown-item .arrow {
+  font-size: 12px;
+  color: var(--teal-dark);
+  font-weight: 600;
+}
+
+/* -- Body 2-col layout ---------------------------------------------------- */
+.mf-detail .mf-body {
+  padding: 32px 0 48px;
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 40px;
+}
+@media (max-width: 900px) {
+  .mf-detail .mf-body { grid-template-columns: 1fr; }
+}
+
+.mf-detail .mf-section { margin-top: 40px; }
+.mf-detail .mf-section:first-child { margin-top: 0; }
+.mf-detail .mf-section .mf-eyebrow { color: var(--teal-dark); }
+.mf-detail .mf-section h2 {
+  font-size: 26px;
+  margin-top: 8px;
+  margin-bottom: 16px;
+}
+
+/* -- Cards ---------------------------------------------------------------- */
+.mf-detail .mf-card {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 14px;
+}
+
+/* ============== Resource cards (Mid-Fi) ============== */
+.mf-detail .resources h3,
+.mf-detail #dataset-resources h3 {
+  font-family: 'Sora', sans-serif;
+  font-size: 26px;
+  margin-bottom: 16px;
+}
+.mf-detail .resource-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+}
+.mf-detail .resource-list .resource-item {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  gap: 14px;
+  align-items: center;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.mf-detail .resource-list .resource-item:hover {
+  border-color: var(--teal);
+  box-shadow: 0 4px 16px rgba(82, 167, 155, 0.10);
+}
+
+.mf-detail .mf-format-chip {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  background: var(--cream);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--navy);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+/* Format-tinted chip colors */
+.mf-detail .mf-format-chip[data-format*="csv"],
+.mf-detail .mf-format-chip[data-format*="xls"],
+.mf-detail .mf-format-chip[data-format*="tsv"] { background: #e5f0d8; color: #4a6321; }
+.mf-detail .mf-format-chip[data-format*="json"],
+.mf-detail .mf-format-chip[data-format*="geojson"] { background: #fce8d6; color: #8a4a1e; }
+.mf-detail .mf-format-chip[data-format*="xml"],
+.mf-detail .mf-format-chip[data-format*="rdf"]  { background: #e5dcec; color: #563f72; }
+.mf-detail .mf-format-chip[data-format*="netcdf"],
+.mf-detail .mf-format-chip[data-format*="nc"]   { background: var(--teal-soft); color: var(--teal-dark); }
+.mf-detail .mf-format-chip[data-format*="pdf"]  { background: #f2d7d7; color: #7a2828; }
+.mf-detail .mf-format-chip[data-format*="zip"],
+.mf-detail .mf-format-chip[data-format*="tar"]  { background: #e2dfd8; color: #4a4540; }
+.mf-detail .mf-format-chip[data-format*="erddap"],
+.mf-detail .mf-format-chip[data-format*="opendap"],
+.mf-detail .mf-format-chip[data-format*="wms"],
+.mf-detail .mf-format-chip[data-format*="wfs"]  { background: #d6e6f0; color: #2a4d6a; }
+
+.mf-detail .mf-resource-info { min-width: 0; }
+.mf-detail .mf-resource-info .heading {
+  font-family: 'Sora', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--navy);
+  text-decoration: none;
+  display: block;
+  margin: 0;
+  line-height: 1.3;
+}
+.mf-detail .mf-resource-info .heading:hover { color: var(--teal-dark); }
+.mf-detail .mf-resource-info .description {
+  font-size: 12px;
+  color: var(--muted);
+  margin: 4px 0 0;
+  line-height: 1.45;
+}
+.mf-detail .mf-resource-info .description p { margin: 0; }
+.mf-detail .mf-resource-info .description p + p { margin-top: 4px; }
+
+.mf-detail .mf-resource-meta {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+.mf-detail .mf-resource-meta .mf-format-label {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 100px;
+  font-size: 10px;
+  font-weight: 600;
+  background: var(--teal-soft);
+  color: var(--teal-dark);
+  letter-spacing: 0.05em;
+}
+.mf-detail .mf-resource-meta .mf-resource-size {
+  font-size: 11px;
+  color: var(--muted);
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+.mf-detail .mf-resource-actions .btn,
+.mf-detail .resource-item .btn-group .btn {
+  background: linear-gradient(180deg, var(--teal) 0%, var(--teal-dark) 100%);
+  color: white;
+  border: 1px solid var(--teal-dark);
+  border-radius: 8px;
+  font-size: 12px;
+  padding: 9px 16px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  box-shadow: 0 1px 2px rgba(21,47,55,0.08), inset 0 1px 0 rgba(255,255,255,0.18);
+  transition: transform 0.1s ease, box-shadow 0.15s ease, filter 0.15s ease;
+}
+.mf-detail .mf-resource-actions .btn:hover,
+.mf-detail .resource-item .btn-group .btn:hover {
+  filter: brightness(1.05);
+  box-shadow: 0 4px 12px rgba(82,167,155,0.28), inset 0 1px 0 rgba(255,255,255,0.18);
+  transform: translateY(-1px);
+}
+.mf-detail .mf-resource-actions .btn:active,
+.mf-detail .resource-item .btn-group .btn:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(21,47,55,0.12), inset 0 1px 2px rgba(0,0,0,0.08);
+}
+.mf-detail .mf-resource-actions .btn .fa,
+.mf-detail .resource-item .btn-group .btn .fa { font-size: 11px; }
+.mf-detail .mf-resource-actions .btn .caret,
+.mf-detail .resource-item .btn-group .btn .caret {
+  border-top-color: rgba(255,255,255,0.85);
+  margin-left: 2px;
+}
+.mf-detail .mf-resource-actions .dropdown-menu,
+.mf-detail .resource-item .btn-group .dropdown-menu {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  box-shadow: 0 12px 32px rgba(21,47,55,0.14);
+  padding: 6px;
+}
+.mf-detail .mf-resource-actions .dropdown-item,
+.mf-detail .resource-item .btn-group .dropdown-item {
+  border-radius: 6px;
+  font-size: 12px;
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--navy);
+}
+.mf-detail .mf-resource-actions .dropdown-item:hover,
+.mf-detail .resource-item .btn-group .dropdown-item:hover {
+  background: var(--cream);
+  color: var(--navy);
+}
+.mf-detail .mf-resource-actions .dropdown-item .fa,
+.mf-detail .resource-item .btn-group .dropdown-item .fa { color: var(--teal-dark); width: 14px; }
+
+/* Compact resource cards in a multi-col grid (max 300px each) */
+.mf-detail .resource-list .resource-item .mf-format-chip { width: 40px; height: 40px; font-size: 10px; }
+.mf-detail .resource-list .resource-item { grid-template-columns: 40px 1fr; gap: 10px; padding: 10px 12px; }
+.mf-detail .resource-list .resource-item .heading { font-size: 13px; }
+.mf-detail .resource-list .resource-item .description { font-size: 11px; }
+
+/* Always-visible sections (no collapse) */
+.mf-detail .mf-always-visible h3 {
+  cursor: default;
+}
+.mf-detail .mf-always-visible h3 .collapse-icon,
+.mf-detail .mf-always-visible h3 a {
+  pointer-events: none;
+}
+.mf-detail .mf-always-visible h3 a.section_hide_controle { color: var(--navy); }
+.mf-detail .mf-always-visible h3 .collapse-icon { display: none; }
+.mf-detail .mf-always-visible .collapse { display: block !important; }
+
+/* ============== Contact cards (Mid-Fi) ============== */
+.mf-detail .mf-contacts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+}
+.mf-detail .mf-contact-card {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.mf-detail .mf-contact-card:hover {
+  border-color: var(--teal);
+  box-shadow: 0 2px 12px rgba(82, 167, 155, 0.08);
+}
+.mf-detail .mf-contact-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: var(--teal);
+  color: white;
+  font-family: 'Sora', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+/* Rotate avatar colors so multiple cards aren't identical */
+.mf-detail .mf-contact-card:nth-child(3n+1) .mf-contact-avatar { background: var(--teal); }
+.mf-detail .mf-contact-card:nth-child(3n+2) .mf-contact-avatar { background: var(--accent-warm); }
+.mf-detail .mf-contact-card:nth-child(3n+3) .mf-contact-avatar { background: #1f4a54; }
+
+.mf-detail .mf-contact-body { flex: 1; min-width: 0; }
+.mf-detail .mf-contact-name {
+  font-family: 'Sora', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--navy);
+  line-height: 1.3;
+}
+.mf-detail .mf-contact-org {
+  font-size: 12px;
+  color: var(--navy-soft);
+  font-weight: 500;
+  margin-top: 2px;
+  line-height: 1.4;
+}
+.mf-detail .mf-contact-org .position { color: var(--navy); }
+.mf-detail .mf-contact-org .org { color: var(--muted); }
+.mf-detail .mf-contact-role {
+  font-size: 11px;
+  color: var(--teal-dark);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-top: 4px;
+  line-height: 1.3;
+}
+.mf-detail .mf-contact-email,
+.mf-detail .mf-contact-phone {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 8px;
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+.mf-detail .mf-contact-email:hover { color: var(--teal-dark); }
+.mf-detail .mf-contact-extra { margin: 8px 0 0; font-size: 12px; }
+.mf-detail .mf-contact-extra dt {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  font-weight: 600;
+  margin-top: 6px;
+}
+.mf-detail .mf-contact-extra dd { margin: 1px 0 0; color: var(--navy); font-size: 12px; }
+
+/* -- Meta key/value rows -------------------------------------------------- */
+.mf-detail .mf-meta-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 13px;
+}
+.mf-detail .mf-meta-row:last-child { border-bottom: none; }
+.mf-detail .mf-meta-row .k { color: var(--muted); font-weight: 500; }
+.mf-detail .mf-meta-row .v { color: var(--navy); font-weight: 500; text-align: right; }
+
+/* --- Metadata source (div-based, not a table) --- */
+.mf-detail .mf-metadata-source {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  padding: 4px 0;
+}
+.mf-detail .mf-metadata-source-logo img {
+  max-height: 50px;
+  max-width: 80px;
+  border-radius: 6px;
+}
+.mf-detail .mf-metadata-source-body {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  color: var(--navy);
+}
+.mf-detail .mf-metadata-source-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  align-items: baseline;
+  padding: 4px 0;
+}
+.mf-detail .mf-metadata-source-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  font-weight: 600;
+}
+.mf-detail .mf-metadata-source-links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+}
+.mf-detail .mf-metadata-source-links a {
+  color: var(--teal-dark);
+  word-break: break-all;
+}
+.mf-detail .mf-metadata-source-modified {
+  font-size: 12px;
+  color: var(--muted);
+  margin: 4px 0 0 0;
+}
+
+/* Map existing CKAN tables (access, dates) to a key/value look */
+.mf-detail .access table,
+.mf-detail .dates table {
+  border: none;
+  background: transparent;
+  margin: 0;
+}
+.mf-detail .access table th,
+.mf-detail .access table td,
+.mf-detail .dates table th,
+.mf-detail .dates table td {
+  border: none;
+  border-bottom: 1px solid var(--line);
+  background: transparent;
+  padding: 10px 0;
+  font-size: 13px;
+  vertical-align: top;
+}
+/* No separator line below the Access and Use section */
+.mf-detail .access table tr:last-child th,
+.mf-detail .access table tr:last-child td { border-bottom: none; }
+
+.mf-detail .access table th,
+.mf-detail .dates table th,
+.mf-detail .additional-info table th {
+  color: var(--muted);
+  font-weight: 500;
+  width: 40%;
+}
+.mf-detail .access table td,
+.mf-detail .dates table td,
+.mf-detail .additional-info table td {
+  color: var(--navy);
+  font-weight: 500;
+}
+
+/* -- Section headings & collapses ---------------------------------------- */
+.mf-detail section > h3,
+.mf-detail .additional-info > h3 {
+  font-family: 'Sora', sans-serif;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--navy);
+  margin: 28px 0 14px;
+  letter-spacing: -0.01em;
+}
+.mf-detail section > h3 a,
+.mf-detail .additional-info > h3 a {
+  color: var(--navy);
+  text-decoration: none;
+}
+.mf-detail .collapse-icon { margin-left: 6px; color: var(--muted); }
+
+/* -- Sidebar boxes -------------------------------------------------------- */
+.mf-detail .mf-sidebar { display: flex; flex-direction: column; gap: 22px; }
+.mf-detail .mf-sidebar > section,
+.mf-detail .mf-sidebar > div { margin: 0; }
+
+.mf-detail .mf-card.cream {
+  background: var(--cream);
+  border-color: transparent;
+  padding: 18px;
+}
+
+/* Restyle CKAN sidebar module-narrow blocks (license, organization, formats) */
+.mf-detail .module-narrow {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 18px;
+  margin-bottom: 0;
+  box-shadow: none;
+}
+.mf-detail .module-narrow .module-heading {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 600;
+  padding: 0 0 10px;
+  margin: 0 0 10px;
+  border-bottom: 1px solid var(--line);
+  background: transparent;
+}
+.mf-detail .module-narrow .module-heading i { color: var(--teal); }
+.mf-detail .module-narrow .module-content {
+  padding: 0;
+  font-size: 13px;
+  color: var(--navy);
+}
+.mf-detail .module-narrow .nav-simple .nav-item {
+  border: none;
+  padding: 6px 0;
+  font-size: 13px;
+}
+.mf-detail .module-narrow .nav-simple .nav-item a {
+  color: var(--teal-dark);
+  text-decoration: none;
+}
+.mf-detail .module-narrow .nav-simple .nav-item a:hover {
+  text-decoration: underline;
+}
+
+/* Cite-as code block */
+.mf-detail .mf-code {
+  background: var(--navy);
+  color: #a9e2d8;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 11px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  line-height: 1.6;
+  word-break: break-word;
+}
+
+/* Citation section — dark navy card */
+.mf-detail .citation {
+  background: var(--navy);
+  border: 1px solid var(--navy);
+  border-radius: 12px;
+  padding: 18px;
+  margin: 0 0 0 0 !important;
+  color: #e2f1ed;
+}
+.mf-detail .citation + script,
+.mf-detail .citation + script + script { display: none; }
+.mf-detail .mf-right .citation { margin-bottom: 0 !important; padding-bottom: 14px; }
+.mf-detail .citation h3 {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #8fc9bf;
+  font-weight: 600;
+  margin: 0 0 10px;
+  padding: 0 0 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.12);
+}
+.mf-detail .citation table,
+.mf-detail .citation tbody,
+.mf-detail .citation tr,
+.mf-detail .citation td {
+  border: none !important;
+  background: transparent !important;
+  padding: 0 !important;
+  display: block;
+  width: 100%;
+}
+.mf-detail .citation #cite_output {
+  font-size: 13px;
+  line-height: 1.55;
+  color: #e2f1ed;
+  margin: 0 0 12px;
+  word-break: break-word;
+}
+.mf-detail .citation #cite_output a {
+  color: #a9e2d8;
+  text-decoration: underline;
+}
+.mf-detail .citation .dropdown.btn-group {
+  float: none !important;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  width: 100%;
+}
+.mf-detail .citation label[for="template"] {
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #8fc9bf;
+  font-weight: 600;
+  padding: 0 4px 0 0;
+  margin: 0;
+  flex-shrink: 0;
+}
+.mf-detail .citation select#cite_template {
+  background: rgba(255,255,255,0.08);
+  color: #e2f1ed;
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 6px;
+  padding: 5px 6px;
+  font-size: 12px;
+  font-family: 'Montserrat', sans-serif;
+  flex-shrink: 0;
+  width: auto;
+  min-width: 0;
+}
+.mf-detail .citation select#cite_template option {
+  background: var(--navy);
+  color: #e2f1ed;
+}
+.mf-detail .citation .btn.dropdown-toggle {
+  background: var(--teal);
+  border: 1px solid var(--teal);
+  color: white;
+  border-radius: 6px;
+  font-size: 11px;
+  padding: 5px 10px;
+  font-weight: 600;
+  white-space: nowrap;
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.mf-detail .citation .btn.dropdown-toggle:hover {
+  background: var(--teal-dark);
+  border-color: var(--teal-dark);
+  color: white;
+}
+.mf-detail .citation .btn.dropdown-toggle .caret {
+  border-top-color: rgba(255,255,255,0.85);
+}
+.mf-detail .citation .dropdown-menu {
+  background: var(--navy);
+  border: 1px solid rgba(255,255,255,0.14);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+  padding: 6px;
+  border-radius: 8px;
+  right: 0;
+  left: auto;
+}
+.mf-detail .citation .dropdown-item {
+  color: #e2f1ed;
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 4px;
+}
+.mf-detail .citation .dropdown-item:hover {
+  background: rgba(82,167,155,0.20);
+  color: white;
+}
+
+/* Contacts grid styles live above under "Contact cards (Mid-Fi)". */
+
+/* -- Breadcrumb ----------------------------------------------------------- */
+.mf-detail .toolbar .breadcrumb,
+.mf-detail .breadcrumb {
+  background: transparent;
+  padding: 16px 0 0;
+  margin: 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+.mf-detail .breadcrumb a { color: var(--muted); text-decoration: none; }
+.mf-detail .breadcrumb .active,
+.mf-detail .breadcrumb li.active a {
+  color: var(--navy);
+  font-weight: 600;
+}
+.mf-detail .breadcrumb > li + li::before { color: var(--muted); content: '›'; }
+
+/* -- Translation icon spacing -------------------------------------------- */
+.mf-detail .translation_icon_group { margin-left: 6px; vertical-align: middle; }
+
+/* -- Misc ----------------------------------------------------------------- */
+.mf-detail .notes.embedded-content { font-size: 16px; color: var(--navy-soft); line-height: 1.6; max-width: 720px; }
+.mf-detail .notes p:first-child { margin-top: 0; }
+
+.mf-detail a { color: var(--teal-dark); }
+.mf-detail a:hover { color: var(--teal); }

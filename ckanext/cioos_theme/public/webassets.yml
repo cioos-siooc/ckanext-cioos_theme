@@ -99,6 +99,12 @@ dataset_browser_css:
   contents:
     - dataset_browser.css
 
+dataset_read_css:
+  filters: cssrewrite
+  output: ckanext-cioos_theme/%(version)s_dataset_read.css
+  contents:
+    - dataset_read.css
+
 dataset_browser_js:
   filter: rjsmin
   output: ckanext-cioos_theme/%(version)s_dataset_browser.js

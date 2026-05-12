@@ -4,166 +4,305 @@
 
 {%- set schema = h.scheming_get_dataset_schema(dataset_type) -%}
 
+{% block styles %}
+  {{ super() }}
+  {% asset 'ckanext-cioos_theme/dataset_read_css' %}
+{% endblock %}
+
 {% block primary_content_inner %}
-  {% block package_description %}
-    {% if pkg.private %}
-      <span class="dataset-private label label-inverse pull-right">
-        <i class="fa fa-lock"></i>
-        {{ _('Private') }}
-      </span>
-    {% endif %}
-    <h1>
-      {% block page_heading %}
-        {{ h.dataset_display_name(pkg) }}
+<div class="mf-detail">
 
-        {# preload translation method image #}
-        <img src="/base/images/auto_translate.svg" style="display:none"/>
+  <div class="mf-left">
+  {# ========================== HERO ========================== #}
+  <section class="mf-hero">
+    <div class="mf-hero-main">
 
-        {% set title_translation_method = h.scheming_language_text(h.cioos_load_json( h.get_pkg_dict_extra(pkg, 'title_translation_method') or pkg.get('title_translation_method') or '{}' )) %}
-        {% if title_translation_method %}
-          <span class="translation_icon_group" title="{{ title_translation_method }}">
-            <i class="translation_icon" aria-hidden="true"></i>
+      {% block package_description %}
+        {% if pkg.private %}
+          <span class="dataset-private label label-inverse pull-right">
+            <i class="fa fa-lock"></i> {{ _('Private') }}
           </span>
         {% endif %}
 
-        {% if pkg.state.startswith('draft') %}
-          [{{ _('Draft') }}]
-        {% endif %}
-        {% if pkg.state == 'deleted' %}
-          [{{ _('Deleted') }}]
-        {% endif %}
-      {% endblock %}
-    </h1>
+        <h1 class="mf-title">
+          {% block page_heading %}
+            {{ h.dataset_display_name(pkg) }}
+            {# preload translation method image #}
+            <img src="/base/images/auto_translate.svg" style="display:none"/>
+            {% set title_translation_method = h.scheming_language_text(h.cioos_load_json( h.get_pkg_dict_extra(pkg, 'title_translation_method') or pkg.get('title_translation_method') or '{}' )) %}
+            {% if title_translation_method %}
+              <span class="translation_icon_group" title="{{ title_translation_method }}">
+                <i class="translation_icon" aria-hidden="true"></i>
+              </span>
+            {% endif %}
+            {% if pkg.state.startswith('draft') %}[{{ _('Draft') }}]{% endif %}
+            {% if pkg.state == 'deleted' %}[{{ _('Deleted') }}]{% endif %}
+          {% endblock %}
+        </h1>
 
-    {% block package_notes %}
-      {%- if not dataset_type -%}
-        <p>
-        dataset_type not passed to template. your version of CKAN
-        might not be compatible with ckanext-scheming
-        </p>
-      {%- endif -%}
-      {% if ( h.scheming_field_by_name(schema.dataset_fields, 'notes') or h.scheming_field_by_name(schema.dataset_fields, 'notes_translated') ) and h.get_translated(pkg, 'notes') %}
-        <div class="notes embedded-content">
-          {{ h.markdown_extract(h.get_translated(pkg, 'notes'), extract_length=200) }}
-          {% set notes_translation_method = h.scheming_language_text(h.cioos_load_json( h.get_pkg_dict_extra(pkg, 'notes_translation_method') or pkg.get('notes_translation_method') or '{}' )) %}
-          {% if notes_translation_method %}
-            <span class="translation_icon_group" title="{{ notes_translation_method }}">
-              <i class="translation_icon" aria-hidden="true"></i>
-            </span>
+        {# ---------- attribution row ---------- #}
+        {% if pkg.organization %}
+          {% set _org_name = h.get_translated(pkg.organization, 'title') or pkg.organization.name %}
+          {% set _org_url = h.url_for(pkg.organization.type + '.read', id=pkg.organization.name) %}
+          <div class="mf-attribution">
+            <span class="mf-attribution-label">{{ _('By') }}</span>
+            <a class="mf-org-chip" href="{{ _org_url }}">
+              <span class="mf-org-avatar">{{ (_org_name or '?')[:2]|upper }}</span>
+              <span class="mf-org-name">{{ _org_name }}</span>
+            </a>
+          </div>
+        {% endif %}
+
+        {# ---------- projects ---------- #}
+        {% set _projects = pkg.get('projects') or h.cioos_load_json(h.get_pkg_dict_extra(pkg, 'projects') or '[]') %}
+        {% if _projects %}
+          <div class="mf-projects">
+            <span class="mf-attribution-label">{{ _('Project') if (_projects is iterable and _projects is not string and _projects|length == 1) else _('Projects') }}</span>
+            {% if _projects is iterable and _projects is not string %}
+              {% for _p in _projects %}<span class="mf-tag teal">{{ _p }}</span>{% endfor %}
+            {% else %}
+              <span class="mf-tag teal">{{ _projects }}</span>
+            {% endif %}
+          </div>
+        {% endif %}
+
+        {# ---------- description ---------- #}
+        {% block package_notes %}
+          {% if ( h.scheming_field_by_name(schema.dataset_fields, 'notes') or h.scheming_field_by_name(schema.dataset_fields, 'notes_translated') ) and h.get_translated(pkg, 'notes') %}
+            <div class="notes embedded-content mf-description">
+              {{ h.markdown_extract(h.get_translated(pkg, 'notes'), extract_length=400) }}
+              {% set notes_translation_method = h.scheming_language_text(h.cioos_load_json( h.get_pkg_dict_extra(pkg, 'notes_translation_method') or pkg.get('notes_translation_method') or '{}' )) %}
+              {% if notes_translation_method %}
+                <span class="translation_icon_group" title="{{ notes_translation_method }}">
+                  <i class="translation_icon" aria-hidden="true"></i>
+                </span>
+              {% endif %}
+            </div>
           {% endif %}
+        {% endblock %}
 
-        </div>
-      {% endif %}
-    {% endblock %}
+        {# keyword tags moved to hero aside (below EOVs) #}
 
-  {% endblock %}
+      {% endblock %}
+    </div>
 
-  
-  {% block metadata_quality_statment %}
+  </section>
+
+  {# ========================== BODY ========================== #}
+  <div class="mf-body-main">
+
+    {% block metadata_quality_statment %}
       {% set harvest_source_quality_level = h.get_pkg_dict_extra(c.pkg_dict, 'harvest_source_quality_level') %}
       {% if harvest_source_quality_level is defined and harvest_source_quality_level in ('unknown','external') %}
         {% snippet "package/snippets/metadata_quality.html", pkg_dict=pkg %}
       {% endif %}
+    {% endblock %}
 
-  {% endblock %}
+    {% block package_access %}
+      {% snippet "package/snippets/access.html", pkg_dict=pkg %}
+    {% endblock %}
 
-  {% block package_access %}
-    {% snippet "package/snippets/access.html", pkg_dict=pkg %}
-  {% endblock %}
+    {% block package_resources %}
+      {% snippet "package/snippets/resources_list.html", pkg=pkg, resources=pkg.resources %}
+    {% endblock %}
 
-  {% block package_resources %}
-    {% snippet "package/snippets/resources_list.html", pkg=pkg, resources=pkg.resources %}
-  {% endblock %}
+    {# package_citation moved to hero sidebar #}
+    {% block package_citation %}{% endblock %}
 
-  {% block package_citation %}
+    {% block package_relationships %}
+      {% snippet "package/snippets/relationships.html", pkg_dict=pkg, relationships=h.cioos_get_package_relationships(pkg)%}
+    {% endblock %}
+
+    {% block package_img_preview %}
+      {% snippet "package/snippets/preview.html", pkg_dict=pkg %}
+    {% endblock %}
+
+    <section id="dataset-contacts" class="additional-info mf-always-visible">
+      <h3>{{ _('Contacts') }}</h3>
+      <div id="contacts-container" class="flex-panels">
+        {% set field = h.scheming_field_by_name(schema.dataset_fields, 'cited-responsible-party') %}
+        {% set cpkg = pkg.copy() %}
+        {%- set _discard = cpkg.update({"cited-responsible-party": h.cioos_group_contacts(cpkg.get('cited-responsible-party',[]) + cpkg.get('metadata-point-of-contact',[]) + cpkg.get('distributor',[]))}) -%}
+        {%- snippet "package/snippets/contacts.html",
+          field=field,
+          data=cpkg,
+          errors=errors,
+          entity_type=entity_type,
+          object_type=object_type
+        -%}
+      </div>
+    </section>
+
+    {# dates section removed #}
+    {% block package_dates %}{% endblock %}
+
+    {% block package_metadata_source %}
+      {% snippet "package/snippets/metadata_source.html", pkg_dict=pkg %}
+    {% endblock %}
+
+    {% block package_additional_info %}
+      {% snippet "scheming/package/snippets/additional_info.html", pkg_dict=pkg, dataset_type=dataset_type, schema=schema %}
+    {% endblock %}
+  </div>
+  </div>{# /.mf-left #}
+
+  {# ========================== RIGHT COLUMN ========================== #}
+  <aside class="mf-right mf-sidebar">
+    {% set dataset_extent = h.dump_json(h.get_pkg_dict_extra(c.pkg_dict, 'spatial') or c.pkg_dict.get('spatial')) %}
+    {% if dataset_extent %}
+      <div class="mf-hero-map">
+        {% set _initial_zoom = h.cioos_spatial_get_map_initial_max_zoom(pkg) %}
+        {% snippet "spatial/snippets/dataset_map.html", extent=dataset_extent, max_zoom=((_initial_zoom|int - 1) if _initial_zoom else 8) %}
+      </div>
+      <script>
+        (function(){
+          // After Leaflet finishes the initial fitBounds, nudge zoom out by one step.
+          function nudge(){
+            var el = document.getElementById('dataset-map-container');
+            if (!el || !el._leaflet_id) { return setTimeout(nudge, 100); }
+            // Find the Leaflet map instance — stored in window L._maps in some builds, otherwise walk
+            for (var k in window) {
+              try {
+                var v = window[k];
+                if (v && v._container === el && typeof v.setZoom === 'function') {
+                  v.setZoom(Math.max(0, v.getZoom() - 1));
+                  return;
+                }
+              } catch(e){}
+            }
+            setTimeout(nudge, 100);
+          }
+          if (document.readyState !== 'loading') setTimeout(nudge, 400);
+          else document.addEventListener('DOMContentLoaded', function(){ setTimeout(nudge, 400); });
+        })();
+      </script>
+    {% endif %}
+
+    {# Metadata key/value card #}
+    <div class="mf-card">
+      <div class="mf-eyebrow" style="margin-bottom:6px;">{{ _('Metadata') }}</div>
+      <div class="mf-meta-row"><span class="k">{{ _('Identifier') }}</span><span class="v">{{ pkg.name }}</span></div>
+
+      {% set _scope = pkg.get('scope') or h.get_pkg_dict_extra(pkg, 'scope') %}
+      {% if _scope %}
+      <div class="mf-meta-row"><span class="k">{{ _('Scope') }}</span><span class="v">{{ _scope|title }}</span></div>
+      {% endif %}
+
+      {% set _status = pkg.get('progress') or h.get_pkg_dict_extra(pkg, 'progress') %}
+      {% if _status %}
+      <div class="mf-meta-row"><span class="k">{{ _('Status') }}</span><span class="v">{{ _status|title }}</span></div>
+      {% endif %}
+
+      {% set _version = pkg.get('version') or h.get_pkg_dict_extra(pkg, 'version') %}
+      {% if _version %}
+      <div class="mf-meta-row"><span class="k">{{ _('Version') }}</span><span class="v">{{ _version }}</span></div>
+      {% endif %}
+
+      {% set _doi = pkg.get('doi') or h.get_pkg_dict_extra(pkg, 'doi') %}
+      {% if not _doi %}
+        {%- set _uri_full = pkg.get('unique-resource-identifier-full') or h.cioos_load_json(h.get_pkg_dict_extra(pkg, 'unique-resource-identifier-full') or '[]') -%}
+        {%- if _uri_full and _uri_full is iterable and _uri_full is not string -%}
+          {%- for _u in _uri_full -%}
+            {%- if _u is mapping and _u.get('code') and 'doi' in (_u.get('code')|string|lower) -%}
+              {% set _doi = _u.get('code') %}
+            {%- endif -%}
+          {%- endfor -%}
+        {%- endif -%}
+      {% endif %}
+      {% if _doi %}
+      <div class="mf-meta-row">
+        <span class="k">DOI</span>
+        <span class="v">
+          {% if 'http' in (_doi|string) %}<a href="{{ _doi }}" target="_blank" rel="noopener">{{ _doi|replace('https://doi.org/','')|replace('http://doi.org/','') }}</a>
+          {% else %}{{ _doi }}{% endif %}
+        </span>
+      </div>
+      {% endif %}
+
+      {# Temporal extent — separate Start / End rows #}
+      {% set _te = pkg.get('temporal-extent') or h.cioos_load_json(h.get_pkg_dict_extra(pkg, 'temporal-extent') or '[]') %}
+      {% if _te and _te is iterable and _te is not string %}
+        {% set _te0 = _te[0] if _te|length else None %}
+        {% if _te0 is mapping %}
+          {% if _te0.get('begin') %}
+          <div class="mf-meta-row"><span class="k">{{ _('Temporal extent — Start') }}</span><span class="v">{{ _te0.get('begin') }}</span></div>
+          {% endif %}
+          {% if _te0.get('end') %}
+          <div class="mf-meta-row"><span class="k">{{ _('Temporal extent — End') }}</span><span class="v">{{ _te0.get('end') }}</span></div>
+          {% endif %}
+        {% endif %}
+      {% endif %}
+
+      {# Vertical extent #}
+      {% set _ve = pkg.get('vertical-extent') or h.cioos_load_json(h.get_pkg_dict_extra(pkg, 'vertical-extent') or '[]') %}
+      {% if _ve and _ve is iterable and _ve is not string %}
+        {% set _ve0 = _ve[0] if _ve|length else None %}
+        {% if _ve0 is mapping and (_ve0.get('min') is not none or _ve0.get('max') is not none) %}
+        <div class="mf-meta-row">
+          <span class="k">{{ _('Vertical extent') }}</span>
+          <span class="v">{{ _ve0.get('min','') }}{% if _ve0.get('max') is not none %} → {{ _ve0.get('max') }}{% endif %} m</span>
+        </div>
+        {% endif %}
+      {% endif %}
+
+      {% if pkg.metadata_created %}
+      <div class="mf-meta-row"><span class="k">{{ _('Published') }}</span><span class="v">{{ h.render_datetime(pkg.metadata_created, date_format='%Y-%m-%d') }}</span></div>
+      {% endif %}
+      {% if pkg.metadata_modified %}
+      <div class="mf-meta-row"><span class="k">{{ _('Last updated') }}</span><span class="v">{{ h.render_datetime(pkg.metadata_modified, date_format='%Y-%m-%d') }}</span></div>
+      {% endif %}
+      {% if pkg.license_id %}
+      <div class="mf-meta-row"><span class="k">{{ _('Licence') }}</span><span class="v">{{ pkg.license_title or pkg.license_id }}</span></div>
+      {% endif %}
+    </div>
+
+    {# Formatted citation #}
     {% if pkg.citation %}
       {% snippet "package/snippets/package_citation.html", pkg_dict=pkg %}
     {% endif %}
-  {% endblock %}
 
-  {% block package_relationships %}
-    {# snippet "package/snippets/relationships.html", pkg_dict=pkg, relationships=h.get_pkg_dict_extra(c.pkg_dict, 'associated-datasets')  #}
-    {% snippet "package/snippets/relationships.html", pkg_dict=pkg, relationships=h.cioos_get_package_relationships(pkg)%}
-  {% endblock %}
-
-  {% block package_img_preview %}
-    {% snippet "package/snippets/preview.html", pkg_dict=pkg %}
-  {% endblock %}
-
-  {% block package_tags %}
-    {% snippet "package/snippets/tags.html", 
-      tags=h.scheming_language_text(h.cioos_load_json(pkg.get('keywords', {}))),
-      tags_translation_method = h.scheming_language_text(h.cioos_load_json( h.get_pkg_dict_extra(pkg, 'keywords_translation_method') or pkg.get('keywords_translation_method') or '{}' )) 
-    %}
-  {% endblock %}
-
-  {% set dataset_extent = h.dump_json(h.get_pkg_dict_extra(c.pkg_dict, 'spatial') or c.pkg_dict.get('spatial')) %}
-  {% if dataset_extent %}
-    {% snippet "spatial/snippets/dataset_map.html", extent=dataset_extent, max_zoom=h.cioos_spatial_get_map_initial_max_zoom(pkg) %}
-  {% endif %}
-
-  {% block package_dates %}
-    {% snippet "package/snippets/dates.html", pkg_dict=pkg %}
-  {% endblock %}
-
-  {% block package_metadata_source %}
-    {% snippet "package/snippets/metadata_source.html", pkg_dict=pkg %}
-  {% endblock %}
-
-  <section id="dataset-contacts" class="additional-info">
-    <h3>
-      <a class="section_hide_controle collapsed" data-bs-toggle="collapse" href="#contacts-container" role="button" aria-expanded="false" aria-controls="contacts_info_list">
-      {{ _('Contacts') }}<i class="collapse-icon"></i>
-      </a>
-    </h3>
-    <div id="contacts-container" class="flex-panels collapse">
-
-      {% set field = h.scheming_field_by_name(schema.dataset_fields, 'cited-responsible-party') %}
-      {% set cpkg = pkg.copy() %}
-      {%- set _ = cpkg.update({"cited-responsible-party": h.cioos_group_contacts(cpkg.get('cited-responsible-party',[]) + cpkg.get('metadata-point-of-contact',[]) + cpkg.get('distributor',[]))}) -%}
-      {%- snippet "package/snippets/contacts.html",
-        field=field,
-        data=cpkg,
-        errors=errors,
-        entity_type=entity_type,
-        object_type=object_type
-      -%}
-
-    </div>
-  </section>
-
-  {% block package_additional_info %}
-    {% snippet "scheming/package/snippets/additional_info.html", pkg_dict=pkg, dataset_type=dataset_type, schema=schema %}
-  {% endblock %}
-
-{% endblock %}
-
-{% block secondary_content %}
-  {{ super() }}
-
-  <section class="module module-narrow module-shallow">
-      <h2 class="module-heading">
-        <i class="fa fa-icon fa-link"></i>
-        {{ _('Formats') }}
-      </h2>
-      <nav>
-        <ul class="list-unstyled nav nav-simple">
-        {% if c.userobj %}
-          <li class="nav-item"><a href="{{ h.url_for(controller='dataset', action='read', id=pkg.get('name') or pkg.id) }}.dcxml"><span class="item-label">{{ _('DataCite XML')}}</span></a></li>
-          {% endif %}
-          {% if h.cioos_helper_available('structured_data') %}
-          <li class="nav-item"><a href="{{ h.url_for(controller='dataset', action='read', id=pkg.get('name') or pkg.id) }}.xml"><span class="item-label">{{ _('RDF/XML')}}</span></a></li>
-          <li class="nav-item"><a href="{{ h.url_for(controller='dataset', action='read', id=pkg.get('name') or pkg.id) }}.ttl"><span class="item-label">{{ _('Turtle')}}</span></a></li>
-          <li class="nav-item"><a href="{{ h.url_for(controller='dataset', action='read', id=pkg.get('name') or pkg.id) }}.n3"><span class="item-label">{{ _('Notation3')}}</span></a></li>
-          <li class="nav-item"><a href="{{ h.url_for(controller='dataset', action='read', id=pkg.get('name') or pkg.id) }}.jsonld"><span class="item-label">{{ _('JSON-LD')}}</span></a></li>
-          <li class="nav-item"><a href="{{ h.url_for(controller='dataset', action='read', id=pkg.get('name') or pkg.id) }}.jsonld?frame=schemaorg"><span class="item-label">{{ _('JSON-LD/Schema.org')}}</span></a></li>
+    {# EOVs #}
+    {% set _eov = pkg.get('eov') or h.get_pkg_dict_extra(pkg, 'eov') %}
+    {% if _eov %}
+    <div>
+      <div class="mf-eyebrow" style="margin-bottom:8px;">{{ _('Essential Ocean Variables') }}</div>
+      <div class="mf-tags-row">
+        {% set _eov_list = h.cioos_load_json(_eov) %}
+        {% if _eov_list is iterable and _eov_list is not string %}
+          {% for v in _eov_list %}<span class="mf-tag teal">{{ v }}</span>{% endfor %}
+        {% else %}
+          <span class="mf-tag teal">{{ _eov }}</span>
         {% endif %}
-          <li class="nav-item"><a href="{{ h.url_for(controller='api',
-                              logic_function='package_show',
-                              action='action', ver=3, id=pkg.get('name') or pkg.id) }}"><span class="item-label">{{ _('JSON')}}</span></a></li>
-          <li class="nav-item"><a href="{{ h.url_for(controller='dataset', action='read', id=pkg.get('name') or pkg.id) }}.basic"><span class="item-label">{{ _('Basic View')}}</span></a></li>
-          <li class="nav-item"><a href="{{ h.url_for(controller='dataset', action='read', id=pkg.get('name') or pkg.id) }}"><span class="item-label">{{ _('Show Permalink')}}</span></a></li>
-        </ul>
-      </nav>
-  </section>
+      </div>
+    </div>
+    {% endif %}
+
+    {# Keywords #}
+    {% set _kw = h.scheming_language_text(h.cioos_load_json(pkg.get('keywords', {}))) %}
+    {% if _kw %}
+    <div>
+      <div class="mf-eyebrow" style="margin-bottom:8px;">{{ _('Keywords') }}</div>
+      <div class="mf-tags-row" style="margin-top:0;">
+        {% if _kw is mapping %}
+          {% for _vocab, _terms in _kw.items() %}
+            {% for _t in (_terms or []) %}
+              <span class="mf-tag">{{ _t }}</span>
+            {% endfor %}
+          {% endfor %}
+        {% elif _kw is iterable and _kw is not string %}
+          {% for _t in _kw %}<span class="mf-tag">{{ _t }}</span>{% endfor %}
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+  </aside>
+</div>{# /.mf-detail #}
 {% endblock %}
+
+{# Sidebar moved into the hero right column; suppress the default sidebar so the body goes full-width. #}
+{% block secondary_content %}{% endblock %}
+{% block secondary %}{% endblock %}
+
+{# Remove the CKAN nav-tabs row (Dataset / Responsible Organizations / Lineage). #}
+{% block content_primary_nav %}{% endblock %}
+
