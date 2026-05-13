@@ -77,13 +77,10 @@ body:has(.mf-detail) [class*="col-md-9"] {
   flex-direction: column;
   gap: 18px;
   min-width: 0;
-  position: sticky;
-  top: 100px;
   align-self: start;
 }
 @media (max-width: 900px) {
   .mf-detail { grid-template-columns: 1fr; }
-  .mf-detail .mf-right { position: static; }
 }
 
 /* -- Hero (no longer 2-col; aside moved to top-level .mf-right) ---------- */
@@ -111,14 +108,15 @@ body:has(.mf-detail) [class*="col-md-9"] {
   align-items: center;
   gap: 10px;
   margin-top: 24px;
-  margin-bottom: 8px;
+  margin-bottom: 20px;
   flex-wrap: wrap;
 }
+.mf-detail .mf-attribution + .mf-projects { margin-top: -14px; }
 .mf-detail .mf-projects {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-top: 6px;
+  margin-top: 24px;
   margin-bottom: 20px;
   flex-wrap: wrap;
 }

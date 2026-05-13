@@ -33,13 +33,14 @@
         {% endif %}
       </p>
 
+      {% if res.size or res.tracking_summary %}
       <div class="mf-resource-meta">
-        <span class="mf-format-label">{{ fmt|upper }}</span>
         {% if res.size %}
           <span class="mf-resource-size">{{ h.localised_filesize(res.size) }}</span>
         {% endif %}
         {{ h.popular('views', res.tracking_summary.total, min=10) if res.tracking_summary }}
       </div>
+      {% endif %}
     </div>
   {% endblock %}
 

@@ -16,7 +16,6 @@
       {%- if not _initials %}{% set _initials = (_name or '?')[:2]|upper %}{% endif -%}
 
       <div class="mf-contact-card">
-        <div class="mf-contact-avatar">{{ _initials }}</div>
         <div class="mf-contact-body">
           <div class="mf-contact-name">{{ _name or _('Contact') ~ ' ' ~ loop.index }}</div>
           {% if _org or _position %}
@@ -24,9 +23,6 @@
               {%- if _position %}<span class="position">{{ _position }}</span>{% if _org %} · {% endif %}{% endif -%}
               {%- if _org %}<span class="org">{{ _org }}</span>{% endif -%}
             </div>
-          {% endif %}
-          {% if _role %}
-            <div class="mf-contact-role"><span class="role">{{ _role|title }}</span></div>
           {% endif %}
           {% if _email %}
             <a class="mf-contact-email" href="mailto:{{ _email }}" title="{{ _email }}">
