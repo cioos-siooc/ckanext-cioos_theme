@@ -1,2 +1,2 @@
-pyld
+pyld==2.0.4  # newer versions require Python 3.10+ (PEP 604 syntax)
 jsonpickle
