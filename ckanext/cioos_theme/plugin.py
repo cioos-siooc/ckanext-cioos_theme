@@ -853,6 +853,31 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
 
             if data_dict.get('projects'):
                 data_dict['projects'] = cioos_helpers.load_json(data_dict.get('projects'))
+
+            # Solr StrField has a hard 32766-byte limit per term. A handful of
+            # records have responsible-party lists with the same individual
+            # repeated across many roles, which can push the JSON blob past
+            # that limit and break indexing. Only intervene when the limit is
+            # actually exceeded so other records are byte-for-byte unchanged.
+            SOLR_STR_FIELD_LIMIT = 32000
+            for field in ('metadata-point-of-contact', 'cited-responsible-party'):
+                value = data_dict.get(field)
+                if not value or not isinstance(value, str):
+                    continue
+                if len(value.encode('utf-8')) <= SOLR_STR_FIELD_LIMIT:
+                    continue
+                try:
+                    grouped = self.group_by_ind_or_org(cioos_helpers.load_json(value))
+                    deduped = json.dumps(grouped)
+                except Exception as err:
+                    log.error('Failed to dedupe oversized %s for %s: %s', field, data_dict.get('id', 'NO ID'), err)
+                    data_dict.pop(field, None)
+                    continue
+                if len(deduped.encode('utf-8')) <= SOLR_STR_FIELD_LIMIT:
+                    data_dict[field] = deduped
+                else:
+                    log.warning('Dropping %s from Solr doc for %s: %d bytes after dedupe exceeds limit', field, data_dict.get('id', 'NO ID'), len(deduped.encode('utf-8')))
+                    data_dict.pop(field, None)
         except Exception as e:
             log.exception(e)
             raise e
