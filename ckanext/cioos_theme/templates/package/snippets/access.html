@@ -1,66 +1,51 @@
 <section class="access">
   <h3>{{ _('Access and Use') }}</h3>
-  <table class="table table-bordered">
-    <tbody>
-      <tr>
-        <td>         
-          {% set license = h.cioos_get_license_def(
-              pkg_dict.license_id, 
-              pkg_dict.license_url, 
-              pkg_dict.license_title
-            ) or {}
-          %}
-          {% set use_constraints = pkg_dict.extras 
-            | selectattr("key","equalto","use-constraints") 
-            | map(attribute="value") 
-            | join('')
-          %}
-          {% set access_constraints = pkg_dict.extras 
-            | selectattr("key","equalto","access-constraints") 
-            | map(attribute="value") 
-            | join('')
-          %}
-          {% set other_constraints = pkg_dict.extras 
-            | selectattr("key","equalto","limitations-on-public-access") 
-            | map(attribute="value") 
-            | join('')
-          %}
 
-          <span>
-            <strong>{{ _('Licence') }}: </strong>
-            {%- if license.get('license_url') -%}
-            <a href="{{license['license_url']}}">{{ license['license_title'] }}</a>
-            {%- else -%}
-            {{ pkg_dict.license_title or pkg_dict.license_id or 'Not Specified' }}
-            {%- endif -%}
-          </span>
-          <br />
+  {% set license = h.cioos_get_license_def(
+      pkg_dict.license_id,
+      pkg_dict.license_url,
+      pkg_dict.license_title
+    ) or {}
+  %}
+  {% set use_constraints = pkg_dict.extras
+    | selectattr("key","equalto","use-constraints")
+    | map(attribute="value")
+    | join('')
+  %}
+  {% set access_constraints = pkg_dict.extras
+    | selectattr("key","equalto","access-constraints")
+    | map(attribute="value")
+    | join('')
+  %}
+  {% set other_constraints = pkg_dict.extras
+    | selectattr("key","equalto","limitations-on-public-access")
+    | map(attribute="value")
+    | join('')
+  %}
 
-          {# no need to do this if just printing licence because use-constraints
-             is used to populate it in the first place #}
-          {% if use_constraints and pkg_dict.license_url and use_constraints != pkg_dict.license_url %}
-          <span>
-            <strong>{{ _('Limitations') }}: </strong>
-            {{ h.cioos_load_json(use_constraints) }}
-          </span>
-          <br />
-          {% endif %}
+  <dl class="mf-access-list">
+    <dt>{{ _('Licence') }}</dt>
+    <dd>
+      {%- if license.get('license_url') -%}
+        <a href="{{ license['license_url'] }}">{{ license['license_title'] }}</a>
+      {%- else -%}
+        {{ pkg_dict.license_title or pkg_dict.license_id or _('Not Specified') }}
+      {%- endif -%}
+    </dd>
 
-          {% if access_constraints%}
-          <span>
-            <strong>{{ _('Access') }}: </strong>
-            {{ '\n'.join(h.cioos_load_json(access_constraints))|title }}
-            {% if other_constraints %}
-            {{ '\u2014' }} {{ '\n'.join(h.cioos_load_json(other_constraints)) }}
-            {% endif %}
-          </span>
-          <br />
-          {% endif %}
+    {% if use_constraints and pkg_dict.license_url and use_constraints != pkg_dict.license_url %}
+    <dt>{{ _('Limitations') }}</dt>
+    <dd>{{ h.cioos_load_json(use_constraints) }}</dd>
+    {% endif %}
 
-
-
-        </td>
-      </tr>
-    </tbody>
-  </table>
+    {% if access_constraints %}
+    <dt>{{ _('Access') }}</dt>
+    <dd>
+      {{ '\n'.join(h.cioos_load_json(access_constraints))|title }}
+      {% if other_constraints %}
+        {{ '—' }} {{ '\n'.join(h.cioos_load_json(other_constraints)) }}
+      {% endif %}
+    </dd>
+    {% endif %}
+  </dl>
 </section>

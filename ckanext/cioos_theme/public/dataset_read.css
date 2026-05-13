@@ -725,15 +725,38 @@ body:has(.mf-detail) [class*="col-md-9"] {
   margin: 4px 0 0 0;
 }
 
-/* Map existing CKAN tables (access, dates) to a key/value look */
-.mf-detail .access table,
+/* Access and Use — div-based key/value list */
+.mf-detail .mf-access-list {
+  margin: 0;
+  display: grid;
+  grid-template-columns: minmax(140px, 200px) 1fr;
+  column-gap: 16px;
+  row-gap: 0;
+}
+.mf-detail .mf-access-list dt,
+.mf-detail .mf-access-list dd {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 13px;
+  margin: 0;
+}
+.mf-detail .mf-access-list dt {
+  color: var(--muted);
+  font-weight: 500;
+}
+.mf-detail .mf-access-list dd {
+  color: var(--navy);
+  font-weight: 500;
+}
+.mf-detail .mf-access-list dt:last-of-type,
+.mf-detail .mf-access-list dd:last-of-type { border-bottom: none; }
+
+/* Map existing CKAN tables (dates, additional-info) to a key/value look */
 .mf-detail .dates table {
   border: none;
   background: transparent;
   margin: 0;
 }
-.mf-detail .access table th,
-.mf-detail .access table td,
 .mf-detail .dates table th,
 .mf-detail .dates table td {
   border: none;
@@ -743,18 +766,13 @@ body:has(.mf-detail) [class*="col-md-9"] {
   font-size: 13px;
   vertical-align: top;
 }
-/* No separator line below the Access and Use section */
-.mf-detail .access table tr:last-child th,
-.mf-detail .access table tr:last-child td { border-bottom: none; }
 
-.mf-detail .access table th,
 .mf-detail .dates table th,
 .mf-detail .additional-info table th {
   color: var(--muted);
   font-weight: 500;
   width: 40%;
 }
-.mf-detail .access table td,
 .mf-detail .dates table td,
 .mf-detail .additional-info table td {
   color: var(--navy);

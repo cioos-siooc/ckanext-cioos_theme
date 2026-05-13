@@ -1130,6 +1130,8 @@ aside #dataset-map {
 #footer .cioos-footer-legal-inner {
   max-width: 1440px;
   margin: 0 auto;
+  padding-left: clamp(16px, 4vw, 40px);
+  padding-right: clamp(16px, 4vw, 40px);
   position: relative;
 }
 

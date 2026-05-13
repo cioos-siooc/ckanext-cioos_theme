@@ -63,7 +63,7 @@ body:has(.home-v3) #header-container .v3-nav {
 body:has(.home-v3) #header-container .v3-nav-inner {
   max-width: 1440px;
   margin: 0 auto;
-  padding: 14px 12.8px;
+  padding: 14px clamp(16px, 4vw, 40px);
   display: flex;
   align-items: center;
   gap: 2.5rem;
