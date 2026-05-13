@@ -103,6 +103,19 @@ body:has(.mf-detail) [class*="col-md-9"] {
   line-height: 1.6;
 }
 
+/* attribution group: org + license/DOI + projects, tight together with breathing room outside */
+.mf-detail .mf-attribution-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 32px;
+  margin-bottom: 32px;
+}
+.mf-detail .mf-attribution-group > * {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
 /* attribution row */
 .mf-detail .mf-attribution {
   display: flex;
@@ -151,8 +164,7 @@ body:has(.mf-detail) [class*="col-md-9"] {
   gap: 6px;
   padding: 3px 10px 3px 3px;
   border-radius: 100px;
-  border: 1px solid var(--line);
-  background: white;
+  background: transparent;
   text-decoration: none;
   color: var(--navy);
 }
@@ -172,6 +184,10 @@ body:has(.mf-detail) [class*="col-md-9"] {
   overflow: hidden;
   flex-shrink: 0;
 }
+.mf-hero-main .mf-attribution .mf-org-chip .mf-org-avatar { 
+  width: 76px;
+  height: 76px;
+}
 .mf-detail .mf-org-chip .mf-org-avatar.has-image {
   background: white;
   border: 1px solid var(--line);
@@ -183,8 +199,12 @@ body:has(.mf-detail) [class*="col-md-9"] {
   display: block;
 }
 .mf-detail .mf-org-chip .mf-org-name {
-  font-size: 12px;
+  font-size: 16px;
   font-weight: 500;
+  max-width: 320px;
+  white-space: normal;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 /* key stats */
@@ -414,11 +434,59 @@ body:has(.mf-detail) [class*="col-md-9"] {
 }
 
 /* ============== Resource cards (Mid-Fi) ============== */
-.mf-detail .resources h3,
-.mf-detail #dataset-resources h3 {
-  font-family: 'Sora', sans-serif;
-  font-size: 26px;
-  margin-bottom: 16px;
+/* Use the shared section > h3 sizing (22px) for consistency across sections */
+
+/* ============== Responsible Organizations ============== */
+.mf-detail .responsible-orgs .mf-resorg-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px;
+}
+.mf-detail .responsible-orgs .mf-resorg-item { margin: 0; }
+.mf-detail .responsible-orgs .mf-resorg-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  text-decoration: none;
+  color: var(--navy);
+  transition: border-color 0.15s ease;
+}
+.mf-detail .responsible-orgs .mf-resorg-link:hover {
+  border-color: var(--teal);
+}
+.mf-detail .responsible-orgs .mf-resorg-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 10px;
+  background: white;
+  border: 1px solid var(--line);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.mf-detail .responsible-orgs .mf-resorg-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+.mf-detail .responsible-orgs .mf-resorg-name {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.3;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .mf-detail .resource-list {
   list-style: none;

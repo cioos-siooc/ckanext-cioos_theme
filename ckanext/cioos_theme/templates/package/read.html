@@ -54,18 +54,36 @@
         </h1>
 
         {# ---------- attribution row ---------- #}
-        {% if pkg.organization %}
-          {% set _org_name = h.get_translated(pkg.organization, 'title') or pkg.organization.name %}
-          {% set _org_url = h.url_for(pkg.organization.type + '.read', id=pkg.organization.name) %}
-          {% set _org_img = h.cioos_org_image_url(pkg.organization) %}
+        {% set _resorg_groups = [] %}
+        {% for _grp in (pkg.get('groups') or []) %}
+          {% set _gname = _grp.get('name', '') if _grp is mapping else '' %}
+          {% set _gtype = _grp.get('type', '') if _grp is mapping else '' %}
+          {% if _gtype == 'resorg' or _gname.startswith('resorg') %}
+            {% set _ = _resorg_groups.append(_grp) %}
+          {% endif %}
+        {% endfor %}
+        {% set _orgs_to_show = _resorg_groups if _resorg_groups else ([pkg.organization] if pkg.organization else []) %}
+        {% if _orgs_to_show or pkg.license_id or pkg.license_title or _doi or (pkg.get('projects') or h.get_pkg_dict_extra(pkg, 'projects')) %}
+        <div class="mf-attribution-group">
+        {% endif %}
+        {% if _orgs_to_show %}
           <div class="mf-attribution">
             <span class="mf-attribution-label">{{ _('By') }}</span>
-            <a class="mf-org-chip" href="{{ _org_url }}">
-              <span class="mf-org-avatar has-image">
-                <img src="{{ _org_img }}" alt="" loading="lazy" />
-              </span>
-              <span class="mf-org-name">{{ _org_name }}</span>
-            </a>
+            {% for _org in _orgs_to_show %}
+              {% set _org_name = h.get_translated(_org, 'title') or _org.get('display_name') or _org.get('title') or _org.get('name') %}
+              {% if _org.get('type') == 'resorg' %}
+                {% set _org_url = h.url_for('cioos.resorg', package_type='dataset', id=_org.name) %}
+              {% else %}
+                {% set _org_url = h.url_for((_org.get('type') or 'organization') + '.read', id=_org.name) %}
+              {% endif %}
+              {% set _org_img = h.cioos_org_image_url(_org) %}
+              <a class="mf-org-chip" href="{{ _org_url }}">
+                <span class="mf-org-avatar has-image">
+                  <img src="{{ _org_img }}" alt="" loading="lazy" />
+                </span>
+                <span class="mf-org-name">{{ _org_name }}</span>
+              </a>
+            {% endfor %}
           </div>
         {% endif %}
 
@@ -106,6 +124,9 @@
               <span class="mf-tag teal">{{ _projects }}</span>
             {% endif %}
           </div>
+        {% endif %}
+        {% if _orgs_to_show or pkg.license_id or pkg.license_title or _doi or _projects %}
+        </div>
         {% endif %}
 
         {# ---------- description ---------- #}
