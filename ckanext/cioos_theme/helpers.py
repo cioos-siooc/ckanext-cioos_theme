@@ -186,6 +186,35 @@ def get_license_def(id, url='', title=''):
         
 
 
+DOI_REGEX = re.compile(r'^10\.\d{4,9}/[-._;()/:A-Z0-9]+$', re.IGNORECASE)
+DOI_URL_PREFIX_REGEX = re.compile(r'^(https?://(dx\.)?doi\.org/|doi:)', re.IGNORECASE)
+
+
+def extract_doi(code, code_space=None):
+    '''Return the bare DOI (e.g. ``10.xxxx/yyy``) from a code / code-space pair,
+    or ``None`` if the pair does not identify a DOI.
+
+    Recognised forms, in order:
+      1. ``code`` starts with ``https://doi.org/``, ``http://doi.org/``,
+         ``http://dx.doi.org/`` (or https variants), or ``doi:`` -- the prefix
+         is stripped.
+      2. ``code_space`` is ``doi.org`` / ``https://doi.org`` (or otherwise
+         contains ``doi``) -- ``code`` is treated as the bare DOI.
+      3. ``code`` already matches the bare DOI regex.
+    '''
+    if not code or not isinstance(code, str):
+        return None
+    candidate = code.strip()
+    m = DOI_URL_PREFIX_REGEX.match(candidate)
+    if m:
+        candidate = candidate[m.end():]
+    elif code_space and isinstance(code_space, str) and 'doi' in code_space.lower():
+        pass
+    elif not DOI_REGEX.match(candidate):
+        return None
+    return candidate if DOI_REGEX.match(candidate) else None
+
+
 def get_fully_qualified_package_uri(pkg, uri_field, default_code_space=None):
     fqURI = []
     uris = pkg.get(uri_field)
@@ -217,6 +246,14 @@ def get_fully_qualified_package_uri(pkg, uri_field, default_code_space=None):
         version = uri.get('version')
         if not code:
             continue
+
+        # Canonicalise DOIs regardless of the input form (bare DOI, doi: prefix,
+        # http(s)://(dx.)doi.org/..., or code-space-only signalling).
+        doi = extract_doi(code, code_space)
+        if doi:
+            fqURI.append('https://doi.org/' + doi)
+            continue
+
         if toolkit.h.is_url(code):
             fqURI.append(code)
             continue

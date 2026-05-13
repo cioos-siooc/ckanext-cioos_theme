@@ -733,20 +733,25 @@ class CIOOSDCATProfile(SchemaOrgProfile):
         if unique_identifiers:
             self.g.remove((dataset_ref, SCHEMA.identifier, None))
             for unique_identifier in unique_identifiers:
-                if 'doi.org' in unique_identifier.get('authority', '') or not unique_identifier.get('authority'):
-                    doi = re.sub(r'^http.*doi\.org/', '', unique_identifier['code'], flags=re.IGNORECASE)  # strip https://doi.org/ and the like
-                    if doi and re.match(r'^10.\d{4,9}\/[-._;()/:A-Z0-9]+$', doi, re.IGNORECASE):
-                        identifier = BNode()
-                        g.add((dataset_ref, SCHEMA.identifier, identifier))
-                        self.g.add((identifier, RDF.type, SCHEMA.PropertyValue))
-                        self.g.add((identifier, SCHEMA.propertyID, Literal("https://registry.identifiers.org/registry/doi")))
-                        self.g.add((identifier, SCHEMA.name, Literal("DOI: %s" % doi)))
-                        self.g.add((identifier, SCHEMA.value, Literal("doi:%s" % doi)))
-                        self.g.add((identifier, SCHEMA.url, Literal("https://doi.org/%s" % doi)))
+                authority = unique_identifier.get('authority', '') or ''
+                code_space = unique_identifier.get('code-space', '') or ''
+                # Treat the identifier as a DOI candidate when authority is
+                # missing, mentions doi.org, or when code/code-space themselves
+                # signal a DOI (handled inside extract_doi).
+                doi_eligible = (not authority) or ('doi.org' in authority)
+                doi = toolkit.h.cioos_extract_doi(unique_identifier.get('code'), code_space) if doi_eligible else None
+                if doi:
+                    identifier = BNode()
+                    g.add((dataset_ref, SCHEMA.identifier, identifier))
+                    self.g.add((identifier, RDF.type, SCHEMA.PropertyValue))
+                    self.g.add((identifier, SCHEMA.propertyID, Literal("https://registry.identifiers.org/registry/doi")))
+                    self.g.add((identifier, SCHEMA.name, Literal("DOI: %s" % doi)))
+                    self.g.add((identifier, SCHEMA.value, Literal("doi:%s" % doi)))
+                    self.g.add((identifier, SCHEMA.url, Literal("https://doi.org/%s" % doi)))
 
-                        uri = dataset_uri(dataset_dict)
-                        self.g.add((dataset_ref, DCAT.previousVersion, URIRefOrLiteral(uri)))
-                        self.g.add((dataset_ref, PROV.wasRevisionOf, URIRefOrLiteral(uri)))
+                    uri = dataset_uri(dataset_dict)
+                    self.g.add((dataset_ref, DCAT.previousVersion, URIRefOrLiteral(uri)))
+                    self.g.add((dataset_ref, PROV.wasRevisionOf, URIRefOrLiteral(uri)))
         else:
             uri = dataset_uri(dataset_dict)
             g.add((dataset_ref, SCHEMA.identifier, Literal('%s' % uri)))

@@ -537,6 +537,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             'cioos_helper_available': cioos_helpers.helper_available,
             'cioos_group_contacts': self.group_by_ind_or_org,
             'cioos_get_fully_qualified_package_uri': cioos_helpers.get_fully_qualified_package_uri,
+            'cioos_extract_doi': cioos_helpers.extract_doi,
             'cioos_version': cioos_helpers.cioos_version,
             'cioos_get_license_def': cioos_helpers.get_license_def,
             'cioos_merge_dict': cioos_helpers.merge_dict,
