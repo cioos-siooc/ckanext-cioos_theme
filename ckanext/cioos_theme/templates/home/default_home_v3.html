@@ -241,7 +241,7 @@
             <a class="v3-org-link" href="{{ org_url }}" title="{{ org_title }}">
               <span class="v3-org-logo">
                 {% if org_img %}
-                  <img src="{{ org_img }}" alt="{{ org_title }}" loading="lazy" />
+                  <img src="{{ org_img }}" alt="{{ org_title }}" loading="lazy" width="56" height="56" style="max-width:100%;max-height:100%;object-fit:contain;" />
                 {% else %}
                   <i class="fas fa-building" aria-hidden="true"></i>
                 {% endif %}

@@ -4,6 +4,19 @@
 
 {%- set schema = h.scheming_get_dataset_schema(dataset_type) -%}
 
+{# ---------- DOI resolution (shared between hero and sidebar) ---------- #}
+{% set _doi = pkg.get('doi') or h.get_pkg_dict_extra(pkg, 'doi') %}
+{% if not _doi %}
+  {%- set _uri_full = pkg.get('unique-resource-identifier-full') or h.cioos_load_json(h.get_pkg_dict_extra(pkg, 'unique-resource-identifier-full') or '[]') -%}
+  {%- if _uri_full and _uri_full is iterable and _uri_full is not string -%}
+    {%- for _u in _uri_full -%}
+      {%- if _u is mapping and _u.get('code') and 'doi' in (_u.get('code')|string|lower) -%}
+        {% set _doi = _u.get('code') %}
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endif -%}
+{% endif %}
+
 {% block styles %}
   {{ super() }}
   {% asset 'ckanext-cioos_theme/dataset_read_css' %}
@@ -50,6 +63,32 @@
               <span class="mf-org-avatar">{{ (_org_name or '?')[:2]|upper }}</span>
               <span class="mf-org-name">{{ _org_name }}</span>
             </a>
+          </div>
+        {% endif %}
+
+        {# ---------- license + DOI (between org and projects) ---------- #}
+        {% if pkg.license_id or pkg.license_title or _doi %}
+          <div class="mf-hero-meta">
+            {% if pkg.license_id or pkg.license_title %}
+              <div class="mf-hero-meta-item">
+                <span class="mf-attribution-label">{{ _('Licence') }}</span>
+                {% if pkg.license_url %}
+                  <a href="{{ pkg.license_url }}" target="_blank" rel="noopener">{{ pkg.license_title or pkg.license_id }}</a>
+                {% else %}
+                  <span>{{ pkg.license_title or pkg.license_id }}</span>
+                {% endif %}
+              </div>
+            {% endif %}
+            {% if _doi %}
+              <div class="mf-hero-meta-item">
+                <span class="mf-attribution-label">DOI</span>
+                {% if 'http' in (_doi|string) %}
+                  <a href="{{ _doi }}" target="_blank" rel="noopener">{{ _doi|replace('https://doi.org/','')|replace('http://doi.org/','') }}</a>
+                {% else %}
+                  <span>{{ _doi }}</span>
+                {% endif %}
+              </div>
+            {% endif %}
           </div>
         {% endif %}
 
@@ -198,27 +237,6 @@
       <div class="mf-meta-row"><span class="k">{{ _('Version') }}</span><span class="v">{{ _version }}</span></div>
       {% endif %}
 
-      {% set _doi = pkg.get('doi') or h.get_pkg_dict_extra(pkg, 'doi') %}
-      {% if not _doi %}
-        {%- set _uri_full = pkg.get('unique-resource-identifier-full') or h.cioos_load_json(h.get_pkg_dict_extra(pkg, 'unique-resource-identifier-full') or '[]') -%}
-        {%- if _uri_full and _uri_full is iterable and _uri_full is not string -%}
-          {%- for _u in _uri_full -%}
-            {%- if _u is mapping and _u.get('code') and 'doi' in (_u.get('code')|string|lower) -%}
-              {% set _doi = _u.get('code') %}
-            {%- endif -%}
-          {%- endfor -%}
-        {%- endif -%}
-      {% endif %}
-      {% if _doi %}
-      <div class="mf-meta-row">
-        <span class="k">DOI</span>
-        <span class="v">
-          {% if 'http' in (_doi|string) %}<a href="{{ _doi }}" target="_blank" rel="noopener">{{ _doi|replace('https://doi.org/','')|replace('http://doi.org/','') }}</a>
-          {% else %}{{ _doi }}{% endif %}
-        </span>
-      </div>
-      {% endif %}
-
       {# Temporal extent — separate Start / End rows #}
       {% set _te = pkg.get('temporal-extent') or h.cioos_load_json(h.get_pkg_dict_extra(pkg, 'temporal-extent') or '[]') %}
       {% if _te and _te is iterable and _te is not string %}
@@ -250,9 +268,6 @@
       {% endif %}
       {% if pkg.metadata_modified %}
       <div class="mf-meta-row"><span class="k">{{ _('Last updated') }}</span><span class="v">{{ h.render_datetime(pkg.metadata_modified, date_format='%Y-%m-%d') }}</span></div>
-      {% endif %}
-      {% if pkg.license_id %}
-      <div class="mf-meta-row"><span class="k">{{ _('Licence') }}</span><span class="v">{{ pkg.license_title or pkg.license_id }}</span></div>
       {% endif %}
     </div>
 
