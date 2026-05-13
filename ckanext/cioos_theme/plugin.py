@@ -863,12 +863,22 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             SOLR_STR_FIELD_LIMIT = 32000
             for field in ('metadata-point-of-contact', 'cited-responsible-party'):
                 value = data_dict.get(field)
-                if not value or not isinstance(value, str):
+                if not value:
                     continue
-                if len(value.encode('utf-8')) <= SOLR_STR_FIELD_LIMIT:
+                if isinstance(value, str):
+                    serialized = value
+                    parsed = cioos_helpers.load_json(value)
+                else:
+                    parsed = value
+                    try:
+                        serialized = json.dumps(value)
+                    except Exception as err:
+                        log.error('Failed to serialize %s for size check (%s): %s', field, data_dict.get('id', 'NO ID'), err)
+                        continue
+                if len(serialized.encode('utf-8')) <= SOLR_STR_FIELD_LIMIT:
                     continue
                 try:
-                    grouped = self.group_by_ind_or_org(cioos_helpers.load_json(value))
+                    grouped = self.group_by_ind_or_org(parsed)
                     deduped = json.dumps(grouped)
                 except Exception as err:
                     log.error('Failed to dedupe oversized %s for %s: %s', field, data_dict.get('id', 'NO ID'), err)
