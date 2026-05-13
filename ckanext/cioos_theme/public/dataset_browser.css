@@ -502,31 +502,33 @@ body.dataset-browser .db-row-orgs {
 }
 body.dataset-browser .db-org-stack {
   display: flex;
+  align-items: center;
+  gap: 6px;
   flex-shrink: 0;
 }
 body.dataset-browser .db-org-avatar {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: var(--teal);
-  color: white;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: white;
+  color: var(--navy);
   font-family: 'Sora', sans-serif;
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 2px solid white;
+  padding: 3px;
+  border: 1px solid var(--line);
   overflow: hidden;
   flex-shrink: 0;
 }
 body.dataset-browser .db-org-avatar img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   display: block;
 }
-body.dataset-browser .db-org-avatar + .db-org-avatar { margin-left: -6px; }
 body.dataset-browser .db-org-avatar:nth-child(1) { z-index: 3; }
 body.dataset-browser .db-org-avatar:nth-child(2) { z-index: 2; }
 body.dataset-browser .db-org-avatar:nth-child(3) { z-index: 1; }
@@ -706,9 +708,9 @@ body.dataset-browser .db-org-chip {
   max-width: 100%;
 }
 body.dataset-browser .db-org-chip .db-org-avatar {
-  width: 26px;
-  height: 26px;
-  font-size: 9px;
+  width: 40px;
+  height: 40px;
+  font-size: 11px;
   flex-shrink: 0;
 }
 body.dataset-browser .db-org-chip .org-name {

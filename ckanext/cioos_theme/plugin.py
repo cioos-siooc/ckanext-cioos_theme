@@ -673,6 +673,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             "cioos_contact_email": lambda: contact_email,
             "cioos_group_info_text": lambda: group_info_text,
             "cioos_load_json": cioos_helpers.load_json,
+            "cioos_org_image_url": cioos_helpers.cioos_org_image_url,
             "cioos_geojson_to_bbox": geojson_to_bbox,
             "cioos_get_facets": cioos_helpers.cioos_get_facets,
             "cioos_get_package_relationships": cioos_helpers.get_package_relationships,

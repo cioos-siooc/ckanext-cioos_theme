@@ -99,17 +99,9 @@ Example:
           {% set first_letter = (words[0][:1] if words else '') %}
           {% set second_letter = (words[1][:1] if words|length > 1 else (org_title[1:2] if org_title|length > 1 else '')) %}
           {% set initials = (first_letter ~ second_letter)|upper %}
-          {% set img = org.get('image_display_url') or org.get('image_url') %}
+          {% set img = h.cioos_org_image_url(org) %}
           <span class="db-org-avatar" title="{{ org_title }}">
-            {% if img %}
-              {% if img.startswith('http://') or img.startswith('https://') %}
-                <img src="{{ img }}" alt="" loading="lazy" />
-              {% else %}
-                <img src="{{ h.url_for_static_or_external('/uploads/group/' ~ img) }}" alt="" loading="lazy" />
-              {% endif %}
-            {% else %}
-              {{ initials or '··' }}
-            {% endif %}
+            <img src="{{ img }}" alt="" loading="lazy" />
           </span>
         {% endfor %}
       </div>

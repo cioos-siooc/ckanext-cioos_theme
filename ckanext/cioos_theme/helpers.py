@@ -217,6 +217,82 @@ def get_datacite_test_mode():
     return toolkit.config.get("ckan.cioos.datacite_test_mode", "True")
 
 
+_ORG_IMAGE_URL_CACHE = {}
+
+
+def cioos_org_image_url(org):
+    """Resolve a displayable image URL for an organization or group dict.
+
+    Falls back to organization_show/group_show when the inline dict (from
+    a package's owner-org / groups list / search result) doesn't carry
+    image_display_url. Returns the placeholder image path when nothing
+    is set.
+    """
+    placeholder = toolkit.h.url_for_static(
+        "/base/images/placeholder-organization.png"
+    )
+
+    if not org or not isinstance(org, dict):
+        return placeholder
+
+    def _pick(d):
+        if not isinstance(d, dict):
+            return None
+        # Fluent-translated logos: image_url_translated is a {lang: value} dict;
+        # h.get_translated returns the value for the current language with
+        # fallback to the site's default language.
+        translated = toolkit.h.get_translated(d, "image_url") if d.get("image_url_translated") else None
+        return translated or d.get("image_display_url") or d.get("image_url")
+
+    img = _pick(org)
+
+    if not img:
+        # Inline dict didn't carry an image; look up the full record.
+        ident = org.get("id") or org.get("name")
+        if not ident:
+            return placeholder
+        cache_key = ("org", ident)
+        if cache_key in _ORG_IMAGE_URL_CACHE:
+            return _ORG_IMAGE_URL_CACHE[cache_key] or placeholder
+        is_org = org.get("is_organization")
+        action_name = "organization_show" if is_org is not False else "group_show"
+        full = None
+        try:
+            full = toolkit.get_action(action_name)(
+                {"ignore_auth": True},
+                {
+                    "id": ident,
+                    "include_datasets": False,
+                    "include_dataset_count": False,
+                    "include_extras": True,
+                    "include_users": False,
+                    "include_groups": False,
+                    "include_tags": False,
+                    "include_followers": False,
+                },
+            )
+        except Exception:
+            # Try the other action if the first guess was wrong.
+            try:
+                other = "group_show" if action_name == "organization_show" else "organization_show"
+                full = toolkit.get_action(other)(
+                    {"ignore_auth": True},
+                    {"id": ident, "include_datasets": False, "include_dataset_count": False, "include_extras": True},
+                )
+            except Exception:
+                full = None
+        img = _pick(full) if full else None
+        _ORG_IMAGE_URL_CACHE[cache_key] = img
+
+    if not img:
+        return placeholder
+
+    if img.startswith("http://") or img.startswith("https://") or img.startswith("/"):
+        return img
+
+    return toolkit.h.url_for_static_or_external("/uploads/group/" + img)
+
+
 def get_ra_extents_url():
     # './ckanext-cioos_theme/ckanext/cioos_theme/public/base/layers/pacific_RA.json'
     ra_file_url = toolkit.config.get("ckan.cioos.ra_json_file", "null")

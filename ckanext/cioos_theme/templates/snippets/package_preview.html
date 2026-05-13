@@ -83,13 +83,10 @@ Used both as the initial-render snippet inside package/search.html, and via the
         {% set org_title = h.get_translated(org, 'title') or org.get('display_name') or org.get('title') or org.get('name') or '' %}
         {% set words = org_title.split() if org_title else [] %}
         {% set initials = ((words[0][:1] if words else '') ~ (words[1][:1] if words|length > 1 else (org_title[1:2] if org_title|length > 1 else '')))|upper %}
-        {% set img = org.get('image_display_url') or org.get('image_url') %}
+        {% set img = h.cioos_org_image_url(org) %}
         <span class="db-org-chip" title="{{ org_title }}">
           <span class="db-org-avatar">
-            {% if img %}
-              {% if img.startswith('http://') or img.startswith('https://') %}<img src="{{ img }}" alt="" loading="lazy" />
-              {% else %}<img src="{{ h.url_for_static_or_external('/uploads/group/' ~ img) }}" alt="" loading="lazy" />{% endif %}
-            {% else %}{{ initials or '··' }}{% endif %}
+            <img src="{{ img }}" alt="" loading="lazy" />
           </span>
           <span class="org-name">{{ org_title }}</span>
         </span>
