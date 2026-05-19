@@ -1135,15 +1135,22 @@ aside #dataset-map {
   border-radius: 14px;
 }
 
-.table-bordered > thead > tr:first-child > th:first-child,
-.table-bordered > tbody > tr:first-child > td:first-child,
-.table-bordered > tbody > tr:first-child > th:first-child {
+.table-bordered > thead > tr:first-child > th:first-child {
   border-top-left-radius: 14px;
 }
 
-.table-bordered > thead > tr:first-child > th:last-child,
-.table-bordered > tbody > tr:first-child > td:last-child,
-.table-bordered > tbody > tr:first-child > th:last-child {
+.table-bordered > thead > tr:first-child > th:last-child {
+  border-top-right-radius: 14px;
+}
+
+/* Only round tbody's first row when there is no thead above it */
+.table-bordered:not(:has(thead)) > tbody > tr:first-child > td:first-child,
+.table-bordered:not(:has(thead)) > tbody > tr:first-child > th:first-child {
+  border-top-left-radius: 14px;
+}
+
+.table-bordered:not(:has(thead)) > tbody > tr:first-child > td:last-child,
+.table-bordered:not(:has(thead)) > tbody > tr:first-child > th:last-child {
   border-top-right-radius: 14px;
 }
 
