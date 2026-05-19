@@ -1241,6 +1241,22 @@ aside #dataset-map {
   margin-inline-start: 10px;
 }
 
+/* Contact role list — drop bullets, inline-flex left-aligned */
+#dataset-contacts .card-body dl.scheming-subfield-list dd > ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 4px 12px;
+}
+
+#dataset-contacts .card-body dl.scheming-subfield-list dd > ul > li {
+  margin: 0;
+  padding: 0;
+}
+
 /* ===========================================
    Dataset Content Styling
    =========================================== */
