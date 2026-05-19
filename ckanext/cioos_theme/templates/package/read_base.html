@@ -40,6 +40,9 @@
 {% endblock #}
 
 {% block secondary_content %}
+<div class="filters">
+<div>
+{% block secondary_content_inner %}
 
   {#
     {% set dataset_extent = h.get_pkg_dict_extra(c.pkg_dict, 'spatial', '') %}
@@ -132,7 +135,9 @@
     </p>
     </section>
 
-
+{% endblock %}
+</div>
+</div>
 {% endblock %}
 
 
