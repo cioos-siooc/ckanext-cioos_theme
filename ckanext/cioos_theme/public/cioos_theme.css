@@ -110,6 +110,29 @@ aside .filters {
   overflow: hidden;
 }
 
+#sentry-feedback,
+sentry-feedback {
+  --bottom: 1rem;
+  --left: 1rem;
+  --right: auto;
+  --top: auto;
+  --inset: auto auto 1rem 1rem;
+  /* Belt-and-suspenders: also pin the host element itself in case the
+     widget's shadow DOM ignores the custom properties above. */
+  position: fixed !important;
+  bottom: 1rem !important;
+  left: 1rem !important;
+  right: auto !important;
+  top: auto !important;
+  z-index: 1000;
+  --background: var(--cioos-footer-bg);
+  --button-primary-background: var(--cioos-accent);
+  --trigger-background: var(--cioos-footer-bg);
+  --trigger-background-hover: var(--cioos-footer-bg);
+  --trigger-foreground: #ffffff;
+  --trigger-border: var(--cioos-footer-bg);
+}
+
 aside .module-narrow {
   border: 1px solid #ddd;
   border-radius: 14px;
