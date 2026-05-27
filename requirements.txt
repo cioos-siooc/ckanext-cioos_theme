@@ -1,3 +1,4 @@
 pyld
 jsonpickle
 future
+requests

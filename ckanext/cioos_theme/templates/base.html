@@ -235,6 +235,10 @@
       endblock %} {# render any style assets registered by page body snippets #}
       {{ h.render_assets('style') }} {# render script assets #} {{
       h.render_assets('script') }}
+      {%- block cioos_ai_chat %}
+      <link rel="stylesheet" href="{{ h.url_for_static('css/cioos_ai_chat.css') }}">
+      <script src="{{ h.url_for_static('js/cioos_ai_chat.js') }}"></script>
+      {%- endblock %}
     </body>
   </html>
 </html>

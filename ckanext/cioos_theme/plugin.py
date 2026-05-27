@@ -22,6 +22,8 @@ from six.moves.urllib.parse import urlparse
 
 from ckanext.dcat.processors import RDFSerializer
 
+import ckanext.cioos_theme.ai_proxy as ai_proxy
+import ckanext.cioos_theme.ai_search as ai_search
 import ckanext.cioos_theme.cli as cli
 import ckanext.cioos_theme.helpers as cioos_helpers
 from ckanext.scheming.helpers import scheming_language_text
@@ -515,6 +517,41 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             view_func=self.dataset_custom_LineageView,
             methods=["GET", "POST"],
         )
+
+        # Endpoints proxy AI (chat widget)
+        blueprint.add_url_rule(
+            "/api/ai/chat",
+            "ai_chat",
+            view_func=ai_proxy.ai_chat,
+            methods=["POST"],
+        )
+        blueprint.add_url_rule(
+            "/api/ai/reset",
+            "ai_session_reset",
+            view_func=ai_proxy.ai_session_reset,
+            methods=["POST"],
+        )
+
+        # Page de recherche IA
+        blueprint.add_url_rule(
+            "/ai-search",
+            "ai_search",
+            view_func=ai_search.ai_search_page,
+            methods=["GET"],
+        )
+        blueprint.add_url_rule(
+            "/ai-search/query",
+            "ai_search_query",
+            view_func=ai_search.ai_search_query,
+            methods=["POST"],
+        )
+        blueprint.add_url_rule(
+            "/ai-search/compare",
+            "ai_search_compare",
+            view_func=ai_search.ai_search_compare,
+            methods=["POST"],
+        )
+
         return blueprint
 
     # IAuthenticator

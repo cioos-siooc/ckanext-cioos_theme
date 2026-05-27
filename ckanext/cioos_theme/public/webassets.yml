@@ -48,3 +48,14 @@ home_v2_css:
   output: ckanext-cioos_theme/%(version)s_home_v2.css
   contents:
     - home_v2.css
+
+cioos-ai-chat-css:
+  filters: cssrewrite
+  output: ckanext-cioos_theme/%(version)s_cioos_ai_chat.css
+  contents:
+    - css/cioos_ai_chat.css
+
+cioos-ai-chat-js:
+  output: ckanext-cioos_theme/%(version)s_cioos_ai_chat.js
+  contents:
+    - js/cioos_ai_chat.js

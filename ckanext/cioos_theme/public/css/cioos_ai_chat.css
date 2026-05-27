@@ -1,0 +1,40 @@
+#cioos-chat-panel,
+#cioos-chat-panel * {
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+#cioos-messages::-webkit-scrollbar,
+#cioos-search-results::-webkit-scrollbar { width: 4px; }
+#cioos-messages::-webkit-scrollbar-track,
+#cioos-search-results::-webkit-scrollbar-track { background: #f5f5f5; }
+#cioos-messages::-webkit-scrollbar-thumb,
+#cioos-search-results::-webkit-scrollbar-thumb {
+  background: #52A79B;
+  border-radius: 2px;
+}
+
+#cioos-chat-input:focus,
+#cioos-search-input:focus {
+  border-color: #52A79B !important;
+  box-shadow: 0 0 0 2px rgba(82,167,155,0.15);
+}
+
+@media (max-width: 860px) {
+  #cioos-chat-panel {
+    width: 100vw !important;
+    right: -100vw !important;
+    flex-direction: column !important;
+  }
+  #cioos-chat-panel > div:last-child > div:nth-child(2) {
+    /* colonne droite en mode mobile → passe en bas */
+    width: 100% !important;
+    height: 220px;
+    border-right: none !important;
+    border-top: 1px solid #E2ECEA;
+  }
+}
+
+body {
+  transition: margin-right 0.25s ease;
+}

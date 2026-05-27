@@ -1,0 +1,577 @@
+{% extends "page.html" %}
+
+{% block subtitle %}{{ _('AI Search') }}{% endblock %}
+
+{% block styles %}
+  {{ super() }}
+  <style>
+    :root {
+      --ai-navy:    #152F37;
+      --ai-teal:    #52A79B;
+      --ai-teal-lt: #EBF8F4;
+      --ai-gold:    #D4AC0D;
+      --ai-gray-bg: #F5F7F8;
+      --ai-gray-bd: #E2E8EA;
+    }
+
+    .ai-search-wrapper {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1.5rem 1rem;
+    }
+
+    /* ── Hero ── */
+    .ai-hero {
+      background: linear-gradient(135deg, var(--ai-navy) 0%, #1a4a5a 100%);
+      color: white;
+      padding: 2rem;
+      border-radius: 12px;
+      margin-bottom: 1.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .ai-hero::before {
+      content: '';
+      position: absolute;
+      top: -50%; right: -10%;
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(82,167,155,0.2) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .ai-hero h1 { font-size: 1.6rem; margin-bottom: 0.3rem; font-weight: 600; }
+    .ai-hero p  { opacity: 0.75; font-size: 0.9rem; margin-bottom: 1.2rem; }
+
+    /* ── Barre de recherche ── */
+    .ai-search-bar { display: flex; gap: 0.5rem; max-width: 700px; }
+    .ai-search-bar input {
+      flex: 1;
+      padding: 0.75rem 1.2rem;
+      border-radius: 8px;
+      border: 2px solid rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.1);
+      color: white;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .ai-search-bar input::placeholder { color: rgba(255,255,255,0.5); }
+    .ai-search-bar input:focus { border-color: var(--ai-teal); }
+    .ai-search-bar button {
+      padding: 0.75rem 1.5rem;
+      background: var(--ai-teal);
+      color: white; border: none;
+      border-radius: 8px;
+      font-size: 0.95rem; font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+      white-space: nowrap;
+    }
+    .ai-search-bar button:hover { background: #3d8a7e; }
+
+    /* ── Méthodes ── */
+    .method-selector { display: flex; gap: 0.4rem; margin-top: 0.75rem; flex-wrap: wrap; }
+    .method-btn {
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.3);
+      background: transparent;
+      color: rgba(255,255,255,0.7);
+      font-size: 0.78rem; cursor: pointer;
+      transition: all 0.15s;
+    }
+    .method-btn.active { background: var(--ai-teal); border-color: var(--ai-teal); color: white; }
+    .method-btn:hover  { border-color: var(--ai-teal); color: white; }
+
+    /* ── Layout résultats ── */
+    .ai-results-layout {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 1.5rem;
+      align-items: start;
+    }
+    @media (max-width: 768px) { .ai-results-layout { grid-template-columns: 1fr; } }
+
+    /* ── Sidebar filtres ── */
+    .ai-filters {
+      background: white;
+      border: 1px solid var(--ai-gray-bd);
+      border-radius: 10px;
+      padding: 1.2rem;
+      position: sticky;
+      top: 1rem;
+    }
+    .ai-filters h3 {
+      font-size: 0.85rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.06em;
+      color: #666; margin-bottom: 1rem;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .filter-section { margin-bottom: 1.2rem; }
+    .filter-section label {
+      display: block; font-size: 0.82rem; font-weight: 600;
+      color: var(--ai-navy); margin-bottom: 0.4rem;
+    }
+    .filter-section select,
+    .filter-section input[type=number] {
+      width: 100%; padding: 0.4rem 0.6rem;
+      border: 1px solid var(--ai-gray-bd);
+      border-radius: 6px; font-size: 0.85rem; color: var(--ai-navy);
+    }
+    .filter-year-range { display: flex; gap: 0.4rem; align-items: center; }
+    .filter-year-range input { flex: 1; }
+    .filter-year-range span { color: #999; font-size: 0.8rem; }
+    .filter-reset-btn {
+      background: none; border: none;
+      color: var(--ai-teal); font-size: 0.78rem; cursor: pointer; padding: 0;
+    }
+
+    /* ── Zone résultats ── */
+    .ai-results-area { min-height: 400px; }
+    .ai-results-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 1rem; padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--ai-gray-bd);
+    }
+    .ai-results-count { font-size: 0.9rem; color: #555; }
+    .ai-results-count strong { color: var(--ai-navy); }
+    .ai-results-time { font-size: 0.78rem; color: #999; }
+
+    /* ── Dataset cards ── */
+    .ai-dataset-card {
+      background: white;
+      border: 1px solid var(--ai-gray-bd);
+      border-radius: 10px; padding: 1.2rem;
+      margin-bottom: 0.75rem;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      text-decoration: none; display: block; color: inherit;
+    }
+    .ai-dataset-card:hover {
+      border-color: var(--ai-teal);
+      box-shadow: 0 2px 12px rgba(82,167,155,0.12);
+    }
+    .ai-card-top {
+      display: flex; justify-content: space-between;
+      align-items: flex-start; gap: 1rem; margin-bottom: 0.5rem;
+    }
+    .ai-card-title { font-size: 0.97rem; font-weight: 600; color: var(--ai-navy); line-height: 1.4; flex: 1; }
+    .ai-card-score {
+      font-size: 0.78rem; color: #999; white-space: nowrap;
+      background: var(--ai-gray-bg); padding: 0.15rem 0.5rem; border-radius: 4px;
+    }
+    .ai-card-desc {
+      font-size: 0.84rem; color: #555; line-height: 1.5; margin-bottom: 0.6rem;
+      display: -webkit-box; -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .ai-card-meta { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; }
+    .ai-badge { display: inline-block; padding: 0.15rem 0.55rem; border-radius: 4px; font-size: 0.75rem; font-weight: 500; }
+    .ai-badge-org  { background: var(--ai-navy); color: white; }
+    .ai-badge-eov  { background: var(--ai-teal-lt); color: #0F6E56; }
+    .ai-badge-fmt  { background: #f0f0f0; color: #444; }
+    .ai-badge-year { background: #FBF5E0; color: #5C4200; }
+
+    /* ── Chargement ── */
+    .ai-loading-grid { display: flex; flex-direction: column; gap: 0.75rem; }
+    .ai-skeleton {
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: ai-shimmer 1.5s infinite;
+      border-radius: 10px; height: 100px;
+    }
+    @keyframes ai-shimmer {
+      0%   { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* ── État vide ── */
+    .ai-empty { text-align: center; padding: 3rem; color: #888; }
+    .ai-empty-icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+    .ai-empty h3 { font-size: 1rem; color: var(--ai-navy); margin-bottom: 0.4rem; }
+
+    /* ── Suggestions initiales ── */
+    .ai-suggestions-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 0.75rem; margin-top: 1rem;
+    }
+    .ai-suggestion-card {
+      background: white; border: 1px solid var(--ai-gray-bd);
+      border-radius: 8px; padding: 0.9rem;
+      cursor: pointer; transition: all 0.15s; text-align: left;
+    }
+    .ai-suggestion-card:hover { border-color: var(--ai-teal); background: var(--ai-teal-lt); }
+    .ai-suggestion-icon { font-size: 1.3rem; margin-bottom: 0.3rem; }
+    .ai-suggestion-text { font-size: 0.85rem; color: var(--ai-navy); font-weight: 500; }
+
+    /* ── Lien recherche classique ── */
+    .ai-classic-link {
+      text-align: center; margin-top: 2rem;
+      padding-top: 1.5rem; border-top: 1px solid var(--ai-gray-bd);
+      font-size: 0.85rem; color: #888;
+    }
+    .ai-classic-link a { color: var(--ai-teal); }
+  </style>
+{% endblock %}
+
+{% block primary_content %}
+<div class="ai-search-wrapper">
+
+  {# ── Hero + barre de recherche ── #}
+  <div class="ai-hero">
+    <h1>🌊 {% if lang == 'fr' %}Recherche IA{% else %}AI Search{% endif %}</h1>
+    <p>
+      {% if lang == 'fr' %}
+        Recherche sémantique dans {{ stats.total | default(0) }} jeux de données
+      {% else %}
+        Semantic search across {{ stats.total | default(0) }} datasets
+      {% endif %}
+    </p>
+    <div class="ai-search-bar">
+      <input
+        id="ai-main-input"
+        type="text"
+        value="{{ initial_q | e }}"
+        placeholder="{% if lang == 'fr' %}Ex : données de température Pacifique après 2020{% else %}E.g. Pacific temperature data after 2020{% endif %}"
+        autofocus
+      />
+      <button id="ai-search-btn">
+        {% if lang == 'fr' %}Rechercher{% else %}Search{% endif %}
+      </button>
+    </div>
+    <div class="method-selector">
+      <button class="method-btn" data-method="bm25">BM25</button>
+      <button class="method-btn" data-method="dense">Dense</button>
+      <button class="method-btn active" data-method="rerank">⭐ Rerank</button>
+      <button class="method-btn" data-method="faiss">FAISS</button>
+      <button class="method-btn" data-method="expand">Expansion</button>
+      <button class="method-btn" data-method="finetuned">Fine-tuned</button>
+    </div>
+  </div>
+
+  {# ── Layout résultats ── #}
+  <div class="ai-results-layout">
+
+    {# ── Sidebar filtres ── #}
+    <aside class="ai-filters">
+      <h3>
+        {% if lang == 'fr' %}Filtres{% else %}Filters{% endif %}
+        <button class="filter-reset-btn" id="ai-filter-reset">
+          {% if lang == 'fr' %}Réinitialiser{% else %}Reset{% endif %}
+        </button>
+      </h3>
+
+      <div class="filter-section">
+        <label>{% if lang == 'fr' %}Variable (EOV){% else %}Ocean Variable (EOV){% endif %}</label>
+        <select id="filter-eov">
+          <option value="">{% if lang == 'fr' %}Toutes les variables{% else %}All variables{% endif %}</option>
+          {% for eov_key, eov_count in (stats.by_eov or {}).items() | sort(attribute='1', reverse=True) %}
+          <option value="{{ eov_key }}">{{ eov_key }} ({{ eov_count }})</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="filter-section">
+        <label>{% if lang == 'fr' %}Organisation{% else %}Organization{% endif %}</label>
+        <select id="filter-org">
+          <option value="">{% if lang == 'fr' %}Toutes les organisations{% else %}All organizations{% endif %}</option>
+          {% for org_name, org_count in (stats.by_org or {}).items() | sort(attribute='1', reverse=True) %}
+          <option value="{{ org_name }}">{{ org_name }} ({{ org_count }})</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="filter-section">
+        <label>{% if lang == 'fr' %}Période{% else %}Time Period{% endif %}</label>
+        <div class="filter-year-range">
+          <input type="number" id="filter-year-start"
+                 placeholder="{% if lang == 'fr' %}Début{% else %}From{% endif %}"
+                 min="1900" max="2030" />
+          <span>→</span>
+          <input type="number" id="filter-year-end"
+                 placeholder="{% if lang == 'fr' %}Fin{% else %}To{% endif %}"
+                 min="1900" max="2030" />
+        </div>
+      </div>
+
+      <div class="filter-section">
+        <label>Format</label>
+        <select id="filter-format">
+          <option value="">{% if lang == 'fr' %}Tous les formats{% else %}All formats{% endif %}</option>
+          {% for fmt, fmt_count in (stats.by_format or {}).items() | sort(attribute='1', reverse=True) %}
+          {% if fmt_count > 0 %}
+          <option value="{{ fmt }}">{{ fmt }} ({{ fmt_count }})</option>
+          {% endif %}
+          {% endfor %}
+        </select>
+      </div>
+    </aside>
+
+    {# ── Zone résultats principale ── #}
+    <main class="ai-results-area">
+
+      <div class="ai-results-header" id="ai-results-header" style="display:none;">
+        <div class="ai-results-count" id="ai-results-count"></div>
+        <div class="ai-results-time" id="ai-results-time"></div>
+      </div>
+
+      <div id="ai-results-container">
+        <div id="ai-initial-state">
+          <div style="color:#666; font-size:0.9rem; margin-bottom:0.75rem;">
+            {% if lang == 'fr' %}💡 Essayez ces recherches populaires :{% else %}💡 Try these popular searches:{% endif %}
+          </div>
+          <div class="ai-suggestions-grid">
+            {% if lang == 'fr' %}
+              {% set suggestions = [
+                ('🌡️', 'données de température de subsurface'),
+                ('🧂', 'données de salinité Pacifique'),
+                ('🐟', 'données sur les poissons du Saint-Laurent'),
+                ('🧊', 'données sur la glace de mer arctique'),
+                ('🫧', "mesures d'oxygène dissous"),
+                ('🌱', 'phytoplancton biomasse diversité'),
+                ('🌊', 'courants de surface océan'),
+                ('📡', 'données disponibles en ERDDAP'),
+              ] %}
+            {% else %}
+              {% set suggestions = [
+                ('🌡️', 'subsurface temperature measurements'),
+                ('🧂', 'Pacific salinity data'),
+                ('🐟', 'fish data St. Lawrence'),
+                ('🧊', 'arctic sea ice extent'),
+                ('🫧', 'dissolved oxygen measurements'),
+                ('🌱', 'phytoplankton biomass diversity'),
+                ('🌊', 'surface ocean currents'),
+                ('📡', 'data available in ERDDAP format'),
+              ] %}
+            {% endif %}
+            {% for icon, text in suggestions %}
+            <button class="ai-suggestion-card"
+                    onclick="AiSearch.search({{ text | tojson }})">
+              <div class="ai-suggestion-icon">{{ icon }}</div>
+              <div class="ai-suggestion-text">{{ text }}</div>
+            </button>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <div class="ai-classic-link">
+        {% if lang == 'fr' %}
+          Préférez-vous la <a href="/dataset">recherche classique CKAN →</a>
+        {% else %}
+          Prefer the <a href="/dataset">classic CKAN search →</a>
+        {% endif %}
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<script>
+const AiSearch = (function () {
+  const LANG = {{ lang | tojson }};
+  let currentMethod = 'rerank';
+  let currentAbort  = null;
+
+  function getFilters() {
+    return {
+      eov:          document.getElementById('filter-eov')?.value        || '',
+      organization: document.getElementById('filter-org')?.value        || '',
+      year_start:   document.getElementById('filter-year-start')?.value || '',
+      year_end:     document.getElementById('filter-year-end')?.value   || '',
+      format:       document.getElementById('filter-format')?.value     || '',
+    };
+  }
+
+  async function search(query) {
+    const q = query !== undefined
+      ? query
+      : (document.getElementById('ai-main-input')?.value?.trim() || '');
+
+    const filters = getFilters();
+    const hasFilters = Object.values(filters).some(Boolean);
+    if (!q && !hasFilters) return;
+
+    if (document.getElementById('ai-main-input') && query !== undefined) {
+      document.getElementById('ai-main-input').value = q;
+    }
+
+    if (currentAbort) currentAbort.abort();
+    currentAbort = new AbortController();
+
+    showLoading();
+
+    try {
+      const payload = {
+        query:  q,
+        top_k:  20,
+        method: currentMethod,
+        filters: {},
+      };
+      if (filters.eov)          payload.filters.eov          = filters.eov;
+      if (filters.organization) payload.filters.organization = filters.organization;
+      if (filters.year_start)   payload.filters.year_start   = filters.year_start;
+      if (filters.year_end)     payload.filters.year_end     = filters.year_end;
+      if (filters.format)       payload.filters.format       = filters.format;
+
+      const r = await fetch('/ai-search/query', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify(payload),
+        signal:  currentAbort.signal,
+      });
+      currentAbort = null;
+      const data = await r.json();
+
+      if (data.error) { showError(data.error); return; }
+
+      renderResults(data);
+      updateUrl(q, filters);
+
+    } catch (err) {
+      if (err.name === 'AbortError') return;
+      showError(LANG === 'fr' ? 'Erreur de connexion à l\'API.' : 'API connection error.');
+    }
+  }
+
+  function renderResults(data) {
+    const container = document.getElementById('ai-results-container');
+    const header    = document.getElementById('ai-results-header');
+    const countEl   = document.getElementById('ai-results-count');
+    const timeEl    = document.getElementById('ai-results-time');
+
+    header.style.display = 'flex';
+    const n = data.results?.length || 0;
+    countEl.innerHTML = LANG === 'fr'
+      ? `<strong>${n}</strong> résultat(s) — méthode : ${data.method}`
+      : `<strong>${n}</strong> result(s) — method: ${data.method}`;
+    timeEl.textContent = `${data.time_ms || 0}ms`;
+
+    if (!n) {
+      container.innerHTML = `
+        <div class="ai-empty">
+          <div class="ai-empty-icon">🔍</div>
+          <h3>${LANG === 'fr' ? 'Aucun résultat trouvé' : 'No results found'}</h3>
+          <p>${LANG === 'fr'
+            ? 'Essayez une autre formulation ou retirez des filtres.'
+            : 'Try a different query or remove some filters.'}</p>
+        </div>`;
+      return;
+    }
+
+    container.innerHTML = data.results.map(ds => renderCard(ds)).join('');
+  }
+
+  function renderCard(ds) {
+    const org = typeof ds.organization === 'object'
+      ? (ds.organization?.title || '')
+      : (ds.organization || '');
+
+    const rawEov = ds.eov || '';
+    const eovs = (Array.isArray(rawEov) ? rawEov : rawEov.split(',')).slice(0, 2);
+    const formats = (ds.formats || []).slice(0, 2);
+    const score  = ds.score != null ? `${(ds.score * 100).toFixed(0)}%` : '';
+    const period = ds.period || '';
+    const desc   = (ds.description || '').substring(0, 180);
+    const url    = ds.ckan_url || `/dataset/${ds.name || ds.id || ''}`;
+
+    const eovBadges  = eovs.filter(Boolean).map(e =>
+      `<span class="ai-badge ai-badge-eov">${esc(e.trim())}</span>`).join('');
+    const fmtBadges  = formats.map(f =>
+      `<span class="ai-badge ai-badge-fmt">${esc(f)}</span>`).join('');
+    const yearBadge  = period
+      ? `<span class="ai-badge ai-badge-year">📅 ${esc(period)}</span>` : '';
+    const scoreBadge = score
+      ? `<span class="ai-card-score">${esc(score)}</span>` : '';
+
+    return `
+      <a href="${esc(url)}" class="ai-dataset-card">
+        <div class="ai-card-top">
+          <div class="ai-card-title">${esc(ds.title || '')}</div>
+          ${scoreBadge}
+        </div>
+        ${desc ? `<div class="ai-card-desc">${esc(desc)}</div>` : ''}
+        <div class="ai-card-meta">
+          ${org ? `<span class="ai-badge ai-badge-org">${esc(org)}</span>` : ''}
+          ${eovBadges}${fmtBadges}${yearBadge}
+        </div>
+      </a>`;
+  }
+
+  function showLoading() {
+    document.getElementById('ai-initial-state')?.remove();
+    document.getElementById('ai-results-header').style.display = 'none';
+    document.getElementById('ai-results-container').innerHTML =
+      '<div class="ai-loading-grid">' +
+      [1,2,3,4,5].map(() => '<div class="ai-skeleton"></div>').join('') +
+      '</div>';
+  }
+
+  function showError(msg) {
+    document.getElementById('ai-results-container').innerHTML = `
+      <div class="ai-empty">
+        <div class="ai-empty-icon">⚠️</div>
+        <h3>${esc(msg)}</h3>
+      </div>`;
+  }
+
+  function updateUrl(q, filters) {
+    const params = new URLSearchParams();
+    if (q)                    params.set('q',         q);
+    if (filters.eov)          params.set('eov',       filters.eov);
+    if (filters.organization) params.set('org',       filters.organization);
+    if (filters.year_start)   params.set('year_from', filters.year_start);
+    if (filters.year_end)     params.set('year_to',   filters.year_end);
+    try { history.replaceState(null, '', `/ai-search?${params.toString()}`); } catch(e) {}
+  }
+
+  function esc(str) {
+    return String(str)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function init() {
+    document.getElementById('ai-search-btn')?.addEventListener('click', () => search());
+    document.getElementById('ai-main-input')?.addEventListener('keydown',
+      e => { if (e.key === 'Enter') search(); });
+
+    document.querySelectorAll('.method-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.method-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentMethod = btn.dataset.method;
+        const q = document.getElementById('ai-main-input')?.value?.trim();
+        if (q) search(q);
+      });
+    });
+
+    ['filter-eov', 'filter-org', 'filter-format'].forEach(id => {
+      document.getElementById(id)?.addEventListener('change', () => {
+        const q = document.getElementById('ai-main-input')?.value?.trim();
+        if (q) search(q);
+      });
+    });
+
+    document.getElementById('ai-filter-reset')?.addEventListener('click', () => {
+      ['filter-eov','filter-org','filter-format'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+      });
+      ['filter-year-start','filter-year-end'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+      });
+      const q = document.getElementById('ai-main-input')?.value?.trim();
+      if (q) search(q);
+    });
+
+    const initialQ = {{ initial_q | tojson }};
+    if (initialQ) setTimeout(() => search(initialQ), 100);
+  }
+
+  return { init, search };
+})();
+
+document.addEventListener('DOMContentLoaded', AiSearch.init);
+</script>
+{% endblock %}
