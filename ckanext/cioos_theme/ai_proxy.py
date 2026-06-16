@@ -178,3 +178,25 @@ def ai_session_reset():
     """POST /api/ai/reset — réinitialise la session AI côté serveur."""
     _set_session_id(None)
     return flask.jsonify({"ok": True})
+
+
+def ai_feedback():
+    """
+    Proxy POST /api/ai/feedback → cioos-api/feedback/rate
+    Évite le CORS — le JS appelle /api/ai/feedback
+    (même origine CKAN) au lieu de localhost:8000 directement.
+    """
+    body = flask.request.get_json(force=True) or {}
+    try:
+        r = requests.post(
+            f"{CIOOS_AI_API}/feedback/rate",
+            json=body,
+            timeout=5,
+        )
+        return flask.Response(
+            r.content,
+            status=r.status_code,
+            mimetype="application/json",
+        )
+    except Exception as e:
+        return flask.jsonify({"ok": False, "error": str(e)}), 500

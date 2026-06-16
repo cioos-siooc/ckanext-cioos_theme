@@ -9,6 +9,7 @@ const CIOOS_AI = (function () {
   let isLoading          = false;
   let currentAbort       = null;
   let chatMessages       = [];
+  let currentDatasets    = [];
 
   // ── Session persistée ────────────────────────────────────
   function getSessionId()    { return sessionStorage.getItem('cioos_session'); }
@@ -330,12 +331,28 @@ const CIOOS_AI = (function () {
           </div>
 
           <!-- Footer stats -->
-          <div id="cioos-search-meta" style="
+          <div style="
             padding:0.4rem 0.75rem;
             border-top:1px solid #E2ECEA;
-            font-size:0.72rem; color:#999;
             background:white; flex-shrink:0;
-          "></div>
+            display:flex; align-items:center;
+            justify-content:space-between; gap:0.5rem;
+          ">
+            <span id="cioos-search-meta"
+              style="font-size:0.72rem;color:#999;flex:1;"></span>
+            <button id="cioos-export-csv"
+              style="
+                display:none;
+                padding:0.25rem 0.6rem;
+                background:#152F37; color:white;
+                border:none; border-radius:5px;
+                font-size:0.72rem; font-weight:600;
+                cursor:pointer; font-family:inherit;
+                white-space:nowrap; transition:background 0.15s;
+              "
+              title="Télécharger les résultats en CSV"
+            >⬇ CSV</button>
+          </div>
         </div>
 
       </div>
@@ -391,8 +408,15 @@ const CIOOS_AI = (function () {
     // Message utilisateur
     appendUserMsg(query);
 
-    // Lance la recherche fine-tunée EN PARALLÈLE
-    const searchPromise = searchFinetuned(query);
+    let chatSentDatasets = false;
+
+    // Lance la recherche fine-tunée EN PARALLÈLE comme aperçu rapide.
+    // N'affiche que si le chat n'a pas encore envoyé ses propres datasets.
+    searchFinetuned(query).then(results => {
+      if (!chatSentDatasets && results.length > 0) {
+        renderSearchResults(results, results.length, 'preview', false);
+      }
+    }).catch(() => {});
 
     // Bulle bot vide pour le stream
     const botBubble = createBotBubble();
@@ -401,6 +425,13 @@ const CIOOS_AI = (function () {
 
     const textEl   = botBubble.querySelector('.cioos-bubble-text');
     const cursorEl = botBubble.querySelector('.cioos-cursor');
+    const loadingEl = botBubble.querySelector('.cioos-stream-loading');
+    const statusEl  = botBubble.querySelector('.cioos-status-text');
+    const isFr      = (document.documentElement.lang || 'fr') === 'fr';
+    function setStatus(label, color) {
+      if (statusEl) statusEl.textContent = label;
+      if (loadingEl) loadingEl.style.color = color || '#52A79B';
+    }
     let   fullText = '';
 
     try {
@@ -430,14 +461,49 @@ const CIOOS_AI = (function () {
           try {
             const ev = JSON.parse(part.slice(6));
 
-            if (ev.type === 'token') {
+            if (ev.type === 'routing') {
+              const intentLabels = {
+                GREETING:        isFr ? 'Analyse du message…'     : 'Analysing…',
+                COUNTING:        isFr ? 'Comptage en cours…'      : 'Counting…',
+                SEMANTIC_SEARCH: isFr ? 'Recherche sémantique…'   : 'Searching…',
+                FILTERED_SEARCH: isFr ? 'Filtrage des résultats…' : 'Filtering…',
+                DATASET_DETAIL:  isFr ? 'Chargement du dataset…'  : 'Loading dataset…',
+                MORE_RESULTS:    isFr ? 'Chargement de la suite…' : 'Loading more…',
+                FOLLOW_UP:       isFr ? 'Contexte en cours…'      : 'In context…',
+                OUT_OF_SCOPE:    isFr ? 'Hors domaine…'           : 'Out of scope…',
+                CATALOGUE_STATS: isFr ? 'Statistiques…'           : 'Statistics…',
+                UNKNOWN:         isFr ? 'Analyse…'                : 'Analysing…',
+              };
+              setStatus(intentLabels[ev.intent] || (isFr ? 'Traitement…' : 'Processing…'));
+            }
+
+            else if (ev.type === 'searching') {
+              setStatus(isFr ? 'Recherche dans le catalogue…' : 'Searching the catalogue…');
+            }
+
+            else if (ev.type === 'generating') {
+              setStatus(isFr ? 'Génération de la réponse…' : 'Generating response…');
+            }
+
+            else if (ev.type === 'datasets') {
+              chatSentDatasets = true;
+              const n              = ev.n_matching || 0;
+              const isContinuation = (ev.offset || 0) > 0;
+              const source         = ev.rag_mode === 'dataset_detail' ? 'similar' : 'chat';
+              setStatus(
+                isFr ? `${n} résultat(s) trouvé(s)` : `${n} result(s) found`,
+                '#0F6E56'
+              );
+              if (ev.items?.length) {
+                renderSearchResults(ev.items, n, source, isContinuation);
+              }
+            }
+
+            else if (ev.type === 'token') {
+              if (loadingEl) loadingEl.style.display = 'none';
               fullText += ev.content || '';
               if (textEl) textEl.textContent = fullText;
               scrollChatToBottom();
-            }
-
-            else if (ev.type === 'datasets' && ev.items?.length) {
-              renderSearchResults(ev.items, ev.n_matching, 'chat');
             }
 
             else if (ev.type === 'action' && ev.action) {
@@ -445,6 +511,7 @@ const CIOOS_AI = (function () {
             }
 
             else if (ev.type === 'done') {
+              if (loadingEl) loadingEl.style.display = 'none';
               if (cursorEl) cursorEl.remove();
               if (textEl) textEl.innerHTML = parseMarkdown(fullText);
               const metaEl = botBubble.querySelector('.cioos-bubble-meta');
@@ -455,6 +522,15 @@ const CIOOS_AI = (function () {
                     ? ` · ${ev.n_matching} résultat(s)` : '');
                 metaEl.style.display = 'block';
               }
+              const currentLang = ev.lang || document.documentElement.lang || 'fr';
+              addFeedbackButtons(
+                botBubble,
+                query,
+                fullText,
+                ev.rag_mode   || 'semantic',
+                ev.n_matching || 0,
+                currentLang,
+              );
             }
 
           } catch(e) { /* JSON parse error, skip */ }
@@ -465,12 +541,6 @@ const CIOOS_AI = (function () {
       if (cursorEl) cursorEl.remove();
       if (textEl) textEl.textContent =
         'Erreur de connexion à l\'API CIOOS.';
-    }
-
-    // Résultats de la recherche fine-tunée parallèle
-    const results = await searchPromise;
-    if (results.length > 0) {
-      renderSearchResults(results, results.length, 'finetuned');
     }
 
     chatMessages.push({ role: 'user', text: query });
@@ -499,94 +569,179 @@ const CIOOS_AI = (function () {
     if (btn) { btn.textContent = '🔍'; btn.disabled = false; }
   }
 
+  // ── Carte dataset réutilisable ────────────────────────────
+  function buildDatasetCard(ds) {
+    const org  = typeof ds.organization === 'object'
+      ? ds.organization?.title || ''
+      : ds.organization || '';
+    const eovs = Array.isArray(ds.eov)
+      ? ds.eov.slice(0, 2)
+      : (ds.eov || '').split(',').slice(0, 2);
+    const name = ds.name || ds.id || '';
+    const url  = ds.ckan_url || (name ? `/dataset/${name}` : '#');
+    const score = ds.score != null
+      ? `${(ds.score * 100).toFixed(0)}%` : '';
+
+    const card = document.createElement('a');
+    card.href  = url;
+    card.style.cssText = `
+      display:block; background:white;
+      border:1px solid #E2ECEA; border-radius:7px;
+      padding:0.7rem 0.8rem; margin-bottom:0.4rem;
+      text-decoration:none; color:inherit; cursor:pointer;
+      transition:border-color 0.15s;
+    `;
+    if (url === '#') {
+      card.onclick = e => e.preventDefault();
+      card.style.cursor  = 'default';
+      card.style.opacity = '0.7';
+    }
+    card.onmouseover = () => { if (url !== '#') card.style.borderColor = '#52A79B'; };
+    card.onmouseout  = () => card.style.borderColor = '#E2ECEA';
+
+    card.innerHTML = `
+      <div style="display:flex;justify-content:space-between;
+                  align-items:flex-start;gap:0.4rem;margin-bottom:0.3rem;">
+        <div style="font-weight:600;font-size:0.83rem;
+                    color:#152F37;line-height:1.3;flex:1;">
+          ${esc((ds.title || '').substring(0, 60))}
+          ${(ds.title?.length || 0) > 60 ? '…' : ''}
+        </div>
+        ${score ? `<span style="font-size:0.72rem;color:#888;
+          background:#F0F0F0;padding:0.1rem 0.4rem;
+          border-radius:4px;white-space:nowrap;">${score}</span>` : ''}
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:0.3rem;">
+        ${org ? `<span style="background:#152F37;color:white;
+          padding:0.1rem 0.5rem;border-radius:4px;
+          font-size:0.72rem;font-weight:500;">${esc(org)}</span>` : ''}
+        ${eovs.map(e => `<span style="background:#EBF8F4;color:#0F6E56;
+          padding:0.1rem 0.5rem;border-radius:4px;
+          font-size:0.72rem;">${esc(e.trim())}</span>`).join('')}
+        ${ds.period ? `<span style="color:#888;font-size:0.72rem;">
+          📅 ${esc(ds.period)}</span>` : ''}
+      </div>
+    `;
+    return card;
+  }
+
+  // ── Export CSV ────────────────────────────────────────────
+  function exportToCSV(datasets) {
+    if (!datasets || datasets.length === 0) return;
+
+    const lang  = document.documentElement.lang || 'fr';
+    const isFr  = lang === 'fr';
+
+    const headers = isFr
+      ? ['Titre', 'Organisation', 'Variables (EOV)',
+         'Période', 'Formats', 'Score', 'URL CKAN']
+      : ['Title', 'Organization', 'Variables (EOV)',
+         'Period', 'Formats', 'Score', 'CKAN URL'];
+
+    const rows = datasets.map(ds => {
+      const title   = ds.title || '';
+      const org     = typeof ds.organization === 'object'
+        ? (ds.organization?.title || '')
+        : (ds.organization || '');
+      const eovs    = Array.isArray(ds.eov)
+        ? ds.eov.join(' | ')
+        : (ds.eov || '');
+      const period  = ds.period || '';
+      const formats = Array.isArray(ds.formats)
+        ? ds.formats.join(' | ')
+        : (ds.formats || '');
+      const score   = ds.score != null
+        ? (ds.score * 100).toFixed(1) + '%' : '';
+      const url     = `${window.location.origin}/dataset/${ds.name || ds.id || ''}`;
+
+      return [title, org, eovs, period, formats, score, url]
+        .map(v => `"${String(v).replace(/"/g, '""')}"`)
+        .join(',');
+    });
+
+    const csvContent = [headers.join(','), ...rows].join('\n');
+    const BOM        = '﻿';
+    const blob       = new Blob([BOM + csvContent],
+                                { type: 'text/csv;charset=utf-8;' });
+    const blobUrl    = URL.createObjectURL(blob);
+    const filename   = `cioos_datasets_${
+      new Date().toISOString().slice(0, 10)
+    }.csv`;
+
+    const link    = document.createElement('a');
+    link.href     = blobUrl;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(blobUrl);
+
+    console.log(`Export CSV : ${datasets.length} datasets → ${filename}`);
+  }
+
   // ── Rendu des résultats dans le panneau droit ─────────────
-  function renderSearchResults(results, total, source) {
+  function renderSearchResults(results, total, source, append) {
+    if (append === undefined) append = false;
     const container = document.getElementById('cioos-search-results');
-    const metaEl    = document.getElementById('cioos-search-meta');
+    const exportBtn = document.getElementById('cioos-export-csv');
     if (!container) return;
 
     const lang = document.documentElement.lang || 'fr';
     const isFr = lang === 'fr';
 
+    if (!append) {
+      container.innerHTML = '';
+      currentDatasets = [];
+    }
+
     if (!results || results.length === 0) {
-      container.innerHTML = `
-        <div style="text-align:center;color:#999;
-                    font-size:0.82rem;padding:2rem 1rem;">
-          ${isFr ? 'Aucun résultat trouvé' : 'No results found'}
-        </div>`;
-      if (metaEl) metaEl.textContent = '';
+      if (!append) {
+        container.innerHTML = `
+          <div style="text-align:center;color:#999;
+                      font-size:0.82rem;padding:2rem 1rem;">
+            ${isFr ? 'Aucun résultat trouvé' : 'No results found'}
+          </div>`;
+        const metaEl = document.getElementById('cioos-search-meta');
+        if (metaEl) metaEl.textContent = '';
+        if (exportBtn) exportBtn.style.display = 'none';
+      }
       return;
     }
 
-    container.innerHTML = results.map(ds => {
-      const org = typeof ds.organization === 'object'
-        ? ds.organization?.title || ''
-        : ds.organization || '';
-      const eovs = Array.isArray(ds.eov)
-        ? ds.eov.slice(0, 2)
-        : (ds.eov || '').split(',').slice(0, 2);
-      const url  = `/dataset/${ds.name || ds.id || ''}`;
-      const score = ds.score != null
-        ? `${(ds.score * 100).toFixed(0)}%` : '';
+    const prevLen = currentDatasets.length;
+    currentDatasets = append
+      ? [...currentDatasets, ...results]
+      : [...results];
 
-      return `
-        <a href="${url}" style="
-          display:block;
-          background:white; border:1px solid #E2ECEA;
-          border-radius:7px; padding:0.7rem 0.8rem;
-          margin-bottom:0.4rem; text-decoration:none;
-          color:inherit; cursor:pointer;
-          transition:border-color 0.15s;
-        "
-        onmouseover="this.style.borderColor='#52A79B'"
-        onmouseout="this.style.borderColor='#E2ECEA'"
-        >
-          <div style="
-            display:flex;justify-content:space-between;
-            align-items:flex-start;gap:0.4rem;
-            margin-bottom:0.3rem;
-          ">
-            <div style="
-              font-weight:600;font-size:0.83rem;
-              color:#152F37;line-height:1.3;flex:1;
-            ">
-              ${esc((ds.title || '').substring(0, 60))}
-              ${(ds.title?.length||0) > 60 ? '…' : ''}
-            </div>
-            ${score ? `<span style="
-              font-size:0.72rem;color:#888;
-              background:#F0F0F0;padding:0.1rem 0.4rem;
-              border-radius:4px;white-space:nowrap;
-            ">${score}</span>` : ''}
-          </div>
-          <div style="display:flex;flex-wrap:wrap;gap:0.3rem;">
-            ${org ? `<span style="
-              background:#152F37;color:white;
-              padding:0.1rem 0.5rem;border-radius:4px;
-              font-size:0.72rem;font-weight:500;
-            ">${esc(org)}</span>` : ''}
-            ${eovs.map(e => `
-              <span style="
-                background:#EBF8F4;color:#0F6E56;
-                padding:0.1rem 0.5rem;border-radius:4px;
-                font-size:0.72rem;
-              ">${esc(e.trim())}</span>
-            `).join('')}
-            ${ds.period ? `<span style="
-              color:#888;font-size:0.72rem;
-            ">📅 ${esc(ds.period)}</span>` : ''}
-          </div>
-        </a>
-      `;
-    }).join('');
+    currentDatasets.forEach((ds, i) => {
+      if (append && i < prevLen) return;
+      container.appendChild(buildDatasetCard(ds));
+    });
 
+    if (exportBtn) {
+      if (currentDatasets.length > 0) {
+        exportBtn.style.display = 'block';
+        exportBtn.textContent   = `⬇ CSV (${currentDatasets.length})`;
+        exportBtn.onclick = () => exportToCSV(currentDatasets);
+      } else {
+        exportBtn.style.display = 'none';
+      }
+    }
+
+    const metaEl = document.getElementById('cioos-search-meta');
     if (metaEl) {
-      const label = source === 'chat'
-        ? (isFr ? 'depuis le chat' : 'from chat')
-        : (isFr ? 'modèle fine-tuné' : 'fine-tuned model');
+      const shown = currentDatasets.length;
+      const sourceLabel = {
+        chat:      isFr ? 'résultats du chat'   : 'from chat',
+        finetuned: isFr ? 'modèle fine-tuné'    : 'fine-tuned model',
+        preview:   isFr ? 'aperçu rapide'       : 'quick preview',
+        similar:   isFr ? 'datasets similaires' : 'similar datasets',
+      }[source] || source;
+      const metaColor = source === 'preview' ? '#aaa' : '#52A79B';
       metaEl.textContent =
-        `${results.length}${total > results.length ? '/' + total : ''} ` +
-        `${isFr ? 'résultat(s)' : 'result(s)'} · ${label}`;
+        `${shown}${total > shown ? '/' + total : ''} ` +
+        `${isFr ? 'résultat(s)' : 'result(s)'} · ${sourceLabel}`;
+      metaEl.style.color = metaColor;
     }
   }
 
@@ -623,7 +778,19 @@ const CIOOS_AI = (function () {
     const loadingEl = document.createElement('div');
     loadingEl.className = 'cioos-stream-loading';
     loadingEl.style.cssText =
-      'font-size:0.75rem;color:#52A79B;margin-bottom:0.2rem;font-style:italic;';
+      'display:flex;align-items:center;gap:6px;font-size:0.75rem;color:#52A79B;margin-bottom:0.2rem;font-style:italic;';
+
+    const spinner = document.createElement('span');
+    spinner.style.cssText =
+      'width:10px;height:10px;border:1.5px solid #C6E3DF;border-top-color:#52A79B;' +
+      'border-radius:50%;display:inline-block;animation:cioos-spin 0.8s linear infinite;flex-shrink:0;';
+
+    const statusText = document.createElement('span');
+    statusText.className = 'cioos-status-text';
+    statusText.textContent = (document.documentElement.lang || 'fr') === 'fr' ? 'Analyse…' : 'Analysing…';
+
+    loadingEl.appendChild(spinner);
+    loadingEl.appendChild(statusText);
 
     const textEl   = document.createElement('div');
     textEl.className = 'cioos-bubble-text';
@@ -656,11 +823,109 @@ const CIOOS_AI = (function () {
           0% { background-position:200% 0; }
           100% { background-position:-200% 0; }
         }
+        @keyframes cioos-spin {
+          to { transform:rotate(360deg); }
+        }
       `;
       document.head.appendChild(s);
     }
 
     return wrapper;
+  }
+
+  // ── Boutons de feedback sous chaque réponse bot ───────────
+  function addFeedbackButtons(bubble, query, responseText, ragMode, nMatching, lang) {
+    if (bubble.querySelector('.cioos-feedback-row')) return;
+
+    const isFr = lang === 'fr';
+
+    const feedbackRow = document.createElement('div');
+    feedbackRow.className = 'cioos-feedback-row';
+    feedbackRow.style.cssText = `
+      display:flex; align-items:center; gap:0.4rem;
+      margin-top:0.4rem; padding-top:0.4rem;
+      border-top:1px solid #E2ECEA;
+    `;
+
+    const label = document.createElement('span');
+    label.textContent = isFr ? 'Utile ?' : 'Helpful?';
+    label.style.cssText = 'font-size:0.72rem;color:#999;font-family:inherit;';
+
+    const btnStyle = `
+      background:none; border:1px solid #E2ECEA;
+      border-radius:5px; padding:0.2rem 0.5rem;
+      cursor:pointer; font-size:0.85rem;
+      transition:background 0.15s,border-color 0.15s;
+      font-family:inherit;
+    `;
+
+    const btnPositive = document.createElement('button');
+    btnPositive.textContent = '👍';
+    btnPositive.title = isFr ? 'Réponse utile' : 'Helpful response';
+    btnPositive.style.cssText = btnStyle;
+
+    const btnNegative = document.createElement('button');
+    btnNegative.textContent = '👎';
+    btnNegative.title = isFr ? 'Réponse inutile' : 'Not helpful';
+    btnNegative.style.cssText = btnStyle;
+
+    const statusEl = document.createElement('span');
+    statusEl.style.cssText =
+      'font-size:0.72rem;color:#52A79B;display:none;font-family:inherit;';
+
+    async function sendFeedback(rating) {
+      btnPositive.disabled = true;
+      btnNegative.disabled = true;
+      btnPositive.style.opacity = '0.5';
+      btnNegative.style.opacity = '0.5';
+
+      if (rating === 'positive') {
+        btnPositive.style.background  = '#EBF8F4';
+        btnPositive.style.borderColor = '#52A79B';
+      } else {
+        btnNegative.style.background  = '#FFF0F0';
+        btnNegative.style.borderColor = '#E30513';
+      }
+
+      try {
+        const r = await fetch('/api/ai/feedback', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            session_id: sessionId || 'anonymous',
+            query:      query.substring(0, 300),
+            response:   responseText.substring(0, 1000),
+            rating,
+            rag_mode:   ragMode   || 'semantic',
+            n_matching: nMatching || 0,
+            lang:       lang      || 'fr',
+          }),
+        });
+        if (r.ok) {
+          statusEl.textContent   = isFr ? '✓ Merci !' : '✓ Thanks!';
+          statusEl.style.display = 'inline';
+        } else {
+          statusEl.textContent   = isFr ? '⚠ Erreur' : '⚠ Error';
+          statusEl.style.display = 'inline';
+          statusEl.style.color   = '#E30513';
+        }
+      } catch(e) {
+        console.warn('Feedback error:', e);
+        statusEl.textContent   = '⚠';
+        statusEl.style.display = 'inline';
+      }
+    }
+
+    btnPositive.onclick = () => sendFeedback('positive');
+    btnNegative.onclick = () => sendFeedback('negative');
+
+    feedbackRow.appendChild(label);
+    feedbackRow.appendChild(btnPositive);
+    feedbackRow.appendChild(btnNegative);
+    feedbackRow.appendChild(statusEl);
+
+    const bubbleEl = bubble.querySelector('div');
+    if (bubbleEl) bubbleEl.appendChild(feedbackRow);
   }
 
   // ── Message utilisateur ───────────────────────────────────

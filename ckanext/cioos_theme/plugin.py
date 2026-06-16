@@ -531,6 +531,12 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             view_func=ai_proxy.ai_session_reset,
             methods=["POST"],
         )
+        blueprint.add_url_rule(
+            "/api/ai/feedback",
+            "ai_feedback",
+            view_func=ai_proxy.ai_feedback,
+            methods=["POST"],
+        )
 
         # Page de recherche IA
         blueprint.add_url_rule(
