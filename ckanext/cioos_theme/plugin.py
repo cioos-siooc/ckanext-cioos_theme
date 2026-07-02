@@ -542,6 +542,15 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         # Note: Do not reset g.user/g.userobj here - let CKAN's default authenticator handle it
         return
 
+    def identify_user(self, user_id=None):
+        """Allow CKAN core auth middleware to continue with default auth flow.
+
+        CKAN 2.12 calls ``identify_user`` on IAuthenticator plugins during
+        request preprocessing. Returning None indicates this plugin does not
+        authenticate the current request.
+        """
+        return None
+
     def login(self, error=None):
         try:
             remote_addr = toolkit.request.headers["X-Forwarded-For"]
@@ -1463,7 +1472,6 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                 del package_dict["harvest_document_content"]
             except:
                 pass
-
         org_id = package_dict.get("owner_org")
         data_type = package_dict.get("type")
 

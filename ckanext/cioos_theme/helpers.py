@@ -457,7 +457,9 @@ def cioos_get_eovs(show_all=False):
     search_facets = getattr(toolkit.c, "search_facets", {}) or {}
     eov = search_facets.get("eov", {}).get("items", [])
     if not eov:
-        eov = toolkit.h.get_facet_items_dict("eov", limit=None, exclude_active=False)
+        eov = toolkit.h.get_facet_items_dict(
+            "eov", search_facets, limit=None, exclude_active=False
+        )
 
     try:
         # retreave a copy of the choices list for the eov field
