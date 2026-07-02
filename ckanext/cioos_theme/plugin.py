@@ -224,7 +224,7 @@ def cioos_tag_name_validator(field, schema):
 
     def validator(value, context):
         tagname_match = re.compile(
-            "[\w\u00c0-\u018f\u0300-\u0315 .'’,;\\/\(\)-]*$", re.UNICODE
+            r"[\w\u00c0-\u018f\u0300-\u0315 .'’,;\\/\(\)-]*$", re.UNICODE
         )
         if not tagname_match.match(value):
             raise Invalid(
@@ -240,7 +240,7 @@ def cioos_tag_name_validator(field, schema):
 def cioos_name_validator(field, schema):
 
     CIOOS_PACKAGE_NAME_MAX_LENGTH = 255
-    name_match = re.compile("[a-z0-9_\-]*$")
+    name_match = re.compile(r"[a-z0-9_-]*$")
 
     def validator(value, context):
         """Return the given value if it's a valid name, otherwise raise Invalid.
