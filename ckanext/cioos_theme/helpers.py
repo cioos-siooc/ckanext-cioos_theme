@@ -107,45 +107,6 @@ def load_about_markdown():
         return None
 
 
-# def get_organization_list(data_dict):
-#     '''Returns a list of organizations.
-#
-#     :param id: the id or name of the organization
-#     '''
-#     # If a context of None is passed to the action function then the default context dict will be created
-#     # All other parameters are optional and are set to their default value
-#     # cf. http://docs.ckan.org/en/latest/extensions/plugins-toolkit.html#ckan.plugins.toolkit.ckan.plugins.toolkit.get_action
-#     return toolkit.get_action('organization_list')(None, data_dict = data_dict)
-#
-# def get_organization_dict(id):
-#     '''Returns the details of an organization.
-#
-#     :param id: the id or name of the organization
-#     '''
-#     # If a context of None is passed to the action function then the default context dict will be created
-#     # All other parameters are optional and are set to their default value
-#     # cf. http://docs.ckan.org/en/latest/api/index.html#ckan.logic.action.get.organization_show
-#     return toolkit.get_action('organization_show')(None, data_dict = {'id': id})
-#
-# def get_organization_dict_extra(organization_dict, key, default=None):
-#     '''Returns the value for the organization extra with the provided key.
-#
-#     If the key is not found, it returns a default value, which is None by
-#     default.
-#
-#     :param organization_dict: dictized organization
-#     :key: extra key to lookup
-#     :default: default value returned if not found
-#     '''
-#     extras = organization_dict['extras'] if 'extras' in organization_dict else []
-#
-#     for extra in extras:
-#         if extra['key'] == key:
-#             return extra['value']
-#
-#     return default
-
-
 # copied from dcat extension
 def helper_available(helper_name):
     """
@@ -156,49 +117,6 @@ def helper_available(helper_name):
     except (AttributeError, HelperError):
         return False
     return True
-
-
-def generate_doi_suffix():
-    import random
-
-    chars = [
-        "a",
-        "b",
-        "c",
-        "d",
-        "e",
-        "f",
-        "g",
-        "h",
-        "j",
-        "k",
-        "m",
-        "n",
-        "p",
-        "q",
-        "r",
-        "s",
-        "t",
-        "u",
-        "v",
-        "w",
-        "x",
-        "y",
-        "z",
-        "0",
-        "1",
-        "2",
-        "3",
-        "4",
-        "5",
-        "6",
-        "7",
-        "8",
-        "9",
-    ]
-    str1 = "".join(random.SystemRandom().choice(chars) for _ in range(4))
-    str2 = "".join(random.SystemRandom().choice(chars) for _ in range(4))
-    return str1 + "-" + str2
 
 
 def get_doi_authority_url():
@@ -389,47 +307,6 @@ def get_package_relationships(pkg):
     return rels_from_schema
 
 
-# the following functions have been depricated. use above function instead
-# def get_package_relationships(pkg):
-#     '''Returns the relationships of a package.
-
-#     :param id: the id or name of the package
-#     '''
-#     rel = pkg.get('relationships_as_subject') + pkg.get('relationships_as_object')
-#     b = []
-#     for x in rel:
-#         if x not in b:
-#             b.append(x)
-#     return b
-
-
-# def print_package_relationship_type(type):
-#     out = 'depends on'
-#     if 'child' in type:
-#         out = 'parent'
-#     elif 'parent' in type:
-#         out = 'child'
-#     elif 'link' in type:
-#         out = 'cross link'
-#     return out
-
-
-# def get_package_relationship_reverse_type(type):
-#     return PackageRelationship.reverse_type(type)
-
-
-# def get_package_title(id):
-#     '''Returns the title of a package.
-
-#     :param id: the id or name of the package
-#     '''
-#     try:
-#         pkg = toolkit.get_action('package_show')(None, data_dict={'id': id})
-#     except Exception as e:
-#         return None
-#     return toolkit.h.get_translated(pkg, 'title')
-
-
 def _merge_lists(key, list1, list2):
     merged = {}
     for item in list1 + list2:
@@ -515,7 +392,7 @@ def cioos_datasets():
 def cioos_schema_field_map():
     import inspect
 
-    import jinja2
+    import markupsafe
 
     import ckanext.spatial.model as spatial_model
 
@@ -583,7 +460,7 @@ def cioos_schema_field_map():
     output = output + cioos_schema_field_map_parent(
         resource_fields_schema, resource_locator, class_dict, map, "Resource Fields"
     )
-    return jinja2.Markup(output)
+    return markupsafe.Markup(output)
 
 
 # process any first level fields in the isodocument
@@ -894,4 +771,7 @@ def cioos_structured_data(data_dict):
 
     output = serializer.serialize_dataset(data_dict, _format="jsonld")
 
-    return output
+    # The output is embedded inside a <script type="application/ld+json">
+    # block with |safe, so escape "</" to prevent metadata containing
+    # "</script>" from breaking out of the script tag (stored XSS).
+    return output.replace("</", "<\\/")

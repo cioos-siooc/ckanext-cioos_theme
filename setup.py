@@ -33,16 +33,12 @@ setup(
         "Development Status :: 4 - Beta",
         # Pick your license as you wish (should match "license" above)
         "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
-        # Specify the Python versions you support here. In particular, ensure
-        # that you indicate whether you support Python 2, Python 3 or both.
-        "Programming Language :: Python :: 2.7",
     ],
     # What does your project relate to?
     keywords="""CKAN CIOOS Theme""",
     # You can just specify the packages manually here if your project is
     # simple. Or you can use find_packages().
     packages=find_packages(exclude=["contrib", "docs", "tests*"]),
-    namespace_packages=["ckanext"],
     install_requires=[
         # CKAN extensions should not list dependencies here, but in a separate
         # ``requirements.txt`` file.
@@ -65,17 +61,12 @@ setup(
     entry_points="""
         [ckan.plugins]
         cioos_theme=ckanext.cioos_theme.plugin:Cioos_ThemePlugin
-        cioos_group=ckanext.cioos_theme.plugin:Cioos_GroupPlugin
 
         [babel.extractors]
         ckan = ckan.lib.extract:extract_ckan
 
         [ckan.rdf.profiles]
         cioos_dcat=ckanext.cioos_theme.dcat.profiles:CIOOSDCATProfile
-
-        [paste.paster_command]
-        package_relationships=ckanext.cioos_theme.commands.package_relationships:PackageRelationships
-        sitemap=ckanext.cioos_theme.commands.sitemap:SiteMap
     """,
     # If you are changing from the default layout of your extension, you may
     # have to change the message extractors, you can read more about babel

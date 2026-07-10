@@ -3,6 +3,7 @@ import json
 import logging
 import re
 
+from ckan.lib.munge import munge_tag
 from ckan.plugins import toolkit
 from ckanext.cioos_theme.helpers import load_json
 from ckanext.dcat.profiles import CleanedURIRef, SchemaOrgProfile, URIRefOrLiteral
@@ -619,9 +620,9 @@ class CIOOSDCATProfile(SchemaOrgProfile):
                 else:
                     org_uri = ""
             if ind_uri:
-                creator_details = CleanedURIRef(uri)
+                creator_details = CleanedURIRef(ind_uri)
             elif org_uri:
-                creator_details = CleanedURIRef(uri)
+                creator_details = CleanedURIRef(org_uri)
             else:
                 creator_details = BNode()
             if name:
@@ -654,12 +655,7 @@ class CIOOSDCATProfile(SchemaOrgProfile):
             self.g.add((dataset_ref, SCHEMA.creator, creator_details))
 
         # variableMeasured
-        try:
-            std_names = dataset_dict.get("cf_standard_names")
-        except Exception:
-            # TODO: add logging, etc
-            pass
-
+        std_names = dataset_dict.get("cf_standard_names")
         if std_names is not None and hasattr(std_names, "__iter__"):
             for standard_name in sorted(std_names):
                 g.add((dataset_ref, SCHEMA.variableMeasured, Literal(standard_name)))
@@ -922,7 +918,7 @@ class CIOOSDCATProfile(SchemaOrgProfile):
             scope_desc = scope.get("description", {})
 
             aboutRef = BNode()
-            g.add(dataset_ref, SCHEMA.about, aboutRef)
+            g.add((dataset_ref, SCHEMA.about, aboutRef))
             g.add((aboutRef, RDF.type, SCHEMA.Event))
             g.add((aboutRef, SCHEMA.name, Literal(scope_level)))
             g.add((aboutRef, SCHEMA.description, Literal(scope_desc)))
@@ -952,7 +948,7 @@ class CIOOSDCATProfile(SchemaOrgProfile):
 
                 instrumentRef = BNode()
                 g.add((instrumentRef, RDF.type, SCHEMA.Thing))
-                g.add((instrumentRef, SCHEMA.name, instrument.get("type")))
+                g.add((instrumentRef, SCHEMA.name, Literal(instrument.get("type"))))
                 g.add(
                     (
                         instrumentRef,

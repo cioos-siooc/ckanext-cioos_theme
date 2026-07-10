@@ -18,7 +18,7 @@ from ckantoolkit import _, g
 from flask import Blueprint
 from pyld import jsonld
 from shapely.geometry import shape
-from six.moves.urllib.parse import urlparse
+from urllib.parse import urlparse
 
 from ckanext.dcat.processors import RDFSerializer
 
@@ -28,17 +28,10 @@ from ckanext.scheming.helpers import scheming_language_text
 from ckanext.scheming.validation import scheming_validator
 
 Invalid = df.Invalid
-
-# import debugpy
-
 StopOnError = df.StopOnError
 missing = df.missing
 log = logging.getLogger(__name__)
 log_auth = logging.getLogger(__name__ + ".auth")
-
-# debugpy.listen(('0.0.0.0', 5678))
-# log.debug("Waiting for debugger attach")
-# debugpy.wait_for_client()
 
 
 show_responsible_organizations = toolkit.asbool(

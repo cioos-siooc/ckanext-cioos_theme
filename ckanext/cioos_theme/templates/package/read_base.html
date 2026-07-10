@@ -23,22 +23,6 @@
   {{ h.build_nav_icon('cioos.lineage', _('Lineage'), package_type=dataset_type, id=pkg.id if is_activity_archive else pkg.name, icon='book') }}
 {% endblock %}
 
-{# block primary_content_inner %}
-    {% block package_revision_info %}
-      {% if c.revision_date %}
-        <div class="module info alert alert-info">
-          <p class="module-content">
-            {% set timestamp = h.render_datetime(c.revision_date, with_hours=True) %}
-            {% set url = h.url_for(controller='dataset', action='read', id=pkg.name) %}
-
-            {% trans timestamp=timestamp, url=url %}This is an old revision of this dataset, as edited at {{ timestamp }}. It may differ significantly from the <a href="{{ url }}">current revision</a>.{% endtrans %}
-          </p>
-        </div>
-      {% endif %}
-    {% endblock %}
-
-{% endblock #}
-
 {% block secondary_content %}
 <div class="filters">
 <div>

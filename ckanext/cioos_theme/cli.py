@@ -175,7 +175,7 @@ def write_sitemap_files(
             os.write(fd, b"</urlset>\n")
             os.close(fd)
 
-            click.echo("done with %s.", path)
+            click.echo("done with %s." % path)
 
             filename_number = filename_number + 1
             if type:
