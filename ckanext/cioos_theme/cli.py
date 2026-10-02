@@ -57,25 +57,26 @@ def create(page_size, max_per_page):
     filename_number = 1
     file_list = []
 
-    write_sitemap_files(count, 
-                        start, 
+    # schema.org JSON-LD sitemaps are listed first in the index
+    write_sitemap_files(count,
+                        start,
                         filename_number,
-                        file_list, 
+                        file_list,
+                        page_size,
+                        max_per_page,
+                        DIR_SITEMAP,
+                        'dataset_jsonld_schemaorg',
+                        '.jsonld?frame=schemaorg')
+    write_sitemap_files(count,
+                        start,
+                        filename_number,
+                        file_list,
                         page_size,
                         max_per_page,
                         DIR_SITEMAP)
-    write_sitemap_files(count, 
-                        start, 
-                        filename_number, 
-                        file_list, 
-                        page_size, 
-                        max_per_page,
-                        DIR_SITEMAP,
-                        'dataset_jsonld_schemaorg', 
-                        '.jsonld?frame=schemaorg')
 
     path = DIR_SITEMAP + "sitemap.xml"
-    fd = os.open(path, os.O_WRONLY|os.O_CREAT)
+    fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC)
 
     # write header
     os.write(fd, '<?xml version="1.0" encoding="UTF-8"?>\n'.encode('utf-8'))
