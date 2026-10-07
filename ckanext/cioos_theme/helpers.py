@@ -9,7 +9,6 @@ available to Controllers. This module is available to templates as 'h'.
 import copy
 import json
 import logging
-import re
 from collections import OrderedDict
 from importlib import metadata
 
@@ -21,7 +20,7 @@ import ckan.plugins.toolkit as toolkit
 import jsonpickle
 from ckantoolkit import _, c, config
 
-from ckanext.dcat.processors import RDFSerializer
+from ckanext.cioos.helpers import load_json
 
 log = logging.getLogger(__name__)
 
@@ -35,26 +34,6 @@ except ImportError:
 
 
 get_action = logic.get_action
-
-
-def composite_separator():
-    """Return the composite field separator used by ckanext-scheming.
-
-    ckanext-scheming uses a separator character to construct flat field names
-    from composite (nested) fields. The default is '-' (hyphen), matching
-    the hardcoded value in scheming's expand_form_composite().
-
-    This can be overridden via the 'scheming.composite.separator' config setting.
-    """
-    return config.get("scheming.composite.separator", "-")
-
-
-def load_json(j):
-    try:
-        new_val = json.loads(j)
-    except Exception:
-        new_val = j
-    return new_val
 
 
 def load_about_markdown():
@@ -157,22 +136,6 @@ def helper_available(helper_name):
     return True
 
 
-def get_doi_authority_url():
-    return toolkit.config.get("ckan.cioos.doi_authority_url", "https://doi.org/")
-
-
-def get_doi_prefix():
-    return toolkit.config.get("ckan.cioos.doi_prefix")
-
-
-def get_datacite_org():
-    return toolkit.config.get("ckan.cioos.datacite_org")
-
-
-def get_datacite_test_mode():
-    return toolkit.config.get("ckan.cioos.datacite_test_mode", "True")
-
-
 def get_ra_extents_url():
     # './ckanext-cioos_theme/ckanext/cioos_theme/public/base/layers/pacific_RA.json'
     ra_file_url = toolkit.config.get("ckan.cioos.ra_json_file", "null")
@@ -217,172 +180,6 @@ def get_dataset_extents_url(q, fields, bbox_values, output=None):
 
 def merge_dict(d1, d2):
     return {**d1, **d2}
-
-
-def get_license_def(id, url="", title=""):
-    licenses = toolkit.get_action("license_list")()
-
-    locales_offered = toolkit.config.get("ckan.locales_offered", [])
-    if isinstance(locales_offered, str):
-        locales_offered = locales_offered.split() if locales_offered.strip() else []
-    default_locale = toolkit.config.get("ckan.locale_default") or (
-        locales_offered[0] if locales_offered else "en"
-    )
-    lang = toolkit.h.lang() or default_locale
-
-    # check for id first
-    for license in licenses:
-        if id.lower() == license["id"].lower() or id.lower() in [
-            x.lower() for x in license.get("legacy_ids", [])
-        ]:
-            return {
-                "license_id": license["id"],
-                "license_url": license.get("url_" + lang, license["url"]),
-                "license_title": license.get("title_" + lang, license["title"]),
-            }
-
-    # if that fails match on url or title next
-    if url or title:
-        for license in licenses:
-            if url == license.get("url_" + lang, license["url"]):
-                return {
-                    "license_id": license["id"],
-                    "license_url": license.get("url_" + lang, license["url"]),
-                    "license_title": license.get("title_" + lang, license["title"]),
-                }
-            if title.lower() == license.get("title_" + lang, license["title"]).lower():
-                return {
-                    "license_id": license["id"],
-                    "license_url": license.get("url_" + lang, license["url"]),
-                    "license_title": license.get("title_" + lang, license["title"]),
-                }
-    return None
-
-
-def get_fully_qualified_package_uri(pkg, uri_field, default_code_space=None):
-    fqURI = []
-    uris = pkg.get(uri_field)
-
-    if not uris:
-        # try to build out of flat fields
-        uris = (
-            [
-                {
-                    "authority": pkg.get(uri_field + "authority"),
-                    "code-space": pkg.get(uri_field + "code-space"),
-                    "code": pkg.get(uri_field + "code"),
-                    "version": pkg.get(uri_field + "version"),
-                }
-            ]
-            if pkg.get(uri_field + "code")
-            else None
-        )
-
-    if not uris:
-        return fqURI
-
-    if isinstance(uris, dict):
-        uris = [uris]
-
-    for uri in uris:
-        uri = toolkit.h.cioos_load_json(uri)
-        if not uri:
-            continue
-        code_space = uri.get("code-space") or default_code_space
-        code = uri.get("code")
-        if isinstance(code, list):
-            code = code[0]
-        if not code:
-            continue
-        if toolkit.h.is_url(code):
-            fqURI.append(code)
-            continue
-        out_code = code
-        if code_space not in out_code:
-            out_code = code_space + "/" + out_code
-        if not toolkit.h.is_url(out_code):
-            out_code = "https://" + out_code
-
-        fqURI.append(out_code)
-    return fqURI
-
-
-def get_package_relationships(pkg):
-    # compare schema field, here called aggregation-info and
-    # package relationships.
-    relationships = pkg.get("aggregation-info", [])
-    rels_from_schema = []
-    for rel in relationships:
-        comment = "/".join(
-            filter(None, [rel.get("initiative-type"), rel.get("association-type")])
-        )
-        comment = re.sub(r"([A-Z])", r" \1", comment)
-        comment = comment.title()
-
-        rel_uri = rel.get("aggregate-dataset-identifier_code")
-        rel_name = rel.get("aggregate-dataset-name")
-
-        map_type = {
-            "largerWorkCitation": "parent",
-            "crossReference": "cross link",
-            "dependency": "depends on",
-            "revisionOf": "revision of",
-            "series": "cross link",
-            "isComposedOf": "child",
-        }
-        rel_type = map_type.get(rel.get("association-type"), "links to")
-
-        if rel_uri and rel_name:
-            rels_from_schema.append(
-                {
-                    "subject": pkg["name"],
-                    "type": rel_type,
-                    "object": {"title": rel_name, "url": rel_uri},
-                    "comment": comment,
-                }
-            )
-    return rels_from_schema
-
-
-# the following functions have been depricated. use above function instead
-# def get_package_relationships(pkg):
-#     '''Returns the relationships of a package.
-
-#     :param id: the id or name of the package
-#     '''
-#     rel = pkg.get('relationships_as_subject') + pkg.get('relationships_as_object')
-#     b = []
-#     for x in rel:
-#         if x not in b:
-#             b.append(x)
-#     return b
-
-
-# def print_package_relationship_type(type):
-#     out = 'depends on'
-#     if 'child' in type:
-#         out = 'parent'
-#     elif 'parent' in type:
-#         out = 'child'
-#     elif 'link' in type:
-#         out = 'cross link'
-#     return out
-
-
-# def get_package_relationship_reverse_type(type):
-#     return PackageRelationship.reverse_type(type)
-
-
-# def get_package_title(id):
-#     '''Returns the title of a package.
-
-#     :param id: the id or name of the package
-#     '''
-#     try:
-#         pkg = toolkit.get_action('package_show')(None, data_dict={'id': id})
-#     except Exception as e:
-#         return None
-#     return toolkit.h.get_translated(pkg, 'title')
 
 
 def _merge_lists(key, list1, list2):
@@ -842,13 +639,3 @@ def cioos_version():
 def append_to_homepages(homepages):
     homepages.append({"value": "4", "text": "CIOOS"})
     return homepages
-
-
-def cioos_structured_data(data_dict):
-    toolkit.check_access("dcat_dataset_show", {}, data_dict)
-
-    serializer = RDFSerializer(profiles=["schemaorg", "cioos_dcat"])
-
-    output = serializer.serialize_dataset(data_dict, _format="jsonld")
-
-    return output

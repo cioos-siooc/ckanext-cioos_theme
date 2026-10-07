@@ -16,14 +16,11 @@ classifiers = [
     "Programming Language :: Python :: 3",
 ]
 requires-python = ">=3.10"
-# CKAN itself and the ckanext-* extensions this plugin works with (scheming,
-# fluent, dcat, harvest) are installed by the deployment, not declared here.
+# CKAN itself and the ckanext-* extensions this plugin works with (cioos,
+# scheming, fluent, spatial) are installed by the deployment, not declared here.
 dependencies = [
     "ckantoolkit",
     "jsonpickle",
-    "lxml",
-    "pyld",
-    "rdflib",
     "requests",
     "shapely",
     "six",
@@ -37,9 +34,6 @@ cioos_theme = "ckanext.cioos_theme.plugin:Cioos_ThemePlugin"
 
 [project.entry-points."babel.extractors"]
 ckan = "ckan.lib.extract:extract_ckan"
-
-[project.entry-points."ckan.rdf.profiles"]
-cioos_dcat = "ckanext.cioos_theme.dcat.profiles:CIOOSDCATProfile"
 
 [tool.setuptools.packages.find]
 include = ["ckanext*"]
