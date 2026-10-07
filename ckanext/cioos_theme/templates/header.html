@@ -182,8 +182,18 @@ h.render_markdown(h.scheming_language_text(h.cioos_load_json(g.site_description)
       window.addEventListener("scroll", function () {
         var currentScrollY = window.scrollY;
 
+        // Collapsing the header shortens the page; only collapse when there is
+        // more scroll room than the header height, otherwise the shorter page
+        // snaps back to scrollY=0 and the header toggles in a loop (jitter).
+        var maxScroll =
+          document.documentElement.scrollHeight - window.innerHeight;
         if (currentScrollY > 0) {
-          header.classList.add("header-scrolled");
+          if (
+            header.classList.contains("header-scrolled") ||
+            maxScroll > header.offsetHeight
+          ) {
+            header.classList.add("header-scrolled");
+          }
         } else {
           header.classList.remove("header-scrolled");
         }
