@@ -158,49 +158,6 @@ def helper_available(helper_name):
     return True
 
 
-def generate_doi_suffix():
-    import random
-
-    chars = [
-        "a",
-        "b",
-        "c",
-        "d",
-        "e",
-        "f",
-        "g",
-        "h",
-        "j",
-        "k",
-        "m",
-        "n",
-        "p",
-        "q",
-        "r",
-        "s",
-        "t",
-        "u",
-        "v",
-        "w",
-        "x",
-        "y",
-        "z",
-        "0",
-        "1",
-        "2",
-        "3",
-        "4",
-        "5",
-        "6",
-        "7",
-        "8",
-        "9",
-    ]
-    str1 = "".join(random.SystemRandom().choice(chars) for _ in range(4))
-    str2 = "".join(random.SystemRandom().choice(chars) for _ in range(4))
-    return str1 + "-" + str2
-
-
 def get_doi_authority_url():
     return toolkit.config.get("ckan.cioos.doi_authority_url", "https://doi.org/")
 
