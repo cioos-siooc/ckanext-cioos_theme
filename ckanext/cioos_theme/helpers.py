@@ -11,15 +11,14 @@ import json
 import logging
 import re
 from collections import OrderedDict
+from importlib import metadata
 
 # from ckantoolkit import h
 import ckan.logic as logic
 import ckan.model as model
 import ckan.plugins as p
 import ckan.plugins.toolkit as toolkit
-from importlib import metadata
 import jsonpickle
-from ckan.common import config
 from ckantoolkit import _, c, config
 
 from ckanext.dcat.processors import RDFSerializer
@@ -293,7 +292,6 @@ def get_fully_qualified_package_uri(pkg, uri_field, default_code_space=None):
         code = uri.get("code")
         if isinstance(code, list):
             code = code[0]
-        version = uri.get("version")
         if not code:
             continue
         if toolkit.h.is_url(code):

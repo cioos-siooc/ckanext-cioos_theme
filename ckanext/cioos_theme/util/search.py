@@ -51,7 +51,9 @@ class GeoPackageSearchQuery(PackageSearchQuery):
                 sort="metadata_created asc",
             )
         except Exception as e:
-            error = f"Error in GeoPackageSearchQuery.get_paginated_entity_name_modtime: {e}"
+            error = (
+                f"Error in GeoPackageSearchQuery.get_paginated_entity_name_modtime: {e}"
+            )
             log.error(error)
             print(error)
 

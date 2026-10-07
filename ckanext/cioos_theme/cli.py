@@ -353,7 +353,7 @@ def menu():
     pass
 
 
-@menu.command()
+@menu.command("create")
 @click.option(
     "--url",
     default=lambda: (
@@ -366,7 +366,7 @@ def menu():
     "--output", default="/menu/menu_list.html", help="path to menu list output file"
 )
 @click.option("--echo", default=False, help="echo file output to stdout")
-def create(url, output, echo):
+def create_menu(url, output, echo):
     """create menu file from wordpress site"""
 
     import requests
