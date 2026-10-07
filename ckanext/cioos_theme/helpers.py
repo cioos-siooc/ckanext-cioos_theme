@@ -17,7 +17,7 @@ import ckan.logic as logic
 import ckan.model as model
 import ckan.plugins as p
 import ckan.plugins.toolkit as toolkit
-import importlib_metadata as metadata
+from importlib import metadata
 import jsonpickle
 from ckan.common import config
 from ckantoolkit import _, c, config
