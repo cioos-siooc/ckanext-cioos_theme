@@ -65,17 +65,12 @@ setup(
     entry_points="""
         [ckan.plugins]
         cioos_theme=ckanext.cioos_theme.plugin:Cioos_ThemePlugin
-        cioos_group=ckanext.cioos_theme.plugin:Cioos_GroupPlugin
 
         [babel.extractors]
         ckan = ckan.lib.extract:extract_ckan
 
         [ckan.rdf.profiles]
         cioos_dcat=ckanext.cioos_theme.dcat.profiles:CIOOSDCATProfile
-
-        [paste.paster_command]
-        package_relationships=ckanext.cioos_theme.commands.package_relationships:PackageRelationships
-        sitemap=ckanext.cioos_theme.commands.sitemap:SiteMap
     """,
     # If you are changing from the default layout of your extension, you may
     # have to change the message extractors, you can read more about babel
