@@ -1,52 +1,88 @@
 # ckanext-cioos_theme
 
-This is the CIOOS-SIOOC Theme extension. It is primarily focused on customizing
-the look and feel of the ckan site to match the main CIOOS site. As well as
-stylistic changes this extension also adds some functionality in new page
-layouts as well as search support in the form of new facits.
+This repository ships two CKAN plugins for the CIOOS-SIOOC catalogue:
 
-Current modifications include:
-* scheming validator to clean up and populate the EOV field from harvested tags and keyword fields. This is done by matching keyword and tag entries to the defined choose list for the EOV field and including any words that match. keywords are currently not removed from their original locations so some duplicat entrie will accure.
-* Add logging to put loging and connection attempts to the docker logs. This is to support fail2ban scraping of logs in an attempt to prevent the most basic of brute force attacks
-* Add EOV facet to support searching for datasets by EOV.
-* Copies keyword field into tags_en and tags_fr for easier indexing and searching by langauge
-* many small tweeks to page layout mostly to the dataset and home page.
+- **`cioos`** (package [`ckanext/cioos`](ckanext/cioos/README.md)): all
+  non-visual catalogue logic: schema validators, search indexing and facets,
+  API output, DCAT/Schema.org, DataCite XML, sitemaps, spatial query actions and
+  the fail2ban request logging. It is independent of the theme ([ADR 0002](https://github.com/cioos-siooc/cioos-ckan-docker-base/blob/development-2-12/docs/adr/0002-domain-logic-in-ckanext-cioos.md))
+  and is hosted here until it gets a repository of its own.
+- **`cioos_theme`** (package `ckanext/cioos_theme`): the Legacy theme, i.e. the
+  look and feel of the catalogue, its page layouts, the home, schema map and
+  basic dataset pages, and the `ckan menu create` command that syncs the header
+  menu from a regional WordPress site. Its templates use the `cioos` helpers
+  (`h.cioos_load_json`, `h.cioos_get_license_def`, ...).
 
+Never put non-visual logic in `ckanext/cioos_theme`, and never import
+`ckanext.cioos_theme` from `ckanext.cioos`.
 
-------------
-Requirements
-------------
-Tested on ckan 2.8 but likely works for earlyer versions. This extension requires ckanext-scheming, ckanext-composite, and chanext-fluent to also be installed. If these extensions are missing this code will do very little.
+## Requirements
 
-------------
-Installation
-------------
+CKAN 2.12 with ckanext-scheming, ckanext-fluent, ckanext-dcat and
+ckanext-spatial. In [cioos-ckan-docker-base](https://github.com/cioos-siooc/cioos-ckan-docker-base)
+this repository is a submodule under `src/` and the image installs it; for a
+manual install run `pip install -e .` and add `cioos cioos_theme` to
+`ckan.plugins` (`cioos` first).
 
-.. Add any additional install steps to the list below.
-   For example installing any non-Python dependencies or adding any required
-   config settings.
+## Customizing the theme
 
-To install ckanext-cioos_theme:
+The theme exposes 3 CSS custom properties that a deployment overrides with a
+single CSS file, no fork or rebuild required:
 
-1. Activate your CKAN virtual environment, for example::
+| Token                  | Default   | Used for                             |
+|------------------------|-----------|--------------------------------------|
+| `--cioos-primary`      | `#52a79b` | links, buttons, nav highlight        |
+| `--cioos-primary-dark` | `#3d7a71` | hover state of the above             |
+| `--cioos-accent`       | `#fa7268` | secondary accent (citations, ERDDAP) |
 
-     . /usr/lib/ckan/default/bin/activate
+Neutrals (`--cioos-neutral-0/100/300/600/900`), `--cioos-nav-bg` and
+`--cioos-footer-bg` are defined in `:root` of
+`ckanext/cioos_theme/public/cioos_theme.css` but are intentionally fixed across
+regions.
 
-2. Install the ckanext-cioos_theme Python package into your virtual environment::
+`public/cioos_theme_overrides.css` is the last file of the `cioos_theme_css`
+webassets bundle, so its `:root` declarations win. cioos-ckan-docker-base
+bind-mounts its root `cioos_theme_overrides.css` over it; set the tokens there:
 
-     pip install ckanext-cioos_theme
+```css
+:root {
+  --cioos-primary:      #1b6ca8;
+  --cioos-primary-dark: #14507c;
+  --cioos-accent:       #f4a261;
+}
+```
 
-3. Add ``sep`` to the ``ckan.plugins`` setting in your CKAN
-   config file (by default the config file is located at
-   ``/etc/ckan/default/production.ini``).
+then restart CKAN (webassets re-bundles with a new cache-buster).
 
-4. Restart CKAN. For example if you've deployed CKAN with Apache on Ubuntu::
+When editing the theme CSS, use the existing tokens rather than new hex
+literals; derive new shades with `color-mix()` on a token.
 
-     sudo service apache2 reload
+## Commands
 
+```bash
+ckan menu create --url https://<site>/wp-json/ra/menu/ --output /menu/<region>_menu_list.html
+```
 
------------------
-Running the Tests
------------------
+Builds the header menu template from a WordPress site exposing
+`/wp-json/ra/menu/en` and `/wp-json/ra/menu/fr`; point `ckan.header_file_name`
+at the output file.
 
-Sorry, no test at this time
+## Translations
+
+Each package has its own catalogue (`ckanext/<package>/i18n/`). For the theme,
+`setup.cfg` holds the defaults:
+
+```bash
+python setup.py extract_messages
+python setup.py update_catalog -l fr
+# translate, then
+python setup.py compile_catalog -l fr
+```
+
+For `cioos`, point the same commands at its package:
+
+```bash
+python setup.py extract_messages --input-dirs ckanext/cioos -o ckanext/cioos/i18n/ckanext-cioos.pot
+python setup.py update_catalog -l fr -D ckanext-cioos -i ckanext/cioos/i18n/ckanext-cioos.pot -d ckanext/cioos/i18n
+python setup.py compile_catalog -l fr -D ckanext-cioos -d ckanext/cioos/i18n
+```

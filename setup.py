@@ -1,13 +1,5 @@
-# Package metadata lives in pyproject.toml. setup.py only remains because Babel
-# reads message_extractors from it (python setup.py extract_messages).
+# Package metadata lives in pyproject.toml. setup.py only remains for Babel's
+# setup.py commands (python setup.py extract_messages, see README.md).
 from setuptools import setup
 
-setup(
-    message_extractors={
-        "ckanext": [
-            ("**.py", "python", None),
-            ("**.js", "javascript", None),
-            ("**/templates/**.html", "ckan", None),
-        ],
-    },
-)
+setup()

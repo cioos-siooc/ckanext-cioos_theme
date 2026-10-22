@@ -1,3 +1,4 @@
-include README.rst
+include README.md
 include LICENSE
 recursive-include ckanext/cioos_theme *.html *.json *.js *.less *.css *.mo
+recursive-include ckanext/cioos *.html *.json *.po *.mo
