@@ -3,6 +3,9 @@ cioos_theme_css:
   output: ckanext-cioos_theme/%(version)s_cioos_theme.css
   contents:
     - cioos_theme.css
+    # Last, so a deployment's :root token overrides win (bind-mounted by
+    # cioos-ckan-docker-base; empty stub by default).
+    - cioos_theme_overrides.css
 
 bootstrap_datepicker_js:
   filters: rjsmin
