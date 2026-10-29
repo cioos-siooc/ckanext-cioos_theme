@@ -20,7 +20,7 @@ set nav_class = 'nav nav-pills nav-stacked' %} {% set nav_item_class = ' ' %} {%
 set wrapper_class = 'nav-facet nav-facet-tertiary' %} {% endif %} {% set
 has_active = items|selectattr('active')|list|length > 0 %} {% block
 facet_list_item %}
-<section class="{{ wrapper_class or 'module module-narrow module-shallow' }}">
+<section class="{{ wrapper_class or 'module module-narrow module-shallow module-facet' }}">
   {% block facet_list_heading %}
   <h2 class="module-heading">
     <i class="fas fa-filter"></i>

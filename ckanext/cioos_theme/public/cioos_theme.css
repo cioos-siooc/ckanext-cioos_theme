@@ -150,6 +150,20 @@ aside .filters .module-narrow + .module-narrow {
   border-top: 1px solid #ddd;
 }
 
+/* Merge consecutive facet modules into one card, even outside .filters
+   (e.g. harvest sources page). */
+aside .module-facet:has(+ .module-facet) {
+  margin-bottom: 0;
+  border-bottom: none;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+aside .module-facet + .module-facet {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
 .pagination-wrapper {
   display: flex;
   justify-content: center;
