@@ -14,10 +14,6 @@ endif %}
   {% block header_account %}
   <header class="account-masthead footer-account">
     <div class="container">
-      <button type="button" id="sentry-feedback-trigger" class="footer-feedback" hidden>
-        <i class="fas fa-comment-dots" aria-hidden="true"></i>
-        {{ _('Feedback') }}
-      </button>
       {% block header_account_container_content %} {% if c.userobj %}
       <div
         class="account avatar authed"
