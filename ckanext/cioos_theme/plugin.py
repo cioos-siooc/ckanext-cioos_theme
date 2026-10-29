@@ -940,6 +940,9 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                         "gmd": "http://www.isotc211.org/2005/gmd",
                     }
 
+                    # lxml rejects str input that carries an encoding declaration
+                    if isinstance(hdc, str):
+                        hdc = hdc.encode("utf-8")
                     root = ET.fromstring(hdc)
 
                     default_lang = root.xpath(
