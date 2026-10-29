@@ -9,6 +9,7 @@ available to Controllers. This module is available to templates as 'h'.
 import copy
 import json
 import logging
+import os
 import re
 from collections import OrderedDict
 
@@ -837,8 +838,8 @@ def cioos_get_facets(package_type="dataset", facet_list=["ALL"]):
 
 
 def cioos_version():
-    """Return CIOOS version"""
-    return metadata.version("ckanext.cioos_theme")
+    """Return CIOOS version: the image tag when built by CI, else the package version"""
+    return os.environ.get("CIOOS_CKAN_TAG") or metadata.version("ckanext.cioos_theme")
 
 
 def dedupe_keywords(keywords):
