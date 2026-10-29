@@ -28,7 +28,8 @@ packages=page.items) }} {% endif %} {% endblock %} {% block page_pagination %}
     snippet "spatial/snippets/spatial_query.html", default_extent=default_extent
     %} {% snippet "snippets/daterange.html" %} {% for facet in facet_titles %}
     {{ h.snippet('snippets/facet_list.html', title=facet_titles[facet],
-    name=facet, hide_empty="true", extras={'id':group_dict.id}) }} {% endfor %}
+    name=facet, search_facets=search_facets, hide_empty="true",
+    extras={'id':group_dict.id}) }} {% endfor %}
   </div>
   <a class="close no-text hide-filters">
     <i class="fa fa-times-circle"></i>

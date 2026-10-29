@@ -18,7 +18,7 @@ packages=page.items) }} {% endif %} {% endblock %} {% block page_pagination %}
 <div class="filters">
   <div>
     {% for facet in facet_titles %} {{ h.snippet('snippets/facet_list.html',
-    title=facet_titles[facet], name=facet, hide_empty="true",
+    title=facet_titles[facet], name=facet, search_facets=search_facets, hide_empty="true",
     extras={'id':group_dict.id}) }} {% endfor %}
   </div>
   <a class="close no-text hide-filters"
