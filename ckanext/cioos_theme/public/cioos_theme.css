@@ -683,6 +683,7 @@ aside #dataset-map {
 
 #topmenu .topmenu-inner {
   width: 100%;
+  min-height: 45px;
   max-width: 1140px;
   margin: 0 auto;
   padding: 0 12.8px;
@@ -699,13 +700,17 @@ aside #dataset-map {
   justify-content: flex-end;
   gap: 15px;
   flex: 1 1 auto;
+  align-self: stretch;
 }
 
+/* Logo sits on the bottom edge of the bar */
 #topmenu .topmenu-logo {
   flex-shrink: 0;
+  align-self: flex-end;
 }
 
 #topmenu .topmenu-logo img {
+  display: block;
   max-height: 37px;
 }
 
@@ -1029,12 +1034,7 @@ aside #dataset-map {
   font-weight: 400;
   display: flex;
   flex-wrap: wrap;
-}
-
-#footer #footer-core::after {
-  content: "";
-  display: flex;
-  clear: both;
+  gap: 0 48px;
 }
 
 #footer h1,
@@ -1051,7 +1051,7 @@ aside #dataset-map {
 #footer h3 {
   display: inline-block;
   font-size: 20px;
-  margin-bottom: 35px;
+  margin-bottom: 16px;
   font-weight: 400;
 }
 
@@ -1067,43 +1067,23 @@ aside #dataset-map {
   line-height: 1.8;
 }
 
-/* Footer grid columns */
-#footer .one_half,
-#footer .one_third,
-#footer .two_third,
-#footer .one_fourth,
-#footer .three_fourth,
-#footer .one_fifth,
-#footer .two_fifth,
-#footer .three_fifth,
-#footer .four_fifth,
-#footer .one_sixth,
-#footer .five_sixth {
-  margin-right: 2.6%;
+/* Footer columns share the row */
+#footer #footer-core > * {
+  flex: 1 1 200px;
+  min-width: 0;
   margin-bottom: 20px;
-  position: relative;
-  float: left;
-  padding: 0;
 }
 
-#footer .one_sixth {
-  width: 14.5%;
-}
-#footer .one_third {
-  width: 31.6%;
-}
-#footer .one_half {
-  width: 48.7%;
-}
-#footer .last {
-  float: right;
-  margin-right: 0;
+/* Newsletter column sits at the right edge, sized to the subscribe form */
+#footer #footer-core > .last {
+  flex: 0 1 28em;
+  margin-left: auto;
 }
 
 /* Newsletter subscription form */
 #footer .subcribe_container {
   display: flex;
-  width: 28em;
+  max-width: 28em;
   margin-top: 1em;
 }
 
@@ -1112,7 +1092,11 @@ aside #dataset-map {
 }
 
 #footer .mc-field-group {
-  width: auto;
+  flex: 1 1 auto;
+}
+
+#footer .mc-field-group input {
+  width: 100%;
 }
 
 #footer input::placeholder {
@@ -1792,28 +1776,6 @@ td .panel {
    Make footer columns stack on mobile devices
    =========================================== */
 @media (max-width: 768px) {
-  /* Make all footer columns full width and stack */
-  #footer .one_sixth,
-  #footer .one_third,
-  #footer .one_half,
-  #footer .one_fourth,
-  #footer .two_third,
-  #footer .three_fourth,
-  #footer .one_fifth,
-  #footer .two_fifth,
-  #footer .three_fifth,
-  #footer .four_fifth,
-  #footer .five_sixth {
-    width: 100% !important;
-    float: none !important;
-    margin-right: 0 !important;
-    margin-bottom: 30px;
-  }
-
-  #footer .last {
-    float: none !important;
-  }
-
   /* Adjust footer core padding for mobile */
   #footer {
     padding: 25px 15px;
@@ -1895,7 +1857,7 @@ td .panel {
 }
 
 .eov-grid .media-item:hover {
-  transform: scale(1.07);
+  transform: scale(1.02);
 }
 
 /* ===========================================

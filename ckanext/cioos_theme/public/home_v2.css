@@ -390,7 +390,7 @@
 }
 
 .home-eov-item:hover {
-  transform: scale(1.03);
+  transform: scale(1.01);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
