@@ -370,8 +370,16 @@ aside #dataset-map {
   background-color: var(--cioos-primary-color);
   border-color: var(--cioos-primary-color);
 }
+.pagination {
+  gap: 0.375rem;
+}
 .page-link {
   color: var(--cioos-primary-color);
+}
+/* Separated items: round every link and drop Bootstrap's border overlap. */
+.pagination .page-item .page-link {
+  margin-left: 0;
+  border-radius: var(--bs-pagination-border-radius, 0.375rem);
 }
 
 .form-control {
