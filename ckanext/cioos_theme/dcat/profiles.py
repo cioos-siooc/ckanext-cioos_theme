@@ -4,7 +4,7 @@ import logging
 import re
 
 from ckan.plugins import toolkit
-from ckanext.cioos_theme.helpers import load_json
+from ckanext.cioos_theme.helpers import dedupe_keywords, load_json
 from ckanext.dcat.profiles import CleanedURIRef, SchemaOrgProfile, URIRefOrLiteral
 from ckanext.dcat.utils import DCAT_CLEAN_TAGS, DCAT_EXPOSE_SUBCATALOGS, catalog_uri
 from rdflib import BNode, Literal, URIRef
@@ -525,7 +525,7 @@ class CIOOSDCATProfile(SchemaOrgProfile):
     def _tags_graph(self, dataset_ref, dataset_dict):
         keywords = dataset_dict.get("keywords", [])
         for lang in keywords:
-            for tag in keywords[lang]:
+            for tag in dedupe_keywords(keywords[lang]):
                 self.g.add((dataset_ref, SCHEMA.keywords, Literal(tag, lang=lang)))
 
     def graph_from_dataset(self, dataset_dict, dataset_ref):

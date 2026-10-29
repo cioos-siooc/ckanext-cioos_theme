@@ -841,6 +841,19 @@ def cioos_version():
     return metadata.version("ckanext.cioos_theme")
 
 
+def dedupe_keywords(keywords):
+    """Drop blank keywords and duplicates differing only in case or surrounding
+    whitespace, keeping the first spelling seen."""
+    seen = set()
+    out = []
+    for kw in keywords:
+        key = str(kw).strip().lower()
+        if key and key not in seen:
+            seen.add(key)
+            out.append(kw)
+    return out
+
+
 def append_to_homepages(homepages):
     homepages.append({"value": "4", "text": "CIOOS"})
     return homepages

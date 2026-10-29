@@ -897,9 +897,11 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                 tags_dict = {"en": [], "fr": []}
 
             # update tag list by language
-            data_dict["tags_en"] = tags_dict.get("en", [])
-            data_dict["tags_fr"] = tags_dict.get("fr", [])
-            data_dict["tags"] = data_dict["tags_en"] + data_dict["tags_fr"]
+            data_dict["tags_en"] = cioos_helpers.dedupe_keywords(tags_dict.get("en", []))
+            data_dict["tags_fr"] = cioos_helpers.dedupe_keywords(tags_dict.get("fr", []))
+            data_dict["tags"] = cioos_helpers.dedupe_keywords(
+                data_dict["tags_en"] + data_dict["tags_fr"]
+            )
 
             # update citation by language
             citation_dict = cioos_helpers.load_json(data_dict.get("citation", "{}"))
@@ -1467,6 +1469,13 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
     # add organization extras to organization object in package.
     # this will make the show and search endpoints look the same
     def after_dataset_show(self, context, package_dict):
+        # existing records may hold duplicate keywords (e.g. repeated taxa)
+        keywords = package_dict.get("keywords")
+        if package_dict.get("type") == "dataset" and isinstance(keywords, dict):
+            package_dict["keywords"] = {
+                lang: cioos_helpers.dedupe_keywords(kws) if isinstance(kws, list) else kws
+                for lang, kws in keywords.items()
+            }
         if toolkit.request and toolkit.request.path.startswith("/dataset/"):
             try:
                 del package_dict["harvest_document_content"]
