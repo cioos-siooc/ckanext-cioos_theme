@@ -34,6 +34,9 @@ Invalid = df.Invalid
 StopOnError = df.StopOnError
 missing = df.missing
 log = logging.getLogger(__name__)
+
+# Solr StrField terms are capped at 32766 bytes; stay safely under it.
+SOLR_STR_FIELD_LIMIT = 32000
 log_auth = logging.getLogger(__name__ + ".auth")
 
 # debugpy.listen(('0.0.0.0', 5678))
@@ -1098,6 +1101,44 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                 data_dict["projects"] = cioos_helpers.load_json(
                     data_dict.get("projects")
                 )
+
+            # Solr StrField has a hard 32766-byte limit per term. Some records
+            # repeat the same individual across many roles, pushing the contact
+            # JSON past that limit and breaking indexing. Only intervene when the
+            # limit is exceeded so other records are indexed unchanged.
+            for field in ("metadata-point-of-contact", "cited-responsible-party"):
+                value = data_dict.get(field)
+                if not value:
+                    continue
+                if isinstance(value, str):
+                    serialized = value
+                    parsed = cioos_helpers.load_json(value)
+                else:
+                    parsed = value
+                    serialized = json.dumps(value)
+                if len(serialized.encode("utf-8")) <= SOLR_STR_FIELD_LIMIT:
+                    continue
+                try:
+                    deduped = json.dumps(self.group_by_ind_or_org(parsed))
+                except Exception as err:
+                    log.error(
+                        "Failed to dedupe oversized %s for %s: %s",
+                        field,
+                        data_dict.get("id", "NO ID"),
+                        err,
+                    )
+                    data_dict.pop(field, None)
+                    continue
+                if len(deduped.encode("utf-8")) <= SOLR_STR_FIELD_LIMIT:
+                    data_dict[field] = deduped
+                else:
+                    log.warning(
+                        "Dropping %s from Solr doc for %s: %d bytes after dedupe exceeds limit",
+                        field,
+                        data_dict.get("id", "NO ID"),
+                        len(deduped.encode("utf-8")),
+                    )
+                    data_dict.pop(field, None)
         except Exception as e:
             log.exception(e)
             raise e
