@@ -4,6 +4,8 @@
   Renders only when ckanext.sentry.feedback_enabled is true and a frontend
   DSN is configured (ckanext.sentry.frontend_dsn, falling back to
   ckanext.sentry.dsn). The browser SDK is loaded from Sentry's CDN.
+  The form is attached to the #sentry-feedback-trigger button in footer.html,
+  which stays hidden unless the SDK loads.
 #}
 {% if h.cioos_get_cfg_bool('ckanext.sentry.feedback_enabled', false) %}
 {% set frontend_dsn = h.cioos_get_cfg('ckanext.sentry.frontend_dsn', '') or h.cioos_get_cfg('ckanext.sentry.dsn', '') %}
@@ -37,12 +39,13 @@
       return;
     }
     var feedbackOpts = Object.assign(
-      { colorScheme: "system", showBranding: false, autoInject: true },
+      { colorScheme: "system", showBranding: false, autoInject: false },
       {{ labels|tojson }}
     );
+    var feedback = Sentry.feedbackIntegration(feedbackOpts);
     var initOpts = {
       dsn: {{ frontend_dsn|tojson }},
-      integrations: [Sentry.feedbackIntegration(feedbackOpts)]
+      integrations: [feedback]
     };
     {% if sentry_env %}
     initOpts.environment = {{ sentry_env|tojson }};
@@ -56,6 +59,11 @@
     };
     {% endif %}
     Sentry.init(initOpts);
+    var trigger = document.getElementById("sentry-feedback-trigger");
+    if (trigger) {
+      feedback.attachTo(trigger);
+      trigger.hidden = false;
+    }
   })();
 </script>
 {% endif %}
