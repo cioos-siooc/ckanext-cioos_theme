@@ -884,8 +884,19 @@ def cioos_get_facets(package_type="dataset", facet_list=["ALL"]):
 
 
 def cioos_version():
-    """Return CIOOS version: the image tag when built by CI, else the package version"""
-    return os.environ.get("CIOOS_CKAN_TAG") or metadata.version("ckanext.cioos_theme")
+    """Return the CIOOS version baked into the image by ckan/Dockerfile (the CI
+    image tag, or local-<commit>[-dirty] for local builds), else the
+    CIOOS_CKAN_TAG env var, else the package version"""
+    try:
+        with open("/srv/app/cioos_ckan_version") as f:
+            version = f.read().strip()
+    except OSError:
+        version = ""
+    return (
+        version
+        or os.environ.get("CIOOS_CKAN_TAG")
+        or metadata.version("ckanext.cioos_theme")
+    )
 
 
 def dedupe_keywords(keywords):
