@@ -428,7 +428,8 @@ def _merge_lists(key, list1, list2):
 
 def cioos_get_eovs(show_all=False):
     """Return a list of eov's in a similar format to the facet list
-    If show_all is true then the complete list of eov's is returned. The name
+    If show_all is true then the complete list of eov's is returned, minus
+    deprecated eov's no dataset uses. The name
     and display_name fields are updated from the eoc choices list as found in
     ckanext-scheming. If show_all is false only the eov's returned as part of
     the active facet list are returned.
@@ -478,7 +479,9 @@ def cioos_get_eovs(show_all=False):
         # generate icon file name if not set
         if "icon" not in x:
             x["icon"] = "icon-" + x["name"].lower() + ".png"
-    return output
+    # deprecated eov's stay valid for existing datasets but are only listed
+    # while some datasets still use them
+    return [x for x in output if not x.get("deprecated") or x["count"]]
 
 
 def cioos_count_datasets():
