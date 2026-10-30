@@ -35,6 +35,18 @@
       {% endblock %}
     </h1>
 
+    {# Outside package_notes: scheming/package/read.html overrides that block. #}
+    {% block identifier %}
+      {{ h.snippet('snippets/identifier_list.html',
+          container = 'h3',
+          uri = h.cioos_get_fully_qualified_package_uri(
+            pkg,
+            uri_field='unique-resource-identifier-full',
+            default_code_space='doi.org')
+          )
+      }}
+    {% endblock %}
+
     {% block package_notes %}
       {%- if not dataset_type -%}
         <p>

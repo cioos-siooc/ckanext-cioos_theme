@@ -1336,6 +1336,11 @@ aside #dataset-map {
   max-height: 16px;
 }
 
+/* Dataset identifier (DOI) shown under the dataset title */
+.primary h3.identifier-item {
+  font-size: 18px;
+}
+
 /* Organization field list */
 .primary dl.organization-field-list dt {
   float: left;
