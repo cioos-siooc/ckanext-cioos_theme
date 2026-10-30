@@ -286,6 +286,34 @@ a:hover {
   }
 }
 
+/* Search submit icon: grey like the field border, with a light teal disc on
+   hover. Shared by the homepage, dataset/org/group search and home v2. */
+.search-form .search-input-group button,
+.home-search-btn {
+  color: #ddd;
+  padding-block: 0;
+  i {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2em;
+    height: 2em;
+    border-radius: 50%;
+    transition:
+      background-color 0.2s,
+      color 0.2s;
+  }
+  &:hover,
+  &:focus-visible,
+  &:active {
+    color: var(--cioos-primary-dark);
+    background: transparent;
+    i {
+      background-color: color-mix(in srgb, var(--cioos-primary) 15%, white);
+    }
+  }
+}
+
 aside #dataset-map {
   padding: 0;
 }
