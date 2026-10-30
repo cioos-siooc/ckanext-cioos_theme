@@ -22,7 +22,8 @@
       </title>
 
       {% block links -%}
-      <link rel="shortcut icon" href="{{ g.favicon }}" />
+      <link rel="icon" href="{{ h.url_for_static('/base/images/cioos_favicon.ico') }}" sizes="any" />
+      <link rel="icon" href="{{ h.url_for_static('/base/images/cioos_favicon.svg') }}" type="image/svg+xml" />
       {% endblock -%} {# Critical CSS - prevents FOUC by establishing layout
       before main CSS loads #}
       <style>
