@@ -1,0 +1,23 @@
+{# Display included_in_data_catalogue entries.
+   name/description may be plain strings or {lang: text} dicts (possibly
+   JSON-encoded), depending on the harvester that wrote them.
+#}
+{%- set catalogues = h.cioos_load_json(data[field.field_name]) or [] -%}
+<ul class="list-unstyled mb-0">
+{%- for catalogue in catalogues -%}
+  {%- set catalogue = h.cioos_load_json(catalogue) -%}
+  {%- set url = catalogue.get('url') -%}
+  {%- set name = h.scheming_language_text(h.cioos_load_json(catalogue.get('name'))) or url -%}
+  {%- set description = h.scheming_language_text(h.cioos_load_json(catalogue.get('description'))) -%}
+  {%- if name -%}
+  <li>
+    {%- if url and h.is_url(url) -%}
+      <a href="{{ url }}" target="_blank" rel="nofollow">{{ name }}</a>
+    {%- else -%}
+      {{ name }}
+    {%- endif -%}
+    {%- if description %}<br><small class="text-muted">{{ description }}</small>{% endif -%}
+  </li>
+  {%- endif -%}
+{%- endfor -%}
+</ul>
