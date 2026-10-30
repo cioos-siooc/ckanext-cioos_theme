@@ -1330,6 +1330,15 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         group_dict = {}
         group_dict_by_name = {}
 
+        # hide deprecated eov's from the facets, including the rows=0 searches
+        # behind the home page filters
+        eov_facet = search_results.get("search_facets", {}).get("eov")
+        if eov_facet:
+            deprecated = cioos_helpers.deprecated_eovs()
+            eov_facet["items"] = [
+                x for x in eov_facet["items"] if x["name"] not in deprecated
+            ]
+
         # no need to do all this if not returning data anyway
         if search_params.get("rows") == 0:
             return search_results
