@@ -8,6 +8,10 @@
     <head {% block headtag %}{% endblock %}>
       {%- block meta -%}
       <meta charset="utf-8" />
+      <meta name="csrf_field_name" content="{{ g.csrf_field_name }}" />
+      <meta name="{{ g.csrf_field_name }}" content="{{ csrf_token() }}" />
+      <meta name="site-root" content="{{ h.url_for('home.index', locale='default', _external=true) }}" />
+      <meta name="locale-root" content="{{ h.url_for('home.index', _external=true) }}" />
       {% block meta_generator %}
       <meta name="generator" content="ckan {{ h.ckan_version() }}" />
       {% endblock %} {% block meta_viewport %}
