@@ -1,0 +1,24 @@
+{# Display unique-resource-identifier-full entries as a single identifier,
+   linked when it resolves to a URL, followed by authority and version when set.
+#}
+{%- set identifiers = h.cioos_load_json(data[field.field_name]) or [] -%}
+{%- if identifiers is mapping -%}{%- set identifiers = [identifiers] -%}{%- endif -%}
+<ul class="list-unstyled mb-0">
+{%- for identifier in identifiers -%}
+  {%- set identifier = h.cioos_load_json(identifier) -%}
+  {%- set code = identifier.get('code') -%}
+  {%- set code_space = identifier.get('code-space') -%}
+  {%- if code -%}
+  {%- set full_code = code if (h.is_url(code) or not code_space or code_space in code) else code_space ~ '/' ~ code -%}
+  {%- set details = [identifier.get('authority'), _('Version') ~ ' ' ~ identifier.get('version') if identifier.get('version')]|select|list -%}
+  <li>
+    {%- if h.is_url(full_code) -%}
+      <a href="{{ full_code }}" target="_blank" rel="nofollow">{{ full_code }}</a>
+    {%- else -%}
+      {{ full_code }}
+    {%- endif -%}
+    {%- if details %} <small class="text-muted">({{ details|join(', ') }})</small>{% endif -%}
+  </li>
+  {%- endif -%}
+{%- endfor -%}
+</ul>
