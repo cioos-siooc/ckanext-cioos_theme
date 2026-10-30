@@ -63,7 +63,7 @@
 
         /* Top menu (CIOOS banner) */
         #topmenu {
-          background: #52a79b;
+          background: var(--cioos-nav-bg);
         }
         #topmenu .topmenu-inner {
           display: flex;
@@ -154,7 +154,7 @@
           .toggle-menu {
             display: flex !important;
             visibility: visible !important;
-            background: #52a79b;
+            background: var(--cioos-nav-bg);
             padding: 10px 15px;
             align-items: center;
             justify-content: space-between;
@@ -166,7 +166,7 @@
             position: fixed;
             inset: 0;
             z-index: 9999;
-            background: #152f37;
+            background: var(--cioos-footer-bg);
           }
           .main-nav-check:checked ~ .mobile-nav {
             display: flex !important;
@@ -195,7 +195,12 @@
       'vendor/fontawesome' %} {% asset 'ckanext-cioos_theme/cioos_theme_css' %}
       {% asset 'ckanext-cioos_theme/bootstrap_datepicker_css' %} {% endblock %}
       {# render all assets included in styles block #} {{
-      h.render_assets('style') }} {% if h.cioos_get_additional_css_path() %}
+      h.render_assets('style') }} {% set color_overrides =
+      h.cioos_theme_color_overrides() %} {% if color_overrides %}
+      <style>
+        :root { {% for token, color in color_overrides.items() %}{{ token }}: {{ color }}; {% endfor %}}
+      </style>
+      {% endif %} {% if h.cioos_get_additional_css_path() %}
       <link
         rel="stylesheet"
         type="text/css"

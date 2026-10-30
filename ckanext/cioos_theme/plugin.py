@@ -424,6 +424,10 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
 
         # CKAN CIOOS config options (ckan.cioos.* namespace)
         declaration.declare(key.ckan.cioos.ra_css_path, "")
+        declaration.declare(key.ckan.cioos.primary_color, "")
+        declaration.declare(key.ckan.cioos.primary_dark_color, "")
+        declaration.declare(key.ckan.cioos.accent_color, "")
+        declaration.declare(key.ckan.cioos.footer_color, "")
         declaration.declare(key.ckan.cioos.exclude_facets, "[]")
         declaration.declare(key.ckan.cioos.doi_authority_url, "https://doi.org/")
         declaration.declare(key.ckan.cioos.doi_prefix, "")
@@ -693,6 +697,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             "cioos_get_locale_url": self.get_locale_url,
             "cioos_schema_field_map": cioos_helpers.cioos_schema_field_map,
             "cioos_get_additional_css_path": self.get_additional_css_path,
+            "cioos_theme_color_overrides": cioos_helpers.theme_color_overrides,
             "cioos_get_homepage_path": lambda: toolkit.config.get(
                 "ckan.homepage_template", "home/default_home.html"
             ),

@@ -18,11 +18,11 @@
    =========================================== */
 :root {
   /* CIOOS brand colors */
-  --cioos-nav-bg: #52a79b;
+  --cioos-nav-bg: var(--cioos-primary);
   --cioos-footer-bg: #152f37;
   --cioos-light-bg: #f0f0f0;
-  --cioos-primary-color: #52a79b;
-  --cioos-darker-color: #3d7a71;
+  --cioos-primary: #52a79b;
+  --cioos-primary-dark: #3d7a71;
   --cioos-accent: #fa7268;
 
   --cioos-light-color: #333333;
@@ -222,15 +222,15 @@ aside .module-narrow .module-heading {
 
 .module-narrow .nav-item.active > a,
 .module-narrow .nav-aside li.active a {
-  background-color: var(--cioos-primary-color);
+  background-color: var(--cioos-primary);
 }
 .module-narrow .nav-item.active > a:hover,
 .module-narrow .nav-aside li.active a:hover {
-  background-color: var(--cioos-darker-color);
+  background-color: var(--cioos-primary-dark);
 }
 .module-narrow .nav-item.active > a:before,
 .module-narrow .nav-aside li.active a:before {
-  border-left-color: var(--cioos-primary-color);
+  border-left-color: var(--cioos-primary);
 }
 .module-footer {
   padding: 7px 25px 7px;
@@ -249,27 +249,27 @@ aside .module-narrow .module-heading {
 }
 
 a {
-  color: var(--cioos-primary-color);
+  color: var(--cioos-primary);
 }
 a:hover {
-  color: var(--cioos-darker-color);
+  color: var(--cioos-primary-dark);
 }
 
 .btn {
   font-weight: 400;
 }
 .btn-primary {
-  background-color: var(--cioos-primary-color);
-  border-color: var(--cioos-primary-color);
+  background-color: var(--cioos-primary);
+  border-color: var(--cioos-primary);
 }
 .btn-primary:hover {
-  background-color: var(--cioos-darker-color);
-  border-color: var(--cioos-darker-color);
+  background-color: var(--cioos-primary-dark);
+  border-color: var(--cioos-primary-dark);
 }
 
 .form-check-input:checked {
-  background-color: var(--cioos-primary-color);
-  border-color: var(--cioos-primary-color);
+  background-color: var(--cioos-primary);
+  border-color: var(--cioos-primary);
 }
 
 .search-form .search-input-group {
@@ -299,7 +299,7 @@ aside #dataset-map {
 }
 .nav-link,
 .page-header .nav-tabs li a {
-  color: var(--cioos-primary-color);
+  color: var(--cioos-primary);
 }
 
 .module-content {
@@ -364,7 +364,7 @@ aside #dataset-map {
 /* Fallback for formats without a colour in CKAN core's .badge[data-format] rules,
    which are more specific and win for html, json, xml, csv, pdf, etc. */
 .dataset-resources li a {
-  background-color: var(--cioos-primary-color);
+  background-color: var(--cioos-primary);
   color: white;
   padding: 0.25rem 0.5rem;
   border-radius: 14px;
@@ -430,14 +430,14 @@ aside #dataset-map {
 .page-item.active .page-link {
   z-index: 3;
   color: #fff;
-  background-color: var(--cioos-primary-color);
-  border-color: var(--cioos-primary-color);
+  background-color: var(--cioos-primary);
+  border-color: var(--cioos-primary);
 }
 .pagination {
   gap: 0.375rem;
 }
 .page-link {
-  color: var(--cioos-primary-color);
+  color: var(--cioos-primary);
 }
 /* Separated items: round every link and drop Bootstrap's border overlap. */
 .pagination .page-item .page-link {
@@ -1186,13 +1186,13 @@ aside #dataset-map {
   height: 100%;
   /* Outlined: white with teal border/text; hover/open fill with primary */
   --bs-btn-bg: white;
-  --bs-btn-border-color: var(--cioos-primary-color);
-  --bs-btn-color: var(--cioos-darker-color);
-  --bs-btn-hover-bg: var(--cioos-primary-color);
-  --bs-btn-hover-border-color: var(--cioos-primary-color);
+  --bs-btn-border-color: var(--cioos-primary);
+  --bs-btn-color: var(--cioos-primary-dark);
+  --bs-btn-hover-bg: var(--cioos-primary);
+  --bs-btn-hover-border-color: var(--cioos-primary);
   --bs-btn-hover-color: white;
-  --bs-btn-active-bg: var(--cioos-primary-color);
-  --bs-btn-active-border-color: var(--cioos-primary-color);
+  --bs-btn-active-bg: var(--cioos-primary);
+  --bs-btn-active-border-color: var(--cioos-primary);
   --bs-btn-active-color: white;
   background-color: var(--bs-btn-bg);
   border-color: var(--bs-btn-border-color);

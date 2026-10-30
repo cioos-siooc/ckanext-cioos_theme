@@ -159,6 +159,34 @@ def helper_available(helper_name):
     return True
 
 
+THEME_COLOR_TOKENS = {
+    "ckan.cioos.primary_color": "--cioos-primary",
+    "ckan.cioos.primary_dark_color": "--cioos-primary-dark",
+    "ckan.cioos.accent_color": "--cioos-accent",
+    "ckan.cioos.footer_color": "--cioos-footer-bg",
+}
+HEX_COLOR_RE = re.compile(r"^#(?:[0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$")
+
+
+def theme_color_overrides():
+    """
+    Return {css_token: color} for the brand colors set in config.
+
+    Values are emitted into an inline <style>, so anything that is not a hex
+    color is dropped (with a warning) rather than rendered.
+    """
+    overrides = {}
+    for key, token in THEME_COLOR_TOKENS.items():
+        value = (toolkit.config.get(key) or "").strip()
+        if not value:
+            continue
+        if HEX_COLOR_RE.match(value):
+            overrides[token] = value
+        else:
+            log.warning("Ignoring %s=%r: expected a hex color like #52a79b", key, value)
+    return overrides
+
+
 def get_doi_authority_url():
     return toolkit.config.get("ckan.cioos.doi_authority_url", "https://doi.org/")
 
