@@ -370,16 +370,13 @@
   padding: 0.5rem;
   background: var(--cioos-light-bg);
   border-radius: 12px;
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 0.5rem;
-  justify-content: center;
 }
 
 .home-eov-item {
   position: relative;
-  flex: 0 1 220px;
-  min-width: 180px;
   height: 80px;
   background: white;
   border-radius: 16px;
@@ -492,8 +489,6 @@
   }
 
   .home-eov-item {
-    flex: 0 1 150px;
-    min-width: 140px;
     height: 56px;
   }
 
@@ -517,6 +512,7 @@
   }
 
   .home-eov-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
     gap: 0.35rem;
     padding: 0.35rem;
   }
@@ -528,9 +524,8 @@
     font-size: 34px;
   }
 
-  .home-eov-item {
-    flex: 0 1 200px;
-    min-width: 180px;
+  .home-eov-grid {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   }
 
   .home-eov-icon {

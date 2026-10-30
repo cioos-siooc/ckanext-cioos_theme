@@ -12,6 +12,17 @@
     flex-wrap: wrap;
     justify-content: flex-start;
   }
+  /* Cards stretch to fill each row so the space between cards matches the
+     space around them. */
+  .eov-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 0.75rem;
+  }
+  /* Core's clearfix pseudo-element would take up a grid cell. */
+  .eov-grid::after {
+    content: none;
+  }
   .eov-grid .media-item,
   .module-item {
     position: relative;
@@ -22,8 +33,9 @@
   }
 
   .eov-grid .media-item {
-    height: 210px;
-    width: 150px;
+    height: 220px;
+    width: auto;
+    margin: 0;
     text-overflow: ellipsis;
   }
   .eov-grid .media-item > a.media-link {
@@ -39,8 +51,8 @@
   }
   .eov-grid .media-item > a.media-link img.media-image {
     display: block;
-    width: 125px;
-    height: 125px;
+    width: 135px;
+    height: 135px;
     flex-shrink: 0;
   }
   .eov-grid .item-count.badge {
