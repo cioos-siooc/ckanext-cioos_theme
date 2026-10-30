@@ -76,6 +76,16 @@ group_info_text = toolkit.config.get(
 )
 
 
+def lang_dict(value):
+    """Decode a fluent {lang: value} field, or {} when it is missing or not a dict.
+
+    Records harvested from other CKANs may carry these fields as empty or
+    plain strings.
+    """
+    decoded = cioos_helpers.load_json(value) if value else {}
+    return decoded if isinstance(decoded, dict) else {}
+
+
 def geojson_to_bbox(o):
     return shape(o).bounds
 
@@ -891,13 +901,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             if data_type != "dataset":
                 return data_dict
 
-            try:
-                tags_dict = cioos_helpers.load_json(data_dict.get("keywords", "{}"))
-            except Exception as err:
-                log.error(data_dict.get("id", "NO ID"))
-                log.error(type(err))
-                log.error("error:%s, keywords:%r", err, data_dict.get("keywords", "{}"))
-                tags_dict = {"en": [], "fr": []}
+            tags_dict = lang_dict(data_dict.get("keywords"))
 
             # update tag list by language
             data_dict["tags_en"] = cioos_helpers.dedupe_keywords(tags_dict.get("en", []))
@@ -907,28 +911,19 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             )
 
             # update citation by language
-            citation_dict = cioos_helpers.load_json(data_dict.get("citation", "{}"))
+            citation_dict = lang_dict(data_dict.get("citation"))
             data_dict["citation_en"] = citation_dict.get("en", [])
             data_dict["citation_fr"] = citation_dict.get("fr", [])
 
             # update translation method fields by language
-            ttm_dict = cioos_helpers.load_json(
-                data_dict.get("title_translation_method", "{}")
-            )
-            data_dict["title_translation_method_en"] = ttm_dict.get("en", [])
-            data_dict["title_translation_method_fr"] = ttm_dict.get("fr", [])
-
-            ntm_dict = cioos_helpers.load_json(
-                data_dict.get("notes_translation_method", "{}")
-            )
-            data_dict["notes_translation_method_en"] = ntm_dict.get("en", [])
-            data_dict["notes_translation_method_fr"] = ntm_dict.get("fr", [])
-
-            ktm_dict = cioos_helpers.load_json(
-                data_dict.get("keywords_translation_method", "{}")
-            )
-            data_dict["keywords_translation_method_en"] = ktm_dict.get("en", [])
-            data_dict["keywords_translation_method_fr"] = ktm_dict.get("fr", [])
+            for field in (
+                "title_translation_method",
+                "notes_translation_method",
+                "keywords_translation_method",
+            ):
+                tm_dict = lang_dict(data_dict.get(field))
+                data_dict[field + "_en"] = tm_dict.get("en", [])
+                data_dict[field + "_fr"] = tm_dict.get("fr", [])
 
             # split xml in harvest_document_content into french and englsih fields for indexing
             hdc = data_dict.get("harvest_document_content")
