@@ -97,15 +97,54 @@
     text-align: center;
   }
   .title h1 {
-    font-size: 70px;
-    font-weight: 600;
+    font-size: clamp(2.25rem, 1.5rem + 3vw, 3.5rem);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
     color: #707070;
-    margin: 4rem 0 2rem;
+    margin: 3.5rem 0 1rem;
+  }
+  .title h1 span {
+    font-weight: 300;
   }
   .title h2 {
-    font-size: 24px;
+    font-size: clamp(1.125rem, 1rem + 0.5vw, 1.375rem);
     font-weight: 300;
-    margin: 0 0 3rem;
+    line-height: 1.5;
+    color: #707070;
+    max-width: 36rem;
+    margin: 0 auto 2.5rem;
+  }
+  .title h2 a {
+    font-weight: 600;
+    text-decoration: none;
+  }
+  /* Section headings: small and quiet so the cards and search carry the page. */
+  .row1 h3.heading {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin: 2.5rem 0 0.75rem;
+  }
+  .row1 h4.eov-title {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--cioos-primary-color);
+    margin: 1.5rem 0 0.5rem 0.25rem;
+  }
+  .cioos-module-search .search-input-group,
+  .cioos-module-search .search-input-group input,
+  .cioos-module-search .search-input-group button {
+    border-radius: 999px;
+  }
+  .cioos-module-search .search-input-group input {
+    font-size: 1.125rem;
+    padding: 0.875rem 1.5rem;
+  }
+  .cioos-module-search .search-input-group button {
+    padding: 0 1.5rem;
+    font-size: 1.25rem;
   }
   .accent-color {
     color: var(--cioos-accent);
