@@ -1696,7 +1696,6 @@ td .panel {
       gap: 1rem;
     }
   }
-}
 .secondary #datepickernullrangelabel::after {
   content: "";
 }
