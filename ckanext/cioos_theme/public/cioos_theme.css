@@ -219,6 +219,19 @@ aside .module-narrow .module-heading {
 .nav-aside > li {
   border-bottom: none;
 }
+
+.module-narrow .nav-item.active > a,
+.module-narrow .nav-aside li.active a {
+  background-color: var(--cioos-primary-color);
+}
+.module-narrow .nav-item.active > a:hover,
+.module-narrow .nav-aside li.active a:hover {
+  background-color: var(--cioos-darker-color);
+}
+.module-narrow .nav-item.active > a:before,
+.module-narrow .nav-aside li.active a:before {
+  border-left-color: var(--cioos-primary-color);
+}
 .module-footer {
   padding: 7px 25px 7px;
   margin: 0 14px;
@@ -1178,6 +1191,10 @@ aside #dataset-map {
 
 .resource-list .resource-item .description {
   font-weight: normal;
+}
+
+.module-resource {
+  border-bottom: 0;
 }
 
 /* ===========================================
