@@ -1,9 +1,6 @@
 {% ckan_extends %}
 
 {% block resource_content %}
-  {% block package_archive_notice %}
-    {{ super() }}
-  {% endblock %}
   {% block resource_read_title %}<h1 class="page-heading" title="{{ h.resource_display_name(res) }}">
     {{ h.resource_display_name(res) | truncate(60) }}</h1>
   {% endblock %}
