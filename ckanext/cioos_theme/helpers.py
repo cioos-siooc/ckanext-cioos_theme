@@ -428,8 +428,7 @@ def _merge_lists(key, list1, list2):
 
 def cioos_get_eovs(show_all=False):
     """Return a list of eov's in a similar format to the facet list
-    If show_all is true then the complete list of eov's is returned, minus
-    deprecated eov's. The name
+    If show_all is true then the complete list of eov's is returned. The name
     and display_name fields are updated from the eoc choices list as found in
     ckanext-scheming. If show_all is false only the eov's returned as part of
     the active facet list are returned.
@@ -479,24 +478,7 @@ def cioos_get_eovs(show_all=False):
         # generate icon file name if not set
         if "icon" not in x:
             x["icon"] = "icon-" + x["name"].lower() + ".png"
-    deprecated = deprecated_eovs()
-    return [x for x in output if x["name"] not in deprecated]
-
-
-def deprecated_eovs():
-    """Return the eov values marked deprecated in the dataset schema.
-    They stay valid on existing datasets but are hidden from eov lists and
-    search facets in favour of the eov's that replace them.
-    """
-    schema = toolkit.h.scheming_get_dataset_schema("dataset")
-    field = toolkit.h.scheming_field_by_name(schema["dataset_fields"], "eov")
-    if not field:
-        return set()
-    return {
-        x["value"]
-        for x in toolkit.h.scheming_field_choices(field) or []
-        if x.get("deprecated")
-    }
+    return output
 
 
 def cioos_count_datasets():

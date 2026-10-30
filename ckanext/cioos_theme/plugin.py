@@ -404,7 +404,12 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         declaration.declare(key.ckan.site_logo_translated, "")
         declaration.declare(key.ckan.site_home_url, "")
         declaration.declare(key.ckan.exclude_eov_category, "")
-        declaration.declare(key.ckan.exclude_eov, "")
+        # deprecated eov's stay valid on existing datasets but are hidden from
+        # the home page eov list by default
+        declaration.declare(
+            key.ckan.exclude_eov,
+            "['marineTurtlesBirdsMammalsAbundanceAndDistribution']",
+        )
         declaration.declare(key.ckan.eov_icon_base_path, "/base/images/eov-icons-svg/")
         declaration.declare(key.ckan.header_file_name, "")
         declaration.declare(key.ckan.footer_file_name, "")
@@ -729,7 +734,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             "cioos_get_eov_icon_base_path": lambda: toolkit.config.get(
                 "ckan.eov_icon_base_path", "/base/images/eov-icons-svg/"
             ),
-            "cioos_get_exclude_eov": lambda: toolkit.config.get("ckan.exclude_eov", ""),
+            "cioos_get_exclude_eov": lambda: toolkit.config.get("ckan.exclude_eov"),
             "cioos_get_exclude_eov_category": lambda: toolkit.config.get(
                 "ckan.exclude_eov_category", ""
             ),
@@ -1329,15 +1334,6 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         org_dict = {}
         group_dict = {}
         group_dict_by_name = {}
-
-        # hide deprecated eov's from the facets, including the rows=0 searches
-        # behind the home page filters
-        eov_facet = search_results.get("search_facets", {}).get("eov")
-        if eov_facet:
-            deprecated = cioos_helpers.deprecated_eovs()
-            eov_facet["items"] = [
-                x for x in eov_facet["items"] if x["name"] not in deprecated
-            ]
 
         # no need to do all this if not returning data anyway
         if search_params.get("rows") == 0:
