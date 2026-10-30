@@ -11,19 +11,23 @@
 
   <form method='post' action="" id="admin-config-form" enctype="multipart/form-data">
     {% block admin_form %}
+    {{ h.csrf_input() }}
 
       {{ form.input('ckan.site_title', id='field-ckan-site-title', label=_('Site Title'), value=data['ckan.site_title'], error=error, classes=['control-medium']) }}
 
       {{ form.input('ckan.site_heading', id='field-ckan-site-heading', label=_('Title Heading on Main Page'), value=data['ckan.site_heading'], error=error, classes=['control-medium'], placeholder='{"en": "<span>CIOOS</span> Data Catalogue", "fr": "Catalogue de données du <span>SIOOC</span>"}') }}
 
-      {{ form.select('ckan.theme', id='field-ckan-main-css', label=_('Style'), options=styles, selected=data['ckan.theme'], error=error) }}
+      {{ form.input('ckan.theme', id='field-ckan-main-css', label=_('Custom Stylesheet'), value=data['ckan.theme'], error=error, classes=['control-medium']) }}
 
       {{ form.input('ckan.site_description', id='field-ckan-site-description', label=_('Site Tag Line'), value=data['ckan.site_description'], error=error, classes=['control-medium']) }}
 
       {# default page has an image upload input here. TODO: create custom image_upload snippet based on the image_upload macro in /ckan/ckan/templates/macros/form.html #}
       {{ form.input('ckan.site_logo_translated', id='field-ckan-site-logo', label=_('Site logo'), value=data['ckan.site_logo_translated'], error=error, classes=['control-medium']) }}
 
-      {{ form.image_upload(data, errors, is_upload_enabled=h.uploads_enabled(), is_url=is_url, is_upload=is_upload, upload_label = _("Site logo Don't USE"), url_label=_("Site logo Don't Use"),  field_url=field_url, field_upload='logo_upload', field_clear='clear_logo_upload' )}}
+      {% set field_url = 'ckan.site_logo' %}
+      {% set is_upload = data[field_url] and not data[field_url].startswith('http') %}
+      {% set is_url = data[field_url] and data[field_url].startswith('http') %}
+      {{ form.image_upload(data, errors, is_upload_enabled=h.uploads_enabled("admin"), is_url=is_url, is_upload=is_upload, upload_label = _("Site logo Don't USE"), url_label=_("Site logo Don't Use"),  field_url=field_url, field_upload='logo_upload', field_clear='clear_logo_upload' )}}
 
       {{ form.markdown('ckan.site_about', id='field-ckan-site-about', label=_('About'), value=data['ckan.site_about'], error=error, placeholder=_('About page text')) }}
 
@@ -32,8 +36,6 @@
       {{ form.markdown('ckan.site_intro_text', id='field-ckan-site-intro-text', label=_('Intro Text'), value=data['ckan.site_intro_text'], error=error, placeholder=_('Text on home page')) }}
 
       {{ form.textarea('ckan.site_custom_css', id='field-ckan-site-custom-css', label=_('Custom CSS'), value=data['ckan.site_custom_css'], error=error, placeholder=_('Customisable css inserted into the page header')) }}
-
-      {{ form.select('ckan.homepage_style', id='field-homepage-style', label=_('Homepage'), options=h.cioos_append_to_homepages(homepages), selected=data['ckan.homepage_style'], error=error) }}
 
       {{ form.input('ckan.site_home_url', id='field-ckan-site-home-url', label=_('Site Landing Page'), value=data['ckan.site_home_url'], error=error) }}
 
@@ -81,8 +83,7 @@
           </br> For example: {'fr':'Mon Titre', 'en':'My Title'}</p>
           <p><strong>Site Title:</strong> <em>(BL)</em> This is the title of this CKAN instance
             It appears in various places throughout CKAN.</p>
-          <p><strong>Style:</strong> Choose from a list of simple variations of
-            the main colour scheme to get a very quick custom theme working.</p>
+          <p><strong>Custom Stylesheet:</strong> Define an alternative main CSS file.</p>
           <p><strong>Site Tag Logo:</strong> <em>(BL)</em>This is the logo that appears in the
             header of all the CKAN instance templates.</p>
           <p><strong>About:</strong> <em>(BL)</em>This text will appear on this CKAN instances
@@ -94,8 +95,6 @@
             <code>&lt;head&gt;</code> tag of every page. If you wish to customize
             the templates more fully we recommend
             <a href="{{ docs_url }}" target="_blank">reading the documentation</a>.</p>
-          <p><strong>Homepage:</strong> This is for choosing a predefined layout for
-            the modules that appear on your homepage.</p>
       {% endtrans %}
     {% endblock %}
     </div>

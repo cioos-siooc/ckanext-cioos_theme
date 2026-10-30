@@ -883,11 +883,6 @@ def dedupe_keywords(keywords):
     return out
 
 
-def append_to_homepages(homepages):
-    homepages.append({"value": "4", "text": "CIOOS"})
-    return homepages
-
-
 def cioos_structured_data(data_dict):
     toolkit.check_access("dcat_dataset_show", {}, data_dict)
 

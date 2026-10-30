@@ -718,7 +718,6 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             "cioos_get_dataset_extents_url": cioos_helpers.get_dataset_extents_url,
             "cioos_get_ra_extents_url": cioos_helpers.get_ra_extents_url,
             "cioos_get_extra_value": self._get_extra_value,
-            "cioos_append_to_homepages": cioos_helpers.append_to_homepages,
             "cioos_structured_data": cioos_helpers.cioos_structured_data,
             # Config access helpers
             "cioos_get_header_file_name": lambda: toolkit.config.get(
