@@ -1172,16 +1172,37 @@ aside #dataset-map {
   margin-left: 0;
 }
 
+/* Cover the item's 1px border on top/right/bottom so the button's outline
+   and corners sit exactly on the item's */
 .resource-list .resource-item .btn-group {
-  top: 0;
+  top: -1px;
   right: -1px;
-  height: 100%;
+  bottom: -1px;
   padding: 0;
 }
 
 .resource-list .resource-item .btn-group .btn {
   border-radius: 0 14px 14px 0;
   height: 100%;
+  /* Outlined: white with teal border/text; hover/open fill with primary */
+  --bs-btn-bg: white;
+  --bs-btn-border-color: var(--cioos-primary-color);
+  --bs-btn-color: var(--cioos-darker-color);
+  --bs-btn-hover-bg: var(--cioos-primary-color);
+  --bs-btn-hover-border-color: var(--cioos-primary-color);
+  --bs-btn-hover-color: white;
+  --bs-btn-active-bg: var(--cioos-primary-color);
+  --bs-btn-active-border-color: var(--cioos-primary-color);
+  --bs-btn-active-color: white;
+  background-color: var(--bs-btn-bg);
+  border-color: var(--bs-btn-border-color);
+  color: var(--bs-btn-color);
+}
+.resource-list .resource-item .btn-group .btn:hover,
+.resource-list .resource-item .btn-group .btn.show {
+  background-color: var(--bs-btn-hover-bg);
+  border-color: var(--bs-btn-hover-border-color);
+  color: var(--bs-btn-hover-color);
 }
 
 .resource-list .resource-item .heading {
