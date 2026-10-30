@@ -5,7 +5,7 @@ import re
 
 from ckan.plugins import toolkit
 from ckanext.cioos_theme.helpers import dedupe_keywords, load_json
-from ckanext.dcat.profiles import CleanedURIRef, SchemaOrgProfile, URIRefOrLiteral
+from ckanext.dcat.profiles import CleanedURIRef, SchemaOrgProfile
 from ckanext.dcat.utils import DCAT_CLEAN_TAGS, DCAT_EXPOSE_SUBCATALOGS, catalog_uri
 from rdflib import BNode, Literal, URIRef
 from rdflib.namespace import RDF, RDFS, SKOS, Namespace
@@ -24,8 +24,6 @@ LOCN = Namespace("http://www.w3.org/ns/locn#")
 GSP = Namespace("http://www.opengis.net/ont/geosparql#")
 OWL = Namespace("http://www.w3.org/2002/07/owl#")
 SPDX = Namespace("http://spdx.org/rdf/terms#")
-
-PROV = Namespace("http://www.w3.org/ns/prov#")
 
 GEOJSON_IMT = "https://www.iana.org/assignments/media-types/application/vnd.geo+json"
 
@@ -380,6 +378,18 @@ class CIOOSDCATProfile(SchemaOrgProfile):
 
         self._add_date_triples_from_dict(dataset_dict, dataset_ref, items)
 
+        # Prefer the dataset's own publication date over when it was harvested
+        publication_dates = [
+            date.get("value")
+            for date in load_json(dataset_dict.get("dataset-reference-date", []))
+            if date.get("type") == "publication" and date.get("value")
+        ]
+        if publication_dates:
+            self.g.remove((dataset_ref, SCHEMA.datePublished, None))
+            self._add_date_triple(
+                dataset_ref, SCHEMA.datePublished, min(publication_dates)
+            )
+
         # Dataset URL
         dataset_url = toolkit.h.url_for(
             "dataset.read", id=dataset_dict["name"], _external=True
@@ -436,17 +446,11 @@ class CIOOSDCATProfile(SchemaOrgProfile):
                         ),
                     )
                 )
-                self.g.add(
-                    (
-                        data_catalog,
-                        SCHEMA.description,
-                        Literal(
-                            toolkit.h.scheming_language_text(
-                                load_json(dc.get("description", ""))
-                            )
-                        ),
-                    )
+                description = toolkit.h.scheming_language_text(
+                    load_json(dc.get("description", ""))
                 )
+                if description:
+                    self.g.add((data_catalog, SCHEMA.description, Literal(description)))
                 self.g.add((data_catalog, SCHEMA.url, Literal(dc.get("url"))))
         else:
             data_catalog = URIRef(toolkit.config.get("ckan.site_url"))
@@ -512,7 +516,8 @@ class CIOOSDCATProfile(SchemaOrgProfile):
             self.g.add((contact_point, SCHEMA.contactType, Literal("Publisher")))
 
             publisher_url = dataset_dict.get("publisher_url")
-            self.g.add((contact_point, SCHEMA.url, Literal(publisher_url)))
+            if publisher_url:
+                self.g.add((contact_point, SCHEMA.url, Literal(publisher_url)))
 
     def _resources_graph(self, dataset_ref, dataset_dict):
         g = self.g
@@ -563,21 +568,19 @@ class CIOOSDCATProfile(SchemaOrgProfile):
 
             if name:
                 self.g.add((contact_details, RDF.type, VCARD.Individual))
-                self.g.add((dataset_ref, DCAT.contactPoint, contact_details))
                 self.g.add((contact_details, VCARD.fn, Literal(name)))
-                self.g.add(
-                    (contact_details, VCARD.hasEmail, Literal("mailto:" + email))
-                )
-                self.g.add((contact_details, VCARD.role, Literal(roles)))
-                self.g.add((contact_details, VCARD.org, Literal(org)))
+                if org:
+                    self.g.add((contact_details, VCARD.org, Literal(org)))
             else:
                 self.g.add((contact_details, RDF.type, VCARD.Organization))
-                self.g.add((dataset_ref, DCAT.contactPoint, contact_details))
                 self.g.add((contact_details, VCARD.fn, Literal(org)))
+            self.g.add((dataset_ref, DCAT.contactPoint, contact_details))
+            if email:
                 self.g.add(
                     (contact_details, VCARD.hasEmail, Literal("mailto:" + email))
                 )
-                self.g.add((contact_details, VCARD.role, Literal(roles)))
+            for role in [roles] if isinstance(roles, str) else roles or []:
+                self.g.add((contact_details, VCARD.role, Literal(role)))
 
         # Creators
         for responsible_party in load_json(
@@ -616,10 +619,9 @@ class CIOOSDCATProfile(SchemaOrgProfile):
                     org_uri = "/".join(x.strip() for x in id_list if x.strip())
                 else:
                     org_uri = ""
-            if ind_uri:
-                creator_details = CleanedURIRef(uri)
-            elif org_uri:
-                creator_details = CleanedURIRef(uri)
+            creator_uri = ind_uri if name else org_uri
+            if creator_uri.startswith(("http://", "https://")):
+                creator_details = CleanedURIRef(creator_uri)
             else:
                 creator_details = BNode()
             if name:
@@ -637,17 +639,21 @@ class CIOOSDCATProfile(SchemaOrgProfile):
 
                 self.g.add((creator_details, RDF.type, SCHEMA.Person))
                 self.g.add((creator_details, SCHEMA.name, Literal(name)))
-                self.g.add((creator_details, SCHEMA.sameAs, Literal(ind_uri)))
+                if ind_uri:
+                    self.g.add((creator_details, SCHEMA.sameAs, Literal(ind_uri)))
                 self.g.add((creator_details, SCHEMA.givenName, Literal(given)))
-                self.g.add(
-                    (creator_details, SCHEMA.additionalName, Literal(additional))
-                )
+                if additional:
+                    self.g.add(
+                        (creator_details, SCHEMA.additionalName, Literal(additional))
+                    )
                 self.g.add((creator_details, SCHEMA.familyName, Literal(family)))
-                self.g.add((creator_details, SCHEMA.affiliation, Literal(org)))
+                if org:
+                    self.g.add((creator_details, SCHEMA.affiliation, Literal(org)))
             elif org:
                 self.g.add((creator_details, RDF.type, SCHEMA.Organization))
                 self.g.add((creator_details, SCHEMA.name, Literal(org)))
-                self.g.add((creator_details, SCHEMA.sameAs, Literal(org_uri)))
+                if org_uri:
+                    self.g.add((creator_details, SCHEMA.sameAs, Literal(org_uri)))
 
             self.g.add((dataset_ref, SCHEMA.creator, creator_details))
 
@@ -856,14 +862,6 @@ class CIOOSDCATProfile(SchemaOrgProfile):
                                 Literal("https://doi.org/%s" % doi),
                             )
                         )
-
-                        uri = dataset_uri(dataset_dict)
-                        self.g.add(
-                            (dataset_ref, DCAT.previousVersion, URIRefOrLiteral(uri))
-                        )
-                        self.g.add(
-                            (dataset_ref, PROV.wasRevisionOf, URIRefOrLiteral(uri))
-                        )
         else:
             uri = dataset_uri(dataset_dict)
             g.add((dataset_ref, SCHEMA.identifier, Literal("%s" % uri)))
@@ -965,3 +963,15 @@ class CIOOSDCATProfile(SchemaOrgProfile):
                 g.add((actionRef, SCHEMA.instrument, instrumentRef))
                 g.add((actionRef, SCHEMA.name, Literal(scope_level)))
                 g.add((aboutRef, SCHEMA.potentialAction, actionRef))
+
+        # Nodes the base profile hung off the original dataset node (its spatial
+        # Place, group Things) are left dangling once that node is replaced above.
+        orphans = True
+        while orphans:
+            orphans = {
+                s
+                for s in g.subjects(unique=True)
+                if isinstance(s, BNode) and (None, None, s) not in g
+            }
+            for s in orphans:
+                g.remove((s, None, None))
