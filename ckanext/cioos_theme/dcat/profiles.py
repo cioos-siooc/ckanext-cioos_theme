@@ -541,8 +541,6 @@ class CIOOSDCATProfile(SchemaOrgProfile):
         dataset_ref = URIRef(dataset_uri(dataset_dict) + ".jsonld")
         g.add((dataset_ref, RDF.type, SCHEMA.Dataset))
 
-        self.g.namespace_manager.bind("@vocab", SCHEMA, replace=True)
-
         # remove all previous contact points set by base profile as it is garbage.
         for s, p, o in self.g.triples((None, SCHEMA.contactPoint, None)):
             self.g.remove((s, None, None))

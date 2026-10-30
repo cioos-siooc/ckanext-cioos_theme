@@ -20,7 +20,7 @@ from pyld import jsonld
 from shapely.geometry import shape
 from six.moves.urllib.parse import urlparse
 
-from ckanext.dcat.processors import RDFSerializer
+from ckanext.dcat.utils import url_to_rdflib_format
 
 import ckanext.cioos_theme.cli as cli
 import ckanext.cioos_theme.helpers as cioos_helpers
@@ -368,11 +368,14 @@ def dcat_dataset_show(up_func, context, data_dict):
         # Re-serialize with Schema.org profiles instead of framing DCAT output
         toolkit.check_access("dcat_dataset_show", context, data_dict)
         dataset_dict = toolkit.get_action("package_show")(context, data_dict)
-        serializer = RDFSerializer(profiles=["schemaorg", "cioos_dcat"])
-        output = serializer.serialize_dataset(dataset_dict, _format="jsonld")
+        output = cioos_helpers.dataset_jsonld(dataset_dict)
         frametext = {"@context": {"@vocab": "http://schema.org/"}, "@type": "Dataset"}
         framed_output = jsonld.frame(json.loads(output), frametext)
         return json.dumps(framed_output, separators=(",", ":"))
+    if url_to_rdflib_format(data_dict.get("format")) == "json-ld":
+        toolkit.check_access("dcat_dataset_show", context, data_dict)
+        dataset_dict = toolkit.get_action("package_show")(context, data_dict)
+        return cioos_helpers.dataset_jsonld(dataset_dict, data_dict.get("profiles"))
     return up_func(context, data_dict)
 
 
@@ -723,7 +726,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             "cioos_get_dataset_extents_url": cioos_helpers.get_dataset_extents_url,
             "cioos_get_ra_extents_url": cioos_helpers.get_ra_extents_url,
             "cioos_get_extra_value": self._get_extra_value,
-            "cioos_structured_data": cioos_helpers.cioos_structured_data,
+            "structured_data": cioos_helpers.structured_data,
             # Config access helpers
             "cioos_get_header_file_name": lambda: toolkit.config.get(
                 "ckan.header_file_name", ""

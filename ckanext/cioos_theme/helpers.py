@@ -24,6 +24,7 @@ from ckan.common import config
 from ckantoolkit import _, c, config
 
 from ckanext.dcat.processors import RDFSerializer
+from rdflib.namespace import RDF
 
 log = logging.getLogger(__name__)
 
@@ -894,11 +895,36 @@ def dedupe_keywords(keywords):
     return out
 
 
-def cioos_structured_data(data_dict):
-    toolkit.check_access("dcat_dataset_show", {}, data_dict)
+def dataset_jsonld(dataset_dict, profiles=None):
+    """Serialize a dataset as JSON-LD with schema.org as the default vocabulary.
 
-    serializer = RDFSerializer(profiles=["schemaorg", "cioos_dcat"])
+    The graph binds schema.org to the ``schema`` prefix so Turtle, N3 and
+    RDF/XML stay valid; JSON-LD gets it as ``@vocab`` instead so its keys stay
+    bare (``name``, not ``schema:name``). Prefixes named like a schema.org term
+    in the graph are left out, or a key like ``geo`` would expand to the
+    GeoSPARQL namespace instead of ``schema:geo``.
+    """
+    serializer = RDFSerializer(profiles=profiles or ["schemaorg", "cioos_dcat"])
+    serializer.graph_from_dataset(dataset_dict)
+    graph = serializer.g
+    schema = str(dict(graph.namespaces())["schema"])
+    used_terms = {str(p) for p in graph.predicates()} | {
+        str(o) for o in graph.objects(None, RDF.type)
+    }
+    context = {
+        prefix: str(namespace)
+        for prefix, namespace in graph.namespaces()
+        if prefix not in ("", "rdf", "schema") and schema + prefix not in used_terms
+    }
+    context["@vocab"] = schema
+    return serializer.g.serialize(format="json-ld", context=context)
 
-    output = serializer.serialize_dataset(data_dict, _format="jsonld")
 
-    return output
+@toolkit.chained_helper
+def structured_data(next_helper, dataset_dict, profiles=None):
+    """Embed the same JSON-LD in the dataset page as its .jsonld export.
+
+    Replaces ckanext-dcat's helper, which its 'structured_data' plugin renders
+    in the dataset page template.
+    """
+    return dataset_jsonld(dataset_dict, profiles)
