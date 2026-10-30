@@ -348,6 +348,8 @@ aside #dataset-map {
   margin: 0;
 }
 
+/* Fallback for formats without a colour in CKAN core's .badge[data-format] rules,
+   which are more specific and win for html, json, xml, csv, pdf, etc. */
 .dataset-resources li a {
   background-color: var(--cioos-primary-color);
   color: white;
