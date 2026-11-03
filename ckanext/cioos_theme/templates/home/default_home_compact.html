@@ -1,0 +1,290 @@
+{#
+  Compact variant of default_home.html: categories in a fixed order, smaller
+  EOV icons with the label beside them.
+
+  To use this template, set in .env:
+    CKAN__HOMEPAGE_TEMPLATE=home/default_home_compact.html
+#}
+<style>
+  .eov-grid,
+  .module-grid {
+    margin: 0;
+    list-style: none;
+    min-height: 205px;
+    padding: 0.75rem;
+    background: var(--cioos-light-bg);
+    border: 0;
+    border-radius: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+  /* Cards stretch to fill each row so the space between cards matches the
+     space around them. */
+  .eov-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    /* Gaps and padding leave room for the corner count badges, which
+       overhang each card by up to ~0.75rem. */
+    gap: 1rem;
+    padding: 1rem 1.25rem 1.25rem 1rem;
+    min-height: 0;
+  }
+  /* Core's clearfix pseudo-element would take up a grid cell. */
+  .eov-grid::after {
+    content: none;
+  }
+  .eov-grid .media-item,
+  .module-item {
+    position: relative;
+    float: left;
+    display: flex;
+    background-color: white;
+    border-radius: 1rem;
+  }
+
+  .eov-grid .media-item {
+    height: 72px;
+    width: auto;
+    margin: 0;
+    /* Core gives .media-item 0.75rem padding; drop it so the label centres
+       on the full card height. The icon (shorter than the card, aligned to
+       the bottom) leaves its own gap above. */
+    padding: 0;
+    text-overflow: ellipsis;
+  }
+  .eov-grid .media-item > a.media-link {
+    flex: 1 1 auto;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.75rem;
+    padding: 0 0.75rem 0 0;
+    text-align: left;
+    box-sizing: border-box;
+  }
+  .eov-grid .media-item > a.media-link img.media-image {
+    display: block;
+    width: 64px;
+    height: 64px;
+    flex-shrink: 0;
+    margin: 0;
+    align-self: flex-end;
+    /* Fits the card's bottom-left corner; other corners square. */
+    border-radius: 0 0 0 1rem;
+  }
+  /* Count sits on the card's bottom-right corner, overlaid so it takes no
+     width from the label. The right edge is fixed (half the min-width past
+     the corner), so short counts centre on the corner and longer ones grow
+     inward. */
+  .eov-grid .item-count.badge {
+    position: absolute;
+    right: -0.75rem;
+    bottom: 0;
+    transform: translateY(50%);
+    z-index: 1;
+    border: 1px solid white;
+    min-width: 1.5rem;
+    padding: 0.15rem 0.4rem;
+    /* White on primary-dark is ~5:1 contrast (WCAG AA). */
+    color: white;
+    background: var(--cioos-primary-dark);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    text-align: center;
+  }
+  .media-heading {
+    font-size: 14px;
+    line-height: 1.25;
+    color: #333;
+    flex: 1;
+    min-width: 0;
+    /* Wrap only at spaces (core allows mid-word breaks and hyphenation). */
+    word-break: normal;
+    overflow-wrap: normal;
+    hyphens: none;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  h4 {
+    width: 100%;
+    margin-top: 2rem;
+    margin-bottom: 0.5rem;
+  }
+  .centertext {
+    text-align: center;
+  }
+  .title h1 {
+    font-size: clamp(2.25rem, 1.5rem + 3vw, 3.5rem);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: #707070;
+    margin: 3rem 0 0.75rem;
+  }
+  .title h1 span {
+    font-weight: 300;
+  }
+  .title h2 {
+    font-size: clamp(1.125rem, 1rem + 0.5vw, 1.375rem);
+    font-weight: 300;
+    line-height: 1.5;
+    color: #707070;
+    max-width: 36rem;
+    margin: 0 auto 2rem;
+  }
+  .title h2 a {
+    font-weight: 600;
+    text-decoration: none;
+  }
+  /* Section headings: small and quiet so the cards and search carry the page. */
+  .row1 h3.heading {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin: 3rem 0 1rem;
+  }
+  /* Core's .module-content side padding indents the EOV panels from their
+     heading; align everything on the column edge instead. */
+  .row1 .module-content.box:has(.eov-grid) {
+    padding: 0;
+  }
+  .row1 h4.eov-title {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--cioos-primary);
+    margin: 2rem 0 0.5rem 0.25rem;
+  }
+  .row1 h4.eov-title:first-child {
+    margin-top: 0;
+  }
+  /* Core and theme stack ~150px of margins/padding under the search box
+     (.search-giant, .search-form, .module-content). Clear them so the next
+     section heading's margin alone sets the gap. */
+  .cioos-module-search .module-content,
+  .cioos-module-search .search-form {
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  .cioos-module-search .search-giant {
+    margin: 0 auto;
+  }
+  .cioos-module-search .search-input-group,
+  .cioos-module-search .search-input-group input,
+  .cioos-module-search .search-input-group button {
+    border-radius: 999px;
+  }
+  .cioos-module-search .search-input-group input {
+    font-size: 1.125rem;
+    padding: 0.875rem 1.5rem;
+  }
+  .cioos-module-search .search-input-group button {
+    padding: 0 1.5rem;
+    font-size: 1.25rem;
+  }
+  .accent-color {
+    color: var(--cioos-accent);
+  }
+  footer {
+    margin-top: 5rem;
+  }
+</style>
+
+<div role="main">
+  <div class="container">
+    <div class="row row1">
+      <div class="col-md-12 col1 centertext title module-content-end">
+        <h1>
+          {{ h.scheming_language_text(h.cioos_load_json(g.site_heading)) | safe
+          or _('<span>CIOOS</span> Data Catalogue') }}
+        </h1>
+        <h2 class="subtitle">
+          {{ _('Search, find, download — all of our') }}
+          <span
+            ><a
+              class="accent-color"
+              href="{{ h.url_for(controller='dataset', action='search') }}"
+              >{{h.cioos_count_datasets()}}</a
+            ></span
+          >
+          {{ _('datasets') }}.
+        </h2>
+        <!-- old block -->
+        {# block promoted #} {# snippet 'home/snippets/promoted.html' #} {#
+        endblock #}
+      </div>
+      <div class="col-md-12 col1 module-content-end cioos-module-search">
+        {% block search %} {% snippet 'home/snippets/search.html' %} {% endblock
+        %}
+      </div>
+      <div class="col-md-12 col1 module-content-end">
+        <h3 class="heading">{{ _('Search By Ocean Variable:') }}</h3>
+        <div class="module-content box">
+          {% block eov_list %} {% set eov = h.cioos_get_eovs(show_all=True) %}
+          {% set grouped = eov|rejectattr('category',
+          'undefined')|groupby('category')|list %}
+          {# Fixed display order; any other category follows alphabetically #}
+          {% set category_order = ['Physical', 'BioEcosystems',
+          'Biogeochemical', 'Cross-disciplinary', 'Other'] %}
+          {% set category_order = category_order +
+          (grouped|map(attribute='grouper')|reject('in', category_order)|list) %}
+          {% for category in category_order %}
+          {% for grouper, list in grouped if grouper == category %} {% if grouper and grouper not in
+          h.cioos_get_exclude_eov_category() %}
+          <h4 class="eov-title">{{ _(grouper) }}</h4>
+          <ul class="media-grid eov-grid">
+            {% for item in list|sort(attribute='name') %} {% if item.name not in
+            h.cioos_get_exclude_eov() %} {% set href =
+            h.url_for(controller='dataset', action='search', eov=item.name) %}
+            {% set label = label_function(item) if label_function else
+            h.scheming_language_text(item.display_name) %} {% set label =
+            _(label) %} {% set label_truncated = label|truncate(45,
+            killwords=True) if not label_function else label %} {% set
+            count_value = item.get('count', 0) or 0 %} {% set count =
+            count_label(count_value) if count_label else ('%d' % count_value) %}
+            {% set icon_base = h.cioos_get_eov_icon_base_path() or
+            '/base/images/eov-icons-svg/' %} {% set img_url =
+            item.image_display_url or h.url_for_static(icon_base +
+            item.get('icon')) %}
+            <li
+              class="media-item {{ 'media-item-disabled' if count_value == 0 }}"
+            >
+              <a
+                class="media-link"
+                href="{{ href }}"
+                title="{{ label if label != label_truncated else '' }}"
+              >
+                <img
+                  rel="preload"
+                  as="image"
+                  type="image/svg+xml"
+                  src="{{ img_url }}"
+                  alt="{{ item.name }}"
+                  class="media-image img-responsive"
+                />
+                <div class="media-heading">{{ label_truncated }}</div>
+                {% if count_value > 0 %}
+                <div class="item-count badge">{{ count }}</div>
+                {% endif %}
+              </a>
+            </li>
+            {% endif %} {% endfor %}
+          </ul>
+          {% endif %} {% endfor %} {% endfor %} {% endblock %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
