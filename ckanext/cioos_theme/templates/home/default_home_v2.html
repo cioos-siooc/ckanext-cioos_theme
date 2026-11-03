@@ -6,6 +6,7 @@
 #}
 
 {# Load required assets — only active when this template is selected #}
+{% asset 'ckanext-cioos_theme/home_css' %}
 {% asset 'ckanext-cioos_theme/home_v2_css' %}
 {% asset 'ckanext-spatial/spatial_query_css' %}
 {% asset 'ckanext-spatial/spatial_query_js' %}
@@ -68,7 +69,7 @@
     {# ── Section D: EOV Cards ── #}
     <section class="home-eov-section">
       <div class="d-flex align-items-center justify-content-between mb-2">
-        <h3 class="home-section-heading mb-0">{{ _('Browse by Ocean Variable') }}</h3>
+        <h2 class="home-section-heading mb-0">{{ _('Browse by Ocean Variable') }}</h2>
         {# Mobile collapse toggle #}
         <button
           class="btn btn-sm home-eov-toggle d-lg-none"
@@ -85,40 +86,7 @@
       {# EOV grid — visible on desktop, collapsible on mobile #}
       <div class="collapse show" id="homeEovGrid">
         {% block eov_list %}
-          {% set eov = h.cioos_get_eovs(show_all=True) %}
-          {% for grouper, list in eov|rejectattr('category', 'undefined')|groupby('category') %}
-            {% if grouper and grouper not in h.cioos_get_exclude_eov_category() %}
-              <div class="home-eov-category-label">{{ _(grouper) }}</div>
-              <ul class="home-eov-grid">
-                {% for item in list|sort(attribute='name') %}
-                  {% if item.name not in h.cioos_get_exclude_eov() %}
-                    {% set href = h.url_for(controller='dataset', action='search', eov=item.name) %}
-                    {% set label = label_function(item) if label_function else h.scheming_language_text(item.display_name) %}
-                    {% set label = _(label) %}
-                    {% set label_truncated = label|truncate(35, killwords=True) if not label_function else label %}
-                    {% set count_value = item.get('count', 0) or 0 %}
-                    {% set count = count_label(count_value) if count_label else ('%d' % count_value) %}
-                    {% set icon_base = h.cioos_get_eov_icon_base_path() or '/base/images/eov-icons-svg/' %}
-                    {% set img_url = item.image_display_url or h.url_for_static(icon_base + item.get('icon')) %}
-                    <li class="home-eov-item {{ 'home-eov-item-disabled' if count_value == 0 }}">
-                      <a class="home-eov-link" href="{{ href }}" title="{{ label }}">
-                        <img
-                          src="{{ img_url }}"
-                          alt="{{ item.name }}"
-                          class="home-eov-icon"
-                          loading="lazy"
-                        />
-                        <span class="home-eov-label">{{ label_truncated }}</span>
-                        {% if count_value > 0 %}
-                          <span class="home-eov-badge">{{ count }}</span>
-                        {% endif %}
-                      </a>
-                    </li>
-                  {% endif %}
-                {% endfor %}
-              </ul>
-            {% endif %}
-          {% endfor %}
+          {% snippet 'home/snippets/eov_grid.html', variant='compact', truncate_length=35 %}
         {% endblock %}
       </div>
     </section>

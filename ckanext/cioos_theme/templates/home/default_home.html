@@ -1,235 +1,41 @@
-<style>
-  .eov-grid,
-  .module-grid {
-    margin: 0;
-    list-style: none;
-    min-height: 205px;
-    padding: 0.75rem;
-    background: var(--cioos-light-bg);
-    border: 0;
-    border-radius: 1rem;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: flex-start;
-  }
-  /* Cards stretch to fill each row so the space between cards matches the
-     space around them. */
-  .eov-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: 0.75rem;
-  }
-  /* Core's clearfix pseudo-element would take up a grid cell. */
-  .eov-grid::after {
-    content: none;
-  }
-  .eov-grid .media-item,
-  .module-item {
-    position: relative;
-    float: left;
-    display: flex;
-    background-color: white;
-    border-radius: 1rem;
-  }
+{#
+  CIOOS home page: a hero band with the keyword search, then the Essential Ocean Variables.
 
-  .eov-grid .media-item {
-    height: 220px;
-    width: auto;
-    margin: 0;
-    text-overflow: ellipsis;
-  }
-  .eov-grid .media-item > a.media-link {
-    flex: 1 1 auto;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    text-align: center;
-    box-sizing: border-box;
-  }
-  .eov-grid .media-item > a.media-link img.media-image {
-    display: block;
-    width: 135px;
-    height: 135px;
-    flex-shrink: 0;
-  }
-  .eov-grid .item-count.badge {
-    position: absolute;
-    top: 0;
-    right: 0;
-    display: inline-block;
-    min-width: 2.25rem;
-    padding: 0.4rem 0.7rem;
-    color: white;
-    background: #6e6e6e;
-    border-radius: 999px;
-    box-shadow:
-      0 10px 18px rgba(0, 0, 0, 0.14),
-      0 3px 8px rgba(0, 0, 0, 0.12),
-      inset 0 1px 0 rgba(255, 255, 255, 0.85),
-      inset 0 -1px 0 rgba(0, 0, 0, 0.08);
-    transform: translate(24%, -28%);
-    font-size: 0.8rem;
-    font-weight: 700;
-    line-height: 1;
-    text-align: center;
-    z-index: 1;
-    overflow: hidden;
-  }
-  .media-heading {
-    font-size: 16px;
-    color: #333;
-    max-width: 100%;
-    width: 100%;
-    word-break: break-word;
-    display: block;
-    margin: 0;
-    vertical-align: middle;
-  }
-  h4 {
-    width: 100%;
-    margin-top: 2rem;
-    margin-bottom: 0.5rem;
-  }
-  .centertext {
-    text-align: center;
-  }
-  .title h1 {
-    font-size: clamp(2.25rem, 1.5rem + 3vw, 3.5rem);
-    font-weight: 700;
-    line-height: 1.1;
-    letter-spacing: -0.02em;
-    color: #707070;
-    margin: 3.5rem 0 1rem;
-  }
-  .title h1 span {
-    font-weight: 300;
-  }
-  .title h2 {
-    font-size: clamp(1.125rem, 1rem + 0.5vw, 1.375rem);
-    font-weight: 300;
-    line-height: 1.5;
-    color: #707070;
-    max-width: 36rem;
-    margin: 0 auto 2.5rem;
-  }
-  .title h2 a {
-    font-weight: 600;
-    text-decoration: none;
-  }
-  /* Section headings: small and quiet so the cards and search carry the page. */
-  .row1 h3.heading {
-    font-size: 1.125rem;
-    font-weight: 600;
-    margin: 2.5rem 0 0.75rem;
-  }
-  .row1 h4.eov-title {
-    font-size: 0.8125rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--cioos-primary);
-    margin: 1.5rem 0 0.5rem 0.25rem;
-  }
-  .cioos-module-search .search-input-group,
-  .cioos-module-search .search-input-group input,
-  .cioos-module-search .search-input-group button {
-    border-radius: 999px;
-  }
-  .cioos-module-search .search-input-group input {
-    font-size: 1.125rem;
-    padding: 0.875rem 1.5rem;
-  }
-  .cioos-module-search .search-input-group button {
-    padding: 0 1.5rem;
-    font-size: 1.25rem;
-  }
-  .accent-color {
-    color: var(--cioos-accent);
-  }
-  footer {
-    margin-top: 5rem;
-  }
-</style>
+  eov_layout - how the EOVs are shown: 'tile' (default) or 'compact' cards
+               (home/snippets/eov_grid.html), or 'ranked' for cards ranked
+               by dataset count with count bars (home/snippets/eov_ranked.html).
+               home/default_home_compact.html renders this page with 'ranked'.
+#}
+{% asset 'ckanext-cioos_theme/home_css' %}
 
-<div role="main">
-  <div class="container">
-    <div class="row row1">
-      <div class="col-md-12 col1 centertext title module-content-end">
-        <h1>
-          {{ h.scheming_language_text(h.cioos_load_json(g.site_heading)) | safe
-          or _('<span>CIOOS</span> Data Catalogue') }}
-        </h1>
-        <h2 class="subtitle">
-          {{ _('Search, find, download — all of our') }}
-          <span
-            ><a
-              class="accent-color"
-              href="{{ h.url_for(controller='dataset', action='search') }}"
-              >{{h.cioos_count_datasets()}}</a
-            ></span
-          >
-          {{ _('datasets') }}.
-        </h2>
-        <!-- old block -->
-        {# block promoted #} {# snippet 'home/snippets/promoted.html' #} {#
-        endblock #}
-      </div>
-      <div class="col-md-12 col1 module-content-end cioos-module-search">
-        {% block search %} {% snippet 'home/snippets/search.html' %} {% endblock
-        %}
-      </div>
-      <div class="col-md-12 col1 module-content-end">
-        <h3 class="heading">{{ _('Search By Ocean Variable:') }}</h3>
-        <div class="module-content box">
-          {% block eov_list %} {% set eov = h.cioos_get_eovs(show_all=True) %}
-          {% for grouper, list in eov|rejectattr('category',
-          'undefined')|groupby('category') %} {% if grouper and grouper not in
-          h.cioos_get_exclude_eov_category() %}
-          <h4 class="eov-title">{{ _(grouper) }}</h4>
-          <ul class="media-grid eov-grid">
-            {% for item in list|sort(attribute='name') %} {% if item.name not in
-            h.cioos_get_exclude_eov() %} {% set href =
-            h.url_for(controller='dataset', action='search', eov=item.name) %}
-            {% set label = label_function(item) if label_function else
-            h.scheming_language_text(item.display_name) %} {% set label =
-            _(label) %} {% set label_truncated = label|truncate(45,
-            killwords=True) if not label_function else label %} {% set
-            count_value = item.get('count', 0) or 0 %} {% set count =
-            count_label(count_value) if count_label else ('%d' % count_value) %}
-            {% set icon_base = h.cioos_get_eov_icon_base_path() or
-            '/base/images/eov-icons-svg/' %} {% set img_url =
-            item.image_display_url or h.url_for_static(icon_base +
-            item.get('icon')) %}
-            <li
-              class="media-item {{ 'media-item-disabled' if count_value == 0 }}"
-            >
-              <a
-                class="media-link"
-                href="{{ href }}"
-                title="{{ label if label != label_truncated else '' }}"
-              >
-                <img
-                  rel="preload"
-                  as="image"
-                  type="image/svg+xml"
-                  src="{{ img_url }}"
-                  alt="{{ item.name }}"
-                  class="media-image img-responsive"
-                />
-                <div class="media-heading">{{ label_truncated }}</div>
-                {% if count_value > 0 %}
-                <div class="item-count badge">{{ count }}</div>
-                {% endif %}
-              </a>
-            </li>
-            {% endif %} {% endfor %}
-          </ul>
-          {% endif %} {% endfor %} {% endblock %}
-        </div>
-      </div>
+<div role="main" class="cioos-home">
+  <section class="home-hero">
+    <div class="container">
+      <h1 class="home-hero-title">
+        {{ h.scheming_language_text(h.cioos_load_json(g.site_heading)) | safe
+        or _('<span>CIOOS</span> Data Catalogue') }}
+      </h1>
+      {% block search %}
+        {% snippet 'home/snippets/search.html' %}
+      {% endblock %}
+      <p class="home-hero-count">
+        {{ _('Search, find, download — all of our') }}
+        <a href="{{ h.url_for('dataset.search') }}">{{ h.localised_number(h.cioos_count_datasets()) }}</a>
+        {{ _('datasets') }}.
+      </p>
     </div>
+  </section>
+
+  <div class="container">
+    <section class="eov-section" aria-labelledby="eov-section-heading">
+      <h2 class="home-section-heading" id="eov-section-heading">{{ _('Search By Ocean Variable:') }}</h2>
+      {% block eov_list %}
+        {% if eov_layout == 'ranked' %}
+          {% snippet 'home/snippets/eov_ranked.html' %}
+        {% else %}
+          {% snippet 'home/snippets/eov_grid.html', variant=eov_layout %}
+        {% endif %}
+      {% endblock %}
+    </section>
   </div>
 </div>

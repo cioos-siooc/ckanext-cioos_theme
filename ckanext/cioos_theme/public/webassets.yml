@@ -48,3 +48,18 @@ home_v2_css:
   output: ckanext-cioos_theme/%(version)s_home_v2.css
   contents:
     - home_v2.css
+
+home_css:
+  filters: cssrewrite
+  output: ckanext-cioos_theme/%(version)s_home.css
+  contents:
+    - home.css
+
+eov_categories_js:
+  filters: rjsmin
+  output: ckanext-cioos_theme/%(version)s_eov_categories.js
+  extra:
+    preload:
+      - base/main
+  contents:
+    - js/modules/eov-categories.js

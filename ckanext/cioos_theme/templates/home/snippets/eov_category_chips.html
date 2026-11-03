@@ -1,0 +1,14 @@
+{#
+  Category filter chips for the home page EOV card grid (eov_grid.html).
+  Without JavaScript each chip is a link to its category's anchor; the
+  eov-categories module (on an ancestor) turns them into filters.
+
+  categories - category names, in display order.
+#}
+{% asset 'ckanext-cioos_theme/eov_categories_js' %}
+<nav class="eov-chips" aria-label="{{ _('Ocean variable categories') }}">
+  <a class="eov-chip" href="#eov-all" data-category="">{{ _('All') }}</a>
+  {%- for category in categories %}
+  <a class="eov-chip" href="#eov-{{ category|lower|replace(' ', '-') }}" data-category="{{ category|lower|replace(' ', '-') }}">{{ _(category) }}</a>
+  {%- endfor %}
+</nav>

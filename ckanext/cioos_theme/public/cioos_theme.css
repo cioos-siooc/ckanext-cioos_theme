@@ -1768,16 +1768,6 @@ td .panel {
   white-space: pre-wrap;
 }
 
-/* Media item disabled state */
-.media-item-disabled:active {
-  pointer-events: none;
-}
-
-.media-item-disabled {
-  pointer-events: auto;
-  opacity: 0.6;
-}
-
 /* Module headings */
 .module h3 {
   font-weight: 400;
@@ -1922,18 +1912,6 @@ td .panel {
     padding: 8px 12px;
     font-size: 14px;
   }
-}
-
-.eov-grid .media-item {
-  transition: transform 0.15s ease-in-out;
-  border: 1px solid #ddd;
-  .media-heading {
-    font-size: 14px;
-  }
-}
-
-.eov-grid .media-item:hover {
-  transform: scale(1.02);
 }
 
 /* ===========================================
