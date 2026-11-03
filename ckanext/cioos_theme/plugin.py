@@ -23,6 +23,7 @@ from six.moves.urllib.parse import urlparse
 from ckanext.dcat.utils import url_to_rdflib_format
 
 import ckanext.cioos_theme.cli as cli
+import ckanext.cioos_theme.embeddings as embeddings
 import ckanext.cioos_theme.helpers as cioos_helpers
 from ckanext.scheming.helpers import scheming_language_text
 from ckanext.scheming.validation import scheming_validator
@@ -40,6 +41,11 @@ SOLR_STR_FIELD_LIMIT = 32000
 # A `field:value` token such as "id:abc" or "tags:ocean". A colon followed by a
 # space, as in a title like "Placentia Bay: North Harbour", is plain text.
 FIELDED_QUERY_RE = re.compile(r"\w:\S")
+# Search syntax typed on purpose (phrases, wildcards, fuzzy, exclusions,
+# boolean operators): such queries stay purely lexical.
+OPERATOR_QUERY_RE = re.compile(r'["*?~]|(?:^|\s)[-+!]|\b(?:AND|OR|NOT)\b')
+# How many nearest datasets by meaning are added to a free-text search.
+SEMANTIC_NEIGHBOURS = 20
 log_auth = logging.getLogger(__name__ + ".auth")
 
 # debugpy.listen(('0.0.0.0', 5678))
@@ -445,6 +451,8 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         declaration.declare(key.ckan.cioos.datacite_org, "")
         declaration.declare(key.ckan.cioos.datacite_test_mode, "True")
         declaration.declare(key.ckan.cioos.ra_json_file, "null")
+        # text-embeddings-inference base URL for semantic ranking; empty disables it
+        declaration.declare(key.ckan.cioos.embeddings_url, "")
 
         # Lang option used in templates
         declaration.declare(key.lang, "")
@@ -1152,6 +1160,12 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                         len(deduped.encode("utf-8")),
                     )
                     data_dict.pop(field, None)
+
+            vector = embeddings.embed(
+                embeddings.dataset_passage(data_dict), embeddings.INDEX_TIMEOUT
+            )
+            if vector:
+                data_dict["embedding"] = vector
         except Exception as e:
             log.exception(e)
             raise e
@@ -1216,7 +1230,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         return out
 
     def _free_text_query(self, search_params, q):
-        """Rewrite a free-text search as edismax.
+        """Rewrite a free-text search as edismax, plus semantic neighbours.
 
         Fielded queries ("id:abc") keep CKAN's standard parsing, since our code
         and other extensions rely on it.
@@ -1231,7 +1245,25 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         search_params["defType"] = "lucene"
         search_params.setdefault("mm", "2<-1 5<80%")
         search_params.setdefault("tie", "0.1")
-        search_params["q"] = "{!edismax q.op=OR}" + q
+        lexical = "{!edismax q.op=OR}" + q
+
+        vector = None
+        if not OPERATOR_QUERY_RE.search(q):
+            vector = embeddings.embed(q, embeddings.QUERY_TIMEOUT)
+        if not vector:
+            search_params["q"] = lexical
+            return
+        # Hybrid: lexical matches OR the datasets nearest in meaning, so "whale
+        # sightings" also finds acoustic whale monitoring, in either language.
+        # Lexical scores dwarf vector similarity (< 1), so exact matches stay on
+        # top and the neighbours follow them. lexq/vecq are allowed by
+        # ckan/patches/ckan/01_allow_cioos_search_params.patch.
+        search_params["q"] = "{!bool should=$lexq should=$vecq}"
+        search_params["lexq"] = lexical
+        search_params["vecq"] = "{!knn f=embedding topK=%d}%s" % (
+            SEMANTIC_NEIGHBOURS,
+            json.dumps(vector),
+        )
 
     # handle custom temporal range search facet
     def before_dataset_search(self, search_params):
