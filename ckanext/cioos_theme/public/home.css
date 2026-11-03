@@ -94,6 +94,16 @@
   font-weight: 600;
   margin: 3rem 0 1rem;
 }
+/* The "Essential Ocean Variables" link to GOOS: theme teal, underlined so it
+   reads as a link inside the heading. Darkened primary-dark is ~6:1 on white. */
+.cioos-home .home-section-heading a {
+  color: color-mix(in srgb, var(--cioos-primary-dark) 80%, black);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+.cioos-home .home-section-heading a:hover {
+  color: var(--cioos-primary-dark);
+}
 
 /* ── EOV category chips ── */
 .eov-chips {

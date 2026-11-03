@@ -28,7 +28,12 @@
 
   <div class="container">
     <section class="eov-section" aria-labelledby="eov-section-heading">
-      <h2 class="home-section-heading" id="eov-section-heading">{{ _('Search By Ocean Variable:') }}</h2>
+      {#- "Essential Ocean Variables" links to the GOOS page describing them; a
+          placeholder keeps the link movable within the translated sentence. #}
+      {%- set eov_link -%}
+        <a href="https://goosocean.org/what-we-do/framework/essential-ocean-variables/" hreflang="en">{{ _('Essential Ocean Variables') }}</a>
+      {%- endset %}
+      <h2 class="home-section-heading" id="eov-section-heading">{{ _('Search by {eovs}').format(eovs=eov_link)|safe }}</h2>
       {% block eov_list %}
         {% if eov_layout == 'ranked' %}
           {% snippet 'home/snippets/eov_ranked.html' %}
