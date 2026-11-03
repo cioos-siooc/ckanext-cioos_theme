@@ -1,23 +1,44 @@
 {#
   Essential Ocean Variables by category: one column per category (up to
   four), each a panel of cards ranked by dataset count, stacked one per row.
-  Each panel shows its top four cards; "Show N more", at the base of the
-  panel, reveals the rest. A card shows the icon (flush with its bottom-left
-  corner), the label and the dataset count. Styled by home.css. Place it
-  under an h2: category titles are h3.
+  A card shows the icon (flush with its bottom-left corner), the label and
+  the dataset count. A filter box above the columns narrows the cards by
+  name as you type (the eov-filter module); the columns themselves stay put,
+  and one with no match says so. It needs JavaScript, so it stays hidden
+  without it. Styled by home.css. Place it under an h2: category
+  titles are h3.
 
   Example:
     {% snippet 'home/snippets/eov_ranked.html' %}
 #}
+{% asset 'ckanext-cioos_theme/eov_filter_js' %}
 {% set icon_base = h.cioos_get_eov_icon_base_path() or '/base/images/eov-icons-svg/' %}
 {% set groups = h.cioos_eov_categories() %}
-{# Cards shown per category before "Show N more"; the most used ones, since
-   cards are ranked by dataset count. #}
-{% set visible = 4 %}
 
-{% macro eov_card(item) -%}
-  {%- set label = _(h.scheming_language_text(item.display_name)) %}
-  {%- set img_url = item.image_display_url or h.url_for_static(icon_base + item.get('icon')) %}
+<div class="eov-ranked-view" data-module="eov-filter" data-module-no-match="{{ _('No ocean variable matches your filter.') }}">
+  <div class="eov-filter" hidden>
+    <i class="fas fa-search eov-filter-icon" aria-hidden="true"></i>
+    <input
+      type="search"
+      class="eov-filter-input"
+      id="eov-filter-input"
+      aria-label="{{ _('Filter ocean variables') }}"
+      placeholder="{{ _('Filter ocean variables') }}"
+      autocomplete="off"
+    />
+  </div>
+  {#- Announces "no matches" to screen readers; empty otherwise. #}
+  <p class="eov-filter-status" role="status" aria-live="polite"></p>
+
+  <div class="eov-ranked-columns">
+    {%- for group in groups %}
+      {%- set slug = group.category|lower|replace(' ', '-') %}
+    <section class="eov-category" id="eov-{{ slug }}" aria-labelledby="eov-{{ slug }}-title">
+      <h3 class="eov-title" id="eov-{{ slug }}-title">{{ _(group.category) }}</h3>
+      <ul class="eov-ranked">
+        {%- for item in group.eovs %}
+          {%- set label = _(h.scheming_language_text(item.display_name)) %}
+          {%- set img_url = item.image_display_url or h.url_for_static(icon_base + item.get('icon')) %}
         <li class="eov-row{{ ' eov-row--empty' if item.count == 0 }}">
           {%- if item.count > 0 %}
           <a class="eov-row-link" href="{{ h.url_for('dataset.search', eov=item.name) }}" title="{{ label }}">
@@ -37,34 +58,11 @@
             </span>
           {{ '</a>'|safe if item.count > 0 else '</span>'|safe }}
         </li>
-{%- endmacro %}
-
-<div class="eov-ranked-columns">
-  {%- for group in groups %}
-    {%- set slug = group.category|lower|replace(' ', '-') %}
-    {%- set more = group.eovs[visible:] %}
-    <section class="eov-category" id="eov-{{ slug }}" aria-labelledby="eov-{{ slug }}-title">
-      <h3 class="eov-title" id="eov-{{ slug }}-title">{{ _(group.category) }}</h3>
-      <div class="eov-panel">
-        <ul class="eov-ranked">
-          {%- for item in group.eovs[:visible] %}{{ eov_card(item) }}{% endfor %}
-        </ul>
-        {%- if more %}
-        {#- Native disclosure: works without JavaScript, by keyboard and with
-            screen readers. home.css orders the summary after the extra cards,
-            so the button stays at the base of the panel, and swaps its text
-            when open. #}
-        <details class="eov-more">
-          <summary class="eov-more-toggle">
-            <span class="eov-more-closed">{{ _('Show {num} more').format(num=more|length) }}</span>
-            <span class="eov-more-open">{{ _('Show fewer') }}</span>
-          </summary>
-          <ul class="eov-ranked">
-            {%- for item in more %}{{ eov_card(item) }}{% endfor %}
-          </ul>
-        </details>
-        {%- endif %}
-      </div>
+        {%- endfor %}
+        {#- Shown by the filter when none of this category's cards match. #}
+        <li class="eov-ranked-none" hidden>{{ _('No match') }}</li>
+      </ul>
     </section>
-  {%- endfor %}
+    {%- endfor %}
+  </div>
 </div>

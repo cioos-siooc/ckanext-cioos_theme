@@ -297,6 +297,83 @@ a.eov-link:hover {
    Each category is a panel of cards sorted by dataset count. A card is the
    icon, filling the card's full inner height on the left, then the label
    with the count under it, centred vertically. */
+/* The ranked view puts its filter box on the same line as the section
+   subtitle (default_home.html's h2). The snippet's wrapper drops out of
+   layout (display: contents) so the filter, status line and columns become
+   grid items of the section next to the h2; the DOM is unchanged, so the
+   eov-filter module still finds everything inside its element. On narrow
+   screens the filter wraps under the subtitle. */
+.cioos-home .eov-section:has(> .eov-ranked-view) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 3rem;
+}
+.cioos-home .eov-section:has(> .eov-ranked-view) > .home-section-heading {
+  margin: 0;
+}
+.eov-ranked-view {
+  display: contents;
+}
+.eov-ranked-view > .eov-filter-status,
+.eov-ranked-view > .eov-ranked-columns {
+  grid-column: 1 / -1;
+}
+@media (max-width: 575.98px) {
+  .cioos-home .eov-section:has(> .eov-ranked-view) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Filter box (eov-filter module): a white pill with a search icon, sized for
+   a few words. */
+.eov-filter {
+  position: relative;
+  width: min(22rem, 100%);
+}
+.eov-filter-icon {
+  position: absolute;
+  top: 50%;
+  left: 0.875rem;
+  transform: translateY(-50%);
+  font-size: 0.8125rem;
+  /* Muted grey, ~5.7:1 on white with the default palette. */
+  color: color-mix(in srgb, var(--cioos-light-color) 75%, var(--bs-body-bg));
+  pointer-events: none;
+}
+.eov-filter-input {
+  width: 100%;
+  padding: 0.5rem 0.875rem 0.5rem 2.25rem;
+  border: 1px solid var(--bs-border-color);
+  border-radius: 999px;
+  background: var(--bs-body-bg);
+  color: var(--bs-body-color);
+  font-size: 0.875rem;
+}
+.eov-filter-input:focus {
+  outline: 2px solid var(--cioos-primary-dark);
+  outline-offset: 1px;
+  border-color: var(--cioos-primary-dark);
+}
+/* A category's "No match" line while the filter hides all its cards. */
+.eov-ranked-none {
+  padding: 0.5rem;
+  font-size: 0.8125rem;
+  text-align: center;
+  /* Muted grey, ~5.1:1 on the panel's light grey with the default palette. */
+  color: color-mix(in srgb, var(--cioos-light-color) 75%, var(--bs-body-bg));
+}
+/* Only takes space while it has a message ("no matches"). */
+.eov-filter-status:empty {
+  display: none;
+}
+.eov-filter-status {
+  margin: 0;
+  font-size: 0.875rem;
+  color: color-mix(in srgb, var(--cioos-light-color) 75%, var(--bs-body-bg));
+}
+
 /* One column per category (four with the default settings), each at least
    14rem wide: narrower screens drop to two columns, then one. A grid rather
    than CSS columns, so expanding one category never moves the others. */
@@ -310,73 +387,17 @@ a.eov-link:hover {
 .eov-ranked-columns .eov-title {
   margin-top: 0;
 }
-.eov-panel {
-  padding: 0.5rem;
-  background: var(--cioos-light-bg);
-  border-radius: 1rem;
-}
-/* Cards stack one per row inside each category panel. */
+/* Each category is one panel (the list itself) with its cards stacked one
+   per row. */
 .eov-ranked {
   list-style: none;
   margin: 0;
-  padding: 0;
+  padding: 0.5rem;
+  background: var(--cioos-light-bg);
+  border-radius: 1rem;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: 0.5rem;
-}
-/* "Show N more": the remaining cards plus a quiet text button at the base
-   of the panel. The disclosure is a flex column with the button ordered
-   last, so it stays under the cards when open and the hidden cards continue
-   the stack with the same 0.5rem gap as the first ones. Once open it reads
-   "Show fewer". (Browsers that can't lay out <details> as flex keep the
-   button above the extra cards.) */
-.eov-more {
-  display: flex;
-  flex-direction: column;
-}
-.eov-more > .eov-ranked {
-  margin-top: 0.5rem;
-}
-.eov-more-toggle {
-  order: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.25rem;
-  margin-top: 0.375rem;
-  padding: 0.125rem 0.25rem;
-  border-radius: 0.375rem;
-  /* Muted grey, ~5.7:1 on the panel's light grey with the default palette. */
-  color: color-mix(in srgb, var(--cioos-light-color) 75%, var(--bs-body-bg));
-  font-size: 0.75rem;
-  font-weight: 500;
-  cursor: pointer;
-  list-style: none;
-}
-.eov-more-toggle::-webkit-details-marker {
-  display: none;
-}
-.eov-more-toggle::after {
-  content: "";
-  width: 0.3rem;
-  height: 0.3rem;
-  border-right: 1.5px solid currentColor;
-  border-bottom: 1.5px solid currentColor;
-  transform: translateY(-0.1rem) rotate(45deg);
-}
-.eov-more[open] > .eov-more-toggle::after {
-  transform: translateY(0.05rem) rotate(-135deg);
-}
-.eov-more-toggle:hover {
-  color: var(--cioos-primary-dark);
-}
-.eov-more-toggle:focus-visible {
-  outline: 2px solid var(--cioos-primary-dark);
-  outline-offset: 1px;
-}
-.eov-more:not([open]) .eov-more-open,
-.eov-more[open] .eov-more-closed {
-  display: none;
 }
 .eov-row-link {
   /* Fits a two-line label and the count beside a 54px icon. */
