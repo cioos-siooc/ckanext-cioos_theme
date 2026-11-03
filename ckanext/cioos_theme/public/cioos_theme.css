@@ -38,8 +38,20 @@ html {
   overscroll-behavior: none;
 }
 
+/* Sticky footer: the body is at least as tall as the viewport and the footer
+   takes up the slack above it, so on short pages it still sits at the very
+   bottom with no blank space below. Body's children are plain blocks (skip
+   link, header, content, footer) plus fixed/hidden elements, so a flex
+   column doesn't change their size. */
 body {
   font-family: var(--cioos-base-font);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+body > footer {
+  margin-top: auto;
 }
 
 /* Sora font for all headings */
