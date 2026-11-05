@@ -9,18 +9,10 @@
   padding-bottom: 5rem;
 }
 
-/* ── Hero: title, search and dataset count on a soft primary tint ──
-   A light wash of primary that fades into the white page, with dark text:
-   the CIOOS banner above (#topmenu, also primary) stays the only strong
-   teal block, and dark-on-light keeps its contrast whatever colours a
-   region sets. */
+/* ── Hero: title, search and dataset count on the plain page background ──
+   The CIOOS banner above (#topmenu, primary) stays the only teal block. */
 .cioos-home .home-hero {
   color: var(--cioos-light-color);
-  background: linear-gradient(
-    180deg,
-    color-mix(in srgb, var(--cioos-primary) 14%, var(--bs-body-bg)),
-    var(--bs-body-bg)
-  );
   padding: clamp(2.5rem, 1.5rem + 4vw, 5rem) 0 clamp(2rem, 1.25rem + 3vw, 3.5rem);
   text-align: center;
 }
@@ -29,8 +21,8 @@
   font-weight: 700;
   line-height: 1.1;
   letter-spacing: -0.02em;
-  /* Large text: ~4.3:1 on the tint, above the 3:1 AA needs at this size. */
-  color: var(--cioos-primary-dark);
+  /* The original title grey (#707070 on white), ~5:1. */
+  color: color-mix(in srgb, var(--cioos-light-color) 70%, var(--bs-body-bg));
   margin: 0 0 1.75rem;
 }
 .cioos-home .home-hero-title span {
@@ -47,7 +39,7 @@
   box-shadow: var(--bs-box-shadow-sm);
 }
 /* The input draws no outline of its own; the whole pill shows focus.
-   Primary-dark rather than accent: coral on the tint is under the 3:1 a
+   Primary-dark rather than accent: coral on white is under the 3:1 a
    focus ring needs. */
 .cioos-home .home-search:focus-within {
   outline: 3px solid var(--cioos-primary-dark);
@@ -78,7 +70,7 @@
 .cioos-home .home-hero-count {
   margin: 1.25rem 0 0;
   font-weight: 300;
-  /* Muted, ~5.9:1 on the tint with the default palette. */
+  /* Muted, ~7:1 on white with the default palette. */
   color: color-mix(in srgb, var(--cioos-light-color) 80%, var(--bs-body-bg));
 }
 .cioos-home .home-hero-count a {
@@ -94,15 +86,17 @@
   font-weight: 600;
   margin: 3rem 0 1rem;
 }
-/* The "Essential Ocean Variables" link to GOOS: theme teal, underlined so it
-   reads as a link inside the heading. Darkened primary-dark is ~6:1 on white. */
+/* The "Essential Ocean Variables" link to GOOS: theme teal, which sets it
+   apart from the heading text; underlined only on hover. Darkened
+   primary-dark is ~6:1 on white. */
 .cioos-home .home-section-heading a {
   color: color-mix(in srgb, var(--cioos-primary-dark) 80%, black);
-  text-decoration: underline;
-  text-underline-offset: 0.2em;
+  text-decoration: none;
 }
 .cioos-home .home-section-heading a:hover {
   color: var(--cioos-primary-dark);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
 }
 
 .eov-link:focus-visible {
@@ -184,9 +178,10 @@ a.eov-link:hover {
 .eov-label {
   min-width: 0;
   margin: 0;
-  /* Wrap only at spaces (core allows mid-word breaks and hyphenation). */
+  /* Wrap at spaces (core allows mid-word breaks and hyphenation); a single
+     word wider than the card still breaks rather than spilling out. */
   word-break: normal;
-  overflow-wrap: normal;
+  overflow-wrap: break-word;
   hyphens: none;
 }
 /* Count tab filling the card's square top-right corner. It sits over the
@@ -217,8 +212,11 @@ a.eov-link:hover {
 .eov-grid--tile {
   grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
 }
+/* A minimum, not a fixed height: a label wrapping to three lines grows its
+   card (and, through the grid row, the cards beside it) instead of
+   overflowing the bottom edge. */
 .eov-grid--tile .eov-item {
-  height: 220px;
+  min-height: 220px;
 }
 .eov-grid--tile .eov-link {
   flex-direction: column;
@@ -255,7 +253,7 @@ a.eov-link:hover {
   /* Shorter than the card and aligned to the bottom, filling its
      bottom-left corner; other corners square. It is taller than the
      space under the count tab and extends into the link's top padding,
-     which only the tab on the right side needs. */
+     which only the pill on the right side needs. */
   align-self: flex-end;
   border-radius: 0 0 0 1rem;
 }
