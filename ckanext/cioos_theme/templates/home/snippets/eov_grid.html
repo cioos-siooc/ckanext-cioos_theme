@@ -1,10 +1,7 @@
 {#
-  Essential Ocean Variable cards, grouped by category in a fixed order, with
-  a row of category chips above them. Shared by every home page template;
-  styled by home.css. Place it under an h2: category titles are h3.
-
-  Without JavaScript the chips are links that jump to their category; the
-  eov-categories module turns them into filters that show one category.
+  Essential Ocean Variable cards, grouped by category in a fixed order.
+  Shared by every home page template; styled by home.css. Place it under an
+  h2: category titles are h3.
 
   variant         - 'tile' (large icon above the label) or 'compact' (small
                     icon beside the label). Default: 'tile'.
@@ -17,13 +14,10 @@
 {% set truncate_length = truncate_length or 45 %}
 {% set groups = h.cioos_eov_categories() %}
 
-<div class="eov-categories" data-module="eov-categories">
-  {% snippet 'home/snippets/eov_category_chips.html', categories=groups|map(attribute='category')|list %}
-
-  <div id="eov-all">
+<div class="eov-categories">
   {%- for group in groups %}
     {%- set slug = group.category|lower|replace(' ', '-') %}
-    <section class="eov-category" id="eov-{{ slug }}" data-category="{{ slug }}" data-eov-filter-item aria-labelledby="eov-{{ slug }}-title">
+    <section class="eov-category" id="eov-{{ slug }}" aria-labelledby="eov-{{ slug }}-title">
       <h3 class="eov-title" id="eov-{{ slug }}-title">{{ _(group.category) }}</h3>
       <ul class="eov-grid eov-grid--{{ variant }}">
         {%- for item in group.eovs|sort(attribute='name') %}
@@ -53,5 +47,4 @@
       </ul>
     </section>
   {%- endfor %}
-  </div>
 </div>

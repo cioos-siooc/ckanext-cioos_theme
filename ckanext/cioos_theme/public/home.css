@@ -1,6 +1,6 @@
 /*
   Home page styles for home/default_home.html and home/default_home_compact.html,
-  plus the EOV cards and category chips (home/snippets/eov_grid.html), which
+  plus the EOV cards (home/snippets/eov_grid.html), which
   default_home_v2.html also uses. Loaded through the home_css asset, so only
   home pages pull it in.
 */
@@ -105,39 +105,6 @@
   color: var(--cioos-primary-dark);
 }
 
-/* ── EOV category chips ── */
-.eov-chips {
-  display: flex;
-  gap: 0.5rem;
-  /* One scrolling row on narrow screens rather than several wrapped ones. */
-  overflow-x: auto;
-  padding: 0.25rem 0.25rem 0.75rem;
-  margin: 0 -0.25rem 0.5rem;
-  scrollbar-width: thin;
-}
-.eov-chip {
-  flex-shrink: 0;
-  padding: 0.4rem 1rem;
-  border: 1px solid var(--bs-border-color);
-  border-radius: 999px;
-  background: var(--bs-body-bg);
-  color: var(--cioos-light-color);
-  font-size: 0.875rem;
-  font-weight: 600;
-  text-decoration: none;
-  white-space: nowrap;
-}
-.eov-chip:hover {
-  border-color: var(--cioos-primary);
-  color: var(--cioos-primary-dark);
-  text-decoration: none;
-}
-.eov-chip[aria-pressed="true"] {
-  border-color: var(--cioos-primary-dark);
-  background: var(--cioos-primary-dark);
-  color: var(--bs-white);
-}
-.eov-chip:focus-visible,
 .eov-link:focus-visible {
   outline: 2px solid var(--cioos-primary-dark);
   outline-offset: 2px;
