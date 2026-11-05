@@ -85,7 +85,7 @@
       {# EOV grid — visible on desktop, collapsible on mobile #}
       <div class="collapse show" id="homeEovGrid">
         {% block eov_list %}
-          {% set eov = h.cioos_get_eovs(show_all=True) %}
+          {% set eov = h.cioos_get_eovs(show_all=not h.cioos_hide_unavailable_eovs()) %}
           {% for grouper, list in eov|rejectattr('category', 'undefined')|groupby('category') %}
             {% if grouper and grouper not in h.cioos_get_exclude_eov_category() %}
               <div class="home-eov-category-label">{{ _(grouper) }}</div>

@@ -43,6 +43,8 @@
 
       {{ form.input('ckan.exclude_eov', id='field-ckan-exclude-eov', label=_('Exlcude individul eov\'s'), value=data['ckan.exclude_eov'], error=error) }}
 
+      {{ form.input('ckan.hide_unavailable_eovs', id='field-ckan-hide-unavailable-eovs', label=_('Hide EOVs with no datasets on the home page'), value=data['ckan.hide_unavailable_eovs'], error=error) }}
+
       {{ form.input('ckan.eov_icon_base_path', id='field-ckan-eov-icon-base-path', label=_('EOV Icon Base Path'), value=data['ckan.eov_icon_base_path'], error=error) }}
 
       {{ form.input('ckan.header_file_name', id='field-ckan-header-file-name', label=_('Custom header filename'), value=data['ckan.header_file_name'], error=error) }}

@@ -414,6 +414,8 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             "['marineTurtlesBirdsMammalsAbundanceAndDistribution']",
         )
         declaration.declare(key.ckan.eov_icon_base_path, "/base/images/eov-icons-svg/")
+        # hide home page eov's that no dataset uses instead of greying them out
+        declaration.declare(key.ckan.hide_unavailable_eovs, "false")
         declaration.declare(key.ckan.header_file_name, "")
         declaration.declare(key.ckan.footer_file_name, "")
         declaration.declare(key.ckan.site_about_markdown_file, "")
@@ -657,6 +659,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                 "ckan.exclude_eov_category": [ignore_missing],
                 "ckan.exclude_eov": [ignore_missing],
                 "ckan.eov_icon_base_path": [ignore_missing],
+                "ckan.hide_unavailable_eovs": [ignore_missing, boolean_validator],
                 "ckan.header_file_name": [ignore_missing],
                 "ckan.footer_file_name": [ignore_missing],
                 "ckan.show_social_in_dataset_sidebar": [
@@ -736,6 +739,9 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             ),
             "cioos_get_eov_icon_base_path": lambda: toolkit.config.get(
                 "ckan.eov_icon_base_path", "/base/images/eov-icons-svg/"
+            ),
+            "cioos_hide_unavailable_eovs": lambda: toolkit.asbool(
+                toolkit.config.get("ckan.hide_unavailable_eovs", False)
             ),
             "cioos_get_exclude_eov": lambda: toolkit.config.get("ckan.exclude_eov"),
             "cioos_get_exclude_eov_category": lambda: toolkit.config.get(

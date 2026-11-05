@@ -184,7 +184,7 @@
       <div class="col-md-12 col1 module-content-end">
         <h3 class="heading">{{ _('Search By Ocean Variable:') }}</h3>
         <div class="module-content box">
-          {% block eov_list %} {% set eov = h.cioos_get_eovs(show_all=True) %}
+          {% block eov_list %} {% set eov = h.cioos_get_eovs(show_all=not h.cioos_hide_unavailable_eovs()) %}
           {% for grouper, list in eov|rejectattr('category',
           'undefined')|groupby('category') %} {% if grouper and grouper not in
           h.cioos_get_exclude_eov_category() %}
