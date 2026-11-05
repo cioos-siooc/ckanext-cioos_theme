@@ -26,8 +26,15 @@
       </title>
 
       {% block links -%}
+      {#- ckan.favicon (CKAN__FAVICON) replaces the CIOOS icons; CKAN's own
+          default (/base/images/ckan.ico) counts as unset. -#}
+      {%- set favicon = g.favicon -%}
+      {%- if favicon and favicon != '/base/images/ckan.ico' %}
+      <link rel="icon" href="{{ h.url_for_static_or_external(favicon) }}" />
+      {%- else %}
       <link rel="icon" href="{{ h.url_for_static('/base/images/cioos_favicon.ico') }}" sizes="any" />
       <link rel="icon" href="{{ h.url_for_static('/base/images/cioos_favicon.svg') }}" type="image/svg+xml" />
+      {%- endif %}
       {% endblock -%} {# Critical CSS - prevents FOUC by establishing layout
       before main CSS loads #}
       <style>
