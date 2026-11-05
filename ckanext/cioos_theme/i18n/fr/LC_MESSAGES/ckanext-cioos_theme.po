@@ -804,3 +804,38 @@ msgstr "Ajouter une capture d'écran"
 
 msgid "Remove screenshot"
 msgstr "Supprimer la capture d'écran"
+
+# Home page (home/default_home.html and its EOV snippets)
+msgid "Search by {eovs}"
+msgstr "Recherche par {eovs}"
+
+msgid "Filter ocean variables"
+msgstr "Filtrer les variables océaniques"
+
+msgid "No match"
+msgstr "Aucun résultat"
+
+msgid "No ocean variable matches your filter."
+msgstr "Aucune variable océanique ne correspond à votre filtre."
+
+msgid "Ocean variable categories"
+msgstr "Catégories de variables océaniques"
+
+msgid "All"
+msgstr "Toutes"
+
+msgid "datasets"
+msgstr "jeux de données"
+
+msgid "no datasets"
+msgstr "aucun jeu de données"
+
+# Home page v2 (home/default_home_v2.html)
+msgid "Advanced Filters"
+msgstr "Filtres avancés"
+
+msgid "Browse by Ocean Variable"
+msgstr "Parcourir par variable océanique"
+
+msgid "Search Datasets"
+msgstr "Rechercher des jeux de données"
