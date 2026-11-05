@@ -406,7 +406,9 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         declaration.declare(key.ckan.site_heading, "")
         declaration.declare(key.ckan.site_logo_translated, "")
         declaration.declare(key.ckan.site_home_url, "")
-        declaration.declare(key.ckan.exclude_eov_category, "")
+        # the catch-all "Other" category is hidden from the home page eov list
+        # by default; set it to "" to show it
+        declaration.declare(key.ckan.exclude_eov_category, "['Other']")
         # deprecated eov's stay valid on existing datasets but are hidden from
         # the home page eov list by default
         declaration.declare(
@@ -705,6 +707,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             "cioos_datasets": cioos_helpers.cioos_datasets,
             "cioos_count_datasets": cioos_helpers.cioos_count_datasets,
             "cioos_get_eovs": cioos_helpers.cioos_get_eovs,
+            "cioos_eov_categories": cioos_helpers.cioos_eov_categories,
             "cioos_get_locale_url": self.get_locale_url,
             "cioos_schema_field_map": cioos_helpers.cioos_schema_field_map,
             "cioos_get_additional_css_path": self.get_additional_css_path,
@@ -740,12 +743,9 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             "cioos_get_eov_icon_base_path": lambda: toolkit.config.get(
                 "ckan.eov_icon_base_path", "/base/images/eov-icons-svg/"
             ),
-            "cioos_hide_unavailable_eovs": lambda: toolkit.asbool(
-                toolkit.config.get("ckan.hide_unavailable_eovs", False)
-            ),
             "cioos_get_exclude_eov": lambda: toolkit.config.get("ckan.exclude_eov"),
             "cioos_get_exclude_eov_category": lambda: toolkit.config.get(
-                "ckan.exclude_eov_category", ""
+                "ckan.exclude_eov_category"
             ),
             "cioos_show_social_in_dataset_sidebar": lambda: toolkit.asbool(
                 toolkit.config.get("ckan.show_social_in_dataset_sidebar", False)

@@ -26,3 +26,35 @@ def test_theme_color_overrides_drops_non_hex_values():
 @pytest.mark.ckan_config("ckan.cioos.primary_color", "#1b6ca8")
 def test_theme_color_overrides_rendered_in_page(app):
     assert ":root { --cioos-primary: #1b6ca8; }" in app.get("/dataset/").body
+
+
+
+def _eov(name, category="Physical", count=0):
+    return {"name": name, "category": category, "count": count}
+
+
+def test_eov_categories_orders_categories_and_ranks_by_count():
+    from ckanext.cioos_theme.helpers import eov_categories
+
+    groups = eov_categories([
+        _eov("oxygen", category="Biogeochemical", count=926),
+        _eov("brandNew", category="Aardvark", count=3),
+        _eov("seaState", count=29),
+        _eov("seaSurfaceTemperature", count=286),
+    ])
+
+    # Fixed order first; categories outside it follow alphabetically.
+    assert [g["category"] for g in groups] == ["Physical", "Biogeochemical", "Aardvark"]
+    assert [x["name"] for x in groups[0]["eovs"]] == ["seaSurfaceTemperature", "seaState"]
+
+
+def test_eov_categories_applies_exclusions_and_handles_no_counts():
+    from ckanext.cioos_theme.helpers import eov_categories
+
+    groups = eov_categories(
+        [{"name": "seaState", "category": "Physical"}, _eov("oxygen", category="Biogeochemical"), _eov("seaIce")],
+        exclude_eov="['seaIce']",
+        exclude_category="Biogeochemical",
+    )
+
+    assert groups == [{"category": "Physical", "eovs": [_eov("seaState")]}]

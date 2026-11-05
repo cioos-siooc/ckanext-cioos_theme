@@ -1,0 +1,8 @@
+{#
+  Variant of default_home.html whose EOV cards are compact, ranked by
+  dataset count within each category, and carry a count bar.
+
+  To use this template, set in .env:
+    CKAN__HOMEPAGE_TEMPLATE=home/default_home_compact.html
+#}
+{% snippet 'home/default_home.html', eov_layout='ranked' %}

@@ -482,6 +482,59 @@ def cioos_get_eovs(show_all=False):
     return output
 
 
+# Display order of EOV categories on the home page; any other category
+# follows alphabetically.
+EOV_CATEGORY_ORDER = (
+    "Physical",
+    "BioEcosystems",
+    "Biogeochemical",
+    "Cross-disciplinary",
+    "Other",
+)
+
+
+def eov_categories(eovs, exclude_eov="", exclude_category=""):
+    """Group EOVs by category for the home page.
+
+    Returns ``[{"category": name, "eovs": [eov, ...]}, ...]`` in
+    EOV_CATEGORY_ORDER. EOVs in a category are sorted by dataset count,
+    largest first; a missing count becomes 0.
+
+    ``exclude_eov`` / ``exclude_category`` are the raw config strings; an EOV
+    is skipped when its name / category appears in them.
+    """
+    eovs = [
+        x for x in eovs
+        if x.get("category")
+        and x["category"] not in (exclude_category or "")
+        and x["name"] not in (exclude_eov or "")
+    ]
+    groups = {}
+    for x in eovs:
+        groups.setdefault(x["category"], []).append(dict(x, count=x.get("count") or 0))
+    rank = {name: i for i, name in enumerate(EOV_CATEGORY_ORDER)}
+    return [
+        {"category": category, "eovs": sorted(items, key=lambda x: (-x["count"], x["name"]))}
+        for category, items in sorted(
+            groups.items(), key=lambda kv: (rank.get(kv[0], len(rank)), kv[0])
+        )
+    ]
+
+
+def cioos_eov_categories():
+    """eov_categories() for the home page, with site exclusions.
+
+    Lists every EOV in the schema, or only those with datasets when
+    ckan.hide_unavailable_eovs is set.
+    """
+    hide_unavailable = toolkit.asbool(toolkit.config.get("ckan.hide_unavailable_eovs", False))
+    return eov_categories(
+        cioos_get_eovs(show_all=not hide_unavailable),
+        toolkit.config.get("ckan.exclude_eov"),
+        toolkit.config.get("ckan.exclude_eov_category"),
+    )
+
+
 def cioos_count_datasets():
     """Return a count of datasets"""
     user = logic.get_action("get_site_user")({"model": model, "ignore_auth": True}, {})

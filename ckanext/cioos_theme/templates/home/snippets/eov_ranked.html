@@ -1,0 +1,68 @@
+{#
+  Essential Ocean Variables by category: one column per category (up to
+  four), each a panel of cards ranked by dataset count, stacked one per row.
+  A card shows the icon (flush with its bottom-left corner), the label and
+  the dataset count. A filter box above the columns narrows the cards by
+  name as you type (the eov-filter module); the columns themselves stay put,
+  and one with no match says so. It needs JavaScript, so it stays hidden
+  without it. Styled by home.css. Place it under an h2: category
+  titles are h3.
+
+  Example:
+    {% snippet 'home/snippets/eov_ranked.html' %}
+#}
+{% asset 'ckanext-cioos_theme/eov_filter_js' %}
+{% set icon_base = h.cioos_get_eov_icon_base_path() or '/base/images/eov-icons-svg/' %}
+{% set groups = h.cioos_eov_categories() %}
+
+<div class="eov-ranked-view" data-module="eov-filter" data-module-no-match="{{ _('No ocean variable matches your filter.') }}">
+  <div class="eov-filter" hidden>
+    <i class="fas fa-search eov-filter-icon" aria-hidden="true"></i>
+    <input
+      type="search"
+      class="eov-filter-input"
+      id="eov-filter-input"
+      aria-label="{{ _('Filter ocean variables') }}"
+      placeholder="{{ _('Filter ocean variables') }}"
+      autocomplete="off"
+    />
+  </div>
+  {#- Announces "no matches" to screen readers; empty otherwise. #}
+  <p class="eov-filter-status" role="status" aria-live="polite"></p>
+
+  <div class="eov-ranked-columns">
+    {%- for group in groups %}
+      {%- set slug = group.category|lower|replace(' ', '-') %}
+    <section class="eov-category" id="eov-{{ slug }}" aria-labelledby="eov-{{ slug }}-title">
+      <h3 class="eov-title" id="eov-{{ slug }}-title">{{ _(group.category) }}</h3>
+      <ul class="eov-ranked">
+        {%- for item in group.eovs %}
+          {%- set label = _(h.scheming_language_text(item.display_name)) %}
+          {%- set img_url = item.image_display_url or h.url_for_static(icon_base + item.get('icon')) %}
+        <li class="eov-row{{ ' eov-row--empty' if item.count == 0 }}">
+          {%- if item.count > 0 %}
+          <a class="eov-row-link" href="{{ h.url_for('dataset.search', eov=item.name) }}" title="{{ label }}">
+          {%- else %}
+          {#- A variable with no datasets is not a link: its search would be empty. #}
+          <span class="eov-row-link" title="{{ label }}">
+          {%- endif %}
+            {#- Decorative: the label beside it names the variable. #}
+            <img class="eov-row-icon" src="{{ img_url }}" alt="" loading="lazy" />
+            <span class="eov-row-text">
+              <span class="eov-row-label">{{ label }}</span>
+              {%- if item.count > 0 %}
+              <span class="eov-row-count">{{ h.localised_number(item.count) }}<span class="visually-hidden"> {{ _('datasets') }}</span></span>
+              {%- else %}
+              <span class="eov-row-count"><span aria-hidden="true">–</span><span class="visually-hidden">{{ _('no datasets') }}</span></span>
+              {%- endif %}
+            </span>
+          {{ '</a>'|safe if item.count > 0 else '</span>'|safe }}
+        </li>
+        {%- endfor %}
+        {#- Shown by the filter when none of this category's cards match. #}
+        <li class="eov-ranked-none" hidden>{{ _('No match') }}</li>
+      </ul>
+    </section>
+    {%- endfor %}
+  </div>
+</div>

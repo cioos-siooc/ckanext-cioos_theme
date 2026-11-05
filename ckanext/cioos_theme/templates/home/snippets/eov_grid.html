@@ -1,0 +1,58 @@
+{#
+  Essential Ocean Variable cards, grouped by category in a fixed order, with
+  a row of category chips above them. Shared by every home page template;
+  styled by home.css. Place it under an h2: category titles are h3.
+
+  Without JavaScript the chips are links that jump to their category; the
+  eov-categories module turns them into filters that show one category.
+
+  variant         - 'tile' (large icon above the label) or 'compact' (small
+                    icon beside the label). Default: 'tile'.
+  truncate_length - maximum label length before truncation. Default: 45.
+
+  Example:
+    {% snippet 'home/snippets/eov_grid.html', variant='compact' %}
+#}
+{% set variant = variant or 'tile' %}
+{% set truncate_length = truncate_length or 45 %}
+{% set icon_base = h.cioos_get_eov_icon_base_path() or '/base/images/eov-icons-svg/' %}
+{% set groups = h.cioos_eov_categories() %}
+
+<div class="eov-categories" data-module="eov-categories">
+  {% snippet 'home/snippets/eov_category_chips.html', categories=groups|map(attribute='category')|list %}
+
+  <div id="eov-all">
+  {%- for group in groups %}
+    {%- set slug = group.category|lower|replace(' ', '-') %}
+    <section class="eov-category" id="eov-{{ slug }}" data-category="{{ slug }}" data-eov-filter-item aria-labelledby="eov-{{ slug }}-title">
+      <h3 class="eov-title" id="eov-{{ slug }}-title">{{ _(group.category) }}</h3>
+      <ul class="eov-grid eov-grid--{{ variant }}">
+        {%- for item in group.eovs|sort(attribute='name') %}
+          {%- set label = _(h.scheming_language_text(item.display_name)) %}
+          {%- set label_truncated = label|truncate(truncate_length, killwords=True) %}
+          {%- set count = item.count %}
+          {%- set img_url = item.image_display_url or h.url_for_static(icon_base + item.get('icon')) %}
+          {%- set title_attr = (' title="%s"'|format(label|e))|safe if label != label_truncated else '' %}
+        <li class="eov-item{{ ' eov-item--empty' if count == 0 }}">
+          {#- A variable with no datasets is not a link: its search would be empty. #}
+          {%- if count > 0 %}
+          <a class="eov-link" href="{{ h.url_for('dataset.search', eov=item.name) }}"{{ title_attr }}>
+          {%- else %}
+          <span class="eov-link"{{ title_attr }}>
+          {%- endif %}
+            {#- Decorative: the label beside it names the variable. #}
+            <img class="eov-icon" src="{{ img_url }}" alt="" loading="lazy" />
+            <span class="eov-label">{{ label_truncated }}</span>
+            {%- if count > 0 %}
+            <span class="eov-badge">{{ h.localised_number(count) }}<span class="visually-hidden"> {{ _('datasets') }}</span></span>
+            {%- else %}
+            <span class="visually-hidden">({{ _('no datasets') }})</span>
+            {%- endif %}
+          {{ '</a>'|safe if count > 0 else '</span>'|safe }}
+        </li>
+        {%- endfor %}
+      </ul>
+    </section>
+  {%- endfor %}
+  </div>
+</div>

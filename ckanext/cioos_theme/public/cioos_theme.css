@@ -38,8 +38,20 @@ html {
   overscroll-behavior: none;
 }
 
+/* Sticky footer: the body is at least as tall as the viewport and the footer
+   takes up the slack above it, so on short pages it still sits at the very
+   bottom with no blank space below. Body's children are plain blocks (skip
+   link, header, content, footer) plus fixed/hidden elements, so a flex
+   column doesn't change their size. */
 body {
   font-family: var(--cioos-base-font);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+body > footer {
+  margin-top: auto;
 }
 
 /* Sora font for all headings */
@@ -1768,16 +1780,6 @@ td .panel {
   white-space: pre-wrap;
 }
 
-/* Media item disabled state */
-.media-item-disabled:active {
-  pointer-events: none;
-}
-
-.media-item-disabled {
-  pointer-events: auto;
-  opacity: 0.6;
-}
-
 /* Module headings */
 .module h3 {
   font-weight: 400;
@@ -1922,18 +1924,6 @@ td .panel {
     padding: 8px 12px;
     font-size: 14px;
   }
-}
-
-.eov-grid .media-item {
-  transition: transform 0.15s ease-in-out;
-  border: 1px solid #ddd;
-  .media-heading {
-    font-size: 14px;
-  }
-}
-
-.eov-grid .media-item:hover {
-  transform: scale(1.02);
 }
 
 /* ===========================================
