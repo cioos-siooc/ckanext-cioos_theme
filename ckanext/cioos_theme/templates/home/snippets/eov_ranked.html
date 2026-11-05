@@ -12,7 +12,6 @@
     {% snippet 'home/snippets/eov_ranked.html' %}
 #}
 {% asset 'ckanext-cioos_theme/eov_filter_js' %}
-{% set icon_base = h.cioos_get_eov_icon_base_path() or '/base/images/eov-icons-svg/' %}
 {% set groups = h.cioos_eov_categories() %}
 
 <div class="eov-ranked-view" data-module="eov-filter" data-module-no-match="{{ _('No ocean variable matches your filter.') }}">
@@ -38,7 +37,7 @@
       <ul class="eov-ranked">
         {%- for item in group.eovs %}
           {%- set label = _(h.scheming_language_text(item.display_name)) %}
-          {%- set img_url = item.image_display_url or h.url_for_static(icon_base + item.get('icon')) %}
+          {%- set img_url = h.cioos_eov_icon_url(item) %}
         <li class="eov-row{{ ' eov-row--empty' if item.count == 0 }}">
           {%- if item.count > 0 %}
           <a class="eov-row-link" href="{{ h.url_for('dataset.search', eov=item.name) }}" title="{{ label }}">

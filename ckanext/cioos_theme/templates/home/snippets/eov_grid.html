@@ -15,7 +15,6 @@
 #}
 {% set variant = variant or 'tile' %}
 {% set truncate_length = truncate_length or 45 %}
-{% set icon_base = h.cioos_get_eov_icon_base_path() or '/base/images/eov-icons-svg/' %}
 {% set groups = h.cioos_eov_categories() %}
 
 <div class="eov-categories" data-module="eov-categories">
@@ -31,7 +30,7 @@
           {%- set label = _(h.scheming_language_text(item.display_name)) %}
           {%- set label_truncated = label|truncate(truncate_length, killwords=True) %}
           {%- set count = item.count %}
-          {%- set img_url = item.image_display_url or h.url_for_static(icon_base + item.get('icon')) %}
+          {%- set img_url = h.cioos_eov_icon_url(item) %}
           {%- set title_attr = (' title="%s"'|format(label|e))|safe if label != label_truncated else '' %}
         <li class="eov-item{{ ' eov-item--empty' if count == 0 }}">
           {#- A variable with no datasets is not a link: its search would be empty. #}

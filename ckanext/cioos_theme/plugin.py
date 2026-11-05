@@ -15,7 +15,7 @@ from ckan.lib.plugins import DefaultTranslation
 from ckan.logic import NotFound
 from ckan.views.dataset import GroupView
 from ckantoolkit import _, g
-from flask import Blueprint
+from flask import Blueprint, make_response
 from pyld import jsonld
 from shapely.geometry import shape
 from six.moves.urllib.parse import urlparse
@@ -315,6 +315,21 @@ def cioos_is_valid_range(field, schema):
     return validator
 
 
+def render_eov_icon(filename):
+    """A bundled EOV icon in the configured icon color."""
+    if filename not in cioos_helpers.bundled_eov_icons():
+        toolkit.abort(404)
+    color = cioos_helpers.eov_icon_color()
+    if not color:
+        return toolkit.redirect_to(
+            toolkit.h.url_for_static(cioos_helpers.DEFAULT_EOV_ICON_BASE_PATH + filename)
+        )
+    response = make_response(cioos_helpers.recolored_eov_icon(filename, color))
+    response.mimetype = "image/svg+xml"
+    response.headers["Cache-Control"] = "public, max-age=86400"
+    return response
+
+
 def render_schemamap():
     return toolkit.render("schemamap.html")
 
@@ -440,6 +455,8 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         declaration.declare(key.ckan.cioos.primary_dark_color, "")
         declaration.declare(key.ckan.cioos.accent_color, "")
         declaration.declare(key.ckan.cioos.footer_color, "")
+        # bundled EOV icon color; empty follows ckan.cioos.primary_color
+        declaration.declare(key.ckan.cioos.eov_icon_color, "")
         declaration.declare(key.ckan.cioos.exclude_facets, "[]")
         declaration.declare(key.ckan.cioos.doi_authority_url, "https://doi.org/")
         declaration.declare(key.ckan.cioos.doi_prefix, "")
@@ -525,6 +542,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         blueprint = Blueprint("cioos", self.__module__)
         rules = [
             ("/schemamap", "schemamap", render_schemamap),
+            ("/eov-icon/<filename>", "eov_icon", render_eov_icon),
             ("/dataset/<id>.dcxml", "datacite_xml", render_datacite_xml),
             ("/dataset/<id>.basic", "package_basic", render_basic_package_view),
             ("/", "home", cioos_home_index),
@@ -712,6 +730,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             "cioos_schema_field_map": cioos_helpers.cioos_schema_field_map,
             "cioos_get_additional_css_path": self.get_additional_css_path,
             "cioos_theme_color_overrides": cioos_helpers.theme_color_overrides,
+            "cioos_eov_icon_url": cioos_helpers.eov_icon_url,
             "cioos_get_homepage_path": lambda: toolkit.config.get(
                 "ckan.homepage_template", "home/default_home.html"
             ),

@@ -7,6 +7,7 @@ available to Controllers. This module is available to templates as 'h'.
 """
 
 import copy
+import functools
 import json
 import logging
 import os
@@ -186,6 +187,58 @@ def theme_color_overrides():
         else:
             log.warning("Ignoring %s=%r: expected a hex color like #52a79b", key, value)
     return overrides
+
+
+DEFAULT_EOV_ICON_BASE_PATH = "/base/images/eov-icons-svg/"
+EOV_ICON_DIR = os.path.join(
+    os.path.dirname(__file__), "public", "base", "images", "eov-icons-svg"
+)
+# The single teal the bundled icons are drawn in (cioos-commons/eovs/logos,
+# synced here); their glyphs are white and stay white.
+EOV_ICON_TEAL_RE = re.compile(r"#51a79a", re.IGNORECASE)
+
+
+def eov_icon_color():
+    """
+    Color to draw the bundled EOV icons in: ckan.cioos.eov_icon_color, else
+    the primary color, else None (serve the icons as drawn).
+    """
+    for key in ("ckan.cioos.eov_icon_color", "ckan.cioos.primary_color"):
+        value = (toolkit.config.get(key) or "").strip()
+        if HEX_COLOR_RE.match(value):
+            return value
+        if value:
+            log.warning("Ignoring %s=%r: expected a hex color like #52a79b", key, value)
+    return None
+
+
+@functools.lru_cache(maxsize=None)
+def bundled_eov_icons():
+    return frozenset(f for f in os.listdir(EOV_ICON_DIR) if f.endswith(".svg"))
+
+
+@functools.lru_cache(maxsize=256)
+def recolored_eov_icon(filename, color):
+    """The bundled icon `filename` (must be in bundled_eov_icons) in `color`."""
+    with open(os.path.join(EOV_ICON_DIR, filename), encoding="utf-8") as f:
+        return EOV_ICON_TEAL_RE.sub(color, f.read())
+
+
+def eov_icon_url(item):
+    """
+    URL of an EOV's home page icon. A custom image_display_url wins; the
+    bundled icons are recolored when an icon color is set; icons from a
+    custom ckan.eov_icon_base_path are served as is.
+    """
+    if item.get("image_display_url"):
+        return item["image_display_url"]
+    icon = item.get("icon") or ""
+    base = toolkit.config.get("ckan.eov_icon_base_path") or DEFAULT_EOV_ICON_BASE_PATH
+    color = eov_icon_color()
+    if color and base == DEFAULT_EOV_ICON_BASE_PATH and icon in bundled_eov_icons():
+        # The color is in the URL only to bust caches when it changes.
+        return toolkit.url_for("cioos.eov_icon", filename=icon, c=color.lstrip("#"))
+    return toolkit.h.url_for_static(base + icon)
 
 
 def get_doi_authority_url():
