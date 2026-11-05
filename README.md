@@ -12,6 +12,14 @@ Current modifications include:
 * Copies keyword field into tags_en and tags_fr for easier indexing and searching by langauge
 * many small tweeks to page layout mostly to the dataset and home page.
 
+## Configuration
+
+Every config option this extension reads (site identity, header/footer, home
+page EOV list, dataset sidebar, facets, DataCite, brand colors) is documented in
+the [cioos-ckan-docker-base README](https://github.com/cioos-siooc/cioos-ckan-docker-base#theme-settings).
+The options are declared in `declare_config_options()` in
+`ckanext/cioos_theme/plugin.py`.
+
 
 ------------
 Requirements
