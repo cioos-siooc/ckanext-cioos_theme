@@ -114,15 +114,3 @@ def test_eov_icon_url_and_view_serve_recolored_icon(app, test_request_context):
     assert response.headers["Content-Type"].startswith("image/svg+xml")
     assert "#1b6ca8" in response.body
     app.get("/eov-icon/..%2Fplugin.py", status=404)
-
-
-@pytest.mark.usefixtures("with_plugins")
-@pytest.mark.ckan_config("ckan.cioos.primary_color", "#1b6ca8")
-def test_eov_icon_url_keeps_custom_base_path(test_request_context, monkeypatch):
-    import ckan.plugins.toolkit as toolkit
-    from ckanext.cioos_theme.helpers import eov_icon_url
-
-    # Set after plugin load: envvars re-applies .env over ckan_config markers.
-    monkeypatch.setitem(toolkit.config, "ckan.eov_icon_base_path", "/regional/icons/")
-    with test_request_context():
-        assert eov_icon_url({"icon": "currents.svg"}).endswith("/regional/icons/currents.svg")

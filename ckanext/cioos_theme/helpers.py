@@ -189,7 +189,7 @@ def theme_color_overrides():
     return overrides
 
 
-DEFAULT_EOV_ICON_BASE_PATH = "/base/images/eov-icons-svg/"
+EOV_ICON_STATIC_PATH = "/base/images/eov-icons-svg/"
 EOV_ICON_DIR = os.path.join(
     os.path.dirname(__file__), "public", "base", "images", "eov-icons-svg"
 )
@@ -227,18 +227,16 @@ def recolored_eov_icon(filename, color):
 def eov_icon_url(item):
     """
     URL of an EOV's home page icon. A custom image_display_url wins; the
-    bundled icons are recolored when an icon color is set; icons from a
-    custom ckan.eov_icon_base_path are served as is.
+    bundled icons are recolored when an icon color is set.
     """
     if item.get("image_display_url"):
         return item["image_display_url"]
     icon = item.get("icon") or ""
-    base = toolkit.config.get("ckan.eov_icon_base_path") or DEFAULT_EOV_ICON_BASE_PATH
     color = eov_icon_color()
-    if color and base == DEFAULT_EOV_ICON_BASE_PATH and icon in bundled_eov_icons():
+    if color and icon in bundled_eov_icons():
         # The color is in the URL only to bust caches when it changes.
         return toolkit.url_for("cioos.eov_icon", filename=icon, c=color.lstrip("#"))
-    return toolkit.h.url_for_static(base + icon)
+    return toolkit.h.url_for_static(EOV_ICON_STATIC_PATH + icon)
 
 
 def get_doi_authority_url():

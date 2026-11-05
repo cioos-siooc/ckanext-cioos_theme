@@ -322,7 +322,7 @@ def render_eov_icon(filename):
     color = cioos_helpers.eov_icon_color()
     if not color:
         return toolkit.redirect_to(
-            toolkit.h.url_for_static(cioos_helpers.DEFAULT_EOV_ICON_BASE_PATH + filename)
+            toolkit.h.url_for_static(cioos_helpers.EOV_ICON_STATIC_PATH + filename)
         )
     response = make_response(cioos_helpers.recolored_eov_icon(filename, color))
     response.mimetype = "image/svg+xml"
@@ -430,7 +430,6 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             key.ckan.exclude_eov,
             "['marineTurtlesBirdsMammalsAbundanceAndDistribution']",
         )
-        declaration.declare(key.ckan.eov_icon_base_path, "/base/images/eov-icons-svg/")
         # hide home page eov's that no dataset uses instead of greying them out
         declaration.declare(key.ckan.hide_unavailable_eovs, "false")
         declaration.declare(key.ckan.header_file_name, "")
@@ -678,7 +677,6 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                 "ckan.site_home_url": [ignore_missing, url_validator_with_port],
                 "ckan.exclude_eov_category": [ignore_missing],
                 "ckan.exclude_eov": [ignore_missing],
-                "ckan.eov_icon_base_path": [ignore_missing],
                 "ckan.hide_unavailable_eovs": [ignore_missing, boolean_validator],
                 "ckan.header_file_name": [ignore_missing],
                 "ckan.footer_file_name": [ignore_missing],
@@ -758,9 +756,6 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             ),
             "cioos_get_footer_file_name": lambda: toolkit.config.get(
                 "ckan.footer_file_name", ""
-            ),
-            "cioos_get_eov_icon_base_path": lambda: toolkit.config.get(
-                "ckan.eov_icon_base_path", "/base/images/eov-icons-svg/"
             ),
             "cioos_get_exclude_eov": lambda: toolkit.config.get("ckan.exclude_eov"),
             "cioos_get_exclude_eov_category": lambda: toolkit.config.get(
