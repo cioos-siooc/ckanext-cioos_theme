@@ -224,7 +224,7 @@
         rel="stylesheet"
       />
       #} {% block head_extras %} {# defined in the config.ini under
-      "ckan.template_head_end" #} {{ g.template_head_end | safe }} {% endblock
+      "ckan.template_head_end" #} {{ h.cioos_template_head_end() | safe }} {% endblock
       %} {%- block custom_styles %} {%- if g.site_custom_css -%}
       <style>
         {{ g.site_custom_css | safe }}
@@ -245,7 +245,7 @@
     >
       {%- block page %}{% endblock -%} {%- block scripts %} {% endblock -%} {%
       include "snippets/sentry_feedback.html" %} {% block body_extras -%} {# defined in the config.ini under
-      "ckan.template_footer_end" #} {{ g.template_footer_end | safe }} {%-
+      "ckan.template_footer_end" #} {{ h.cioos_template_footer_end() | safe }} {%-
       endblock %} {# render any style assets registered by page body snippets #}
       {{ h.render_assets('style') }} {# render script assets #} {{
       h.render_assets('script') }}

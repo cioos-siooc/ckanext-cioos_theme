@@ -44,36 +44,29 @@ log_auth = logging.getLogger(__name__ + ".auth")
 # debugpy.wait_for_client()
 
 
-show_responsible_organizations = toolkit.asbool(
-    toolkit.config.get("cioos.show_responsible_organizations_facet", "True")
-)
+# Config is read at call time, never at import: ckanext-envvars applies the
+# CKAN__* / CKAN___* environment variables after plugin modules are imported.
 
-hide_organization_in_dataset_sidebar = toolkit.asbool(
-    toolkit.config.get("ckan.hide_organization_in_dataset_sidebar", False)
-)
+DEFAULT_ORGANIZATIONS_INFO_TEXT = {
+    "en": "CKAN Organizations are used to create, manage and publish collections of datasets. Users can have different roles within an Organization, depending on their level of authorisation to create, edit and publish.",
+    "fr": "Les Organisations CKAN sont utilisées pour créer, gérer et publier des collections de jeux de données. Les utilisateurs peuvent avoir différents rôles au sein d'une Organisation, en fonction de leur niveau d'autorisation pour créer, éditer et publier.",
+}
 
-contact_email = toolkit.config.get("cioos.contact_email", "info@cioos.ca")
-organizations_info_text = toolkit.config.get(
-    "cioos.organizations_info_text",
-    {
-        "en": "CKAN Organizations are used to create, manage and publish collections of datasets. Users can have different roles within an Organization, depending on their level of authorisation to create, edit and publish.",
-        "fr": "Les Organisations CKAN sont utilisées pour créer, gérer et publier des collections de jeux de données. Les utilisateurs peuvent avoir différents rôles au sein d'une Organisation, en fonction de leur niveau d'autorisation pour créer, éditer et publier.",
+DEFAULT_GROUP_INFO_TEXT = {
+    "resorg": {
+        "en": "You can use CKAN Responsible Organizations to create and manage collections of datasets. In this case, a dataset is assigned to each organization that has been identified as contributing to, retains ownership of, or responsible for the data in the dataset.",
+        "fr": "Vous pouvez utiliser les organisations responsables de CKAN pour créer et gérer des collections d'ensembles de données. Dans ce cas, un ensemble de données est attribué à chaque organisation qui a été identifiée comme contribuant, conservant la propriété ou responsable des données de l'ensemble de données.",
     },
-)
-
-group_info_text = toolkit.config.get(
-    "cioos.group_info_text",
-    {
-        "resorg": {
-            "en": "You can use CKAN Responsible Organizations to create and manage collections of datasets. In this case, a dataset is assigned to each organization that has been identified as contributing to, retains ownership of, or responsible for the data in the dataset.",
-            "fr": "Vous pouvez utiliser les organisations responsables de CKAN pour créer et gérer des collections d'ensembles de données. Dans ce cas, un ensemble de données est attribué à chaque organisation qui a été identifiée comme contribuant, conservant la propriété ou responsable des données de l'ensemble de données.",
-        },
-        "group": {
-            "en": "You can use CKAN Groups to create and manage collections of datasets. This could be to catalogue datasets for a particular project or team, or on a particular theme, or as a very simple way to help people find and search your own published datasets.",
-            "fr": "Vous pouvez utiliser les groupes CKAN pour créer et gérer des collections d'ensembles de données. Il peut s'agir de cataloguer des ensembles de données pour un projet ou une équipe particulière, ou sur un thème particulier, ou encore d'un moyen très simple d'aider les gens à trouver et à rechercher vos propres ensembles de données publiés.",
-        },
+    "group": {
+        "en": "You can use CKAN Groups to create and manage collections of datasets. This could be to catalogue datasets for a particular project or team, or on a particular theme, or as a very simple way to help people find and search your own published datasets.",
+        "fr": "Vous pouvez utiliser les groupes CKAN pour créer et gérer des collections d'ensembles de données. Il peut s'agir de cataloguer des ensembles de données pour un projet ou une équipe particulière, ou sur un thème particulier, ou encore d'un moyen très simple d'aider les gens à trouver et à rechercher vos propres ensembles de données publiés.",
     },
-)
+}
+
+
+def config_json(key, default):
+    """A JSON config value as a Python object, or `default` when unset or empty."""
+    return cioos_helpers.load_json(toolkit.config.get(key) or "{}") or default
 
 
 def lang_dict(value):
@@ -435,6 +428,9 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
         declaration.declare(key.ckan.header_file_name, "")
         declaration.declare(key.ckan.footer_file_name, "")
         declaration.declare(key.ckan.site_about_markdown_file, "")
+        # raw HTML appended to <head> / <body>; CKAN 2.12 dropped these keys
+        declaration.declare(key.ckan.template_head_end, "")
+        declaration.declare(key.ckan.template_footer_end, "")
         declaration.declare(key.ckan.show_social_in_dataset_sidebar, "false")
         declaration.declare(key.ckan.hide_organization_in_breadcrumb, "false")
         declaration.declare(key.ckan.hide_organization_in_dataset_sidebar, "false")
@@ -713,9 +709,19 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
 
     def get_helpers(self):
         return {
-            "cioos_organizations_info_text": lambda: organizations_info_text,
-            "cioos_contact_email": lambda: contact_email,
-            "cioos_group_info_text": lambda: group_info_text,
+            "cioos_organizations_info_text": lambda: config_json(
+                "cioos.organizations_info_text", DEFAULT_ORGANIZATIONS_INFO_TEXT
+            ),
+            "cioos_contact_email": lambda: toolkit.config.get("cioos.contact_email"),
+            "cioos_group_info_text": lambda: config_json(
+                "cioos.group_info_text", DEFAULT_GROUP_INFO_TEXT
+            ),
+            "cioos_template_head_end": lambda: toolkit.config.get(
+                "ckan.template_head_end"
+            ),
+            "cioos_template_footer_end": lambda: toolkit.config.get(
+                "ckan.template_footer_end"
+            ),
             "cioos_load_json": cioos_helpers.load_json,
             "cioos_geojson_to_bbox": geojson_to_bbox,
             "cioos_get_facets": cioos_helpers.cioos_get_facets,
@@ -882,11 +888,15 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
 
             facets_dict["eov"] = toolkit._("Ocean Variables")
             facets_dict["ecv"] = toolkit._("Climate Variables")
-            if show_responsible_organizations:
+            if toolkit.asbool(
+                toolkit.config.get("cioos.show_responsible_organizations_facet")
+            ):
                 facets_dict["resorg_groups" + "_" + self.lang()] = toolkit._(
                     "Responsible Organization"
                 )
-            if not hide_organization_in_dataset_sidebar:
+            if not toolkit.asbool(
+                toolkit.config.get("ckan.hide_organization_in_dataset_sidebar")
+            ):
                 facets_dict["organization" + "_" + self.lang()] = toolkit._(
                     "Organization"
                 )
