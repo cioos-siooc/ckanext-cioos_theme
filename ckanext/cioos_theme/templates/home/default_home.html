@@ -5,6 +5,9 @@
                (home/snippets/eov_grid.html), or 'ranked' for cards ranked
                by dataset count with count bars (home/snippets/eov_ranked.html).
                home/default_home_compact.html renders this page with 'ranked'.
+
+  A regional home page can extend this template and fill the
+  home_sections block, which sits between the hero and the EOVs.
 #}
 {% asset 'ckanext-cioos_theme/home_css' %}
 
@@ -25,6 +28,8 @@
       </p>
     </div>
   </section>
+
+  {% block home_sections %}{% endblock %}
 
   <div class="container">
     <section class="eov-section" aria-labelledby="eov-section-heading">
