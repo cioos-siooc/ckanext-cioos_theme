@@ -134,8 +134,8 @@
   display: flex;
   background: var(--bs-body-bg);
   border: 1px solid var(--bs-border-color);
-  /* Top-right corner left square: the count tab sits in it. */
-  border-radius: 1rem 0 1rem 1rem;
+  /* The count tab sits inside its top-right corner. */
+  border-radius: 1rem;
   transition:
     transform 0.15s ease-out,
     box-shadow 0.15s ease-out,
@@ -184,20 +184,20 @@ a.eov-link:hover {
   overflow-wrap: break-word;
   hyphens: none;
 }
-/* Count tab filling the card's square top-right corner. It sits over the
-   card's 1px border so it is flush with the outer edge, and only its inner
-   (bottom-left) corner is rounded. Height is 1.25rem; the variants reserve
-   that much space at the top of the card so labels and icons stay clear. */
+/* Count tab in the card's top-right corner, inside the card's 1px border
+   so the grey line runs over it; its outer corner follows the border's
+   inner curve. Height is 1.25rem; the variants reserve that much space at
+   the top of the card so labels and icons stay clear. */
 .eov-badge {
   position: absolute;
-  top: -1px;
-  right: -1px;
+  top: 0;
+  right: 0;
   z-index: 1;
   box-sizing: border-box;
   min-width: 2rem;
   height: 1.25rem;
   padding: 0 0.5rem;
-  border-radius: 0 0 0 0.75rem;
+  border-radius: 0 calc(1rem - 1px) 0 0.75rem;
   /* White on primary-dark is ~5:1 contrast (WCAG AA). */
   color: var(--bs-white);
   background: var(--cioos-primary-dark);
@@ -374,8 +374,20 @@ a.eov-link:hover {
   grid-template-columns: minmax(0, 1fr);
   gap: 0.5rem;
 }
+/* The card's positioned box: the count tab (.eov-badge, inside the link)
+   is placed against it rather than the link, so the link's overflow clip
+   doesn't cut the tab's outer 1px. For the same reason the hover lift is
+   on this box: a transform on the link would make it the tab's
+   containing block again. */
+.eov-row {
+  position: relative;
+  transition: transform 0.15s ease-out;
+}
+.eov-row:has(> a:hover) {
+  transform: translateY(-2px);
+}
 .eov-row-link {
-  /* Fits a two-line label and the count beside a 54px icon. */
+  /* Fits a two-line label beside a 54px icon. */
   --card-height: 3.5rem;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
@@ -392,12 +404,10 @@ a.eov-link:hover {
   color: var(--cioos-light-color);
   text-decoration: none;
   transition:
-    transform 0.15s ease-out,
     box-shadow 0.15s ease-out,
     border-color 0.15s ease-out;
 }
 a.eov-row-link:hover {
-  transform: translateY(-2px);
   border-color: var(--cioos-primary);
   box-shadow: var(--bs-box-shadow-sm);
   color: var(--cioos-light-color);
@@ -408,10 +418,11 @@ a.eov-row-link:focus-visible {
   outline-offset: 2px;
 }
 @media (prefers-reduced-motion: reduce) {
+  .eov-row,
   .eov-row-link {
     transition: none;
   }
-  a.eov-row-link:hover {
+  .eov-row:has(> a:hover) {
     transform: none;
   }
 }
@@ -430,11 +441,22 @@ a.eov-row-link:focus-visible {
   object-fit: cover;
   object-position: center bottom;
 }
-/* Label and count in plain block flow: a line-clamped (-webkit-box) label
-   placed straight into an auto grid row collapses to zero height in Chrome. */
+/* On these cards the border is on the link, which fills this box, so the
+   tab is inset by the border's 1px; the card's radius is 0.75rem. */
+.eov-row .eov-badge {
+  top: 1px;
+  right: 1px;
+  border-radius: 0 calc(0.75rem - 1px) 0 0.75rem;
+}
+/* The label is centred vertically and left-aligned beside the icon. Its
+   block wrapper keeps the line clamp working: a line-clamped (-webkit-box)
+   label placed straight into an auto grid row collapses to zero height in
+   Chrome. Right padding keeps it clear of the count tab. */
 .eov-row-text {
   display: block;
   min-width: 0;
+  padding-right: 3rem;
+  text-align: left;
 }
 .eov-row-label {
   font-size: 0.8125rem;
@@ -447,18 +469,8 @@ a.eov-row-link:focus-visible {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
-.eov-row-count {
-  display: block;
-  margin-top: 0.0625rem;
-  font-size: 0.6875rem;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  line-height: 1.25;
-  /* Muted grey, ~5.7:1 on white with the default palette (AA). */
-  color: color-mix(in srgb, var(--cioos-light-color) 75%, var(--bs-body-bg));
-}
 /* Not a link (no datasets); inactive components are exempt from contrast
-   requirements, and the count also carries a hidden "no datasets". */
+   requirements, and the card also carries a hidden "(no datasets)". */
 .eov-row--empty .eov-row-link {
   opacity: 0.6;
 }
