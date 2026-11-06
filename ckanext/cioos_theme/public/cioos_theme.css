@@ -261,10 +261,10 @@ aside .module-narrow .module-heading {
 }
 
 a {
-  color: var(--cioos-primary);
+  color: var(--cioos-primary-dark);
 }
 a:hover {
-  color: var(--cioos-primary-dark);
+  color: var(--cioos-primary);
 }
 
 .btn {
@@ -337,8 +337,13 @@ aside #dataset-map {
 .page-header {
   background-color: var(--bs-body-bg);
 }
-.nav-link,
+.nav-link {
+  color: var(--cioos-primary);
+}
 .page-header .nav-tabs li a {
+  color: var(--bs-body-color);
+}
+.page-header .nav-tabs li a:hover {
   color: var(--cioos-primary);
 }
 
