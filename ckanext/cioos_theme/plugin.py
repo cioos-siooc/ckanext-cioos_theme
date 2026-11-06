@@ -37,6 +37,9 @@ log = logging.getLogger(__name__)
 
 # Solr StrField terms are capped at 32766 bytes; stay safely under it.
 SOLR_STR_FIELD_LIMIT = 32000
+# A `field:value` token such as "id:abc" or "tags:ocean". A colon followed by a
+# space, as in a title like "Placentia Bay: North Harbour", is plain text.
+FIELDED_QUERY_RE = re.compile(r"\w:\S")
 log_auth = logging.getLogger(__name__ + ".auth")
 
 # debugpy.listen(('0.0.0.0', 5678))
@@ -1242,6 +1245,24 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             out.append(v1)
         return out
 
+    def _free_text_query(self, search_params, q):
+        """Rewrite a free-text search as edismax.
+
+        Fielded queries ("id:abc") keep CKAN's standard parsing, since our code
+        and other extensions rely on it.
+        """
+        # edismax (vs CKAN's default dismax) honours wildcards, quoted phrases,
+        # -exclusions and OR, and the pf/pf2/ps phrase boosts set as /select
+        # defaults in solr/configoverlay.json. q.op=OR is a local param because
+        # CKAN's q.op=AND makes edismax require every term and ignore mm, while
+        # CKAN's fq strings still need AND. Solr only reads local params in q
+        # with the lucene parser, and CKAN applies its mm/tie defaults only to
+        # colon-free queries, so set them here.
+        search_params["defType"] = "lucene"
+        search_params.setdefault("mm", "2<-1 5<80%")
+        search_params.setdefault("tie", "0.1")
+        search_params["q"] = "{!edismax q.op=OR}" + q
+
     # handle custom temporal range search facet
     def before_dataset_search(self, search_params):
         if toolkit.request:
@@ -1251,6 +1272,14 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                 lang,
                 lang,
             )
+            q = (search_params.get("q") or "").strip()
+            if (
+                q
+                and q != "*:*"
+                and "defType" not in search_params
+                and not FIELDED_QUERY_RE.search(q)
+            ):
+                self._free_text_query(search_params, q)
 
         extras = search_params.get("extras", {})
         search_params["fq_list"] = search_params.get("fq_list", [])
