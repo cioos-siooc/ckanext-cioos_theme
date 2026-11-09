@@ -174,37 +174,59 @@ h.render_markdown(h.scheming_language_text(h.cioos_load_json(g.site_description)
   </script>
 
   <script>
+    // Hide-on-scroll header, tuned like cioospacific.ca (Salient theme): past
+    // OFFSET px the CIOOS bar slides away; each scroll step of DELTA px or more
+    // hides (down) or reveals (up) the menu bar; it always shows near the
+    // bottom of the page. Styles live in cioos_theme.css.
     (function () {
+      var OFFSET = 60;
+      var DELTA = 2;
+      var BOTTOM_REVEAL = 30;
       var header = document.getElementById("header-container");
-      var lastScrollY = 0;
-      var threshold = window.innerHeight * 0.33;
+      var topmenu = document.getElementById("topmenu");
+      var lastY = window.scrollY;
+      var queued = false;
 
-      window.addEventListener("scroll", function () {
-        var currentScrollY = window.scrollY;
+      function measure() {
+        header.style.setProperty(
+          "--topmenu-height",
+          topmenu.offsetHeight + "px",
+        );
+      }
 
-        // Collapsing the header shortens the page; only collapse when there is
-        // more scroll room than the header height, otherwise the shorter page
-        // snaps back to scrollY=0 and the header toggles in a loop (jitter).
-        var maxScroll =
-          document.documentElement.scrollHeight - window.innerHeight;
-        if (currentScrollY > 0) {
-          if (
-            header.classList.contains("header-scrolled") ||
-            maxScroll > header.offsetHeight
-          ) {
-            header.classList.add("header-scrolled");
-          }
-        } else {
-          header.classList.remove("header-scrolled");
-        }
+      function update() {
+        queued = false;
+        var y = window.scrollY;
+        var step = y - lastY;
+        var nearBottom =
+          window.innerHeight + y + BOTTOM_REVEAL >=
+          document.documentElement.scrollHeight;
+        lastY = y;
 
-        if (currentScrollY > threshold && currentScrollY > lastScrollY) {
-          header.classList.add("header-hidden");
-        } else if (currentScrollY < lastScrollY) {
+        header.classList.toggle("header-scrolled", y > OFFSET);
+        if (y <= OFFSET || nearBottom || step <= -DELTA) {
           header.classList.remove("header-hidden");
+        } else if (step >= DELTA) {
+          header.classList.add("header-hidden");
         }
+      }
 
-        lastScrollY = currentScrollY;
+      measure();
+      update();
+      window.addEventListener("resize", measure);
+      window.addEventListener(
+        "scroll",
+        function () {
+          if (!queued) {
+            queued = true;
+            requestAnimationFrame(update);
+          }
+        },
+        { passive: true },
+      );
+      // Keyboard users tabbing into a hidden header get it back.
+      header.addEventListener("focusin", function () {
+        header.classList.remove("header-hidden");
       });
     })();
   </script>
