@@ -39,9 +39,23 @@
           {# no need to do this if just printing licence because use-constraints
              is used to populate it in the first place #}
           {% if use_constraints and pkg_dict.license_url and use_constraints != pkg_dict.license_url %}
+          {# use-constraints is a JSON {lang: text}; the translation method is
+             set for languages machine-translated and not yet verified #}
+          {% set use_constraints_translation_method = h.cioos_load_json(
+              h.get_pkg_dict_extra(pkg_dict, 'use-constraints_translation_method') or '{}'
+            )
+          %}
+          {% set use_constraints_translation_method = use_constraints_translation_method.get(h.lang())
+              if use_constraints_translation_method is mapping else ''
+          %}
           <span>
             <strong>{{ _('Limitations') }}: </strong>
-            {{ h.cioos_load_json(use_constraints) }}
+            {{ h.scheming_language_text(h.cioos_load_json(use_constraints)) }}
+            {% if use_constraints_translation_method %}
+              <span class="translation_icon_group" title="{{ use_constraints_translation_method }}">
+                <i class="translation_icon" aria-hidden="true"></i>
+              </span>
+            {% endif %}
           </span>
           <br />
           {% endif %}
