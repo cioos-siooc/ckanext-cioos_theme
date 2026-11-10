@@ -1,10 +1,10 @@
 # À propos du catalogue du Système intégré d'observation de l'océan du Canada (SIOOC)
 
-Le catalogue de données du Système intégré d'observation de l'océan du Canada (SIOOC) est construit sur le Comprehensive Knowledge Archive Network (CKAN), une plateforme en code source ouvert de renommée mondiale pour la gestion et la découverte de données. CKAN fournit des outils puissants pour publier, partager, rechercher et accéder aux données océanographiques en gérant des métadonnées complètes qui indiquent où les données sont stockées, ainsi que de solides capacités d'API pour un accès programmatique.
+Le catalogue de données du Système intégré d'observation de l'océan du Canada (SIOOC) est construit sur le [Comprehensive Knowledge Archive Network](https://ckan.org) (CKAN), une plateforme en code source ouvert de renommée mondiale pour la gestion et la découverte de données. CKAN fournit des outils puissants pour publier, partager, rechercher et accéder aux données océanographiques en gérant des métadonnées complètes qui indiquent où les données sont stockées, ainsi que de solides capacités d'API pour un accès programmatique.
 
 ## Partie d'un réseau national
 
-Le catalogue du SIOOC est un nœud clé au sein de la fédération de catalogues de données régionaux exploités par le Système intégré d'observation de l'océan du Canada (SIOOC). Cette fédération regroupe les associations régionales du SIOOC et les organisations partenaires afin d'assurer que les données océaniques recueillies à travers le Canada soient accessibles, interopérables et conformes à des normes communes, tout en respectant l'expertise régionale et la spécialisation de chaque catalogue.
+Le catalogue du SIOOC est un nœud clé au sein de la fédération de catalogues de données régionaux exploités par le [Système intégré d'observation de l'océan du Canada](https://siooc.ca) (SIOOC). Cette fédération regroupe les associations régionales du SIOOC et les organisations partenaires afin d'assurer que les données océaniques recueillies à travers le Canada soient accessibles, interopérables et conformes à des normes communes, tout en respectant l'expertise régionale et la spécialisation de chaque catalogue.
 
 Dans le cadre de cette fédération, le catalogue du SIOOC utilise l'image officielle du SIOOC et les outils associés, assurant ainsi une expérience utilisateur et une infrastructure technique cohérentes à travers tous les nœuds régionaux. Cette standardisation facilite la découverte et l'accès aux données à l'échelle de l'ensemble du réseau SIOOC.
 
