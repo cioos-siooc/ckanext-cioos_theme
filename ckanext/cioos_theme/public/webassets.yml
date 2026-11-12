@@ -23,16 +23,6 @@ bootstrap_datepicker_css:
   contents:
     - js/datepicker/bootstrap-datepicker3.css
 
-truncate_js:
-  filters: rjsmin
-  output: ckanext-cioos_theme/%(version)s_truncate.js
-  extra:
-    preload:
-      - base/main
-      - vendor/jquery
-  contents:
-    - js/modules/truncate.js
-
 home_search_js:
   filters: rjsmin
   output: ckanext-cioos_theme/%(version)s_home_search.js

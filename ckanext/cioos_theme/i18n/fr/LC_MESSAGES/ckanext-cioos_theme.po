@@ -839,3 +839,18 @@ msgstr "Parcourir par variable océanique"
 
 msgid "Search Datasets"
 msgstr "Rechercher des jeux de données"
+
+msgid "Title was automatically translated"
+msgstr "Le titre a été traduit automatiquement"
+
+msgid "Description was automatically translated"
+msgstr "La description a été traduite automatiquement"
+
+msgid "Keywords were automatically translated"
+msgstr "Les mots-clés ont été traduits automatiquement"
+
+msgid "Limitations were automatically translated"
+msgstr "Les limites ont été traduites automatiquement"
+
+msgid "Method: %(method)s"
+msgstr "Méthode : %(method)s"

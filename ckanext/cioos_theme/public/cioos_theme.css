@@ -1514,16 +1514,33 @@ section .card-header-thin {
 /* ===========================================
    Translation Icon
    =========================================== */
+/* Follows the translated text (description's last paragraph, limitations,
+   keywords heading) at the text's size, centred on the line. In the title it
+   is smaller and sits on the baseline, like a note marker. */
 .translation_icon {
-  background-image: url(/base/images/auto_translate.svg);
-  background-size: auto 100%;
-  background-repeat: no-repeat;
-  padding-left: 83px;
+  display: block;
+  height: 1em;
+  aspect-ratio: 65.41 / 26.1; /* auto_translate.svg viewBox */
+  background: url(/base/images/auto_translate.svg) no-repeat center / contain;
 }
 
 .translation_icon_group {
-  padding-left: 3px;
-  font-size: medium;
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 0.2em;
+  line-height: 1;
+  cursor: help;
+  text-decoration: none;
+}
+
+h1 .translation_icon_group {
+  font-size: 0.6em;
+  vertical-align: baseline;
+}
+
+/* Field sentence and translation method on separate lines */
+.translation-tooltip .tooltip-inner {
+  white-space: pre-line;
 }
 
 /* ===========================================

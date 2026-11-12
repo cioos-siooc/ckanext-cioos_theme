@@ -51,11 +51,7 @@
           <span>
             <strong>{{ _('Limitations') }}: </strong>
             {{ h.scheming_language_text(h.cioos_load_json(use_constraints)) }}
-            {% if use_constraints_translation_method %}
-              <span class="translation_icon_group" title="{{ use_constraints_translation_method }}">
-                <i class="translation_icon" aria-hidden="true"></i>
-              </span>
-            {% endif %}
+            {% snippet "snippets/translation_icon.html", label=_('Limitations were automatically translated'), method=use_constraints_translation_method %}
           </span>
           <br />
           {% endif %}
