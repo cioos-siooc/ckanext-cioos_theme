@@ -1,20 +1,23 @@
 {#
-Robot icon marking a machine translation that has not been reviewed. Shows
-which field was translated and the translation method on hover, keyboard
-focus, or click/tap (Bootstrap tooltip, initialised by CKAN core's
-init_tooltips.js). Renders nothing when there is no method: the text is the
+Robot icon marking a machine translation that has not been reviewed. On
+hover, keyboard focus, or click/tap it opens a popover naming the translated
+field and the translation method (js/modules/translation-method.js). The
+method may be Markdown, e.g. links to the translation service; it is
+rendered sanitized. Renders nothing when there is no method: the text is the
 original or was translated by a person.
 
 label  - translated sentence naming the field, e.g. _('Title was automatically translated')
-method - translation method for the current language (string)
+method - translation method for the current language (string, may be Markdown)
 #}
 {% if method %}
+  {% asset 'ckanext-cioos_theme/translation_method_js' %}
   {% set details = _('Method: %(method)s', method=method) %}
-  <a tabindex="0" role="button" class="translation_icon_group"
-     data-bs-toggle="tooltip" data-bs-trigger="hover focus"
-     data-bs-custom-class="translation-tooltip"
-     data-bs-title="{{ label }}&#10;{{ details }}"
-     aria-label="{{ label }}. {{ details }}">
-    <i class="translation_icon" aria-hidden="true"></i>
-  </a>
+  <span class="translation_icon_group" data-module="translation-method">
+    <a tabindex="0" role="button" class="translation_icon_button"
+       data-bs-title="{{ label }}"
+       data-bs-content="{{ h.render_markdown(details, auto_link=False)|forceescape }}"
+       aria-label="{{ label }}. {{ h.markdown_extract(details, extract_length=0) }}">
+      <i class="translation_icon" aria-hidden="true"></i>
+    </a>
+  </span>
 {% endif %}

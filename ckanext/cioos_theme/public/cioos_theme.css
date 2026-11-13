@@ -1529,6 +1529,10 @@ section .card-header-thin {
   vertical-align: middle;
   margin-left: 0.2em;
   line-height: 1;
+}
+
+.translation_icon_button {
+  display: inline-block;
   cursor: help;
   text-decoration: none;
 }
@@ -1538,9 +1542,9 @@ h1 .translation_icon_group {
   vertical-align: baseline;
 }
 
-/* Field sentence and translation method on separate lines */
-.translation-tooltip .tooltip-inner {
-  white-space: pre-line;
+/* The method paragraph from render_markdown: no trailing gap */
+.translation-popover .popover-body p:last-child {
+  margin-bottom: 0;
 }
 
 /* ===========================================

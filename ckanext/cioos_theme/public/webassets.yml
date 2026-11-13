@@ -53,3 +53,12 @@ eov_filter_js:
       - base/main
   contents:
     - js/modules/eov-filter.js
+
+translation_method_js:
+  filters: rjsmin
+  output: ckanext-cioos_theme/%(version)s_translation_method.js
+  extra:
+    preload:
+      - base/main
+  contents:
+    - js/modules/translation-method.js
