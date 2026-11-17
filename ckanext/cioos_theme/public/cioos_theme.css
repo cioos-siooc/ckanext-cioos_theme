@@ -1194,7 +1194,7 @@ aside #dataset-map {
 }
 
 .resource-list .resource-item {
-  border: 1px solid #ddd;
+  border: 1px solid var(--bs-border-color);
   margin-bottom: 7px;
   border-radius: 14px;
   margin-left: 0;
@@ -1212,16 +1212,20 @@ aside #dataset-map {
 .resource-list .resource-item .btn-group .btn {
   border-radius: 0 14px 14px 0;
   height: 100%;
-  /* Outlined: white with teal border/text; hover/open fill with primary */
-  --bs-btn-bg: white;
-  --bs-btn-border-color: var(--cioos-primary);
+  /* Part of the item, not a box of its own: transparent, so the item's
+     outline shows through its (transparent) border, with teal text. The
+     hover/open tint matches the Related Works cards and is clipped inside
+     the border so the outline stays unbroken. */
+  --bs-btn-bg: transparent;
+  --bs-btn-border-color: transparent;
   --bs-btn-color: var(--cioos-primary-dark);
-  --bs-btn-hover-bg: var(--cioos-primary);
-  --bs-btn-hover-border-color: var(--cioos-primary);
-  --bs-btn-hover-color: white;
-  --bs-btn-active-bg: var(--cioos-primary);
-  --bs-btn-active-border-color: var(--cioos-primary);
-  --bs-btn-active-color: white;
+  --bs-btn-hover-bg: color-mix(in srgb, var(--cioos-primary) 6%, white);
+  --bs-btn-hover-border-color: transparent;
+  --bs-btn-hover-color: var(--cioos-primary-dark);
+  --bs-btn-active-bg: color-mix(in srgb, var(--cioos-primary) 6%, white);
+  --bs-btn-active-border-color: transparent;
+  --bs-btn-active-color: var(--cioos-primary-dark);
+  background-clip: padding-box;
   background-color: var(--bs-btn-bg);
   border-color: var(--bs-btn-border-color);
   color: var(--bs-btn-color);
