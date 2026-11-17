@@ -13,6 +13,7 @@ import logging
 import os
 import re
 from collections import OrderedDict
+from urllib.parse import urlparse
 
 # from ckantoolkit import h
 import ckan.logic as logic
@@ -391,40 +392,38 @@ def get_fully_qualified_package_uri(pkg, uri_field, default_code_space=None):
 
 
 def get_package_relationships(pkg):
-    # compare schema field, here called aggregation-info and
-    # package relationships.
-    relationships = pkg.get("aggregation-info", [])
-    rels_from_schema = []
-    for rel in relationships:
-        comment = "/".join(
-            filter(None, [rel.get("initiative-type"), rel.get("association-type")])
-        )
-        comment = re.sub(r"([A-Z])", r" \1", comment)
-        comment = comment.title()
+    """Related works from the schema's aggregation-info field, for display.
 
+    Each item carries the linked title and URL, its host (shown under the
+    title) and a translated label for the ISO association type.
+    """
+    labels = {
+        "largerWorkCitation": _("Parent"),
+        "isComposedOf": _("Child"),
+        "crossReference": _("Cross reference"),
+        "series": _("Series"),
+        "dependency": _("Depends on"),
+        "revisionOf": _("Revision of"),
+    }
+    rels = []
+    for rel in pkg.get("aggregation-info", []):
         rel_uri = rel.get("aggregate-dataset-identifier_code")
         rel_name = rel.get("aggregate-dataset-name")
-
-        map_type = {
-            "largerWorkCitation": "parent",
-            "crossReference": "cross link",
-            "dependency": "depends on",
-            "revisionOf": "revision of",
-            "series": "cross link",
-            "isComposedOf": "child",
-        }
-        rel_type = map_type.get(rel.get("association-type"), "links to")
-
-        if rel_uri and rel_name:
-            rels_from_schema.append(
-                {
-                    "subject": pkg["name"],
-                    "type": rel_type,
-                    "object": {"title": rel_name, "url": rel_uri},
-                    "comment": comment,
-                }
-            )
-    return rels_from_schema
+        if not (rel_uri and rel_name):
+            continue
+        host = urlparse(rel_uri).hostname or ""
+        rels.append(
+            {
+                "subject": pkg["name"],
+                "type": labels.get(rel.get("association-type"), _("Related")),
+                "object": {
+                    "title": rel_name,
+                    "url": rel_uri,
+                    "host": host.removeprefix("www."),
+                },
+            }
+        )
+    return rels
 
 
 # the following functions have been depricated. use above function instead

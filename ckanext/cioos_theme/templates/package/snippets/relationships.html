@@ -1,30 +1,24 @@
 {% if relationships %}
 <section class="relationships">
   <h3>{{ _('Related Works') }}</h3>
-  <div class="list-group relationship-list">
+  <ul class="relationship-list">
     {% for rel in relationships %}
-    <div class="list-group-item relationship-item col-xs-12">
-      <a
-        href="{{  rel['object']['url'] }}"
-        target="_blank"
-        class="relationship-item-link col-xs-12"
-      >
-        <div class="list-group-item-body col-md-10">
-          <div class="heading">{{ h.scheming_language_text(rel['object']['title']) }}</div>
-          {# <div class="description">
-            <span>Type: {{ rel["comment"] }}</span>
-          </div> #}
-        </div>
-        <div class="list-group-item-body col-md-2 align-content-center">
-          <div class="relationships-type">
-            <span class="label label-clear-100">
-              {{ rel["type"].title() }}
-            </span>
-          </div>
-        </div>
+    <li class="relationship-item">
+      <a class="relationship-link" href="{{ rel.object.url }}" target="_blank" rel="noopener">
+        <span class="relationship-text">
+          <span class="relationship-title">{{ h.scheming_language_text(rel.object.title) }}</span>
+          <span class="visually-hidden">{{ _('(opens in a new tab)') }}</span>
+          {% if rel.object.host %}
+          <span class="relationship-host">
+            <i class="fa fa-external-link" aria-hidden="true"></i>
+            {{ rel.object.host }}
+          </span>
+          {% endif %}
+        </span>
+        <span class="relationship-type">{{ rel.type }}</span>
       </a>
-    </div>
+    </li>
     {% endfor %}
-  </div>
+  </ul>
 </section>
 {% endif %}

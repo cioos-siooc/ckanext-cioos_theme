@@ -778,6 +778,30 @@ msgstr "Organisations responsables"
 msgid "Related Works"
 msgstr "Travaux connexes"
 
+msgid "(opens in a new tab)"
+msgstr "(s'ouvre dans un nouvel onglet)"
+
+msgid "Parent"
+msgstr "Parent"
+
+msgid "Child"
+msgstr "Enfant"
+
+msgid "Cross reference"
+msgstr "Renvoi"
+
+msgid "Series"
+msgstr "Série"
+
+msgid "Depends on"
+msgstr "Dépend de"
+
+msgid "Revision of"
+msgstr "Révision de"
+
+msgid "Related"
+msgstr "Connexe"
+
 msgid "Download Citation"
 msgstr "Télécharger la citation"
 
