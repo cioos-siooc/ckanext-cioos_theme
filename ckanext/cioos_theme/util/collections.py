@@ -1,11 +1,11 @@
-"""Collection links read from a dataset's own aggregation-info.
+"""Find the collections a dataset belongs to, from its own aggregation-info.
 
-A dataset belongs to a collection when one of its aggregation-info entries
-(ISO 19115 MD_AssociatedResource) has initiative-type "collection". The entry's
-identifier carries the collection's UUID (bare, as a catalogue URL, or as a
-dataset name such as ca-cioos_<uuid>) and its name carries the collection's
-title. Only the dataset's own metadata is read, so the collection dataset
-does not need to exist, or be indexed, first.
+A dataset belongs to a collection when one of its aggregation-info entries has
+initiative-type "collection". That entry's identifier gives the collection UUID
+and its name gives the collection title (EN/FR).
+
+The collection UUID is stored with its prefix, e.g. ca-cioos_<uuid>, the same
+value as in the collection's catalogue URL.
 """
 
 import json
@@ -14,9 +14,16 @@ import re
 
 log = logging.getLogger(__name__)
 
-UUID_RE = re.compile(
-    r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}", re.IGNORECASE
+UUID_PATTERN = r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+UUID_RE = re.compile(UUID_PATTERN, re.IGNORECASE)
+
+# A UUID, with the prefix in front of it if there is one (ca-cioos_ or ca.cioos_).
+PREFIXED_UUID_RE = re.compile(
+    r"(?:([0-9a-z.-]+)_)?(" + UUID_PATTERN + ")", re.IGNORECASE
 )
+
+# Prefix used when a link has a UUID with no prefix. CIOOS records always use ca.cioos.
+DEFAULT_PREFIX = "ca-cioos"
 
 
 def _decode(value):
@@ -32,15 +39,28 @@ def _decode(value):
 def find_uuid(text):
     """Return the first UUID in text, lower-cased, or None.
 
-    Only the hyphenated 8-4-4-4-12 form is recognised, wherever it appears
-    (bare, upper case, urn:uuid:, {braces}, ca-cioos_ / ca.cioos_ prefixes, URLs).
-    A UUID written without hyphens (32 hex digits) is not matched on purpose:
-    MD5 hashes and other IDs look the same, so matching them could index
-    something that isn't a collection. Such links are skipped and logged.
-    If the text holds several UUIDs, only the first is returned.
+    Only the 8-4-4-4-12 form with hyphens is found. A UUID written without
+    hyphens is ignored on purpose: other IDs (e.g. MD5 hashes) look the same.
     """
     match = UUID_RE.search(text or "")
     return match.group(0).lower() if match else None
+
+
+def find_collection(text):
+    """Return (uuid, collection UUID with prefix) from a link, or (None, None).
+
+    Examples:
+    - "https://.../dataset/ca-cioos_<uuid>" -> "ca-cioos_<uuid>"
+    - "ca.cioos_<uuid>"                      -> "ca-cioos_<uuid>"  ("." becomes "-")
+    - "<uuid>" (no prefix)                   -> "ca-cioos_<uuid>"  (assumes CIOOS)
+    - "https://.../dataset/ca-gc-dfo-mpo-cnodc-cndoc_<uuid>" keeps its own prefix
+    """
+    match = PREFIXED_UUID_RE.search(text or "")
+    if not match:
+        return None, None
+    prefix, uuid = match.group(1), match.group(2).lower()
+    prefix = prefix.lower().replace(".", "-") if prefix else DEFAULT_PREFIX
+    return uuid, f"{prefix}_{uuid}"
 
 
 def _names(value, fallback):
@@ -55,12 +75,13 @@ def _names(value, fallback):
 
 
 def extract_collections(aggregation_info, dataset_name=""):
-    """List the collections a dataset belongs to, as (uuid, {"en", "fr"}) tuples.
+    """Return the dataset's collections as a list of (collection UUID, {"en", "fr"} title).
 
-    aggregation_info is the dataset's aggregation-info value (a list, or a JSON
-    string of one). dataset_name is the dataset's own name; a link to its own
-    UUID is ignored. Entries whose identifier holds no UUID (e.g. a DOI) are
-    skipped with a warning. Each collection appears once, in first-seen order.
+    The collection UUID has its prefix, e.g. "ca-cioos_<uuid>".
+    - aggregation_info: the dataset's aggregation-info (a list or a JSON string).
+    - dataset_name: the dataset's own name, used to skip a link to itself.
+    Links with no UUID (e.g. a DOI) are skipped and logged.
+    The same collection linked twice is counted once.
     """
     entries = _decode(aggregation_info)
     if not isinstance(entries, list):
@@ -73,7 +94,7 @@ def extract_collections(aggregation_info, dataset_name=""):
         if not isinstance(item, dict) or item.get("initiative-type") != "collection":
             continue
         code = item.get("aggregate-dataset-identifier_code") or ""
-        uuid = find_uuid(code)
+        uuid, collection_id = find_collection(code)
         if not uuid:
             log.warning(
                 "Dataset %s: collection link %r has no UUID; not indexed",
@@ -81,8 +102,10 @@ def extract_collections(aggregation_info, dataset_name=""):
                 code,
             )
             continue
+        # Compare bare UUIDs, so "ca.cioos_<uuid>" and "ca-cioos_<uuid>" count as one.
         if uuid == own_uuid or uuid in seen:
             continue
         seen.add(uuid)
-        collections.append((uuid, _names(item.get("aggregate-dataset-name"), uuid)))
+        title = _names(item.get("aggregate-dataset-name"), collection_id)
+        collections.append((collection_id, title))
     return collections
