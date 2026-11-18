@@ -20,10 +20,9 @@ from pyld import jsonld
 from shapely.geometry import shape
 from six.moves.urllib.parse import urlparse
 
-from ckanext.dcat.utils import url_to_rdflib_format
-
 import ckanext.cioos_theme.cli as cli
 import ckanext.cioos_theme.helpers as cioos_helpers
+from ckanext.dcat.utils import url_to_rdflib_format
 from ckanext.scheming.helpers import scheming_language_text
 from ckanext.scheming.validation import scheming_validator
 
@@ -188,15 +187,15 @@ def fluent_field_default(field, schema):
             # field is blank, populate with default value
             data[key] = {}
             lang_list = toolkit.h.fluent_form_languages()
-            for l in lang_list:
-                data[key][l] = ""
+            for lang in lang_list:
+                data[key][lang] = ""
 
         elif not data[key].startswith("{"):
             # its a string, need to format as a json object
             new_dict = {}
             lang_list = toolkit.h.fluent_form_languages()
-            for l in lang_list:
-                new_dict[l] = data[key]
+            for lang in lang_list:
+                new_dict[lang] = data[key]
             data[key] = new_dict
         # we should now have a json object so nothing left to do.
         return data

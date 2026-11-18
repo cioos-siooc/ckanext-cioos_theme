@@ -3,6 +3,7 @@ import json
 import logging
 import re
 
+from ckan.lib.munge import munge_tag
 from ckan.plugins import toolkit
 from ckanext.cioos_theme.helpers import dedupe_keywords, load_json
 from ckanext.dcat.profiles import CleanedURIRef, SchemaOrgProfile
