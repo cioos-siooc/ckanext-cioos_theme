@@ -279,6 +279,24 @@ a:hover {
   border-color: var(--cioos-primary-dark);
 }
 
+/* Organization/group external page link (sidebar) */
+.external-home-link {
+  display: inline-block;
+  margin-top: 4px;
+  font-size: 0.8125rem;
+  color: var(--bs-secondary-color);
+  text-decoration: none;
+}
+.external-home-link:hover,
+.external-home-link:focus-visible {
+  color: var(--cioos-primary-dark);
+  text-decoration: underline;
+}
+.external-home-link .fa {
+  margin-right: 4px;
+  font-size: 0.75em;
+}
+
 .form-check-input:checked {
   background-color: var(--cioos-primary);
   border-color: var(--cioos-primary);
