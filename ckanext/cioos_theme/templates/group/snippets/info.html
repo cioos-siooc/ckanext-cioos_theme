@@ -43,7 +43,7 @@
       {% endif %}
     {% endif %}
     {% if group.external_home_url %}
-      <a href="{{ group.external_home_url }}" class="btn"><i class="fa fa-icon fa-link"></i>{{ _('External Page') }}</a>
+      <a href="{{ group.external_home_url }}" class="external-home-link"><i class="fa fa-external-link" aria-hidden="true"></i> {{ _('External Page') }}</a>
     {% endif %}
     {% endblock %}
     {% if show_nums %}

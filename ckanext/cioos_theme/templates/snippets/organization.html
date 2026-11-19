@@ -60,7 +60,7 @@ Example:
         </p>
       {% endif %}
       {% if organization.external_home_url %}
-        <a href="{{ organization.external_home_url }}" class="btn"><i class="fa fa-icon fa-link"></i>{{ _('External Organization Page') }}</a>
+        <a href="{{ organization.external_home_url }}" class="external-home-link"><i class="fa fa-external-link" aria-hidden="true"></i> {{ _('External Organization Page') }}</a>
       {% endif %}
       {% endblock %}
       {% if show_nums %}
