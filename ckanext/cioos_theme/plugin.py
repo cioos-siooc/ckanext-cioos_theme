@@ -23,6 +23,7 @@ from six.moves.urllib.parse import urlparse
 import ckanext.cioos_theme.cli as cli
 import ckanext.cioos_theme.helpers as cioos_helpers
 from ckanext.dcat.utils import url_to_rdflib_format
+from ckanext.cioos_theme.util.collections import extract_collections
 from ckanext.scheming.helpers import scheming_language_text
 from ckanext.scheming.validation import scheming_validator
 
@@ -1066,6 +1067,24 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
                         data_dict["resorg_groups_en"] = group_title.get("en", "")
                         data_dict["resorg_groups_fr"] = group_title.get("fr", "")
 
+            except Exception as err:
+                log.error(err)
+
+            # Collections this dataset belongs to (from its aggregation-info links):
+            # collection UUIDs with prefix (e.g. ca-cioos_<uuid>) and their EN/FR titles.
+            # ckanext-dcat (which runs before this plugin) removes "aggregation-info" here;
+            # CKAN keeps the same JSON in "extras_aggregation-info", so read that instead.
+            try:
+                aggregation_info = data_dict.get("aggregation-info") or data_dict.get(
+                    "extras_aggregation-info"
+                )
+                collections = extract_collections(
+                    aggregation_info, data_dict.get("name", "")
+                )
+                if collections:
+                    data_dict["collection_ids"] = [cid for cid, _title in collections]
+                    data_dict["collections_en"] = [t["en"] for _cid, t in collections]
+                    data_dict["collections_fr"] = [t["fr"] for _cid, t in collections]
             except Exception as err:
                 log.error(err)
 
