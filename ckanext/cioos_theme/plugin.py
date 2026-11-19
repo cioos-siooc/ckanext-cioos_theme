@@ -882,6 +882,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             or "projects" not in facets_dict
             or "resource-type" not in facets_dict
             or "resorg_groups" not in facets_dict
+            or "collections_" + self.lang() not in facets_dict
         ):
             ordered_dict = facets_dict.copy()
             facets_dict.clear()
@@ -903,6 +904,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             facets_dict["harvest_source_title"] = toolkit._("Metadata Harvested From")
             facets_dict["tags" + "_" + self.lang()] = toolkit._("Tags")
             facets_dict["projects"] = toolkit._("Projects")
+            facets_dict["collections" + "_" + self.lang()] = toolkit._("Collections")
             facets_dict["resource-type"] = toolkit._("Resource Type")
 
             # add any facets we may have missed

@@ -295,6 +295,9 @@ msgstr "Type de ressource"
 msgid "Projects"
 msgstr "Projets"
 
+msgid "Collections"
+msgstr "Collections"
+
 msgid "Metadata Harvested From"
 msgstr "Métadonnées récoltés de"
 
