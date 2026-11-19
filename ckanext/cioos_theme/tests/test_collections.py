@@ -10,6 +10,7 @@ OTHER_UUID = "c96eb674-ff35-4b1d-b6c2-0356b99f530a"
 CID = "ca-cioos_" + UUID
 OTHER_CID = "ca-cioos_" + OTHER_UUID
 NAME = {"en": "Bedford Basin Collection", "fr": "Collection du bassin de Bedford"}
+DOI = "10.60622/v6nn-kw50"
 
 
 def entry(code, name=NAME, initiative="collection"):
@@ -51,13 +52,36 @@ def test_upper_case_is_lower_cased():
     assert extract_collections([entry("CA.CIOOS_" + UUID.upper())]) == [(CID, NAME)]
 
 
-def test_doi_only_is_skipped_and_logged(caplog):
+def test_doi_link_is_stored_as_bare_doi():
+    assert extract_collections([entry("https://doi.org/" + DOI)]) == [(DOI, NAME)]
+
+
+def test_doi_forms_give_the_same_id():
+    for link in (DOI, "doi:" + DOI, "https://dx.doi.org/" + DOI, "DOI:10.60622/V6NN-KW50"):
+        assert find_collection(link) == (DOI, DOI), link
+
+
+def test_doi_is_checked_before_uuid():
+    doi_with_uuid = "10.5285/3a1e1bde-f356-c7f5-e063-7086abc04c0b"
+    assert find_collection("doi:" + doi_with_uuid) == (doi_with_uuid, doi_with_uuid)
+
+
+def test_same_doi_in_different_forms_counts_once():
+    entries = [entry("https://doi.org/" + DOI), entry("doi:" + DOI)]
+    assert extract_collections(entries) == [(DOI, NAME)]
+
+
+def test_doi_and_uuid_links_give_two_ids_with_the_same_title():
+    entries = [entry("https://doi.org/" + DOI), entry(UUID)]
+    assert extract_collections(entries) == [(DOI, NAME), (CID, NAME)]
+
+
+def test_link_without_doi_or_uuid_is_skipped_and_logged(caplog):
+    link = "https://data.ceotr.ca/erddap/tabledap/new_bb1_hyp_level2_binned.html"
     with caplog.at_level(logging.WARNING):
-        result = extract_collections(
-            [entry("https://doi.org/10.60622/v6nn-kw50")], "ca-cioos_" + OTHER_UUID
-        )
+        result = extract_collections([entry(link)], "ca-cioos_" + OTHER_UUID)
     assert result == []
-    assert "10.60622/v6nn-kw50" in caplog.text
+    assert "new_bb1_hyp_level2_binned" in caplog.text
 
 
 def test_other_initiative_types_are_ignored():
