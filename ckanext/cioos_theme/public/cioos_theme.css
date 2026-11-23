@@ -1972,3 +1972,10 @@ td .panel {
 .harvest-types label.radio input {
   margin-right: 8px;
 }
+
+/* Error pages (404, 403…): centred in the upper part of the page */
+.cioos-error-page {
+  max-width: 40rem;
+  margin: 4rem auto 0;
+  text-align: center;
+}
