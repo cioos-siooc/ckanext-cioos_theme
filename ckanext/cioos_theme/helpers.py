@@ -534,7 +534,7 @@ def cioos_get_eovs(show_all=False):
 # follows alphabetically.
 EOV_CATEGORY_ORDER = (
     "Physical",
-    "BioEcosystems",
+    "Biology and Ecosystems",
     "Biogeochemical",
     "Cross-disciplinary",
     "Other",
