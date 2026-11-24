@@ -1972,3 +1972,15 @@ td .panel {
 .harvest-types label.radio input {
   margin-right: 8px;
 }
+
+/* Error pages (404, 403…): centred, the text starting a little below the
+   header. The area fills half the window so the footer stays low; clamp()
+   keeps the gap sensible on short laptops and tall monitors. */
+.cioos-error-page {
+  box-sizing: border-box;
+  max-width: 40rem;
+  min-height: 50vh;
+  margin: 0 auto;
+  padding: clamp(2rem, 12vh, 10rem) 1rem 4rem;
+  text-align: center;
+}
