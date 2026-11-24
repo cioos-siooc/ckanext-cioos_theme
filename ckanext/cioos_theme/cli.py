@@ -44,30 +44,37 @@ def create(page_size, max_per_page):
     package_query = GeoPackageSearchQuery()
     count = package_query.get_count()
     click.echo("%s records found" % count)
-    if not count:
-        click.echo("Nothing to process, exiting.")
-        return
 
     start = 0
     filename_number = 1
     file_list = []
 
-    # schema.org JSON-LD sitemaps are listed first in the index (ODIS harvest)
-    write_sitemap_files(
-        count,
-        start,
-        filename_number,
-        file_list,
-        page_size,
-        max_per_page,
-        DIR_SITEMAP,
-        "dataset_jsonld_schemaorg",
-        ".jsonld?frame=schemaorg",
-    )
-    write_sitemap_files(
-        count, start, filename_number, file_list, page_size, max_per_page, DIR_SITEMAP
-    )
+    # With no datasets, still write an empty index so /sitemap/sitemap.xml
+    # exists from the first run on a fresh catalogue.
+    if count:
+        # schema.org JSON-LD sitemaps are listed first in the index (ODIS harvest)
+        write_sitemap_files(
+            count,
+            start,
+            filename_number,
+            file_list,
+            page_size,
+            max_per_page,
+            DIR_SITEMAP,
+            "dataset_jsonld_schemaorg",
+            ".jsonld?frame=schemaorg",
+        )
+        write_sitemap_files(
+            count,
+            start,
+            filename_number,
+            file_list,
+            page_size,
+            max_per_page,
+            DIR_SITEMAP,
+        )
 
+    os.makedirs(DIR_SITEMAP, exist_ok=True)
     path = DIR_SITEMAP + "sitemap.xml"
     fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC)
 
