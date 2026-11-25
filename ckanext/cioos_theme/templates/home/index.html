@@ -1,4 +1,7 @@
 {% extends "page.html" %} {% set homepage_page = h.cioos_get_homepage_path() %}
+{#- The home page styles go in <head>: an {% asset %} in the body snippet only
+    renders at the end of <body>, so the EOV icons would flash at full size. #}
+{% block styles %}{{ super() }}{% asset 'ckanext-cioos_theme/home_css' %}{% endblock %}
 {% block subtitle %}{% endblock %} {% block maintag %}{% endblock %} {% block
 toolbar %}{% endblock %} {% block content %}
 <div class="homepage">

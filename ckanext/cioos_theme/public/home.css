@@ -1,8 +1,8 @@
 /*
   Home page styles for home/default_home.html and home/default_home_compact.html,
   plus the EOV cards (home/snippets/eov_grid.html), which
-  default_home_v2.html also uses. Loaded through the home_css asset, so only
-  home pages pull it in.
+  default_home_v2.html also uses. Loaded in <head> by home/index.html through the
+  home_css asset, so only home pages pull it in.
 */
 
 .cioos-home {
