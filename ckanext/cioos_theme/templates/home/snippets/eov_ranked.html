@@ -2,11 +2,12 @@
   Essential Ocean Variables by category: one column per category (up to
   four), each a panel of cards ranked by dataset count, stacked one per row.
   A card shows the icon (flush with its bottom-left corner), the label and,
-  as on the tile cards, the dataset count in a tab in its top-right corner. A filter box above the columns narrows the cards by
-  name as you type (the eov-filter module); the columns themselves stay put,
-  and one with no match says so. It needs JavaScript, so it stays hidden
-  without it. Styled by home.css. Place it under an h2: category
-  titles are h3.
+  as on the tile cards, the dataset count in a tab in its top-right corner;
+  the full label fits in up to three lines. A filter box above the
+  columns narrows the cards by name as you type (the eov-filter module); the
+  columns themselves stay put, and one with no match says so. It needs
+  JavaScript, so it stays hidden without it. Styled by home.css. Place it
+  under an h2: category titles are h3.
 
   Example:
     {% snippet 'home/snippets/eov_ranked.html' %}
@@ -40,10 +41,10 @@
           {%- set img_url = h.cioos_eov_icon_url(item) %}
         <li class="eov-row{{ ' eov-row--empty' if item.count == 0 }}">
           {%- if item.count > 0 %}
-          <a class="eov-row-link" href="{{ h.url_for('dataset.search', eov=item.name) }}" title="{{ label }}">
+          <a class="eov-row-link" href="{{ h.url_for('dataset.search', eov=item.name) }}">
           {%- else %}
           {#- A variable with no datasets is not a link: its search would be empty. #}
-          <span class="eov-row-link" title="{{ label }}">
+          <span class="eov-row-link">
           {%- endif %}
             {#- Decorative: the label beside it names the variable. #}
             <img class="eov-row-icon" src="{{ img_url }}" alt="" loading="lazy" />
