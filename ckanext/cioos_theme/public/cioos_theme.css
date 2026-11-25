@@ -1187,7 +1187,8 @@ aside #dataset-map {
 
 /* ===========================================
    Resource List (Dataset Resources)
-   Rounded corners for resource items
+   Items stack touching, sharing a 1px border (the -1px margin), so only
+   the list's outer corners are rounded.
    =========================================== */
 .resource-list {
   margin: 0;
@@ -1195,9 +1196,23 @@ aside #dataset-map {
 
 .resource-list .resource-item {
   border: 1px solid var(--bs-border-color);
-  margin-bottom: 7px;
-  border-radius: 14px;
-  margin-left: 0;
+  margin: 0;
+  border-radius: 0;
+  transition: background-color 0.15s ease;
+}
+
+.resource-list .resource-item + .resource-item {
+  margin-top: -1px;
+}
+
+.resource-list .resource-item:first-child {
+  border-top-left-radius: 14px;
+  border-top-right-radius: 14px;
+}
+
+.resource-list .resource-item:last-child {
+  border-bottom-left-radius: 14px;
+  border-bottom-right-radius: 14px;
 }
 
 /* Cover the item's 1px border on top/right/bottom so the button's outline
@@ -1209,32 +1224,30 @@ aside #dataset-map {
   padding: 0;
 }
 
-.resource-list .resource-item .btn-group .btn {
-  border-radius: 0 14px 14px 0;
-  height: 100%;
-  /* Part of the item, not a box of its own: transparent, so the item's
-     outline shows through its (transparent) border, with teal text. The
-     hover/open tint matches the Related Works cards and is clipped inside
-     the border so the outline stays unbroken. */
-  --bs-btn-bg: transparent;
-  --bs-btn-border-color: transparent;
-  --bs-btn-color: var(--cioos-primary-dark);
-  --bs-btn-hover-bg: color-mix(in srgb, var(--cioos-primary) 6%, white);
-  --bs-btn-hover-border-color: transparent;
-  --bs-btn-hover-color: var(--cioos-primary-dark);
-  --bs-btn-active-bg: color-mix(in srgb, var(--cioos-primary) 6%, white);
-  --bs-btn-active-border-color: transparent;
-  --bs-btn-active-color: var(--cioos-primary-dark);
-  background-clip: padding-box;
-  background-color: var(--bs-btn-bg);
-  border-color: var(--bs-btn-border-color);
-  color: var(--bs-btn-color);
-}
+/* Part of the item, not a box of its own: transparent in every state, with
+   teal text, so the item's outline and its hover tint show through. */
+.resource-list .resource-item .btn-group .btn,
 .resource-list .resource-item .btn-group .btn:hover,
+.resource-list .resource-item .btn-group .btn:active,
 .resource-list .resource-item .btn-group .btn.show {
-  background-color: var(--bs-btn-hover-bg);
-  border-color: var(--bs-btn-hover-border-color);
-  color: var(--bs-btn-hover-color);
+  border-radius: 0;
+  height: 100%;
+  background-color: transparent;
+  border-color: transparent;
+  color: var(--cioos-primary-dark);
+}
+.resource-list .resource-item:first-child .btn-group .btn {
+  border-top-right-radius: 14px;
+}
+.resource-list .resource-item:last-child .btn-group .btn {
+  border-bottom-right-radius: 14px;
+}
+
+/* One hover for every dataset-page card (resources, related works): a
+   light teal tint over the whole card; borders and text stay as they are. */
+.resource-list .resource-item:hover,
+.relationship-link:hover {
+  background-color: color-mix(in srgb, var(--cioos-primary) 6%, white);
 }
 
 .resource-list .resource-item .heading {
@@ -1371,6 +1384,27 @@ aside #dataset-map {
   min-width: 150px;
   width: 100%;
   margin-inline-start: 10px;
+}
+
+/* Contact cards stack touching like the resource list: a shared 1px border
+   (the -1px margin), with only the group's outer corners rounded */
+#contacts-container > .card {
+  margin: 0;
+  border-radius: 0;
+}
+
+#contacts-container > .card + .card {
+  margin-top: -1px;
+}
+
+#contacts-container > .card:first-child {
+  border-top-left-radius: 14px;
+  border-top-right-radius: 14px;
+}
+
+#contacts-container > .card:last-child {
+  border-bottom-left-radius: 14px;
+  border-bottom-right-radius: 14px;
 }
 
 /* Contact role list — drop bullets, inline-flex left-aligned */
@@ -1599,14 +1633,21 @@ h1 .translation_icon_group {
   justify-content: center;
   gap: 0 0.5rem;
 }
+/* Border and text are pinned for every state, overriding CKAN core's
+   white-on-blue a.tag:hover; the hover is the same light teal tint as the
+   resource and related-works cards. */
+.tag,
+a.tag:hover {
+  border: 1px solid var(--bs-border-color);
+  box-shadow: none;
+  color: var(--bs-emphasis-color);
+}
 .tag {
   background-color: white;
+  transition: background-color 0.15s ease;
 }
 a.tag:hover {
-  background-color: var(--cioos-accent);
-  border: none;
-  color: white;
-  box-shadow: none;
+  background-color: color-mix(in srgb, var(--cioos-primary) 6%, white);
 }
 
 .card {
@@ -1805,17 +1846,31 @@ td .panel {
 
 /* ===========================================
    Related Works (dataset page)
-   Bordered cards matching the resource list
+   Bordered cards matching the resource list: stacked touching, sharing
+   a 1px border, with only the list's outer corners rounded
    =========================================== */
 .relationship-list {
-  display: grid;
-  gap: 7px;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
+.relationship-item + .relationship-item {
+  margin-top: -1px;
+}
+
+.relationship-item:first-child .relationship-link {
+  border-top-left-radius: 14px;
+  border-top-right-radius: 14px;
+}
+
+.relationship-item:last-child .relationship-link {
+  border-bottom-left-radius: 14px;
+  border-bottom-right-radius: 14px;
+}
+
 .relationship-link {
+  position: relative;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -1823,22 +1878,20 @@ td .panel {
   gap: 0.5rem 1rem;
   padding: 10px 15px;
   border: 1px solid var(--bs-border-color);
-  border-radius: 14px;
+  border-radius: 0;
   color: inherit;
   text-decoration: none;
-  transition:
-    border-color 0.15s ease,
-    background-color 0.15s ease;
+  transition: background-color 0.15s ease;
 }
 
 .relationship-link:hover {
-  border-color: var(--cioos-primary);
-  background-color: color-mix(in srgb, var(--cioos-primary) 6%, white);
   color: inherit;
   text-decoration: none;
 }
 
+/* Lift the focused card so its outline isn't covered by the next card */
 .relationship-link:focus-visible {
+  z-index: 1;
   outline: 2px solid var(--cioos-primary-dark);
   outline-offset: 2px;
 }
@@ -1851,8 +1904,11 @@ td .panel {
   min-width: 0;
 }
 
+/* Same look as the resource-list headings (CKAN core: #000, 14px; the
+   theme sets their weight to 600) */
 .relationship-title {
-  color: var(--cioos-primary-dark);
+  color: var(--bs-emphasis-color);
+  font-size: 14px;
   font-weight: 600;
 }
 
