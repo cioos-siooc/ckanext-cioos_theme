@@ -3,11 +3,11 @@
   four), each a panel of cards ranked by dataset count, stacked one per row.
   A card shows the icon (flush with its bottom-left corner), the label and,
   as on the tile cards, the dataset count in a tab in its top-right corner;
-  the full label fits in up to three lines. A filter box above the
-  columns narrows the cards by name as you type (the eov-filter module); the
-  columns themselves stay put, and one with no match says so. It needs
-  JavaScript, so it stays hidden without it. Styled by home.css. Place it
-  under an h2: category titles are h3.
+  the full label fits in up to three lines (four, in a smaller font, for the
+  longest). A filter box above the columns narrows the cards by name as you
+  type (the eov-filter module); the columns themselves stay put, and one
+  with no match says so. It needs JavaScript, so it stays hidden without it.
+  Styled by home.css. Place it under an h2: category titles are h3.
 
   Example:
     {% snippet 'home/snippets/eov_ranked.html' %}
@@ -48,7 +48,8 @@
           {%- endif %}
             {#- Decorative: the label beside it names the variable. #}
             <img class="eov-row-icon" src="{{ img_url }}" alt="" loading="lazy" />
-            <span class="eov-row-text">
+            {#- The longest labels (over 55 characters) take a smaller font to fit. #}
+            <span class="eov-row-text{{ ' eov-row-text--long' if label|length > 55 }}">
               <span class="eov-row-label">{{ label }}</span>
             </span>
             {%- if item.count > 0 %}

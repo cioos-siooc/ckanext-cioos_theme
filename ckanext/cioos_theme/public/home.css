@@ -477,6 +477,11 @@ a.eov-row-link:focus-visible {
     font-size: 0.75rem;
   }
 }
+/* The longest labels (set by the template) take a smaller font: four lines
+   fit in the card. */
+.eov-row-text--long {
+  font-size: 0.875em;
+}
 /* Keeps the first line clear of the count tab (up to four digits); the
    lines under the tab use the card's full width. */
 .eov-row-text::before {
