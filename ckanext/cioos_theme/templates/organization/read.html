@@ -22,9 +22,7 @@ packages=page.items) }} {% endif %} {% endblock %} {% block page_pagination %}
 %}
 <div class="filters">
   <div>
-    {% set default_extent = h.spatial_default_extent() if
-    h.cioos_helper_available('spatial_default_extent') else
-    h.cioos_get_cfg('ckan.spatial.default_extent', '[-180,-90,180,90]') %} {%
+    {% set default_extent = h.cioos_spatial_default_extent() %} {%
     snippet "spatial/snippets/spatial_query.html", default_extent=default_extent
     %} {% snippet "snippets/daterange.html" %} {% for facet in facet_titles %}
     {{ h.snippet('snippets/facet_list.html', title=facet_titles[facet],

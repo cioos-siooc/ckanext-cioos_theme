@@ -5,7 +5,7 @@
 #}
 {% set lang = h.lang() %}
 {% set resorg_facet = 'resorg_groups_' + lang %}
-{% set default_extent = h.spatial_default_extent() if h.cioos_helper_available('spatial_default_extent') else h.cioos_get_cfg('ckan.spatial.default_extent', '[-180,-90,180,90]') %}
+{% set default_extent = h.cioos_spatial_default_extent() %}
 {# Populate c.search_facets using the existing helper (same as search page).
    cioos_get_eovs also reads c.search_facets directly — get_facet_items_dict
    can silently return [] on the home page, so we do the same here. #}

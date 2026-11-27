@@ -161,6 +161,17 @@ def helper_available(helper_name):
     return True
 
 
+def spatial_default_extent():
+    """Initial extent of the search maps, as Leaflet bounds [[lat, lon], [lat, lon]].
+
+    Read from ``ckanext.spatial.default_extent`` (``CKANEXT__SPATIAL__DEFAULT_EXTENT``);
+    defaults to the whole world.
+    """
+    return toolkit.config.get(
+        "ckanext.spatial.default_extent", "[[-90, -180], [90, 180]]"
+    )
+
+
 THEME_COLOR_TOKENS = {
     "ckan.cioos.primary_color": "--cioos-primary",
     "ckan.cioos.primary_dark_color": "--cioos-primary-dark",

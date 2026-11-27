@@ -746,6 +746,7 @@ class Cioos_ThemePlugin(plugins.SingletonPlugin, DefaultTranslation):
             "cioos_get_datacite_org": cioos_helpers.get_datacite_org,
             "cioos_get_datacite_test_mode": cioos_helpers.get_datacite_test_mode,
             "cioos_helper_available": cioos_helpers.helper_available,
+            "cioos_spatial_default_extent": cioos_helpers.spatial_default_extent,
             "cioos_group_contacts": self.group_by_ind_or_org,
             "cioos_get_fully_qualified_package_uri": cioos_helpers.get_fully_qualified_package_uri,
             "cioos_version": cioos_helpers.cioos_version,

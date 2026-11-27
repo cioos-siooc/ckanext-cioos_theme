@@ -114,3 +114,22 @@ def test_eov_icon_url_and_view_serve_recolored_icon(app, test_request_context):
     assert response.headers["Content-Type"].startswith("image/svg+xml")
     assert "#1b6ca8" in response.body
     app.get("/eov-icon/..%2Fplugin.py", status=404)
+
+
+@pytest.mark.ckan_config("ckanext.spatial.default_extent", "[[40.0, -71.0], [62.0, -42.0]]")
+def test_spatial_default_extent_reads_ckanext_spatial_key():
+    from ckanext.cioos_theme.helpers import spatial_default_extent
+
+    assert spatial_default_extent() == "[[40.0, -71.0], [62.0, -42.0]]"
+
+
+def test_spatial_default_extent_defaults_to_leaflet_world_bounds():
+    from ckanext.cioos_theme.helpers import spatial_default_extent
+
+    assert spatial_default_extent() == "[[-90, -180], [90, 180]]"
+
+
+@pytest.mark.usefixtures("with_plugins")
+@pytest.mark.ckan_config("ckanext.spatial.default_extent", "[[40.0, -71.0], [62.0, -42.0]]")
+def test_spatial_default_extent_rendered_on_search_map(app):
+    assert 'data-default_extent="[[40.0, -71.0], [62.0, -42.0]]"' in app.get("/dataset/").body

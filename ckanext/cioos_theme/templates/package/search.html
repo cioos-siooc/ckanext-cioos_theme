@@ -3,9 +3,7 @@ styles %} {{ super() }} {% asset 'ckanext-spatial/spatial_query_css' %} {%
 endblock %} {% block scripts %} {{ super() }} {% asset
 'ckanext-spatial/spatial_query_js' %} {% asset
 'ckanext-cioos_theme/spatial_fix_js' %} {% endblock %} {% set lang = h.lang() %}
-{% set default_extent = h.spatial_default_extent() if
-h.cioos_helper_available('spatial_default_extent') else
-h.cioos_get_cfg('ckan.spatial.default_extent', '[-180,-90,180,90]') %} {% set
+{% set default_extent = h.cioos_spatial_default_extent() %} {% set
 dataset_extents_url = h.cioos_get_dataset_extents_url(q=c.q, fields=c.fields,
 bbox_values=request.args.get('ext_bbox'), output='json') %} {% set
 ra_extents_url = h.cioos_get_ra_extents_url() %} {% block subtitle %}{{
