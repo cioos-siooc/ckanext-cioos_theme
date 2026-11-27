@@ -1235,6 +1235,10 @@ aside #dataset-map {
   background-color: transparent;
   border-color: transparent;
   color: var(--cioos-primary-dark);
+  /* Bootstrap's default button bevel (inset top highlight + drop shadow);
+     the focus ring is a separate variable and still shows. */
+  --bs-btn-box-shadow: none;
+  --bs-btn-active-shadow: none;
 }
 .resource-list .resource-item:first-child .btn-group .btn {
   border-top-right-radius: 14px;
